@@ -23,6 +23,7 @@ import {
 } from '@/logic/recommendationEngine'
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from '@/data/tobaccos'
 import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
+import { IconTarget } from '@/components/Icons'
 
 // Mix item for the builder
 interface SelectedTobacco {
@@ -804,7 +805,9 @@ export default function RecommendPage() {
             className="card card-elevated text-center py-12"
             style={{ color: 'var(--color-textMuted)' }}
           >
-            <div className="text-4xl mb-4">🎯</div>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
+              <IconTarget size={32} />
+            </div>
             <p className="text-lg font-medium" style={{ color: 'var(--color-text)' }}>
               Выберите предпочтения
             </p>

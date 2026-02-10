@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
+import { IconStar, IconMix, IconTrash } from '@/components/Icons'
 import type { SavedMix, SavedMixTobacco } from '@/types/database'
 
 interface SavedMixesDrawerProps {
@@ -110,7 +111,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                   color: filterBy === option.value ? 'var(--color-bg)' : 'var(--color-text)',
                 }}
               >
-                {option.value === 'favorites' && '⭐ '}
+                {option.value === 'favorites' && <IconStar size={14} className="inline mr-1 text-[var(--color-warning)]" />}
                 {option.label}
               </button>
             ))}
@@ -146,7 +147,9 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
             </div>
           ) : filteredMixes.length === 0 ? (
             <div className="text-center py-12" style={{ color: 'var(--color-textMuted)' }}>
-              <div className="text-4xl mb-4">📋</div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
+                <IconMix size={32} />
+              </div>
               <p className="font-medium">Нет сохранённых миксов</p>
               <p className="text-sm mt-2">
                 {filterBy === 'favorites'
@@ -169,7 +172,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                           {mix.name}
                         </h3>
                         {mix.is_favorite && (
-                          <span className="text-sm">⭐</span>
+                          <IconStar size={14} className="text-[var(--color-warning)]" />
                         )}
                       </div>
                       <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
@@ -234,7 +237,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                       }}
                       title={mix.is_favorite ? 'Убрать из избранного' : 'В избранное'}
                     >
-                      {mix.is_favorite ? '⭐' : '☆'}
+                      <IconStar size={16} className={mix.is_favorite ? 'text-[var(--color-warning)]' : 'text-[var(--color-textMuted)]'} />
                     </button>
                     <button
                       onClick={() => handleDelete(mix.id)}
@@ -248,7 +251,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                       }}
                       title="Удалить"
                     >
-                      🗑️
+                      <IconTrash size={16} />
                     </button>
                   </div>
                 </div>

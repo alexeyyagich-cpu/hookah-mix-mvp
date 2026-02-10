@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
+import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus } from '@/components/Icons'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
 
@@ -42,8 +43,9 @@ export default function SessionsPage() {
             {isFreeTier && ' за последние 30 дней'}
           </p>
         </div>
-        <Link href="/mix" className="btn btn-primary">
-          💨 Создать сессию
+        <Link href="/mix" className="btn btn-primary flex items-center gap-2">
+          <IconPlus size={18} />
+          Создать сессию
         </Link>
       </div>
 
@@ -51,7 +53,9 @@ export default function SessionsPage() {
       {isFreeTier && (
         <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">📅</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-warning)]/20 flex items-center justify-center text-[var(--color-warning)]">
+              <IconCalendar size={20} />
+            </div>
             <div className="flex-1">
               <h3 className="font-semibold">Ограниченная история</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
@@ -84,7 +88,9 @@ export default function SessionsPage() {
       {error && (
         <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">❌</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-danger)]/20 flex items-center justify-center text-[var(--color-danger)]">
+              <IconWarning size={20} />
+            </div>
             <p className="text-[var(--color-danger)]">{error}</p>
           </div>
         </div>
@@ -98,7 +104,9 @@ export default function SessionsPage() {
         </div>
       ) : filteredSessions.length === 0 ? (
         <div className="card p-12 text-center">
-          <div className="text-5xl mb-4">💨</div>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
+            <IconSmoke size={32} className="text-[var(--color-textMuted)]" />
+          </div>
           <h3 className="text-lg font-semibold mb-2">
             {filter ? 'Ничего не найдено' : 'Нет сессий'}
           </h3>
@@ -156,8 +164,9 @@ export default function SessionsPage() {
                   })}
                 </div>
                 {selectedSession.bowl_type && (
-                  <span className="badge badge-primary">
-                    🥣 {selectedSession.bowl_type.name}
+                  <span className="badge badge-primary flex items-center gap-1">
+                    <IconBowl size={14} />
+                    {selectedSession.bowl_type.name}
                   </span>
                 )}
               </div>

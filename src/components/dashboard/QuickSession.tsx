@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { TOBACCOS } from '@/data/tobaccos'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
+import { IconSmoke } from '@/components/Icons'
 import type { Session, SessionItem, TobaccoInventory } from '@/types/database'
 
 interface MixItem {
@@ -109,7 +110,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
-            💨 Сохранить сессию
+            <IconSmoke size={22} className="text-[var(--color-primary)]" />
+            Сохранить сессию
           </h2>
           <button
             onClick={onClose}

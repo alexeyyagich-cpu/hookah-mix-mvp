@@ -9,6 +9,7 @@ import {
   type QuickRepeatResult,
   type QuickRepeatError,
 } from '@/logic/quickRepeatEngine'
+import { IconFire } from '@/components/Icons'
 import type { Guest, MixSnapshot } from '@/types/database'
 import { TOBACCOS } from '@/data/tobaccos'
 
@@ -199,7 +200,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                 className="p-3 rounded-lg flex items-center gap-2"
                 style={{ background: 'color-mix(in srgb, var(--color-primary) 10%, transparent)' }}
               >
-                <span>🔥</span>
+                <IconFire size={18} className="text-[var(--color-warning)]" />
                 <span className="text-sm" style={{ color: 'var(--color-text)' }}>
                   {formatHeatSetup(repeatResult.snapshot.heat_setup)}
                 </span>

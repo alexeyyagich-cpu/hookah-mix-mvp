@@ -10,6 +10,17 @@ import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart
 import { PopularFlavorsChart } from '@/components/dashboard/Charts/PopularFlavorsChart'
 import { BrandPieChart } from '@/components/dashboard/Charts/BrandPieChart'
 import { exportStatisticsCSV, exportStatisticsPDF } from '@/lib/utils/exportReport'
+import {
+  IconSmoke,
+  IconChart,
+  IconScale,
+  IconTarget,
+  IconStar,
+  IconTrendUp,
+  IconLock,
+  IconExport,
+  IconWarning,
+} from '@/components/Icons'
 
 type ViewMode = 'overview' | 'comparison'
 
@@ -132,7 +143,7 @@ export default function StatisticsPage() {
                   } ${isFreeTier && (option.value === '90d' || option.value === 'all') ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {option.label}
-                  {isFreeTier && (option.value === '90d' || option.value === 'all') && ' 🔒'}
+                  {isFreeTier && (option.value === '90d' || option.value === 'all') && <IconLock size={12} className="inline ml-1" />}
                 </button>
               ))}
             </div>
@@ -143,10 +154,11 @@ export default function StatisticsPage() {
             <button
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport}
-              className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               title={canExport ? 'Экспорт данных' : 'Доступно на Pro'}
             >
-              📊 Экспорт {!canExport && '🔒'}
+              <IconExport size={18} />
+              Экспорт {!canExport && <IconLock size={14} />}
             </button>
 
             {exportMenuOpen && canExport && (
@@ -155,13 +167,15 @@ export default function StatisticsPage() {
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
-                  📄 Экспорт CSV
+                  <IconChart size={16} />
+                  Экспорт CSV
                 </button>
                 <button
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
-                  📑 Экспорт PDF
+                  <IconExport size={16} />
+                  Экспорт PDF
                 </button>
               </div>
             )}
@@ -173,7 +187,9 @@ export default function StatisticsPage() {
       {isFreeTier && (
         <div className="card p-4 border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">📈</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)]/20 flex items-center justify-center text-[var(--color-primary)]">
+              <IconTrendUp size={22} />
+            </div>
             <div className="flex-1">
               <h3 className="font-semibold">Расширенная аналитика</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
@@ -191,7 +207,9 @@ export default function StatisticsPage() {
       {error && (
         <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">❌</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-danger)]/20 flex items-center justify-center text-[var(--color-danger)]">
+              <IconWarning size={20} />
+            </div>
             <p className="text-[var(--color-danger)]">{error}</p>
           </div>
         </div>
@@ -235,7 +253,9 @@ export default function StatisticsPage() {
             </div>
           ) : !periodA || !periodB || !comparison ? (
             <div className="card p-12 text-center">
-              <div className="text-5xl mb-4">📊</div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
+                <IconChart size={32} className="text-[var(--color-textMuted)]" />
+              </div>
               <h3 className="text-lg font-semibold mb-2">Недостаточно данных</h3>
               <p className="text-[var(--color-textMuted)]">
                 Нужны данные за оба периода для сравнения
@@ -246,28 +266,28 @@ export default function StatisticsPage() {
               {/* Comparison Cards */}
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <ComparisonCard
-                  icon="💨"
+                  icon={<IconSmoke size={18} />}
                   label="Сессий"
                   periodAValue={periodA.totalSessions}
                   periodBValue={periodB.totalSessions}
                   change={comparison.sessionsChange}
                 />
                 <ComparisonCard
-                  icon="📊"
+                  icon={<IconChart size={18} />}
                   label="Расход (г)"
                   periodAValue={periodA.totalGramsUsed}
                   periodBValue={periodB.totalGramsUsed}
                   change={comparison.gramsChange}
                 />
                 <ComparisonCard
-                  icon="⚖️"
+                  icon={<IconScale size={18} />}
                   label="Средний расход (г)"
                   periodAValue={periodA.averageSessionGrams}
                   periodBValue={periodB.averageSessionGrams}
                   change={comparison.avgGramsChange}
                 />
                 <ComparisonCard
-                  icon="🎯"
+                  icon={<IconTarget size={18} />}
                   label="Совместимость"
                   periodAValue={`${periodA.averageCompatibilityScore}%`}
                   periodBValue={`${periodB.averageCompatibilityScore}%`}
@@ -275,7 +295,7 @@ export default function StatisticsPage() {
                   isPercentChange={false}
                 />
                 <ComparisonCard
-                  icon="⭐"
+                  icon={<IconStar size={18} />}
                   label="Рейтинг"
                   periodAValue={periodA.averageRating}
                   periodBValue={periodB.averageRating}
@@ -338,7 +358,9 @@ export default function StatisticsPage() {
         </div>
       ) : viewMode === 'overview' && !statistics ? (
         <div className="card p-12 text-center">
-          <div className="text-5xl mb-4">📊</div>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
+            <IconChart size={32} className="text-[var(--color-textMuted)]" />
+          </div>
           <h3 className="text-lg font-semibold mb-2">Нет данных</h3>
           <p className="text-[var(--color-textMuted)]">
             Создайте несколько сессий для появления статистики
@@ -349,32 +371,32 @@ export default function StatisticsPage() {
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <StatsCard
-              icon="💨"
+              icon={<IconSmoke size={20} />}
               label="Сессий"
               value={statistics.totalSessions}
               color="primary"
             />
             <StatsCard
-              icon="📊"
+              icon={<IconChart size={20} />}
               label="Расход"
               value={`${statistics.totalGramsUsed}г`}
               color="success"
             />
             <StatsCard
-              icon="⚖️"
+              icon={<IconScale size={20} />}
               label="Средний расход"
               value={`${statistics.averageSessionGrams}г`}
               subtext="на сессию"
             />
             <StatsCard
-              icon="🎯"
+              icon={<IconTarget size={20} />}
               label="Совместимость"
               value={`${statistics.averageCompatibilityScore}%`}
               subtext="в среднем"
               color="primary"
             />
             <StatsCard
-              icon="⭐"
+              icon={<IconStar size={20} />}
               label="Рейтинг"
               value={`${statistics.averageRating}/5`}
               subtext="средняя оценка"
@@ -441,7 +463,10 @@ export default function StatisticsPage() {
           {/* Low Stock Alert */}
           {statistics.lowStockItems.length > 0 && (
             <div className="card">
-              <h2 className="text-lg font-semibold mb-4">⚠️ Заканчивающиеся табаки</h2>
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <IconWarning size={20} className="text-[var(--color-warning)]" />
+                Заканчивающиеся табаки
+              </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {statistics.lowStockItems.map((item) => (
                   <div

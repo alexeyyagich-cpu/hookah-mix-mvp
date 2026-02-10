@@ -19,6 +19,9 @@ import {
   IconPacking,
   IconCoals,
   IconTimer,
+  IconTarget,
+  IconStar,
+  IconMix,
 } from "@/components/Icons";
 import { MIX_RECIPES, type MixRecipe } from "@/data/mixes";
 import { calculateMix, validateMix, type MixItem } from "@/logic/mixCalculator";
@@ -450,7 +453,7 @@ export default function MixPage() {
                 color: "var(--color-text)",
               }}
             >
-              <span>🎯</span>
+              <IconTarget size={16} />
               <span className="hidden md:inline">Подбор</span>
             </Link>
 
@@ -465,7 +468,7 @@ export default function MixPage() {
                   color: "var(--color-text)",
                 }}
               >
-                <span>📋</span>
+                <IconMix size={16} />
                 <span className="hidden md:inline">Миксы</span>
                 <span className={`transition-transform text-xs ${isMixesMenuOpen ? 'rotate-180' : ''}`}>▼</span>
               </button>
@@ -484,7 +487,7 @@ export default function MixPage() {
                       className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors"
                       style={{ color: "var(--color-text)" }}
                     >
-                      <span>📋</span>
+                      <IconMix size={16} />
                       <span>Рецепты миксов</span>
                     </button>
                     {user && (
@@ -493,7 +496,7 @@ export default function MixPage() {
                         className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors border-t"
                         style={{ color: "var(--color-text)", borderColor: "var(--color-border)" }}
                       >
-                        <span>⭐</span>
+                        <IconStar size={16} className="text-[var(--color-warning)]" />
                         <span>Мои сохранённые</span>
                       </button>
                     )}

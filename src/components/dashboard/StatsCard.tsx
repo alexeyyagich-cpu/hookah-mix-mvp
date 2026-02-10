@@ -1,5 +1,7 @@
+import { ReactNode } from 'react'
+
 interface StatsCardProps {
-  icon: string
+  icon: ReactNode
   label: string
   value: string | number
   subtext?: string
@@ -18,11 +20,20 @@ export function StatsCard({ icon, label, value, subtext, trend, color = 'primary
     danger: 'text-[var(--color-danger)]',
   }
 
+  const bgClasses = {
+    primary: 'bg-[var(--color-primary)]/10',
+    success: 'bg-[var(--color-success)]/10',
+    warning: 'bg-[var(--color-warning)]/10',
+    danger: 'bg-[var(--color-danger)]/10',
+  }
+
   return (
     <div className="card p-5 hover:border-[var(--color-borderAccent)] transition-colors">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{icon}</span>
+          <div className={`w-10 h-10 rounded-lg ${bgClasses[color]} ${colorClasses[color]} flex items-center justify-center`}>
+            {icon}
+          </div>
           <span className="text-sm text-[var(--color-textMuted)]">{label}</span>
         </div>
         {trend && (

@@ -5,14 +5,25 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
+import {
+  IconDashboard,
+  IconInventory,
+  IconBowl,
+  IconSession,
+  IconChart,
+  IconSettings,
+  IconCalculator,
+  IconLogout,
+  IconSmoke,
+} from '@/components/Icons'
 
 const navigation = [
-  { name: 'Обзор', href: '/dashboard', icon: '📊' },
-  { name: 'Инвентарь', href: '/inventory', icon: '📦' },
-  { name: 'Чаши', href: '/bowls', icon: '🥣' },
-  { name: 'Сессии', href: '/sessions', icon: '💨' },
-  { name: 'Статистика', href: '/statistics', icon: '📈' },
-  { name: 'Настройки', href: '/settings', icon: '⚙️' },
+  { name: 'Обзор', href: '/dashboard', Icon: IconDashboard },
+  { name: 'Инвентарь', href: '/inventory', Icon: IconInventory },
+  { name: 'Чаши', href: '/bowls', Icon: IconBowl },
+  { name: 'Сессии', href: '/sessions', Icon: IconSession },
+  { name: 'Статистика', href: '/statistics', Icon: IconChart },
+  { name: 'Настройки', href: '/settings', Icon: IconSettings },
 ]
 
 export function Sidebar() {
@@ -26,7 +37,9 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-4 border-b border-[var(--color-border)]">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <span className="text-2xl">💨</span>
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
+            <IconSmoke size={22} color="var(--color-bg)" />
+          </div>
           <div>
             <div className="font-bold">Hookah Mix</div>
             <div className="text-xs text-[var(--color-textMuted)]">Бизнес-кабинет</div>
@@ -53,6 +66,7 @@ export function Sidebar() {
       <nav className="flex-1 p-3 space-y-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href
+          const Icon = item.Icon
           return (
             <Link
               key={item.name}
@@ -64,7 +78,7 @@ export function Sidebar() {
                   : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon size={20} />
               {item.name}
             </Link>
           )
@@ -92,14 +106,14 @@ export function Sidebar() {
           href="/mix"
           className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)] transition-colors"
         >
-          <span className="text-lg">🎰</span>
+          <IconCalculator size={20} />
           Калькулятор миксов
         </Link>
         <button
           onClick={() => signOut()}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
         >
-          <span className="text-lg">🚪</span>
+          <IconLogout size={20} />
           Выйти
         </button>
       </div>

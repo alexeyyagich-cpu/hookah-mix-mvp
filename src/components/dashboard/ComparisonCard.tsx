@@ -1,7 +1,9 @@
 'use client'
 
+import { ReactNode } from 'react'
+
 interface ComparisonCardProps {
-  icon: string
+  icon: ReactNode
   label: string
   periodAValue: string | number
   periodBValue: string | number
@@ -36,7 +38,9 @@ export function ComparisonCard({
   return (
     <div className="card p-4">
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">{icon}</span>
+        <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)]">
+          {icon}
+        </div>
         <span className="text-sm font-medium text-[var(--color-textMuted)]">{label}</span>
       </div>
 

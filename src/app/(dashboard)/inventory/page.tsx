@@ -7,6 +7,7 @@ import { useStatistics } from '@/lib/hooks/useStatistics'
 import { InventoryTable } from '@/components/dashboard/InventoryTable'
 import { AddTobaccoModal } from '@/components/dashboard/AddTobaccoModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
+import { IconExport, IconChart, IconLock, IconPlus } from '@/components/Icons'
 import type { TobaccoInventory } from '@/types/database'
 
 export default function InventoryPage() {
@@ -117,10 +118,11 @@ export default function InventoryPage() {
             <button
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport || inventory.length === 0}
-              className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               title={canExport ? 'Экспорт инвентаря' : 'Доступно на Pro'}
             >
-              📊 {!canExport && '🔒'}
+              <IconExport size={18} />
+              {!canExport && <IconLock size={14} />}
             </button>
 
             {exportMenuOpen && canExport && (
@@ -129,13 +131,15 @@ export default function InventoryPage() {
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
-                  📄 Экспорт CSV
+                  <IconChart size={16} />
+                  Экспорт CSV
                 </button>
                 <button
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
-                  📑 Экспорт PDF
+                  <IconExport size={16} />
+                  Экспорт PDF
                 </button>
               </div>
             )}

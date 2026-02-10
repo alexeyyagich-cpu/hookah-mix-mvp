@@ -10,6 +10,16 @@ import { StatsCard } from '@/components/dashboard/StatsCard'
 import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart'
 import { PopularFlavorsChart } from '@/components/dashboard/Charts/PopularFlavorsChart'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
+import {
+  IconSession,
+  IconScale,
+  IconStar,
+  IconPercent,
+  IconWarning,
+  IconSmoke,
+  IconCalculator,
+  IconArrowRight,
+} from '@/components/Icons'
 import Link from 'next/link'
 
 export default function DashboardPage() {
@@ -50,35 +60,36 @@ export default function DashboardPage() {
             {profile?.business_name || 'Мое заведение'} — обзор за последние 30 дней
           </p>
         </div>
-        <Link href="/mix" className="btn btn-primary">
-          💨 Калькулятор миксов
+        <Link href="/mix" className="btn btn-primary flex items-center gap-2">
+          <IconCalculator size={18} />
+          Калькулятор миксов
         </Link>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          icon="💨"
+          icon={<IconSession size={20} />}
           label="Сессий"
           value={statistics?.totalSessions || 0}
           color="primary"
         />
         <StatsCard
-          icon="📊"
+          icon={<IconScale size={20} />}
           label="Расход"
           value={`${statistics?.totalGramsUsed || 0}г`}
           subtext="табака использовано"
           color="success"
         />
         <StatsCard
-          icon="⭐"
+          icon={<IconStar size={20} />}
           label="Рейтинг"
           value={statistics?.averageRating ? `${statistics.averageRating}/5` : '—'}
           subtext="средняя оценка"
           color="warning"
         />
         <StatsCard
-          icon="🎯"
+          icon={<IconPercent size={20} />}
           label="Совместимость"
           value={statistics?.averageCompatibilityScore ? `${statistics.averageCompatibilityScore}%` : '—'}
           subtext="в среднем"
@@ -90,7 +101,9 @@ export default function DashboardPage() {
       {(lowStockCount > 0 || outOfStockCount > 0) && (
         <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-warning)]/20 flex items-center justify-center text-[var(--color-warning)]">
+              <IconWarning size={20} />
+            </div>
             <div>
               <h3 className="font-semibold">Внимание к инвентарю</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
@@ -156,7 +169,9 @@ export default function DashboardPage() {
         </div>
         {sessions.length === 0 ? (
           <div className="text-center py-8 text-[var(--color-textMuted)]">
-            <div className="text-4xl mb-4">💨</div>
+            <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
+              <IconSmoke size={24} />
+            </div>
             <p>Пока нет сессий</p>
             <p className="text-sm mt-2">Создайте первую забивку в калькуляторе миксов</p>
           </div>
@@ -168,7 +183,9 @@ export default function DashboardPage() {
                 className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-2xl">💨</div>
+                  <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)]">
+                    <IconSmoke size={20} />
+                  </div>
                   <div>
                     <div className="font-medium">
                       {session.session_items?.map(i => i.flavor).join(' + ') || 'Микс'}
@@ -258,7 +275,7 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium">{mix.name}</span>
-                  {mix.is_favorite && <span className="text-sm">⭐</span>}
+                  {mix.is_favorite && <IconStar size={14} className="text-[var(--color-warning)]" />}
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
                   {mix.tobaccos.slice(0, 3).map((t, i) => (

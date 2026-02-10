@@ -9,6 +9,7 @@ import {
   getSuggestedPrices,
   formatPrice,
 } from '@/logic/costCalculator'
+import { IconCoin } from '@/components/Icons'
 
 interface Props {
   items: { tobacco: Tobacco; percent: number }[]
@@ -53,7 +54,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
         }}
       >
         <p className="flex items-center gap-2">
-          <span>💰</span>
+          <IconCoin size={18} />
           <span>Укажите цены закупки в инвентаре для расчёта себестоимости</span>
         </p>
       </div>
@@ -64,7 +65,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <span className="text-lg">💰</span>
+        <IconCoin size={18} className="text-[var(--color-primary)]" />
         <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
           Себестоимость
         </h3>
