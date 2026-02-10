@@ -5,7 +5,7 @@ import { TOBACCOS, getBrandNames, getCategories, type Category } from "@/data/to
 import MixPieChart from "@/components/MixPieChart";
 import ProgressRing from "@/components/ProgressRing";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import AnimatedSmokeBackground from "@/components/AnimatedSmokeBackground";
+import { SmokeCanvasBackground } from "@/components/SmokeCanvasBackground";
 import TobaccoCard from "@/components/TobaccoCard";
 import MixesDrawer from "@/components/MixesDrawer";
 import Confetti from "@/components/Confetti";
@@ -395,9 +395,9 @@ export default function MixPage() {
   const isAtLimit = selectedIds.length >= 3;
 
   return (
-    <div className="min-h-screen transition-theme relative overflow-hidden bg-gradient-fun" style={{ background: "var(--color-bg)" }}>
-      {/* Animated Smoke Background */}
-      <AnimatedSmokeBackground />
+    <div className="min-h-screen transition-theme relative overflow-hidden">
+      {/* Cinematic Smoke Background */}
+      <SmokeCanvasBackground imageSrc="/images/hookah-hero.jpg" />
 
       {/* Confetti for perfect compatibility */}
       <Confetti active={showConfetti} />

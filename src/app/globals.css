@@ -196,24 +196,27 @@ input[type="range"]::-moz-range-thumb {
 
 /* ========== CARD ========== */
 .card {
-  background: var(--color-bgCard);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bgCard) 75%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
   border-radius: 20px;
   padding: 24px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .card:hover {
   border-color: var(--color-borderAccent);
+  background: color-mix(in srgb, var(--color-bgCard) 85%, transparent);
 }
 
 .card-elevated {
-  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 
 .card-elevated:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
 /* ========== PILL / CHIP ========== */
@@ -337,13 +340,13 @@ input[type="range"]::-moz-range-thumb {
 .stat-card {
   text-align: center;
   padding: 16px 12px;
-  background: var(--color-bgHover);
+  background: color-mix(in srgb, var(--color-bgHover) 70%, transparent);
   border-radius: 16px;
   transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  background: var(--color-bgAccent);
+  background: color-mix(in srgb, var(--color-bgAccent) 80%, transparent);
   transform: scale(1.02);
 }
 
@@ -587,16 +590,6 @@ input[type="range"]::-moz-range-thumb {
 /* ========== PERFECT CELEBRATION ========== */
 .perfect-celebration {
   position: relative;
-}
-
-.perfect-celebration::before {
-  content: '🎉';
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  animation: float 2s ease-in-out infinite;
 }
 
 /* ========== SLOT MACHINE ========== */
