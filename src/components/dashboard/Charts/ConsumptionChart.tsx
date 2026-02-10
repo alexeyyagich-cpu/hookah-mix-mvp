@@ -23,38 +23,47 @@ export function ConsumptionChart({ data }: ConsumptionChartProps) {
   const maxSessions = Math.max(...data.map(d => d.sessions), 1)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Chart */}
-      <div className="h-48 flex items-end gap-1">
+      <div className="relative h-40 flex items-end gap-2 px-1">
         {data.map((day, index) => {
           const barHeight = (day.grams / maxGrams) * 100
 
           return (
             <div
               key={day.date}
-              className="flex-1 flex flex-col items-center gap-1 group"
+              className="flex-1 flex flex-col items-center group relative"
+              style={{ height: '100%' }}
             >
-              {/* Tooltip */}
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center mb-1">
+              {/* Tooltip - absolute positioned */}
+              <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
                 <div className="font-medium">{day.grams}г</div>
-                <div className="text-[var(--color-textMuted)]">{day.sessions} сессий</div>
+                <div className="text-[var(--color-textMuted)]">{day.sessions} сес.</div>
               </div>
 
-              {/* Bar */}
-              <div
-                className="w-full rounded-t-md bg-[var(--color-primary)] hover:bg-[var(--color-primaryHover)] transition-all cursor-pointer"
-                style={{ height: `${Math.max(barHeight, 4)}%` }}
-              />
-
-              {/* Date Label */}
-              {(index === 0 || index === data.length - 1 || data.length <= 7) && (
-                <div className="text-[10px] text-[var(--color-textMuted)] mt-1">
-                  {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
-                </div>
-              )}
+              {/* Bar container - fills available height */}
+              <div className="flex-1 w-full flex items-end">
+                <div
+                  className="w-full rounded-t-md bg-[var(--color-primary)] hover:bg-[var(--color-primaryHover)] transition-all cursor-pointer min-h-[4px]"
+                  style={{ height: `${Math.max(barHeight, 3)}%` }}
+                />
+              </div>
             </div>
           )
         })}
+      </div>
+
+      {/* Date Labels */}
+      <div className="flex gap-2 px-1">
+        {data.map((day, index) => (
+          <div key={day.date} className="flex-1 text-center">
+            {(data.length <= 7 || index === 0 || index === data.length - 1) && (
+              <div className="text-[10px] text-[var(--color-textMuted)]">
+                {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Legend */}
