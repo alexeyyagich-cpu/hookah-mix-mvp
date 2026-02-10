@@ -1,10 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
+
+const BOWL_BACKGROUNDS = [
+  '/images/bowl-bg-1.jpg',
+  '/images/bowl-bg-2.jpg',
+  '/images/bowl-bg-3.jpg',
+]
 
 export default function BowlsPage() {
   const {
@@ -25,6 +32,19 @@ export default function BowlsPage() {
   const [name, setName] = useState('')
   const [capacity, setCapacity] = useState('')
   const [saving, setSaving] = useState(false)
+
+  // Random background image selection
+  const backgroundImage = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * BOWL_BACKGROUNDS.length)
+    return BOWL_BACKGROUNDS[randomIndex]
+  }, [])
+
+  // Background portal
+  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    setBgContainer(document.getElementById('page-background'))
+    return () => setBgContainer(null)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,7 +94,21 @@ export default function BowlsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Background Image via Portal */}
+      {bgContainer && createPortal(
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />,
+        bgContainer
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

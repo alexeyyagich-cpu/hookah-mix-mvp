@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '@/lib/AuthContext'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
@@ -36,6 +38,13 @@ export default function DashboardPage() {
   const lowStockCount = inventory.filter(item => item.quantity_grams < lowStockThreshold && item.quantity_grams > 0).length
   const outOfStockCount = inventory.filter(item => item.quantity_grams <= 0).length
 
+  // Background portal
+  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    setBgContainer(document.getElementById('page-background'))
+    return () => setBgContainer(null)
+  }, [])
+
   // Get top 3 saved mixes by usage
   const topMixes = [...savedMixes]
     .sort((a, b) => b.usage_count - a.usage_count)
@@ -52,7 +61,21 @@ export default function DashboardPage() {
     .slice(0, 4) || []
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* Background Image via Portal */}
+      {bgContainer && createPortal(
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: 'url(/images/dashboard-bg.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />,
+        bgContainer
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
