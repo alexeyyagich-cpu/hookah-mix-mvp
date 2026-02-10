@@ -289,21 +289,32 @@ export default function MixPage() {
       const sum = selectedIds.reduce((acc, id) => acc + (next[id] ?? 0), 0);
 
       if (sum !== 100 && selectedIds.length >= 2) {
-        // Mint/fresh tobaccos are capped at 25% to preserve flavor balance
-        const mintCap = 25;
-        const tobaccoList = selectedIds.map(id => TOBACCOS.find(t => t.id === id)).filter(Boolean);
-        const mintIds = tobaccoList.filter(t => t?.category === 'mint').map(t => t!.id);
-        const nonMintIds = selectedIds.filter(id => !mintIds.includes(id));
+        // Special caps for specific tobaccos
+        const SUPERNOVA_ID = 'ds1'; // Darkside Supernova - max 2g per 20g bowl = 10%
+        const supernovaCap = 10;
+        const mintCap = 25; // General mint cap
 
-        // Allocate mint percentages (max 25% each)
+        const tobaccoList = selectedIds.map(id => TOBACCOS.find(t => t.id === id)).filter(Boolean);
+
+        // Separate Supernova, other mints, and non-mints
+        const hasSupernova = selectedIds.includes(SUPERNOVA_ID);
+        const mintIds = tobaccoList
+          .filter(t => t?.category === 'mint' && t?.id !== SUPERNOVA_ID)
+          .map(t => t!.id);
+        const nonMintIds = selectedIds.filter(id => id !== SUPERNOVA_ID && !mintIds.includes(id));
+
+        // Calculate totals with caps
+        const supernovaTotal = hasSupernova ? supernovaCap : 0;
         const mintTotal = mintIds.length * mintCap;
-        const nonMintTotal = 100 - mintTotal;
+        const nonMintTotal = 100 - supernovaTotal - mintTotal;
+
+        // Distribute percentages
+        if (hasSupernova) { next[SUPERNOVA_ID] = supernovaCap; }
+        mintIds.forEach(id => { next[id] = mintCap; });
 
         // Distribute remaining to non-mint tobaccos
         const nonMintBase = nonMintIds.length > 0 ? Math.floor(nonMintTotal / nonMintIds.length) : 0;
         const remainder = nonMintIds.length > 0 ? nonMintTotal - nonMintBase * nonMintIds.length : 0;
-
-        mintIds.forEach(id => { next[id] = mintCap; });
         nonMintIds.forEach((id, idx) => { next[id] = nonMintBase + (idx === 0 ? remainder : 0); });
       }
       return next;

@@ -116,14 +116,19 @@ export default function RecommendPage() {
 
       const newTobaccos = [...prev, { tobacco, percent: 0 }]
 
-      // Calculate percentages with mint cap at 25%
+      // Calculate percentages with special caps
+      const SUPERNOVA_ID = 'ds1' // Darkside Supernova - max 2g per 20g bowl = 10%
+      const supernovaCap = 10
       const mintCap = 25
-      const mintTobaccos = newTobaccos.filter(t => t.tobacco.category === 'mint')
-      const nonMintTobaccos = newTobaccos.filter(t => t.tobacco.category !== 'mint')
 
-      // Allocate mint percentages (max 25% each)
+      const hasSupernova = newTobaccos.some(t => t.tobacco.id === SUPERNOVA_ID)
+      const mintTobaccos = newTobaccos.filter(t => t.tobacco.category === 'mint' && t.tobacco.id !== SUPERNOVA_ID)
+      const nonMintTobaccos = newTobaccos.filter(t => t.tobacco.category !== 'mint' && t.tobacco.id !== SUPERNOVA_ID)
+
+      // Calculate totals with caps
+      const supernovaTotal = hasSupernova ? supernovaCap : 0
       const mintTotal = mintTobaccos.length * mintCap
-      const nonMintTotal = 100 - mintTotal
+      const nonMintTotal = 100 - supernovaTotal - mintTotal
 
       // Distribute remaining to non-mint tobaccos
       const nonMintPercent = nonMintTobaccos.length > 0
@@ -135,7 +140,9 @@ export default function RecommendPage() {
 
       let nonMintIndex = 0
       return newTobaccos.map((t) => {
-        if (t.tobacco.category === 'mint') {
+        if (t.tobacco.id === SUPERNOVA_ID) {
+          return { ...t, percent: supernovaCap }
+        } else if (t.tobacco.category === 'mint') {
           return { ...t, percent: mintCap }
         } else {
           const percent = nonMintPercent + (nonMintIndex === 0 ? remainder : 0)
@@ -147,20 +154,24 @@ export default function RecommendPage() {
   }, [])
 
   // Remove tobacco from mix
-  // Mint/fresh tobaccos are capped at 25% to preserve flavor balance
   const removeFromMix = useCallback((tobaccoId: string) => {
     setSelectedTobaccos(prev => {
       const filtered = prev.filter(t => t.tobacco.id !== tobaccoId)
       if (filtered.length === 0) return []
 
-      // Calculate percentages with mint cap at 25%
+      // Calculate percentages with special caps
+      const SUPERNOVA_ID = 'ds1'
+      const supernovaCap = 10
       const mintCap = 25
-      const mintTobaccos = filtered.filter(t => t.tobacco.category === 'mint')
-      const nonMintTobaccos = filtered.filter(t => t.tobacco.category !== 'mint')
 
-      // Allocate mint percentages (max 25% each)
+      const hasSupernova = filtered.some(t => t.tobacco.id === SUPERNOVA_ID)
+      const mintTobaccos = filtered.filter(t => t.tobacco.category === 'mint' && t.tobacco.id !== SUPERNOVA_ID)
+      const nonMintTobaccos = filtered.filter(t => t.tobacco.category !== 'mint' && t.tobacco.id !== SUPERNOVA_ID)
+
+      // Calculate totals with caps
+      const supernovaTotal = hasSupernova ? supernovaCap : 0
       const mintTotal = mintTobaccos.length * mintCap
-      const nonMintTotal = 100 - mintTotal
+      const nonMintTotal = 100 - supernovaTotal - mintTotal
 
       // Distribute remaining to non-mint tobaccos
       const nonMintPercent = nonMintTobaccos.length > 0
@@ -172,7 +183,9 @@ export default function RecommendPage() {
 
       let nonMintIndex = 0
       return filtered.map((t) => {
-        if (t.tobacco.category === 'mint') {
+        if (t.tobacco.id === SUPERNOVA_ID) {
+          return { ...t, percent: supernovaCap }
+        } else if (t.tobacco.category === 'mint') {
           return { ...t, percent: mintCap }
         } else {
           const percent = nonMintPercent + (nonMintIndex === 0 ? remainder : 0)
