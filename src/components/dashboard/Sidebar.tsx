@@ -37,11 +37,19 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-4 border-b border-[var(--color-border)]">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
-            <IconSmoke size={22} color="var(--color-bg)" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/images/logo-animated.mp4" type="video/mp4" />
+            </video>
           </div>
           <div>
-            <div className="font-bold">Hookah Mix</div>
+            <div className="font-bold">Hookah Torus</div>
             <div className="text-xs text-[var(--color-textMuted)]">Бизнес-кабинет</div>
           </div>
         </Link>

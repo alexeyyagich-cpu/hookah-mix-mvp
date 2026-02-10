@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Hookah Mix Calculator",
+  title: "Hookah Torus",
   description: "Create perfect tobacco mixes with AI-powered recommendations",
 };
 

@@ -427,18 +427,23 @@ export default function MixPage() {
       <header className="sticky top-0 z-50 glass border-b" style={{ borderColor: "var(--color-border)" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
-              style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-            >
-              HM
+            <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              >
+                <source src="/images/logo-animated.mp4" type="video/mp4" />
+              </video>
             </div>
             <div className="hidden sm:block">
               <h1 className="text-base font-semibold" style={{ color: "var(--color-text)" }}>
-                Hookah Mix
+                Hookah Torus
               </h1>
               <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
-                Calculator
+                Mix Calculator
               </p>
             </div>
           </div>

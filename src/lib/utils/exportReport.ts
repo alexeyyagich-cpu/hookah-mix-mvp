@@ -134,7 +134,7 @@ export function exportStatisticsPDF(
 
   // Title
   doc.setFontSize(20)
-  doc.text('Hookah Mix - Отчет', 105, 20, { align: 'center' })
+  doc.text('Hookah Torus - Отчет', 105, 20, { align: 'center' })
 
   // Date range
   doc.setFontSize(10)
@@ -236,7 +236,7 @@ export function exportStatisticsPDF(
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.text(
-      `Hookah Mix | Сгенерировано: ${new Date().toLocaleString('ru-RU')} | Страница ${i} из ${pageCount}`,
+      `Hookah Torus | Сгенерировано: ${new Date().toLocaleString('ru-RU')} | Страница ${i} из ${pageCount}`,
       105,
       290,
       { align: 'center' }
@@ -251,7 +251,7 @@ export function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThresh
 
   // Title
   doc.setFontSize(20)
-  doc.text('Hookah Mix - Инвентарь', 105, 20, { align: 'center' })
+  doc.text('Hookah Torus - Инвентарь', 105, 20, { align: 'center' })
 
   // Date
   doc.setFontSize(10)
@@ -305,7 +305,7 @@ export function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThresh
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.text(
-      `Hookah Mix | Сгенерировано: ${new Date().toLocaleString('ru-RU')} | Страница ${i} из ${pageCount}`,
+      `Hookah Torus | Сгенерировано: ${new Date().toLocaleString('ru-RU')} | Страница ${i} из ${pageCount}`,
       105,
       290,
       { align: 'center' }

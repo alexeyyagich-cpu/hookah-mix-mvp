@@ -1,11 +1,36 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Toaster, toast } from 'sonner'
 import { AuthGuard } from '@/components/auth/AuthGuard'
 import { Sidebar } from '@/components/dashboard/Sidebar'
+import { BrandLoader } from '@/components/BrandLoader'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
+
+function PageTransition() {
+  const pathname = usePathname()
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const previousPathRef = useRef(pathname)
+
+  useEffect(() => {
+    if (previousPathRef.current !== pathname) {
+      setIsTransitioning(true)
+      const timer = setTimeout(() => setIsTransitioning(false), 300)
+      previousPathRef.current = pathname
+      return () => clearTimeout(timer)
+    }
+  }, [pathname])
+
+  if (!isTransitioning) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-bg)]/80 backdrop-blur-sm animate-fadeIn">
+      <BrandLoader size="lg" />
+    </div>
+  )
+}
 
 function LowStockNotifier() {
   const { inventory } = useInventory()
@@ -58,6 +83,7 @@ export default function DashboardLayout({
             {children}
           </div>
         </main>
+        <PageTransition />
         <LowStockNotifier />
         <Toaster
           position="top-right"

@@ -72,6 +72,18 @@ export function RegisterForm() {
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
+        {/* Animated Logo */}
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg shadow-[var(--color-primary)]/20">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="/images/logo-animated.mp4" type="video/mp4" />
+          </video>
+        </div>
         <h1 className="text-3xl font-bold mb-2">Регистрация</h1>
         <p className="text-[var(--color-textMuted)]">
           Создайте аккаунт для вашего заведения

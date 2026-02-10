@@ -12,10 +12,12 @@ export default function AuthLayout({
       <header className="p-4 border-b border-[var(--color-border)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-xl font-bold flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
-              <IconSmoke size={18} color="var(--color-bg)" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+                <source src="/images/logo-animated.mp4" type="video/mp4" />
+              </video>
             </div>
-            Hookah Mix
+            Hookah Torus
           </Link>
           <Link href="/mix" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
             Калькулятор миксов
@@ -30,7 +32,7 @@ export default function AuthLayout({
 
       {/* Footer */}
       <footer className="p-4 text-center text-sm text-[var(--color-textMuted)]">
-        <p>Hookah Mix — сервис для кальянных заведений</p>
+        <p>Hookah Torus — сервис для кальянных заведений</p>
       </footer>
     </div>
   )
