@@ -275,10 +275,24 @@ export default function MixPage() {
       const next = { ...prev };
       for (const id of selectedIds) if (next[id] == null) next[id] = 0;
       const sum = selectedIds.reduce((acc, id) => acc + (next[id] ?? 0), 0);
+
       if (sum !== 100 && selectedIds.length >= 2) {
-        const base = Math.floor(100 / selectedIds.length);
-        const rem = 100 - base * selectedIds.length;
-        selectedIds.forEach((id, idx) => { next[id] = base + (idx === 0 ? rem : 0); });
+        // Mint/fresh tobaccos are capped at 25% to preserve flavor balance
+        const mintCap = 25;
+        const tobaccoList = selectedIds.map(id => TOBACCOS.find(t => t.id === id)).filter(Boolean);
+        const mintIds = tobaccoList.filter(t => t?.category === 'mint').map(t => t!.id);
+        const nonMintIds = selectedIds.filter(id => !mintIds.includes(id));
+
+        // Allocate mint percentages (max 25% each)
+        const mintTotal = mintIds.length * mintCap;
+        const nonMintTotal = 100 - mintTotal;
+
+        // Distribute remaining to non-mint tobaccos
+        const nonMintBase = nonMintIds.length > 0 ? Math.floor(nonMintTotal / nonMintIds.length) : 0;
+        const remainder = nonMintIds.length > 0 ? nonMintTotal - nonMintBase * nonMintIds.length : 0;
+
+        mintIds.forEach(id => { next[id] = mintCap; });
+        nonMintIds.forEach((id, idx) => { next[id] = nonMintBase + (idx === 0 ? remainder : 0); });
       }
       return next;
     });

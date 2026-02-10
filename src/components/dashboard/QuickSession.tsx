@@ -105,10 +105,10 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden">
+      <div className="w-full max-w-lg max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+        <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between flex-shrink-0">
+          <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             💨 Сохранить сессию
           </h2>
           <button
@@ -119,8 +119,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
           </button>
         </div>
 
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Content - scrollable */}
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1">
           {/* Mix Preview */}
           <div className="space-y-3">
             <label className="block text-sm font-medium">Микс</label>
@@ -239,8 +239,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
           </div>
         </form>
 
-        {/* Footer */}
-        <div className="p-6 border-t border-[var(--color-border)] flex items-center justify-end gap-3">
+        {/* Footer - fixed at bottom */}
+        <div className="p-4 sm:p-6 border-t border-[var(--color-border)] flex items-center justify-end gap-3 flex-shrink-0">
           <button
             type="button"
             onClick={onClose}
