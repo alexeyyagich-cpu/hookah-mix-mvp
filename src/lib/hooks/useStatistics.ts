@@ -13,11 +13,12 @@ const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 // Demo bowl for sessions
 const DEMO_BOWL = { id: '1', profile_id: 'demo', name: 'Phunnel Large', capacity_grams: 20, is_default: true, created_at: new Date().toISOString() }
 
-// Demo data for statistics
+// Demo data for statistics - sessions over the past week
 const DEMO_SESSIONS: SessionWithItems[] = [
+  // Today - 2 sessions
   {
     id: '1', profile_id: 'demo', bowl_type_id: '1',
-    session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    session_date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     total_grams: 20, compatibility_score: 92, notes: null, rating: 5,
     session_items: [
       { id: '1', session_id: '1', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 10, percentage: 50 },
@@ -27,7 +28,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   },
   {
     id: '2', profile_id: 'demo', bowl_type_id: '1',
-    session_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    session_date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
     total_grams: 18, compatibility_score: 85, notes: null, rating: 4,
     session_items: [
       { id: '3', session_id: '2', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 12, percentage: 67 },
@@ -35,24 +36,97 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     ],
     bowl_type: DEMO_BOWL,
   },
+  // Yesterday - 3 sessions
   {
-    id: '3', profile_id: 'demo', bowl_type_id: '2',
-    session_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    total_grams: 15, compatibility_score: 78, notes: null, rating: 3,
+    id: '3', profile_id: 'demo', bowl_type_id: '1',
+    session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    total_grams: 20, compatibility_score: 90, notes: null, rating: 5,
     session_items: [
-      { id: '5', session_id: '3', tobacco_inventory_id: '4', tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', grams_used: 15, percentage: 100 },
+      { id: '5', session_id: '3', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 14, percentage: 70 },
+      { id: '6', session_id: '3', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 6, percentage: 30 },
     ],
-    bowl_type: { id: '2', profile_id: 'demo', name: 'Phunnel Medium', capacity_grams: 15, is_default: false, created_at: new Date().toISOString() },
+    bowl_type: DEMO_BOWL,
   },
   {
     id: '4', profile_id: 'demo', bowl_type_id: '1',
+    session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 - 3 * 60 * 60 * 1000).toISOString(),
+    total_grams: 18, compatibility_score: 82, notes: null, rating: 4,
+    session_items: [
+      { id: '7', session_id: '4', tobacco_inventory_id: '3', tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', grams_used: 18, percentage: 100 },
+    ],
+    bowl_type: DEMO_BOWL,
+  },
+  {
+    id: '5', profile_id: 'demo', bowl_type_id: '2',
+    session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 - 6 * 60 * 60 * 1000).toISOString(),
+    total_grams: 15, compatibility_score: 78, notes: null, rating: 3,
+    session_items: [
+      { id: '8', session_id: '5', tobacco_inventory_id: '4', tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', grams_used: 15, percentage: 100 },
+    ],
+    bowl_type: { id: '2', profile_id: 'demo', name: 'Phunnel Medium', capacity_grams: 15, is_default: false, created_at: new Date().toISOString() },
+  },
+  // 2 days ago - 1 session
+  {
+    id: '6', profile_id: 'demo', bowl_type_id: '1',
+    session_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    total_grams: 20, compatibility_score: 88, notes: null, rating: 4,
+    session_items: [
+      { id: '9', session_id: '6', tobacco_inventory_id: '2', tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', grams_used: 10, percentage: 50 },
+      { id: '10', session_id: '6', tobacco_inventory_id: '3', tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', grams_used: 10, percentage: 50 },
+    ],
+    bowl_type: DEMO_BOWL,
+  },
+  // 3 days ago - 2 sessions
+  {
+    id: '7', profile_id: 'demo', bowl_type_id: '1',
+    session_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    total_grams: 20, compatibility_score: 95, notes: 'Отличный микс!', rating: 5,
+    session_items: [
+      { id: '11', session_id: '7', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 12, percentage: 60 },
+      { id: '12', session_id: '7', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 8, percentage: 40 },
+    ],
+    bowl_type: DEMO_BOWL,
+  },
+  {
+    id: '8', profile_id: 'demo', bowl_type_id: '1',
+    session_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 - 4 * 60 * 60 * 1000).toISOString(),
+    total_grams: 18, compatibility_score: 80, notes: null, rating: 4,
+    session_items: [
+      { id: '13', session_id: '8', tobacco_inventory_id: '4', tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', grams_used: 9, percentage: 50 },
+      { id: '14', session_id: '8', tobacco_inventory_id: '2', tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', grams_used: 9, percentage: 50 },
+    ],
+    bowl_type: DEMO_BOWL,
+  },
+  // 5 days ago - 1 session
+  {
+    id: '9', profile_id: 'demo', bowl_type_id: '1',
     session_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20, compatibility_score: 88, notes: null, rating: 4,
     session_items: [
-      { id: '6', session_id: '4', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 14, percentage: 70 },
-      { id: '7', session_id: '4', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 6, percentage: 30 },
+      { id: '15', session_id: '9', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 14, percentage: 70 },
+      { id: '16', session_id: '9', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 6, percentage: 30 },
     ],
     bowl_type: DEMO_BOWL,
+  },
+  // 6 days ago - 2 sessions
+  {
+    id: '10', profile_id: 'demo', bowl_type_id: '1',
+    session_date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+    total_grams: 20, compatibility_score: 91, notes: null, rating: 5,
+    session_items: [
+      { id: '17', session_id: '10', tobacco_inventory_id: '3', tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', grams_used: 10, percentage: 50 },
+      { id: '18', session_id: '10', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 10, percentage: 50 },
+    ],
+    bowl_type: DEMO_BOWL,
+  },
+  {
+    id: '11', profile_id: 'demo', bowl_type_id: '2',
+    session_date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000).toISOString(),
+    total_grams: 15, compatibility_score: 75, notes: null, rating: 3,
+    session_items: [
+      { id: '19', session_id: '11', tobacco_inventory_id: '2', tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', grams_used: 15, percentage: 100 },
+    ],
+    bowl_type: { id: '2', profile_id: 'demo', name: 'Phunnel Medium', capacity_grams: 15, is_default: false, created_at: new Date().toISOString() },
   },
 ]
 
@@ -66,10 +140,26 @@ const DEMO_INVENTORY: TobaccoInventory[] = [
 ]
 
 const DEMO_TRANSACTIONS: InventoryTransaction[] = [
-  { id: '1', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Session: Musthave Pinkman', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '2', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Session: Darkside Supernova', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '3', profile_id: 'demo', tobacco_inventory_id: '5', type: 'session', quantity_grams: -12, session_id: '2', notes: 'Session: Tangiers Cane Mint', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '4', profile_id: 'demo', tobacco_inventory_id: '1', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Initial stock', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  // Today
+  { id: '1', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Pinkman', created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+  { id: '2', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Supernova', created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+  { id: '3', profile_id: 'demo', tobacco_inventory_id: '5', type: 'session', quantity_grams: -12, session_id: '2', notes: 'Cane Mint', created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() },
+  // Yesterday
+  { id: '4', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -14, session_id: '3', notes: 'Pinkman', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '5', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -18, session_id: '4', notes: 'Supernova', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '6', profile_id: 'demo', tobacco_inventory_id: '4', type: 'session', quantity_grams: -15, session_id: '5', notes: 'Bananapapa', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  // 2 days ago
+  { id: '7', profile_id: 'demo', tobacco_inventory_id: '2', type: 'session', quantity_grams: -10, session_id: '6', notes: 'Lemon-Lime', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+  // 3 days ago
+  { id: '8', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -12, session_id: '7', notes: 'Pinkman', created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '9', profile_id: 'demo', tobacco_inventory_id: '4', type: 'session', quantity_grams: -9, session_id: '8', notes: 'Bananapapa', created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+  // 5 days ago
+  { id: '10', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -14, session_id: '9', notes: 'Pinkman', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+  // 6 days ago
+  { id: '11', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '10', notes: 'Supernova', created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
+  // Initial purchases
+  { id: '12', profile_id: 'demo', tobacco_inventory_id: '1', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Закупка', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '13', profile_id: 'demo', tobacco_inventory_id: '3', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Закупка', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
 ]
 
 interface ConsumptionByBrand {
