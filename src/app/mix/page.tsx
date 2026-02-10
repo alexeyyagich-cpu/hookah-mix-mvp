@@ -290,8 +290,10 @@ export default function MixPage() {
       const next = { ...prev };
       for (const id of selectedIds) if (next[id] == null) next[id] = 0;
       const sum = selectedIds.reduce((acc, id) => acc + (next[id] ?? 0), 0);
+      const hasZeroPercent = selectedIds.some(id => (next[id] ?? 0) <= 0);
 
-      if (sum !== 100 && selectedIds.length >= 2) {
+      // Redistribute if sum is not 100 OR if any tobacco has 0% (newly added)
+      if ((sum !== 100 || hasZeroPercent) && selectedIds.length >= 2) {
         // Special caps for specific tobaccos
         const SUPERNOVA_ID = 'ds1'; // Darkside Supernova - max 2g per 20g bowl = 10%
         const supernovaCap = 10;

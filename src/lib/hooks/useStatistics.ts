@@ -194,7 +194,7 @@ interface Statistics {
   consumptionByBrand: ConsumptionByBrand[]
   consumptionByFlavor: ConsumptionByFlavor[]
   dailyConsumption: DailyConsumption[]
-  topMixes: { items: { brand: string; flavor: string; percentage: number }[]; count: number }[]
+  topMixes: { items: { brand: string; flavor: string }[]; count: number }[]
   lowStockItems: TobaccoInventory[]
   recentTransactions: InventoryTransaction[]
   forecasts: InventoryForecast[]
@@ -374,12 +374,13 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       }))
       .sort((a, b) => a.date.localeCompare(b.date))
 
-    // Top mixes (by combination of flavors)
-    const mixMap = new Map<string, { items: { brand: string; flavor: string; percentage: number }[]; count: number }>()
+    // Top mixes (by combination of flavors - without percentages)
+    const mixMap = new Map<string, { items: { brand: string; flavor: string }[]; count: number }>()
     sessions.forEach(session => {
       if (!session.session_items?.length) return
+      // Group by brand+flavor only, not percentage
       const mixKey = session.session_items
-        .map(i => `${i.brand}:${i.flavor}:${i.percentage}`)
+        .map(i => `${i.brand}:${i.flavor}`)
         .sort()
         .join('|')
       const existing = mixMap.get(mixKey)
@@ -390,7 +391,6 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
           items: session.session_items.map(i => ({
             brand: i.brand,
             flavor: i.flavor,
-            percentage: i.percentage,
           })),
           count: 1,
         })

@@ -13,7 +13,7 @@ interface Statistics {
   consumptionByBrand: { brand: string; grams: number; sessions: number }[]
   consumptionByFlavor: { brand: string; flavor: string; grams: number; sessions: number }[]
   dailyConsumption: { date: string; grams: number; sessions: number }[]
-  topMixes: { items: { brand: string; flavor: string; percentage: number }[]; count: number }[]
+  topMixes: { items: { brand: string; flavor: string }[]; count: number }[]
   lowStockItems: TobaccoInventory[]
 }
 
@@ -113,7 +113,7 @@ export function exportStatisticsCSV(statistics: Statistics) {
   lines.push('=== ПОПУЛЯРНЫЕ МИКСЫ ===')
   lines.push('Микс,Использований')
   statistics.topMixes.forEach(m => {
-    const mix = m.items.map(i => `${i.flavor} (${i.percentage}%)`).join(' + ')
+    const mix = m.items.map(i => i.flavor).join(' + ')
     lines.push(`"${mix}",${m.count}`)
   })
 
@@ -196,7 +196,7 @@ export function exportStatisticsPDF(
       startY: currentY + 4,
       head: [['Микс', 'Использований']],
       body: statistics.topMixes.map(m => [
-        m.items.map(i => `${i.flavor} (${i.percentage}%)`).join(' + '),
+        m.items.map(i => i.flavor).join(' + '),
         m.count.toString(),
       ]),
       theme: 'striped',

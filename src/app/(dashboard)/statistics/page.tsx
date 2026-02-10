@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useStatisticsComparison } from '@/lib/hooks/useStatisticsComparison'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -57,6 +58,13 @@ export default function StatisticsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Background portal
+  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    setBgContainer(document.getElementById('page-background'))
+    return () => setBgContainer(null)
+  }, [])
+
   const handlePeriodChange = (period: typeof selectedPeriod) => {
     setSelectedPeriod(period)
     const end = new Date()
@@ -92,7 +100,21 @@ export default function StatisticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Background Image via Portal */}
+      {bgContainer && createPortal(
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: 'url(/images/statistics-bg.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />,
+        bgContainer
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -449,7 +471,6 @@ export default function StatisticsPage() {
                           {mix.items.map((item, i) => (
                             <span key={i}>
                               <span className="font-medium">{item.flavor}</span>
-                              <span className="text-[var(--color-textMuted)]"> ({item.percentage}%)</span>
                               {i < mix.items.length - 1 && ' + '}
                             </span>
                           ))}
