@@ -126,9 +126,9 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ */}
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-8">Часто задаваемые вопросы</h2>
-          <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
             {[
               {
                 q: 'Могу ли я отменить подписку?',
@@ -149,6 +149,10 @@ export default function PricingPage() {
               {
                 q: 'Что будет с моими данными при понижении тарифа?',
                 a: 'Ваши данные сохранятся, но доступ к старой истории и дополнительным позициям в инвентаре будет ограничен.',
+              },
+              {
+                q: 'Как работает пробный период?',
+                a: 'После регистрации вы получаете 14 дней Pro-доступа. Карта не требуется, отмена автоматическая.',
               },
             ].map((faq, index) => (
               <div key={index} className="card p-5">
