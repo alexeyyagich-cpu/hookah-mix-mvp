@@ -1035,7 +1035,7 @@ function GuestModal({
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
-              placeholder="+7 999 123 4567"
+              placeholder="+1 555 123 4567"
               className="w-full p-3 rounded-xl border text-sm"
               style={{
                 background: 'var(--color-bgHover)',

@@ -107,7 +107,7 @@ export const getFlavorImage = (flavor: string): string | undefined => {
 };
 
 export const TOBACCOS: Tobacco[] = [
-  // === MUSTHAVE (Russian dark leaf, strong) ===
+  // === MUSTHAVE (premium dark leaf, strong) ===
   { id: "mh1", brand: "Musthave", flavor: "Pinkman", strength: 8, heatResistance: 8, color: "#EC4899", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
   { id: "mh2", brand: "Musthave", flavor: "Cola", strength: 8, heatResistance: 7, color: "#7C2D12", category: "soda", pairsWith: ["citrus", "fruit", "mint"] },
   { id: "mh3", brand: "Musthave", flavor: "Cookie", strength: 8, heatResistance: 7, color: "#D97706", category: "dessert", pairsWith: ["fruit", "berry", "mint"] },

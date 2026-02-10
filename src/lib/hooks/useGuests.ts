@@ -21,8 +21,8 @@ const DEMO_GUESTS: Guest[] = [
   {
     id: '1',
     profile_id: 'demo',
-    name: 'Алексей',
-    phone: '+7 999 123 4567',
+    name: 'Alex',
+    phone: '+1 555 123 4567',
     photo_url: null,
     notes: 'Постоянный гость, любит крепкие миксы',
     strength_preference: 'strong',
@@ -49,8 +49,8 @@ const DEMO_GUESTS: Guest[] = [
   {
     id: '2',
     profile_id: 'demo',
-    name: 'Мария',
-    phone: '+7 999 987 6543',
+    name: 'Maria',
+    phone: '+1 555 987 6543',
     photo_url: null,
     notes: 'Предпочитает лёгкие фруктовые',
     strength_preference: 'light',
@@ -76,7 +76,7 @@ const DEMO_GUESTS: Guest[] = [
   {
     id: '3',
     profile_id: 'demo',
-    name: 'Дмитрий',
+    name: 'David',
     phone: null,
     photo_url: null,
     notes: null,
@@ -91,8 +91,8 @@ const DEMO_GUESTS: Guest[] = [
   {
     id: '4',
     profile_id: 'demo',
-    name: 'Анна',
-    phone: '+7 999 555 1234',
+    name: 'Anna',
+    phone: '+1 555 555 1234',
     photo_url: null,
     notes: 'VIP гость',
     strength_preference: 'medium',

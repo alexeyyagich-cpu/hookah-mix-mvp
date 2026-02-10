@@ -30,7 +30,7 @@ type Tobacco = {
 
 ### 2. Tobacco Catalog (by brand, ranked by mixing popularity)
 
-#### MustHave (Russian dark leaf, strength: 8)
+#### MustHave (premium dark leaf, strength: 8)
 | Rank | Flavor | Category | Heat | Color | Pairs With |
 |------|--------|----------|------|-------|------------|
 | 1 | Pinkman | berry | 8 | #EC4899 | mint, citrus, tropical |

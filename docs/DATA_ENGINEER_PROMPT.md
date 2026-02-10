@@ -167,11 +167,11 @@ export const BRANDS: Brand[] = [
   {
     id: "musthave",
     name: "Musthave",
-    origin: "Russia",
+    origin: "International",
     leafType: "dark",
     baseStrength: 8,
     baseHeatResistance: 8,
-    description: "Russian dark leaf with bold, intense flavors"
+    description: "Premium dark leaf with bold, intense flavors"
   },
   // ... etc
 ];

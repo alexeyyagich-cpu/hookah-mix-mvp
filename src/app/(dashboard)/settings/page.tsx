@@ -154,7 +154,7 @@ export default function SettingsPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="+7 (999) 123-45-67"
+            placeholder="+1 (555) 123-4567"
           />
         </div>
 
@@ -165,7 +165,7 @@ export default function SettingsPage() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="г. Москва, ул. Примерная, д. 1"
+            placeholder="123 Main Street, New York"
           />
         </div>
 
