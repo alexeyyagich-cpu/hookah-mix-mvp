@@ -376,10 +376,11 @@ export default function MixPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Main actions - always visible */}
             <Link
               href="/recommend"
-              className="btn text-sm flex items-center gap-2"
+              className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
               style={{
                 background: "var(--color-bgHover)",
                 border: "1px solid var(--color-border)",
@@ -387,11 +388,11 @@ export default function MixPage() {
               }}
             >
               <span>🎯</span>
-              <span className="hidden sm:inline">Подбор</span>
+              <span className="hidden md:inline">Подбор</span>
             </Link>
             <button
               onClick={() => setIsMixesDrawerOpen(true)}
-              className="btn text-sm flex items-center gap-2"
+              className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
               style={{
                 background: "var(--color-bgHover)",
                 border: "1px solid var(--color-border)",
@@ -399,12 +400,12 @@ export default function MixPage() {
               }}
             >
               <span>📋</span>
-              <span className="hidden sm:inline">Готовые миксы</span>
+              <span className="hidden md:inline">Миксы</span>
             </button>
             {user && (
               <button
                 onClick={() => setIsSavedMixesDrawerOpen(true)}
-                className="btn text-sm flex items-center gap-2"
+                className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
                 style={{
                   background: "var(--color-bgHover)",
                   border: "1px solid var(--color-border)",
@@ -412,50 +413,60 @@ export default function MixPage() {
                 }}
               >
                 <span>⭐</span>
-                <span className="hidden sm:inline">Мои миксы</span>
+                <span className="hidden md:inline">Мои</span>
               </button>
             )}
             <button
               onClick={() => setIsSlotMachineOpen(true)}
-              className="btn btn-neon text-sm flex items-center gap-2"
+              className="btn btn-neon text-sm flex items-center gap-1.5 px-2 sm:px-3"
             >
               <span>🎰</span>
-              <span className="hidden sm:inline">Рандом</span>
+              <span className="hidden md:inline">Рандом</span>
             </button>
+
+            {/* Conditional save actions */}
             {user && result && (
-              <>
+              <div className="hidden sm:flex items-center gap-1.5">
                 <button
                   onClick={() => setIsSaveMixModalOpen(true)}
-                  className="btn text-sm flex items-center gap-2"
+                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
                   style={{
                     background: "var(--color-primary)",
                     color: "var(--color-bg)",
                   }}
+                  title="Сохранить микс"
                 >
-                  <span>⭐</span>
-                  <span className="hidden sm:inline">Сохранить микс</span>
+                  <span>💾</span>
+                  <span className="hidden lg:inline">Сохранить</span>
                 </button>
                 <button
                   onClick={() => setIsQuickSessionOpen(true)}
-                  className="btn text-sm flex items-center gap-2"
+                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
                   style={{
                     background: "var(--color-success)",
                     color: "white",
                   }}
+                  title="Записать сессию"
                 >
-                  <span>💾</span>
-                  <span className="hidden sm:inline">Сессия</span>
+                  <span>📝</span>
+                  <span className="hidden lg:inline">Сессия</span>
                 </button>
-              </>
+              </div>
             )}
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-6 mx-1" style={{ background: "var(--color-border)" }} />
+
             <ThemeSwitcher />
             {user ? (
-              <Link href="/dashboard" className="btn btn-primary text-sm">
-                Кабинет
+              <Link href="/dashboard" className="btn btn-primary text-sm px-2 sm:px-3">
+                <span className="sm:hidden">👤</span>
+                <span className="hidden sm:inline">Кабинет</span>
               </Link>
             ) : (
-              <Link href="/login" className="btn btn-primary text-sm">
-                Войти
+              <Link href="/login" className="btn btn-primary text-sm px-2 sm:px-3">
+                <span className="sm:hidden">👤</span>
+                <span className="hidden sm:inline">Войти</span>
               </Link>
             )}
           </div>
@@ -984,6 +995,40 @@ export default function MixPage() {
           onClose={() => setIsSavedMixesDrawerOpen(false)}
           onSelectMix={handleLoadSavedMix}
         />
+      )}
+
+      {/* Mobile floating action bar for save actions */}
+      {user && result && (
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:hidden flex items-center gap-2 p-2 rounded-full shadow-lg z-40"
+          style={{
+            background: "var(--color-bg)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          <button
+            onClick={() => setIsSaveMixModalOpen(true)}
+            className="w-12 h-12 rounded-full flex items-center justify-center text-lg"
+            style={{
+              background: "var(--color-primary)",
+              color: "var(--color-bg)",
+            }}
+            title="Сохранить микс"
+          >
+            💾
+          </button>
+          <button
+            onClick={() => setIsQuickSessionOpen(true)}
+            className="w-12 h-12 rounded-full flex items-center justify-center text-lg"
+            style={{
+              background: "var(--color-success)",
+              color: "white",
+            }}
+            title="Записать сессию"
+          >
+            📝
+          </button>
+        </div>
       )}
     </div>
   );

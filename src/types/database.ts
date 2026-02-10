@@ -99,6 +99,23 @@ export interface SavedMix {
   created_at: string
 }
 
+export type StrengthPreference = 'light' | 'medium' | 'strong'
+export type FlavorProfile = 'fresh' | 'fruity' | 'sweet' | 'citrus' | 'spicy' | 'soda'
+
+export interface Guest {
+  id: string
+  profile_id: string
+  name: string
+  phone: string | null
+  notes: string | null
+  strength_preference: StrengthPreference | null
+  flavor_profiles: FlavorProfile[]
+  visit_count: number
+  last_visit_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 // Extended types with relations
 export interface SessionWithItems extends Session {
   session_items: SessionItem[]
@@ -156,6 +173,11 @@ export interface Database {
         Row: SavedMix
         Insert: Omit<SavedMix, 'id' | 'created_at' | 'usage_count'> & { id?: string; created_at?: string; usage_count?: number }
         Update: Partial<Omit<SavedMix, 'id' | 'profile_id'>>
+      }
+      guests: {
+        Row: Guest
+        Insert: Omit<Guest, 'id' | 'created_at' | 'updated_at' | 'visit_count'> & { id?: string; created_at?: string; updated_at?: string; visit_count?: number }
+        Update: Partial<Omit<Guest, 'id' | 'profile_id'>>
       }
     }
   }

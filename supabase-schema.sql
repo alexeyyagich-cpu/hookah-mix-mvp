@@ -342,3 +342,47 @@ CREATE POLICY "Users can delete own saved mixes" ON public.saved_mixes
 CREATE INDEX idx_saved_mixes_profile_id ON public.saved_mixes(profile_id);
 CREATE INDEX idx_saved_mixes_is_favorite ON public.saved_mixes(is_favorite);
 CREATE INDEX idx_saved_mixes_usage_count ON public.saved_mixes(usage_count DESC);
+
+-- ===========================================
+-- GUESTS TABLE (Regular customers with preferences)
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.guests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  phone TEXT,
+  notes TEXT,
+  strength_preference TEXT CHECK (strength_preference IN ('light', 'medium', 'strong')),
+  flavor_profiles JSONB DEFAULT '[]'::jsonb,
+  visit_count INTEGER DEFAULT 0,
+  last_visit_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE public.guests ENABLE ROW LEVEL SECURITY;
+
+-- Policies for guests
+CREATE POLICY "Users can view own guests" ON public.guests
+  FOR SELECT USING (auth.uid() = profile_id);
+
+CREATE POLICY "Users can insert own guests" ON public.guests
+  FOR INSERT WITH CHECK (auth.uid() = profile_id);
+
+CREATE POLICY "Users can update own guests" ON public.guests
+  FOR UPDATE USING (auth.uid() = profile_id);
+
+CREATE POLICY "Users can delete own guests" ON public.guests
+  FOR DELETE USING (auth.uid() = profile_id);
+
+-- Indexes for faster queries
+CREATE INDEX idx_guests_profile_id ON public.guests(profile_id);
+CREATE INDEX idx_guests_last_visit ON public.guests(last_visit_at DESC);
+CREATE INDEX idx_guests_visit_count ON public.guests(visit_count DESC);
+
+-- Trigger for guests updated_at
+DROP TRIGGER IF EXISTS update_guests_updated_at ON public.guests;
+CREATE TRIGGER update_guests_updated_at
+  BEFORE UPDATE ON public.guests
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
