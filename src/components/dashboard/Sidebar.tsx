@@ -36,7 +36,7 @@ export function Sidebar() {
     <>
       {/* Logo */}
       <div className="p-4 border-b border-[var(--color-border)]">
-        <Link href="/dashboard" className="flex items-center gap-3">
+        <Link href="/mix" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
             <video
               autoPlay
@@ -50,7 +50,7 @@ export function Sidebar() {
           </div>
           <div>
             <div className="font-bold">Hookah Torus</div>
-            <div className="text-xs text-[var(--color-textMuted)]">Бизнес-кабинет</div>
+            <div className="text-xs text-[var(--color-textMuted)]">← На главную</div>
           </div>
         </Link>
       </div>
