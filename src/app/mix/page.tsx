@@ -93,6 +93,7 @@ export default function MixPage() {
   const [isQuickSessionOpen, setIsQuickSessionOpen] = useState(false);
   const skipNormalizationRef = React.useRef(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
+  const mixRatioRef = React.useRef<HTMLDivElement>(null);
   const hasInitializedRef = React.useRef(false);
 
   // Apply a preset mix recipe
@@ -381,9 +382,9 @@ export default function MixPage() {
       setPercents(newPercents);
       setIsGuestsDrawerOpen(false);
 
-      // Scroll to results
+      // Scroll to Mix Ratio section (more useful than results)
       setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        mixRatioRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
   }, []);
@@ -658,7 +659,7 @@ export default function MixPage() {
             </section>
 
             {/* Mix Ratio */}
-            <section className="card card-elevated">
+            <section ref={mixRatioRef} className="card card-elevated">
               <h2 className="text-lg font-semibold mb-5" style={{ color: "var(--color-text)" }}>
                 Mix Ratio
               </h2>
