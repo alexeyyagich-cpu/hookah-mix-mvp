@@ -351,9 +351,11 @@ CREATE TABLE IF NOT EXISTS public.guests (
   profile_id UUID REFERENCES public.profiles ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
   phone TEXT,
+  photo_url TEXT,
   notes TEXT,
   strength_preference TEXT CHECK (strength_preference IN ('light', 'medium', 'strong')),
   flavor_profiles JSONB DEFAULT '[]'::jsonb,
+  last_mix_snapshot JSONB, -- Immutable snapshot of last mix for quick repeat
   visit_count INTEGER DEFAULT 0,
   last_visit_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),

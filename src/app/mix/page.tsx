@@ -27,8 +27,11 @@ import { useAuth } from "@/lib/AuthContext";
 import { QuickSession } from "@/components/dashboard/QuickSession";
 import { useSessions } from "@/lib/hooks/useSessions";
 import { useSavedMixes } from "@/lib/hooks/useSavedMixes";
+import { useGuests } from "@/lib/hooks/useGuests";
 import { SaveMixModal } from "@/components/mix/SaveMixModal";
 import { SavedMixesDrawer } from "@/components/mix/SavedMixesDrawer";
+import { RecentGuests } from "@/components/guests/RecentGuests";
+import type { MixSnapshot } from "@/types/database";
 import Link from "next/link";
 
 const BRANDS = getBrandNames();
@@ -67,9 +70,10 @@ function roundToInt(v: number) {
 
 export default function MixPage() {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { createSession } = useSessions();
   const { saveMix, incrementUsage } = useSavedMixes();
+  const { recordVisit } = useGuests();
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([TOBACCOS[0].id, TOBACCOS[1].id]);
@@ -80,6 +84,7 @@ export default function MixPage() {
   const [isMixesDrawerOpen, setIsMixesDrawerOpen] = useState(false);
   const [isSavedMixesDrawerOpen, setIsSavedMixesDrawerOpen] = useState(false);
   const [isSaveMixModalOpen, setIsSaveMixModalOpen] = useState(false);
+  const [isGuestsDrawerOpen, setIsGuestsDrawerOpen] = useState(false);
   const [targetCompatibility, setTargetCompatibility] = useState<number | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
@@ -91,7 +96,7 @@ export default function MixPage() {
   const hasInitializedRef = React.useRef(false);
 
   // Apply a preset mix recipe
-  const applyMixRecipe = useCallback((mix: MixRecipe) => {
+  const applyMixRecipe = useCallback((mix: MixRecipe, scrollToResults = true) => {
     // Find matching tobaccos by flavor name
     const matchedIds: string[] = [];
     const newPercents: Record<string, number> = {};
@@ -132,10 +137,12 @@ export default function MixPage() {
       setSelectedIds(matchedIds);
       setPercents(newPercents);
 
-      // Scroll to results section after a brief delay
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
+      // Scroll to results section after a brief delay (skip on initial load)
+      if (scrollToResults) {
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
     }
   }, []);
 
@@ -160,14 +167,14 @@ export default function MixPage() {
     }, 100);
   }, []);
 
-  // Apply first popular mix on initial load
+  // Apply first popular mix on initial load (without scrolling)
   React.useEffect(() => {
     if (hasInitializedRef.current) return;
     hasInitializedRef.current = true;
 
     const topMix = MIX_RECIPES.find(m => m.popularity >= 5);
     if (topMix) {
-      applyMixRecipe(topMix);
+      applyMixRecipe(topMix, false); // Don't scroll on initial load
     }
   }, [applyMixRecipe]);
 
@@ -356,6 +363,31 @@ export default function MixPage() {
     await saveMix(name, tobaccos, result.compatibility.score);
   }, [items, result, saveMix]);
 
+  // Handle quick repeat from guest
+  const handleRepeatGuestMix = useCallback((snapshot: MixSnapshot, tobaccos: { tobacco: typeof TOBACCOS[0]; percent: number }[]) => {
+    const matchedIds: string[] = [];
+    const newPercents: Record<string, number> = {};
+
+    for (const t of tobaccos) {
+      if (matchedIds.length < 3) {
+        matchedIds.push(t.tobacco.id);
+        newPercents[t.tobacco.id] = t.percent;
+      }
+    }
+
+    if (matchedIds.length >= 2) {
+      skipNormalizationRef.current = true;
+      setSelectedIds(matchedIds);
+      setPercents(newPercents);
+      setIsGuestsDrawerOpen(false);
+
+      // Scroll to results
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, []);
+
   const compatColor = result?.compatibility.level === "perfect" ? theme.colors.success :
                       result?.compatibility.level === "good" ? theme.colors.primary :
                       result?.compatibility.level === "okay" ? theme.colors.warning : theme.colors.danger;
@@ -417,18 +449,31 @@ export default function MixPage() {
               <span className="hidden md:inline">Миксы</span>
             </button>
             {user && (
-              <button
-                onClick={() => setIsSavedMixesDrawerOpen(true)}
-                className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-                style={{
-                  background: "var(--color-bgHover)",
-                  border: "1px solid var(--color-border)",
-                  color: "var(--color-text)",
-                }}
-              >
-                <span>⭐</span>
-                <span className="hidden md:inline">Мои</span>
-              </button>
+              <>
+                <button
+                  onClick={() => setIsSavedMixesDrawerOpen(true)}
+                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
+                  style={{
+                    background: "var(--color-bgHover)",
+                    border: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                  }}
+                >
+                  <span>⭐</span>
+                  <span className="hidden md:inline">Мои</span>
+                </button>
+                <button
+                  onClick={() => setIsGuestsDrawerOpen(true)}
+                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
+                  style={{
+                    background: "var(--color-success)",
+                    color: "white",
+                  }}
+                >
+                  <span>👥</span>
+                  <span className="hidden md:inline">Гости</span>
+                </button>
+              </>
             )}
             <button
               onClick={() => setIsSlotMachineOpen(true)}
@@ -1009,6 +1054,49 @@ export default function MixPage() {
           onClose={() => setIsSavedMixesDrawerOpen(false)}
           onSelectMix={handleLoadSavedMix}
         />
+      )}
+
+      {/* Guests Drawer for Quick Repeat */}
+      {user && isGuestsDrawerOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsGuestsDrawerOpen(false)}
+          />
+          {/* Drawer */}
+          <div
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[70] overflow-y-auto animate-slideInRight"
+            style={{
+              background: "var(--color-bg)",
+              borderLeft: "1px solid var(--color-border)",
+            }}
+          >
+            <div className="sticky top-0 z-10 p-4 flex items-center justify-between border-b" style={{ background: "var(--color-bg)", borderColor: "var(--color-border)" }}>
+              <div>
+                <h2 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
+                  Быстрый повтор
+                </h2>
+                <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
+                  Выберите гостя для повтора микса
+                </p>
+              </div>
+              <button
+                onClick={() => setIsGuestsDrawerOpen(false)}
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: "var(--color-bgHover)", color: "var(--color-textMuted)" }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4">
+              <RecentGuests
+                onRepeatMix={handleRepeatGuestMix}
+                isPro={profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'enterprise'}
+              />
+            </div>
+          </div>
+        </>
       )}
 
       {/* Mobile floating action bar for save actions */}

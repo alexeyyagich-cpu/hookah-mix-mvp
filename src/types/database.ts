@@ -101,15 +101,41 @@ export interface SavedMix {
 
 export type StrengthPreference = 'light' | 'medium' | 'strong'
 export type FlavorProfile = 'fresh' | 'fruity' | 'sweet' | 'citrus' | 'spicy' | 'soda'
+export type PackingStyle = 'fluffy' | 'semi-dense' | 'dense'
+
+/**
+ * Immutable snapshot of a mix - never changes even if inventory/recipes change
+ */
+export interface MixSnapshot {
+  id: string
+  tobaccos: {
+    tobacco_id: string
+    brand: string
+    flavor: string
+    percent: number
+    color: string
+  }[]
+  total_grams: number
+  strength: StrengthPreference
+  compatibility_score: number | null
+  bowl_type: string | null
+  heat_setup: {
+    coals: number
+    packing: PackingStyle
+  }
+  created_at: string
+}
 
 export interface Guest {
   id: string
   profile_id: string
   name: string
   phone: string | null
+  photo_url: string | null
   notes: string | null
   strength_preference: StrengthPreference | null
   flavor_profiles: FlavorProfile[]
+  last_mix_snapshot: MixSnapshot | null
   visit_count: number
   last_visit_at: string | null
   created_at: string
