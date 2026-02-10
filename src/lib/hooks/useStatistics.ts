@@ -200,6 +200,10 @@ interface Statistics {
   forecasts: InventoryForecast[]
 }
 
+interface UseStatisticsOptions {
+  lowStockThreshold?: number
+}
+
 interface UseStatisticsReturn {
   statistics: Statistics | null
   loading: boolean
@@ -209,7 +213,8 @@ interface UseStatisticsReturn {
   setDateRange: (range: { start: Date; end: Date }) => void
 }
 
-export function useStatistics(): UseStatisticsReturn {
+export function useStatistics(options: UseStatisticsOptions = {}): UseStatisticsReturn {
+  const { lowStockThreshold = 50 } = options
   const [sessions, setSessions] = useState<SessionWithItems[]>([])
   const [inventory, setInventory] = useState<TobaccoInventory[]>([])
   const [transactions, setTransactions] = useState<InventoryTransaction[]>([])
@@ -395,9 +400,9 @@ export function useStatistics(): UseStatisticsReturn {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5)
 
-    // Low stock items (less than 50g)
+    // Low stock items (less than threshold)
     const lowStockItems = inventory
-      .filter(item => item.quantity_grams < 50)
+      .filter(item => item.quantity_grams < lowStockThreshold)
       .sort((a, b) => a.quantity_grams - b.quantity_grams)
 
     // Calculate forecasts for each inventory item

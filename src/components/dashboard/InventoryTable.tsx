@@ -8,13 +8,14 @@ import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
 interface InventoryTableProps {
   inventory: TobaccoInventory[]
   forecasts?: Map<string, ForecastResult>
+  lowStockThreshold?: number
   onEdit: (item: TobaccoInventory) => void
   onDelete: (id: string) => void
   onAdjust: (id: string, amount: number) => void
   loading?: boolean
 }
 
-export function InventoryTable({ inventory, forecasts, onEdit, onDelete, onAdjust, loading }: InventoryTableProps) {
+export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, onEdit, onDelete, onAdjust, loading }: InventoryTableProps) {
   const [sortField, setSortField] = useState<keyof TobaccoInventory>('brand')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [filter, setFilter] = useState('')
@@ -56,7 +57,7 @@ export function InventoryTable({ inventory, forecasts, onEdit, onDelete, onAdjus
 
   const getStockStatus = (quantity: number) => {
     if (quantity <= 0) return { color: 'danger', label: 'Нет в наличии' }
-    if (quantity < 50) return { color: 'warning', label: 'Мало' }
+    if (quantity < lowStockThreshold) return { color: 'warning', label: 'Мало' }
     return { color: 'success', label: 'В наличии' }
   }
 

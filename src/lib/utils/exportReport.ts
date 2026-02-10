@@ -36,10 +36,10 @@ function getDateString() {
 // CSV EXPORTS
 // ========================================
 
-export function exportInventoryCSV(inventory: TobaccoInventory[]) {
+export function exportInventoryCSV(inventory: TobaccoInventory[], lowStockThreshold: number = 50) {
   const headers = ['Бренд', 'Вкус', 'Остаток (г)', 'Цена', 'Статус']
   const rows = inventory.map(item => {
-    const status = item.quantity_grams <= 0 ? 'Закончился' : item.quantity_grams < 50 ? 'Мало' : 'В наличии'
+    const status = item.quantity_grams <= 0 ? 'Закончился' : item.quantity_grams < lowStockThreshold ? 'Мало' : 'В наличии'
     return [
       item.brand,
       item.flavor,
@@ -246,7 +246,7 @@ export function exportStatisticsPDF(
   doc.save(`hookah-report-${getDateString()}.pdf`)
 }
 
-export function exportInventoryPDF(inventory: TobaccoInventory[]) {
+export function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThreshold: number = 50) {
   const doc = new jsPDF()
 
   // Title
@@ -260,7 +260,7 @@ export function exportInventoryPDF(inventory: TobaccoInventory[]) {
 
   // Summary
   const totalGrams = inventory.reduce((sum, item) => sum + item.quantity_grams, 0)
-  const lowStock = inventory.filter(i => i.quantity_grams < 50 && i.quantity_grams > 0).length
+  const lowStock = inventory.filter(i => i.quantity_grams < lowStockThreshold && i.quantity_grams > 0).length
   const outOfStock = inventory.filter(i => i.quantity_grams <= 0).length
 
   doc.setFontSize(12)
@@ -273,7 +273,7 @@ export function exportInventoryPDF(inventory: TobaccoInventory[]) {
     startY: 58,
     head: [['Бренд', 'Вкус', 'Остаток (г)', 'Цена', 'Статус']],
     body: inventory.map(item => {
-      const status = item.quantity_grams <= 0 ? 'Закончился' : item.quantity_grams < 50 ? 'Мало' : 'В наличии'
+      const status = item.quantity_grams <= 0 ? 'Закончился' : item.quantity_grams < lowStockThreshold ? 'Мало' : 'В наличии'
       return [
         item.brand,
         item.flavor,

@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useStatistics } from '@/lib/hooks/useStatistics'
+import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { InventoryTable } from '@/components/dashboard/InventoryTable'
 import { AddTobaccoModal } from '@/components/dashboard/AddTobaccoModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
@@ -23,7 +25,9 @@ export default function InventoryPage() {
     itemsLimit,
   } = useInventory()
   const { isFreeTier, canExport } = useSubscription()
-  const { statistics } = useStatistics()
+  const { settings: notificationSettings } = useNotificationSettings()
+  const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
+  const { statistics } = useStatistics({ lowStockThreshold })
 
   // Create forecasts map from statistics
   const forecastsMap = useMemo(() => {
@@ -55,9 +59,9 @@ export default function InventoryPage() {
   const handleExport = (format: 'csv' | 'pdf') => {
     if (!canExport || inventory.length === 0) return
     if (format === 'csv') {
-      exportInventoryCSV(inventory)
+      exportInventoryCSV(inventory, lowStockThreshold)
     } else {
-      exportInventoryPDF(inventory)
+      exportInventoryPDF(inventory, lowStockThreshold)
     }
     setExportMenuOpen(false)
   }
@@ -100,8 +104,29 @@ export default function InventoryPage() {
 
   const totalGrams = inventory.reduce((sum, item) => sum + item.quantity_grams, 0)
 
+  // Background portal
+  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    setBgContainer(document.getElementById('page-background'))
+    return () => setBgContainer(null)
+  }, [])
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Background Image via Portal */}
+      {bgContainer && createPortal(
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: 'url(/images/inventory-bg.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundAttachment: 'fixed',
+          }}
+        />,
+        bgContainer
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -171,7 +196,7 @@ export default function InventoryPage() {
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">Заканчиваются</div>
           <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">
-            {inventory.filter(i => i.quantity_grams < 50 && i.quantity_grams > 0).length}
+            {inventory.filter(i => i.quantity_grams < lowStockThreshold && i.quantity_grams > 0).length}
           </div>
         </div>
         <div className="card p-4">
@@ -215,6 +240,7 @@ export default function InventoryPage() {
       <InventoryTable
         inventory={inventory}
         forecasts={forecastsMap}
+        lowStockThreshold={lowStockThreshold}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onAdjust={handleAdjust}

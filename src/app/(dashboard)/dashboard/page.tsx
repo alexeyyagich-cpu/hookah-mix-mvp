@@ -6,6 +6,7 @@ import { useSessions } from '@/lib/hooks/useSessions'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
+import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { StatsCard } from '@/components/dashboard/StatsCard'
 import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart'
 import { PopularFlavorsChart } from '@/components/dashboard/Charts/PopularFlavorsChart'
@@ -26,11 +27,13 @@ export default function DashboardPage() {
   const { profile } = useAuth()
   const { inventory } = useInventory()
   const { sessions } = useSessions()
-  const { statistics, loading } = useStatistics()
+  const { settings: notificationSettings } = useNotificationSettings()
+  const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
+  const { statistics, loading } = useStatistics({ lowStockThreshold })
   const { isFreeTier, tier } = useSubscription()
   const { savedMixes } = useSavedMixes()
 
-  const lowStockCount = inventory.filter(item => item.quantity_grams < 50).length
+  const lowStockCount = inventory.filter(item => item.quantity_grams < lowStockThreshold && item.quantity_grams > 0).length
   const outOfStockCount = inventory.filter(item => item.quantity_grams <= 0).length
 
   // Get top 3 saved mixes by usage

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useStatisticsComparison } from '@/lib/hooks/useStatisticsComparison'
 import { useSubscription } from '@/lib/hooks/useSubscription'
+import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { StatsCard } from '@/components/dashboard/StatsCard'
 import { ComparisonCard } from '@/components/dashboard/ComparisonCard'
 import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart'
@@ -25,7 +26,9 @@ import {
 type ViewMode = 'overview' | 'comparison'
 
 export default function StatisticsPage() {
-  const { statistics, loading, error, dateRange, setDateRange } = useStatistics()
+  const { settings: notificationSettings } = useNotificationSettings()
+  const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
+  const { statistics, loading, error, dateRange, setDateRange } = useStatistics({ lowStockThreshold })
   const {
     periodA,
     periodB,
