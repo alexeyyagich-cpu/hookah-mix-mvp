@@ -8,7 +8,6 @@ import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { SmokeCanvasBackground } from "@/components/SmokeCanvasBackground";
 import TobaccoCard from "@/components/TobaccoCard";
 import MixesDrawer from "@/components/MixesDrawer";
-import Confetti from "@/components/Confetti";
 import SlotMachine from "@/components/SlotMachine";
 import {
   IconStrength,
@@ -95,7 +94,6 @@ export default function MixPage() {
   const [targetCompatibility, setTargetCompatibility] = useState<number | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [isSlotMachineOpen, setIsSlotMachineOpen] = useState(false);
   const [isQuickSessionOpen, setIsQuickSessionOpen] = useState(false);
   const skipNormalizationRef = React.useRef(false);
@@ -326,14 +324,6 @@ export default function MixPage() {
     });
   }, [selectedIds]);
 
-  // Trigger confetti when perfect compatibility
-  React.useEffect(() => {
-    if (result?.compatibility.level === "perfect") {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [result?.compatibility.level]);
 
   // Handle loading a saved mix
   const handleLoadSavedMix = useCallback((tobaccos: import("@/types/database").SavedMixTobacco[], mixId: string) => {
@@ -419,9 +409,6 @@ export default function MixPage() {
     <div className="min-h-screen transition-theme relative overflow-hidden">
       {/* Cinematic Smoke Background */}
       <SmokeCanvasBackground imageSrc="/images/hookah-hero.jpg" />
-
-      {/* Confetti for perfect compatibility */}
-      <Confetti active={showConfetti} />
 
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b" style={{ borderColor: "var(--color-border)" }}>

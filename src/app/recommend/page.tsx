@@ -318,10 +318,17 @@ export default function RecommendPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/mix"
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
-              style={{ background: 'var(--color-primary)', color: 'var(--color-bg)' }}
+              className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0"
             >
-              HM
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              >
+                <source src="/images/logo-animated.mp4" type="video/mp4" />
+              </video>
             </Link>
             <div className="hidden sm:block">
               <h1 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>
