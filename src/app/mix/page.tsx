@@ -85,6 +85,7 @@ export default function MixPage() {
   const [isSavedMixesDrawerOpen, setIsSavedMixesDrawerOpen] = useState(false);
   const [isSaveMixModalOpen, setIsSaveMixModalOpen] = useState(false);
   const [isGuestsDrawerOpen, setIsGuestsDrawerOpen] = useState(false);
+  const [isMixesMenuOpen, setIsMixesMenuOpen] = useState(false);
   const [targetCompatibility, setTargetCompatibility] = useState<number | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
@@ -425,6 +426,7 @@ export default function MixPage() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Main actions - always visible */}
+            {/* Подбор */}
             <Link
               href="/recommend"
               className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
@@ -437,45 +439,71 @@ export default function MixPage() {
               <span>🎯</span>
               <span className="hidden md:inline">Подбор</span>
             </Link>
-            <button
-              onClick={() => setIsMixesDrawerOpen(true)}
-              className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-              style={{
-                background: "var(--color-bgHover)",
-                border: "1px solid var(--color-border)",
-                color: "var(--color-text)",
-              }}
-            >
-              <span>📋</span>
-              <span className="hidden md:inline">Миксы</span>
-            </button>
+
+            {/* Миксы dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsMixesMenuOpen(!isMixesMenuOpen)}
+                className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
+                style={{
+                  background: "var(--color-bgHover)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                }}
+              >
+                <span>📋</span>
+                <span className="hidden md:inline">Миксы</span>
+                <span className={`transition-transform text-xs ${isMixesMenuOpen ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {isMixesMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsMixesMenuOpen(false)} />
+                  <div
+                    className="absolute top-full left-0 mt-2 w-48 rounded-xl overflow-hidden z-50 shadow-xl"
+                    style={{
+                      background: "var(--color-bgCard)",
+                      border: "1px solid var(--color-border)",
+                    }}
+                  >
+                    <button
+                      onClick={() => { setIsMixesDrawerOpen(true); setIsMixesMenuOpen(false); }}
+                      className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors"
+                      style={{ color: "var(--color-text)" }}
+                    >
+                      <span>📋</span>
+                      <span>Рецепты миксов</span>
+                    </button>
+                    {user && (
+                      <button
+                        onClick={() => { setIsSavedMixesDrawerOpen(true); setIsMixesMenuOpen(false); }}
+                        className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors border-t"
+                        style={{ color: "var(--color-text)", borderColor: "var(--color-border)" }}
+                      >
+                        <span>⭐</span>
+                        <span>Мои сохранённые</span>
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Гости (только для авторизованных) */}
             {user && (
-              <>
-                <button
-                  onClick={() => setIsSavedMixesDrawerOpen(true)}
-                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-                  style={{
-                    background: "var(--color-bgHover)",
-                    border: "1px solid var(--color-border)",
-                    color: "var(--color-text)",
-                  }}
-                >
-                  <span>⭐</span>
-                  <span className="hidden md:inline">Мои</span>
-                </button>
-                <button
-                  onClick={() => setIsGuestsDrawerOpen(true)}
-                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-                  style={{
-                    background: "var(--color-success)",
-                    color: "white",
-                  }}
-                >
-                  <span>👥</span>
-                  <span className="hidden md:inline">Гости</span>
-                </button>
-              </>
+              <button
+                onClick={() => setIsGuestsDrawerOpen(true)}
+                className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
+                style={{
+                  background: "var(--color-success)",
+                  color: "white",
+                }}
+              >
+                <span>👥</span>
+                <span className="hidden md:inline">Гости</span>
+              </button>
             )}
+
+            {/* Рандом */}
             <button
               onClick={() => setIsSlotMachineOpen(true)}
               className="btn btn-neon text-sm flex items-center gap-1.5 px-2 sm:px-3"
@@ -483,36 +511,6 @@ export default function MixPage() {
               <span>🎰</span>
               <span className="hidden md:inline">Рандом</span>
             </button>
-
-            {/* Conditional save actions */}
-            {user && result && (
-              <div className="hidden sm:flex items-center gap-1.5">
-                <button
-                  onClick={() => setIsSaveMixModalOpen(true)}
-                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-                  style={{
-                    background: "var(--color-primary)",
-                    color: "var(--color-bg)",
-                  }}
-                  title="Сохранить микс"
-                >
-                  <span>💾</span>
-                  <span className="hidden lg:inline">Сохранить</span>
-                </button>
-                <button
-                  onClick={() => setIsQuickSessionOpen(true)}
-                  className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-                  style={{
-                    background: "var(--color-success)",
-                    color: "white",
-                  }}
-                  title="Записать сессию"
-                >
-                  <span>📝</span>
-                  <span className="hidden lg:inline">Сессия</span>
-                </button>
-              </div>
-            )}
 
             {/* Divider */}
             <div className="hidden sm:block w-px h-6 mx-1" style={{ background: "var(--color-border)" }} />
@@ -1100,36 +1098,39 @@ export default function MixPage() {
         </>
       )}
 
-      {/* Mobile floating action bar for save actions */}
+      {/* Floating action bar for save actions */}
       {user && result && (
         <div
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:hidden flex items-center gap-2 p-2 rounded-full shadow-lg z-40"
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 p-2 rounded-full shadow-lg z-40"
           style={{
-            background: "var(--color-bg)",
+            background: "color-mix(in srgb, var(--color-bgCard) 90%, transparent)",
+            backdropFilter: "blur(12px)",
             border: "1px solid var(--color-border)",
           }}
         >
           <button
             onClick={() => setIsSaveMixModalOpen(true)}
-            className="w-12 h-12 rounded-full flex items-center justify-center text-lg"
+            className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-primary)",
               color: "var(--color-bg)",
             }}
             title="Сохранить микс"
           >
-            💾
+            <span>💾</span>
+            <span className="hidden sm:inline">Сохранить</span>
           </button>
           <button
             onClick={() => setIsQuickSessionOpen(true)}
-            className="w-12 h-12 rounded-full flex items-center justify-center text-lg"
+            className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-success)",
               color: "white",
             }}
             title="Записать сессию"
           >
-            📝
+            <span>📝</span>
+            <span className="hidden sm:inline">Сессия</span>
           </button>
         </div>
       )}
