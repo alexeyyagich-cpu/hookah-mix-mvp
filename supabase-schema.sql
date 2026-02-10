@@ -389,3 +389,65 @@ DROP TRIGGER IF EXISTS update_guests_updated_at ON public.guests;
 CREATE TRIGGER update_guests_updated_at
   BEFORE UPDATE ON public.guests
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================================
+-- NOTIFICATION SETTINGS TABLE
+-- ============================================================================
+
+DROP TABLE IF EXISTS public.notification_settings CASCADE;
+
+CREATE TABLE public.notification_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE UNIQUE NOT NULL,
+  low_stock_enabled BOOLEAN DEFAULT true,
+  low_stock_threshold INTEGER DEFAULT 50,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.notification_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own notification settings" ON public.notification_settings
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_notification_settings_updated_at ON public.notification_settings;
+CREATE TRIGGER update_notification_settings_updated_at
+  BEFORE UPDATE ON public.notification_settings
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================================
+-- SAVED MIXES TABLE
+-- ============================================================================
+
+DROP TABLE IF EXISTS public.saved_mixes CASCADE;
+
+CREATE TABLE public.saved_mixes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  tobaccos JSONB NOT NULL, -- [{tobacco_id, brand, flavor, percent, color}]
+  compatibility_score INTEGER,
+  is_favorite BOOLEAN DEFAULT false,
+  usage_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.saved_mixes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own saved mixes" ON public.saved_mixes
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Indexes
+CREATE INDEX idx_saved_mixes_profile_id ON public.saved_mixes(profile_id);
+CREATE INDEX idx_saved_mixes_is_favorite ON public.saved_mixes(is_favorite);
+CREATE INDEX idx_saved_mixes_usage_count ON public.saved_mixes(usage_count DESC);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_saved_mixes_updated_at ON public.saved_mixes;
+CREATE TRIGGER update_saved_mixes_updated_at
+  BEFORE UPDATE ON public.saved_mixes
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

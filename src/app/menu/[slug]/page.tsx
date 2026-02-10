@@ -168,7 +168,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                     </div>
                     {lounge.show_prices && mix.price && (
                       <span className="text-lg font-bold text-[var(--color-primary)] whitespace-nowrap ml-2">
-                        {mix.price}₽
+                        ${mix.price}
                       </span>
                     )}
                   </div>
@@ -213,7 +213,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                     </div>
                     {lounge.show_prices && mix.price && (
                       <span className="text-lg font-bold text-[var(--color-text)] whitespace-nowrap ml-2">
-                        {mix.price}₽
+                        ${mix.price}
                       </span>
                     )}
                   </div>

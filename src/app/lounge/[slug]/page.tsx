@@ -1,6 +1,6 @@
 'use client'
 
-import { use } from 'react'
+import { use, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePublicLounge } from '@/lib/hooks/useLoungeProfile'
 import { LOUNGE_FEATURES } from '@/types/lounge'
@@ -11,6 +11,45 @@ import {
   IconTarget,
   IconCalendar,
 } from '@/components/Icons'
+
+// Demo reviews data
+const DEMO_REVIEWS = [
+  {
+    id: '1',
+    name: 'Александр Петров',
+    role: 'Постоянный гость',
+    rating: 5,
+    text: 'Лучшая кальянная в городе! Атмосфера на высоте, персонал всегда приветливый. Фирменные миксы просто огонь, особенно Signature Pink.',
+  },
+  {
+    id: '2',
+    name: 'Мария Иванова',
+    role: 'Блогер',
+    rating: 5,
+    text: 'Обожаю это место! Уютный интерьер, вкусные кальяны и отличная музыка. Рекомендую всем своим подписчикам.',
+  },
+  {
+    id: '3',
+    name: 'Дмитрий Козлов',
+    role: 'Кальянный эксперт',
+    rating: 4,
+    text: 'Хороший выбор табаков и профессиональные кальянщики. Tropical Storm — мой фаворит. Приду ещё!',
+  },
+  {
+    id: '4',
+    name: 'Елена Смирнова',
+    role: 'Гость',
+    rating: 5,
+    text: 'Праздновали здесь день рождения — всё было идеально! VIP-комната очень уютная, обслуживание на 5+.',
+  },
+  {
+    id: '5',
+    name: 'Артём Волков',
+    role: 'Ценитель кальянов',
+    rating: 5,
+    text: 'Качество забивки и сервис на высшем уровне. Терраса летом — отдельный кайф. Место must visit!',
+  },
+]
 
 const DAY_NAMES: Record<string, string> = {
   monday: 'Пн',
@@ -232,7 +271,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
                     </div>
                     {lounge.show_prices && mix.price && (
                       <span className="text-lg font-bold text-[var(--color-primary)]">
-                        {mix.price}₽
+                        ${mix.price}
                       </span>
                     )}
                   </div>
@@ -254,6 +293,11 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
               ))}
             </div>
           </div>
+        )}
+
+        {/* Reviews Section */}
+        {lounge.reviews_count > 0 && (
+          <ReviewsCarousel reviewsCount={lounge.reviews_count} />
         )}
 
         {/* CTA */}
@@ -281,6 +325,138 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
           <p>Страница создана на платформе <Link href="/mix" className="text-[var(--color-primary)] hover:underline">Hookah Torus</Link></p>
         </div>
       </footer>
+    </div>
+  )
+}
+
+// Reviews Carousel Component with scroll tracking
+function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [showLeftFade, setShowLeftFade] = useState(false)
+  const [showRightFade, setShowRightFade] = useState(true)
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return
+    const container = scrollRef.current
+    const { scrollLeft, scrollWidth, clientWidth } = container
+
+    // Calculate active index based on scroll position
+    const cardWidth = 316 // card width (300) + gap (16)
+    const maxScroll = scrollWidth - clientWidth
+    const scrollPercent = scrollLeft / maxScroll
+    const newIndex = Math.round(scrollPercent * (DEMO_REVIEWS.length - 1))
+    setActiveIndex(Math.max(0, Math.min(newIndex, DEMO_REVIEWS.length - 1)))
+
+    // Update fade visibility
+    setShowLeftFade(scrollLeft > 20)
+    setShowRightFade(scrollLeft < maxScroll - 20)
+  }
+
+  const scrollToIndex = (index: number) => {
+    if (!scrollRef.current) return
+    const container = scrollRef.current
+    const { scrollWidth, clientWidth } = container
+    const maxScroll = scrollWidth - clientWidth
+    const targetScroll = (index / (DEMO_REVIEWS.length - 1)) * maxScroll
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    })
+  }
+
+  return (
+    <div className="mb-8">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+          Отзывы наших <span className="text-[var(--color-warning)]">гостей</span>
+        </h2>
+        <p className="text-[var(--color-textMuted)]">
+          Более {reviewsCount} гостей уже оценили наше заведение
+        </p>
+      </div>
+
+      {/* Reviews Carousel */}
+      <div className="relative overflow-hidden -mx-4">
+        {/* Left fade gradient */}
+        <div
+          className={`absolute left-0 top-0 bottom-4 w-20 z-10 pointer-events-none transition-opacity duration-300 ${
+            showLeftFade ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            background: 'linear-gradient(to right, var(--color-bg) 0%, var(--color-bg) 20%, transparent 100%)'
+          }}
+        />
+
+        {/* Right fade gradient */}
+        <div
+          className={`absolute right-0 top-0 bottom-4 w-20 z-10 pointer-events-none transition-opacity duration-300 ${
+            showRightFade ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            background: 'linear-gradient(to left, var(--color-bg) 0%, var(--color-bg) 20%, transparent 100%)'
+          }}
+        />
+
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide px-4"
+        >
+          {DEMO_REVIEWS.map((review) => (
+            <div
+              key={review.id}
+              className="flex-shrink-0 w-[300px] sm:w-[350px] snap-center"
+            >
+              <div className="card h-full border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-colors">
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-black flex-shrink-0">
+                    {review.name.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{review.name}</p>
+                    <p className="text-xs text-[var(--color-textMuted)] truncate">{review.role}</p>
+                  </div>
+                </div>
+
+                {/* Rating */}
+                <div className="flex gap-0.5 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <span
+                      key={i}
+                      className={`text-sm ${i < review.rating ? 'text-[var(--color-warning)]' : 'text-[var(--color-border)]'}`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+
+                {/* Text */}
+                <p className="text-sm text-[var(--color-textMuted)] leading-relaxed">
+                  "{review.text}"
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Scroll indicators - clickable dots */}
+        <div className="flex justify-center gap-2 mt-4">
+          {DEMO_REVIEWS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => scrollToIndex(i)}
+              className={`h-2.5 rounded-full transition-all duration-300 ${
+                i === activeIndex
+                  ? 'bg-[var(--color-primary)] w-6'
+                  : 'bg-[var(--color-border)] hover:bg-[var(--color-textMuted)] w-2.5'
+              }`}
+              aria-label={`Перейти к отзыву ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
