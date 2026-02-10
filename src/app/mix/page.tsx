@@ -8,6 +8,8 @@ import ThemeSwitcher from "@/components/ThemeSwitcher";
 import AnimatedSmokeBackground from "@/components/AnimatedSmokeBackground";
 import TobaccoCard from "@/components/TobaccoCard";
 import MixesDrawer from "@/components/MixesDrawer";
+import Confetti from "@/components/Confetti";
+import SlotMachine from "@/components/SlotMachine";
 import {
   IconStrength,
   IconHeat,
@@ -21,22 +23,42 @@ import {
 import { MIX_RECIPES, type MixRecipe } from "@/data/mixes";
 import { calculateMix, validateMix, type MixItem } from "@/logic/mixCalculator";
 import { useTheme } from "@/lib/ThemeContext";
+import { useAuth } from "@/lib/AuthContext";
+import { QuickSession } from "@/components/dashboard/QuickSession";
+import { useSessions } from "@/lib/hooks/useSessions";
+import { useSavedMixes } from "@/lib/hooks/useSavedMixes";
+import { SaveMixModal } from "@/components/mix/SaveMixModal";
+import { SavedMixesDrawer } from "@/components/mix/SavedMixesDrawer";
+import Link from "next/link";
 
 const BRANDS = getBrandNames();
-const CATEGORIES = getCategories();
+
+// Ordered categories for consistent display
+const CATEGORIES: Category[] = [
+  "fruit",    // Фрукты
+  "berry",    // Ягоды
+  "citrus",   // Цитрус
+  "tropical", // Тропики
+  "mint",     // Свежесть
+  "dessert",  // Десерты
+  "soda",     // Напитки
+  "candy",    // Сладости
+  "spice",    // Специи
+  "herbal",   // Травы
+];
 
 // Category labels and icons for better UX
 const CATEGORY_INFO: Record<Category, { label: string; emoji: string }> = {
+  fruit: { label: "Фрукты", emoji: "🍎" },
   berry: { label: "Ягоды", emoji: "🫐" },
   citrus: { label: "Цитрус", emoji: "🍋" },
-  mint: { label: "Свежесть", emoji: "🌿" },
   tropical: { label: "Тропики", emoji: "🥭" },
-  dessert: { label: "Выпечка", emoji: "🍰" },
+  mint: { label: "Свежесть", emoji: "❄️" },
+  dessert: { label: "Десерты", emoji: "🍰" },
   soda: { label: "Напитки", emoji: "🥤" },
-  fruit: { label: "Фрукты", emoji: "🍎" },
   candy: { label: "Сладости", emoji: "🍬" },
   spice: { label: "Специи", emoji: "🌶️" },
-  herbal: { label: "Травы", emoji: "🌱" },
+  herbal: { label: "Травы", emoji: "🌿" },
 };
 
 function roundToInt(v: number) {
@@ -45,6 +67,9 @@ function roundToInt(v: number) {
 
 export default function MixPage() {
   const { theme } = useTheme();
+  const { user } = useAuth();
+  const { createSession } = useSessions();
+  const { saveMix, incrementUsage } = useSavedMixes();
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([TOBACCOS[0].id, TOBACCOS[1].id]);
@@ -53,9 +78,17 @@ export default function MixPage() {
     [TOBACCOS[1].id]: 40,
   });
   const [isMixesDrawerOpen, setIsMixesDrawerOpen] = useState(false);
+  const [isSavedMixesDrawerOpen, setIsSavedMixesDrawerOpen] = useState(false);
+  const [isSaveMixModalOpen, setIsSaveMixModalOpen] = useState(false);
   const [targetCompatibility, setTargetCompatibility] = useState<number | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [isSlotMachineOpen, setIsSlotMachineOpen] = useState(false);
+  const [isQuickSessionOpen, setIsQuickSessionOpen] = useState(false);
   const skipNormalizationRef = React.useRef(false);
+  const resultsRef = React.useRef<HTMLDivElement>(null);
+  const hasInitializedRef = React.useRef(false);
 
   // Apply a preset mix recipe
   const applyMixRecipe = useCallback((mix: MixRecipe) => {
@@ -98,8 +131,45 @@ export default function MixPage() {
       skipNormalizationRef.current = true;
       setSelectedIds(matchedIds);
       setPercents(newPercents);
+
+      // Scroll to results section after a brief delay
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     }
   }, []);
+
+  // Handle slot machine result
+  const handleSlotResult = useCallback((tobaccos: import("@/data/tobaccos").Tobacco[]) => {
+    const ids = tobaccos.map(t => t.id);
+    const newPercents: Record<string, number> = {};
+
+    // Distribute percentages: 40%, 35%, 25%
+    const percentages = [40, 35, 25];
+    ids.forEach((id, i) => {
+      newPercents[id] = percentages[i] || 25;
+    });
+
+    skipNormalizationRef.current = true;
+    setSelectedIds(ids);
+    setPercents(newPercents);
+
+    // Scroll to results
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  }, []);
+
+  // Apply first popular mix on initial load
+  React.useEffect(() => {
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
+
+    const topMix = MIX_RECIPES.find(m => m.popularity >= 5);
+    if (topMix) {
+      applyMixRecipe(topMix);
+    }
+  }, [applyMixRecipe]);
 
   const filteredTobaccos = useMemo(() => {
     let result = TOBACCOS;
@@ -214,6 +284,64 @@ export default function MixPage() {
     });
   }, [selectedIds]);
 
+  // Trigger confetti when perfect compatibility
+  React.useEffect(() => {
+    if (result?.compatibility.level === "perfect") {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [result?.compatibility.level]);
+
+  // Handle loading a saved mix
+  const handleLoadSavedMix = useCallback((tobaccos: import("@/types/database").SavedMixTobacco[], mixId: string) => {
+    const matchedIds: string[] = [];
+    const newPercents: Record<string, number> = {};
+
+    for (const t of tobaccos) {
+      // Find tobacco by id first
+      let tobacco = TOBACCOS.find(x => x.id === t.tobacco_id);
+      // Fallback to brand + flavor match
+      if (!tobacco) {
+        tobacco = TOBACCOS.find(x =>
+          x.brand.toLowerCase() === t.brand.toLowerCase() &&
+          x.flavor.toLowerCase() === t.flavor.toLowerCase()
+        );
+      }
+
+      if (tobacco && matchedIds.length < 3) {
+        matchedIds.push(tobacco.id);
+        newPercents[tobacco.id] = t.percent;
+      }
+    }
+
+    if (matchedIds.length >= 2) {
+      skipNormalizationRef.current = true;
+      setSelectedIds(matchedIds);
+      setPercents(newPercents);
+
+      // Scroll to results
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, []);
+
+  // Handle saving current mix
+  const handleSaveMix = useCallback(async (name: string) => {
+    if (!result) return;
+
+    const tobaccos = items.map(it => ({
+      tobacco_id: it.tobacco.id,
+      brand: it.tobacco.brand,
+      flavor: it.tobacco.flavor,
+      percent: it.percent,
+      color: it.tobacco.color,
+    }));
+
+    await saveMix(name, tobaccos, result.compatibility.score);
+  }, [items, result, saveMix]);
+
   const compatColor = result?.compatibility.level === "perfect" ? theme.colors.success :
                       result?.compatibility.level === "good" ? theme.colors.primary :
                       result?.compatibility.level === "okay" ? theme.colors.warning : theme.colors.danger;
@@ -221,9 +349,12 @@ export default function MixPage() {
   const isAtLimit = selectedIds.length >= 3;
 
   return (
-    <div className="min-h-screen transition-theme relative overflow-hidden" style={{ background: "var(--color-bg)" }}>
+    <div className="min-h-screen transition-theme relative overflow-hidden bg-gradient-fun" style={{ background: "var(--color-bg)" }}>
       {/* Animated Smoke Background */}
       <AnimatedSmokeBackground />
+
+      {/* Confetti for perfect compatibility */}
+      <Confetti active={showConfetti} />
 
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b" style={{ borderColor: "var(--color-border)" }}>
@@ -245,7 +376,7 @@ export default function MixPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setIsMixesDrawerOpen(true)}
               className="btn text-sm flex items-center gap-2"
@@ -258,10 +389,63 @@ export default function MixPage() {
               <span>📋</span>
               <span className="hidden sm:inline">Готовые миксы</span>
             </button>
+            {user && (
+              <button
+                onClick={() => setIsSavedMixesDrawerOpen(true)}
+                className="btn text-sm flex items-center gap-2"
+                style={{
+                  background: "var(--color-bgHover)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                }}
+              >
+                <span>⭐</span>
+                <span className="hidden sm:inline">Мои миксы</span>
+              </button>
+            )}
+            <button
+              onClick={() => setIsSlotMachineOpen(true)}
+              className="btn btn-neon text-sm flex items-center gap-2"
+            >
+              <span>🎰</span>
+              <span className="hidden sm:inline">Рандом</span>
+            </button>
+            {user && result && (
+              <>
+                <button
+                  onClick={() => setIsSaveMixModalOpen(true)}
+                  className="btn text-sm flex items-center gap-2"
+                  style={{
+                    background: "var(--color-primary)",
+                    color: "var(--color-bg)",
+                  }}
+                >
+                  <span>⭐</span>
+                  <span className="hidden sm:inline">Сохранить микс</span>
+                </button>
+                <button
+                  onClick={() => setIsQuickSessionOpen(true)}
+                  className="btn text-sm flex items-center gap-2"
+                  style={{
+                    background: "var(--color-success)",
+                    color: "white",
+                  }}
+                >
+                  <span>💾</span>
+                  <span className="hidden sm:inline">Сессия</span>
+                </button>
+              </>
+            )}
             <ThemeSwitcher />
-            <a href="/setup" className="btn btn-primary text-sm">
-              Setup →
-            </a>
+            {user ? (
+              <Link href="/dashboard" className="btn btn-primary text-sm">
+                Кабинет
+              </Link>
+            ) : (
+              <Link href="/login" className="btn btn-primary text-sm">
+                Войти
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -331,25 +515,45 @@ export default function MixPage() {
                 ))}
               </div>
 
-              {/* Category filter */}
-              <div className="flex flex-wrap gap-2 mb-5 pb-5 border-b" style={{ borderColor: "var(--color-border)" }}>
+              {/* Category filter toggle */}
+              <div className="mb-5 pb-5 border-b" style={{ borderColor: "var(--color-border)" }}>
                 <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`pill ${selectedCategory === null ? "pill-active" : ""}`}
+                  onClick={() => setShowCategoryFilter(prev => !prev)}
+                  className="pill flex items-center gap-2"
+                  style={{
+                    background: selectedCategory || showCategoryFilter ? "var(--color-primary)" : "var(--color-bgHover)",
+                    color: selectedCategory || showCategoryFilter ? "var(--color-bg)" : "var(--color-text)",
+                  }}
                 >
-                  Все вкусы
+                  <span>🎨</span>
+                  <span>Фильтр по вкусам</span>
+                  {selectedCategory && (
+                    <span className="text-xs opacity-80">({CATEGORY_INFO[selectedCategory].label})</span>
+                  )}
+                  <span className={`transition-transform ${showCategoryFilter ? "rotate-180" : ""}`}>▼</span>
                 </button>
-                {CATEGORIES.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(prev => prev === cat ? null : cat)}
-                    className={`pill ${selectedCategory === cat ? "pill-active" : ""}`}
-                    title={CATEGORY_INFO[cat].label}
-                  >
-                    <span className="mr-1">{CATEGORY_INFO[cat].emoji}</span>
-                    {CATEGORY_INFO[cat].label}
-                  </button>
-                ))}
+
+                {/* Expandable category list */}
+                {showCategoryFilter && (
+                  <div className="flex flex-wrap gap-2 mt-3 animate-fadeInUp">
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className={`pill ${selectedCategory === null ? "pill-active" : ""}`}
+                    >
+                      Все вкусы
+                    </button>
+                    {CATEGORIES.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(prev => prev === cat ? null : cat)}
+                        className={`pill ${selectedCategory === cat ? "pill-active" : ""}`}
+                      >
+                        <span className="mr-1">{CATEGORY_INFO[cat].emoji}</span>
+                        {CATEGORY_INFO[cat].label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Tobacco grid */}
@@ -442,19 +646,31 @@ export default function MixPage() {
 
             {/* Results */}
             {result && (
-              <section className="card card-elevated stagger-children" style={{ overflow: "visible" }}>
+              <section
+                ref={resultsRef}
+                className={`card card-elevated stagger-children ${result?.compatibility.level === "perfect" ? "animate-rainbow-border" : ""}`}
+                style={{
+                  overflow: "visible",
+                  borderWidth: result?.compatibility.level === "perfect" ? "2px" : "1px",
+                }}
+              >
                 {/* Compatibility Ring - Interactive */}
-                <div className="flex flex-col items-center mb-6 pb-8">
-                  <ProgressRing
-                    value={result.compatibility.score}
-                    color={compatColor}
-                    size={160}
-                    strokeWidth={12}
-                    label="Compatibility"
-                    sublabel={result.compatibility.level}
-                    interactive={result.compatibility.score < 80}
-                    onTargetChange={handleTargetChange}
-                  />
+                <div className={`flex flex-col items-center mb-6 pb-8 ${result?.compatibility.level === "perfect" ? "perfect-celebration" : ""}`}>
+                  <div
+                    className={result.compatibility.level === "perfect" ? "animate-pulse-glow" : ""}
+                    style={{ "--glow-color": compatColor } as React.CSSProperties}
+                  >
+                    <ProgressRing
+                      value={result.compatibility.score}
+                      color={compatColor}
+                      size={160}
+                      strokeWidth={12}
+                      label="Compatibility"
+                      sublabel={result.compatibility.level}
+                      interactive={result.compatibility.score < 80}
+                      onTargetChange={handleTargetChange}
+                    />
+                  </div>
 
                   {/* Interactive hint */}
                   {result.compatibility.score < 80 && (
@@ -716,6 +932,47 @@ export default function MixPage() {
         onClose={() => setIsMixesDrawerOpen(false)}
         onSelectMix={applyMixRecipe}
       />
+
+      {/* Slot Machine */}
+      <SlotMachine
+        isOpen={isSlotMachineOpen}
+        onClose={() => setIsSlotMachineOpen(false)}
+        onResult={handleSlotResult}
+      />
+
+      {/* Quick Session Modal for authenticated users */}
+      {user && (
+        <QuickSession
+          isOpen={isQuickSessionOpen}
+          onClose={() => setIsQuickSessionOpen(false)}
+          onSave={async (session, sessionItems, deductFromInventory) => {
+            await createSession(session, sessionItems, deductFromInventory);
+          }}
+          initialMix={items.map(it => ({
+            tobacco: it.tobacco,
+            percent: it.percent,
+          }))}
+        />
+      )}
+
+      {/* Save Mix Modal for authenticated users */}
+      {user && (
+        <SaveMixModal
+          isOpen={isSaveMixModalOpen}
+          onClose={() => setIsSaveMixModalOpen(false)}
+          onSave={handleSaveMix}
+          defaultName={items.map(it => it.tobacco.flavor).join(" + ")}
+        />
+      )}
+
+      {/* Saved Mixes Drawer for authenticated users */}
+      {user && (
+        <SavedMixesDrawer
+          isOpen={isSavedMixesDrawerOpen}
+          onClose={() => setIsSavedMixesDrawerOpen(false)}
+          onSelectMix={handleLoadSavedMix}
+        />
+      )}
     </div>
   );
 }

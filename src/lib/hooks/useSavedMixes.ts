@@ -1,0 +1,260 @@
+'use client'
+
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/lib/AuthContext'
+import type { SavedMix, SavedMixTobacco } from '@/types/database'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+
+// Demo saved mixes
+const DEMO_MIXES: SavedMix[] = [
+  {
+    id: '1',
+    profile_id: 'demo',
+    name: 'Летний вечер',
+    tobaccos: [
+      { tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', percent: 60, color: '#FF6B9D' },
+      { tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', percent: 40, color: '#00D9A5' },
+    ],
+    compatibility_score: 92,
+    is_favorite: true,
+    usage_count: 15,
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: '2',
+    profile_id: 'demo',
+    name: 'Фруктовый микс',
+    tobaccos: [
+      { tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', percent: 50, color: '#FF4B4B' },
+      { tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', percent: 50, color: '#FFE500' },
+    ],
+    compatibility_score: 85,
+    is_favorite: false,
+    usage_count: 8,
+    created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: '3',
+    profile_id: 'demo',
+    name: 'Тропический рай',
+    tobaccos: [
+      { tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', percent: 40, color: '#FFD93D' },
+      { tobacco_id: 'bb1', brand: 'Black Burn', flavor: 'Something Berry', percent: 35, color: '#FF6B9D' },
+      { tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', percent: 25, color: '#00D9A5' },
+    ],
+    compatibility_score: 78,
+    is_favorite: true,
+    usage_count: 5,
+    created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+]
+
+interface UseSavedMixesReturn {
+  savedMixes: SavedMix[]
+  loading: boolean
+  error: string | null
+  saveMix: (name: string, tobaccos: SavedMixTobacco[], compatibilityScore: number | null) => Promise<void>
+  deleteMix: (id: string) => Promise<void>
+  toggleFavorite: (id: string) => Promise<void>
+  incrementUsage: (id: string) => Promise<void>
+  refresh: () => Promise<void>
+}
+
+export function useSavedMixes(): UseSavedMixesReturn {
+  const [savedMixes, setSavedMixes] = useState<SavedMix[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const { user, isDemoMode } = useAuth()
+  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+
+  // Return demo data if in demo mode
+  useEffect(() => {
+    if (isDemoMode && user) {
+      setSavedMixes(DEMO_MIXES)
+      setLoading(false)
+    }
+  }, [isDemoMode, user])
+
+  const fetchMixes = useCallback(async () => {
+    if (!user || !supabase) {
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('saved_mixes')
+        .select('*')
+        .eq('profile_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (fetchError) throw fetchError
+      setSavedMixes(data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка загрузки миксов')
+    }
+
+    setLoading(false)
+  }, [user, supabase])
+
+  useEffect(() => {
+    if (!isDemoMode) {
+      fetchMixes()
+    }
+  }, [fetchMixes, isDemoMode])
+
+  const saveMix = useCallback(async (
+    name: string,
+    tobaccos: SavedMixTobacco[],
+    compatibilityScore: number | null
+  ) => {
+    if (isDemoMode) {
+      // Add to demo data
+      const newMix: SavedMix = {
+        id: Date.now().toString(),
+        profile_id: 'demo',
+        name,
+        tobaccos,
+        compatibility_score: compatibilityScore,
+        is_favorite: false,
+        usage_count: 0,
+        created_at: new Date().toISOString(),
+      }
+      setSavedMixes(prev => [newMix, ...prev])
+      return
+    }
+
+    if (!user || !supabase) return
+
+    setError(null)
+
+    try {
+      const { data, error: insertError } = await supabase
+        .from('saved_mixes')
+        .insert({
+          profile_id: user.id,
+          name,
+          tobaccos,
+          compatibility_score: compatibilityScore,
+        })
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+
+      setSavedMixes(prev => [data, ...prev])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка сохранения микса')
+      throw err
+    }
+  }, [user, supabase, isDemoMode])
+
+  const deleteMix = useCallback(async (id: string) => {
+    if (isDemoMode) {
+      setSavedMixes(prev => prev.filter(m => m.id !== id))
+      return
+    }
+
+    if (!user || !supabase) return
+
+    setError(null)
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('saved_mixes')
+        .delete()
+        .eq('id', id)
+        .eq('profile_id', user.id)
+
+      if (deleteError) throw deleteError
+
+      setSavedMixes(prev => prev.filter(m => m.id !== id))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка удаления микса')
+      throw err
+    }
+  }, [user, supabase, isDemoMode])
+
+  const toggleFavorite = useCallback(async (id: string) => {
+    const mix = savedMixes.find(m => m.id === id)
+    if (!mix) return
+
+    if (isDemoMode) {
+      setSavedMixes(prev => prev.map(m =>
+        m.id === id ? { ...m, is_favorite: !m.is_favorite } : m
+      ))
+      return
+    }
+
+    if (!user || !supabase) return
+
+    setError(null)
+
+    try {
+      const { error: updateError } = await supabase
+        .from('saved_mixes')
+        .update({ is_favorite: !mix.is_favorite })
+        .eq('id', id)
+        .eq('profile_id', user.id)
+
+      if (updateError) throw updateError
+
+      setSavedMixes(prev => prev.map(m =>
+        m.id === id ? { ...m, is_favorite: !m.is_favorite } : m
+      ))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка обновления микса')
+      throw err
+    }
+  }, [user, supabase, savedMixes, isDemoMode])
+
+  const incrementUsage = useCallback(async (id: string) => {
+    const mix = savedMixes.find(m => m.id === id)
+    if (!mix) return
+
+    if (isDemoMode) {
+      setSavedMixes(prev => prev.map(m =>
+        m.id === id ? { ...m, usage_count: m.usage_count + 1 } : m
+      ))
+      return
+    }
+
+    if (!user || !supabase) return
+
+    try {
+      const { error: updateError } = await supabase
+        .from('saved_mixes')
+        .update({ usage_count: mix.usage_count + 1 })
+        .eq('id', id)
+        .eq('profile_id', user.id)
+
+      if (updateError) throw updateError
+
+      setSavedMixes(prev => prev.map(m =>
+        m.id === id ? { ...m, usage_count: m.usage_count + 1 } : m
+      ))
+    } catch (err) {
+      // Silently fail for usage increment
+      console.error('Failed to increment usage:', err)
+    }
+  }, [user, supabase, savedMixes, isDemoMode])
+
+  return {
+    savedMixes,
+    loading,
+    error,
+    saveMix,
+    deleteMix,
+    toggleFavorite,
+    incrementUsage,
+    refresh: fetchMixes,
+  }
+}

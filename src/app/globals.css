@@ -44,6 +44,15 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--color-borderAccent); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-textMuted); }
 
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ========== SELECTION ========== */
 ::selection { background: var(--color-primary); color: var(--color-bg); }
 
@@ -421,3 +430,184 @@ input[type="range"]::-moz-range-thumb {
 .badge-warning { background: color-mix(in srgb, var(--color-warning) 20%, transparent); color: var(--color-warning); }
 .badge-danger { background: color-mix(in srgb, var(--color-danger) 20%, transparent); color: var(--color-danger); }
 .badge-primary { background: color-mix(in srgb, var(--color-primary) 20%, transparent); color: var(--color-primary); }
+
+/* ========== CONFETTI ANIMATION ========== */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--drift, 0)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall var(--fall-duration, 3s) ease-out forwards;
+}
+
+/* ========== PULSE GLOW ========== */
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px var(--glow-color, var(--color-success)));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px var(--glow-color, var(--color-success))) drop-shadow(0 0 50px var(--glow-color, var(--color-success)));
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ========== BOUNCE ========== */
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ========== SHAKE ========== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* ========== SPIN SLOW ========== */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* ========== GRADIENT CARD ========== */
+.card-gradient {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--color-bgCard) 100%, transparent) 0%,
+    color-mix(in srgb, var(--color-bgHover) 80%, var(--color-primary)) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+}
+
+/* ========== NEON BUTTON ========== */
+.btn-neon {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #EC4899 100%);
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  box-shadow:
+    0 0 10px var(--color-primary),
+    0 0 20px color-mix(in srgb, var(--color-primary) 50%, transparent),
+    0 0 30px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  transition: all 0.3s ease;
+}
+
+.btn-neon:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 15px var(--color-primary),
+    0 0 30px color-mix(in srgb, var(--color-primary) 60%, transparent),
+    0 0 45px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.btn-neon:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ========== RAINBOW BORDER ========== */
+@keyframes rainbow-border {
+  0% { border-color: #F59E0B; }
+  20% { border-color: #EC4899; }
+  40% { border-color: #8B5CF6; }
+  60% { border-color: #06B6D4; }
+  80% { border-color: #22C55E; }
+  100% { border-color: #F59E0B; }
+}
+
+.animate-rainbow-border {
+  animation: rainbow-border 3s linear infinite;
+}
+
+/* ========== FLOAT ========== */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ========== GRADIENT BACKGROUND ========== */
+.bg-gradient-fun {
+  background: linear-gradient(
+    135deg,
+    var(--color-bg) 0%,
+    color-mix(in srgb, var(--color-primary) 5%, var(--color-bg)) 50%,
+    color-mix(in srgb, #EC4899 5%, var(--color-bg)) 100%
+  );
+}
+
+/* ========== EMOJI BOUNCE ========== */
+@keyframes emoji-bounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.2) rotate(-10deg); }
+  50% { transform: scale(1) rotate(0deg); }
+  75% { transform: scale(1.2) rotate(10deg); }
+}
+
+.animate-emoji {
+  display: inline-block;
+  animation: emoji-bounce 1s ease-in-out;
+}
+
+/* ========== PERFECT CELEBRATION ========== */
+.perfect-celebration {
+  position: relative;
+}
+
+.perfect-celebration::before {
+  content: '🎉';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  animation: float 2s ease-in-out infinite;
+}
+
+/* ========== SLOT MACHINE ========== */
+/* ========== SLOT MACHINE REEL ========== */
+@keyframes slot-reel {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-500px); }
+}
+
+.animate-slot-reel {
+  animation: slot-reel 0.15s linear infinite;
+}
+
+/* Slot stop with bounce */
+@keyframes slot-stop {
+  0% { transform: translateY(-20px); }
+  50% { transform: translateY(5px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-slot-stop {
+  animation: slot-stop 0.3s ease-out;
+}

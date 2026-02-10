@@ -1,5 +1,19 @@
 export type Category = "berry" | "citrus" | "mint" | "tropical" | "dessert" | "soda" | "fruit" | "candy" | "spice" | "herbal";
 
+// Emoji mapping for flavor categories
+export const CATEGORY_EMOJI: Record<Category, string> = {
+  berry: "🍇",
+  citrus: "🍋",
+  mint: "🌿",
+  tropical: "🥭",
+  dessert: "🍪",
+  soda: "🥤",
+  fruit: "🍑",
+  candy: "🍬",
+  spice: "🌶️",
+  herbal: "🌱",
+};
+
 export type Tobacco = {
   id: string;
   brand: string;

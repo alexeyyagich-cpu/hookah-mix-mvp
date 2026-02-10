@@ -1,0 +1,232 @@
+'use client'
+
+import { useState } from 'react'
+import type { TobaccoInventory } from '@/types/database'
+import type { ForecastResult } from '@/lib/utils/forecast'
+import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
+
+interface InventoryTableProps {
+  inventory: TobaccoInventory[]
+  forecasts?: Map<string, ForecastResult>
+  onEdit: (item: TobaccoInventory) => void
+  onDelete: (id: string) => void
+  onAdjust: (id: string, amount: number) => void
+  loading?: boolean
+}
+
+export function InventoryTable({ inventory, forecasts, onEdit, onDelete, onAdjust, loading }: InventoryTableProps) {
+  const [sortField, setSortField] = useState<keyof TobaccoInventory>('brand')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [filter, setFilter] = useState('')
+  const [adjustingId, setAdjustingId] = useState<string | null>(null)
+  const [adjustAmount, setAdjustAmount] = useState('')
+
+  const handleSort = (field: keyof TobaccoInventory) => {
+    if (sortField === field) {
+      setSortDirection(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
+  const sortedInventory = [...inventory]
+    .filter(item =>
+      item.brand.toLowerCase().includes(filter.toLowerCase()) ||
+      item.flavor.toLowerCase().includes(filter.toLowerCase())
+    )
+    .sort((a, b) => {
+      const aValue = a[sortField]
+      const bValue = b[sortField]
+      if (aValue === null || aValue === undefined) return 1
+      if (bValue === null || bValue === undefined) return -1
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+
+  const handleAdjust = (id: string) => {
+    const amount = parseFloat(adjustAmount)
+    if (!isNaN(amount) && amount !== 0) {
+      onAdjust(id, amount)
+    }
+    setAdjustingId(null)
+    setAdjustAmount('')
+  }
+
+  const getStockStatus = (quantity: number) => {
+    if (quantity <= 0) return { color: 'danger', label: 'Нет в наличии' }
+    if (quantity < 50) return { color: 'warning', label: 'Мало' }
+    return { color: 'success', label: 'В наличии' }
+  }
+
+  if (loading) {
+    return (
+      <div className="card p-8 text-center">
+        <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-[var(--color-textMuted)]">Загрузка инвентаря...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Search */}
+      <div className="relative">
+        <input
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Поиск по бренду или вкусу..."
+          className="w-full px-4 py-3 pl-10 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+        />
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-textMuted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      {/* Table */}
+      <div className="card overflow-hidden p-0">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[var(--color-border)]">
+                <th
+                  onClick={() => handleSort('brand')}
+                  className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
+                >
+                  Бренд {sortField === 'brand' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </th>
+                <th
+                  onClick={() => handleSort('flavor')}
+                  className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
+                >
+                  Вкус {sortField === 'flavor' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </th>
+                <th
+                  onClick={() => handleSort('quantity_grams')}
+                  className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
+                >
+                  Остаток {sortField === 'quantity_grams' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)]">
+                  Статус
+                </th>
+                {forecasts && (
+                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)]">
+                    Прогноз
+                  </th>
+                )}
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)]">
+                  Действия
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)]">
+              {sortedInventory.length === 0 ? (
+                <tr>
+                  <td colSpan={forecasts ? 6 : 5} className="px-4 py-12 text-center text-[var(--color-textMuted)]">
+                    {filter ? 'Ничего не найдено' : 'Инвентарь пуст. Добавьте первый табак!'}
+                  </td>
+                </tr>
+              ) : (
+                sortedInventory.map((item) => {
+                  const status = getStockStatus(item.quantity_grams)
+                  const isAdjusting = adjustingId === item.id
+
+                  return (
+                    <tr key={item.id} className="hover:bg-[var(--color-bgHover)] transition-colors">
+                      <td className="px-4 py-4 font-medium">{item.brand}</td>
+                      <td className="px-4 py-4">{item.flavor}</td>
+                      <td className="px-4 py-4 text-right">
+                        {isAdjusting ? (
+                          <div className="flex items-center justify-end gap-2">
+                            <input
+                              type="number"
+                              value={adjustAmount}
+                              onChange={(e) => setAdjustAmount(e.target.value)}
+                              placeholder="+/-"
+                              className="w-20 px-2 py-1 rounded-lg bg-[var(--color-bgHover)] border border-[var(--color-border)] text-right text-sm"
+                              autoFocus
+                            />
+                            <button
+                              onClick={() => handleAdjust(item.id)}
+                              className="p-1 rounded-lg hover:bg-[var(--color-success)]/20 text-[var(--color-success)]"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={() => {
+                                setAdjustingId(null)
+                                setAdjustAmount('')
+                              }}
+                              className="p-1 rounded-lg hover:bg-[var(--color-danger)]/20 text-[var(--color-danger)]"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setAdjustingId(item.id)}
+                            className="font-mono hover:text-[var(--color-primary)] transition-colors"
+                          >
+                            {item.quantity_grams.toFixed(0)}г
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-4 text-center">
+                        <span className={`badge badge-${status.color}`}>
+                          {status.label}
+                        </span>
+                      </td>
+                      {forecasts && (
+                        <td className="px-4 py-4 text-center">
+                          {(() => {
+                            const forecast = forecasts.get(item.id)
+                            if (!forecast) return <span className="text-[var(--color-textMuted)]">—</span>
+                            const color = getForecastColor(forecast.daysUntilEmpty)
+                            const colorVar = color === 'muted' ? 'var(--color-textMuted)' :
+                                             color === 'danger' ? 'var(--color-danger)' :
+                                             color === 'warning' ? 'var(--color-warning)' :
+                                             'var(--color-success)'
+                            return (
+                              <span
+                                className="font-medium text-sm"
+                                style={{ color: colorVar }}
+                                title={forecast.confidence !== 'low' ? `Уверенность: ${forecast.confidence === 'high' ? 'высокая' : 'средняя'}` : 'Мало данных'}
+                              >
+                                {formatForecastDays(forecast.daysUntilEmpty)}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                      )}
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => onEdit(item)}
+                            className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
+                            title="Редактировать"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => onDelete(item.id)}
+                            className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
+                            title="Удалить"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
