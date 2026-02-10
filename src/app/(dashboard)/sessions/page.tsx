@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
@@ -14,6 +15,13 @@ export default function SessionsPage() {
 
   const [filter, setFilter] = useState('')
   const [selectedSession, setSelectedSession] = useState<SessionWithItems | null>(null)
+
+  // Background portal
+  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    setBgContainer(document.getElementById('page-background'))
+    return () => setBgContainer(null)
+  }, [])
 
   const filteredSessions = sessions.filter(session =>
     session.session_items?.some(item =>
@@ -33,7 +41,21 @@ export default function SessionsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Background Image via Portal */}
+      {bgContainer && createPortal(
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: 'url(/images/sessions-bg.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />,
+        bgContainer
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
