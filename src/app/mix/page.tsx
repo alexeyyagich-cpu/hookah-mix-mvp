@@ -377,6 +377,18 @@ export default function MixPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/recommend"
+              className="btn text-sm flex items-center gap-2"
+              style={{
+                background: "var(--color-bgHover)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+              }}
+            >
+              <span>🎯</span>
+              <span className="hidden sm:inline">Подбор</span>
+            </Link>
             <button
               onClick={() => setIsMixesDrawerOpen(true)}
               className="btn text-sm flex items-center gap-2"
