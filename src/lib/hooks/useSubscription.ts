@@ -15,6 +15,8 @@ interface UseSubscriptionReturn {
   daysUntilExpiry: number | null
   canExport: boolean
   canAccessApi: boolean
+  canUseMarketplace: boolean
+  canUseAutoReorder: boolean
 }
 
 export function useSubscription(): UseSubscriptionReturn {
@@ -47,5 +49,7 @@ export function useSubscription(): UseSubscriptionReturn {
     daysUntilExpiry: isExpired ? null : daysUntilExpiry,
     canExport: effectiveLimits.export,
     canAccessApi: effectiveLimits.api_access,
+    canUseMarketplace: effectiveLimits.marketplace,
+    canUseAutoReorder: effectiveLimits.auto_reorder,
   }
 }

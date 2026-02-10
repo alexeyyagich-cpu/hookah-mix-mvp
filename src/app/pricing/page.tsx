@@ -165,10 +165,10 @@ export default function PricingPage() {
             Есть вопросы? Напишите нам
           </p>
           <a
-            href="mailto:support@hookah-mix.ru"
+            href="mailto:support@hookah-mix.com"
             className="text-[var(--color-primary)] hover:underline"
           >
-            support@hookah-mix.ru
+            support@hookah-mix.com
           </a>
         </div>
       </main>

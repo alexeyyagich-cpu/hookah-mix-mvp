@@ -18,8 +18,8 @@ const DEMO_LOUNGE: LoungeProfile = {
   latitude: 55.7558,
   longitude: 37.6173,
   phone: '+7 (999) 123-45-67',
-  email: 'hello@demo-lounge.ru',
-  website: 'https://demo-lounge.ru',
+  email: 'hello@demo-lounge.com',
+  website: 'https://demo-lounge.com',
   instagram: 'demo_lounge',
   telegram: 'demo_lounge_chat',
   working_hours: {

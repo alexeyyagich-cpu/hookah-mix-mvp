@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { TobaccoInventory } from '@/types/database'
 import type { ForecastResult } from '@/lib/utils/forecast'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
+import { useSubscription } from '@/lib/hooks/useSubscription'
+import { IconShop } from '@/components/Icons'
 
 interface InventoryTableProps {
   inventory: TobaccoInventory[]
@@ -21,6 +24,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
   const [filter, setFilter] = useState('')
   const [adjustingId, setAdjustingId] = useState<string | null>(null)
   const [adjustAmount, setAdjustAmount] = useState('')
+  const { canUseMarketplace } = useSubscription()
 
   const handleSort = (field: keyof TobaccoInventory) => {
     if (sortField === field) {
@@ -204,6 +208,16 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                       )}
                       <td className="px-4 py-4">
                         <div className="flex items-center justify-end gap-2">
+                          {/* Order button for low stock items */}
+                          {canUseMarketplace && status.color !== 'success' && (
+                            <Link
+                              href="/marketplace"
+                              className="p-2 rounded-lg hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors"
+                              title="Заказать"
+                            >
+                              <IconShop size={16} />
+                            </Link>
+                          )}
                           <button
                             onClick={() => onEdit(item)}
                             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"

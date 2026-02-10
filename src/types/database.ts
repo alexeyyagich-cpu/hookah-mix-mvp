@@ -206,8 +206,131 @@ export interface Database {
         Insert: Omit<Guest, 'id' | 'created_at' | 'updated_at' | 'visit_count'> & { id?: string; created_at?: string; updated_at?: string; visit_count?: number }
         Update: Partial<Omit<Guest, 'id' | 'profile_id'>>
       }
+      suppliers: {
+        Row: Supplier
+        Insert: Omit<Supplier, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Omit<Supplier, 'id'>>
+      }
+      supplier_products: {
+        Row: SupplierProduct
+        Insert: Omit<SupplierProduct, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<SupplierProduct, 'id' | 'supplier_id'>>
+      }
+      marketplace_orders: {
+        Row: MarketplaceOrder
+        Insert: Omit<MarketplaceOrder, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<MarketplaceOrder, 'id' | 'profile_id'>>
+      }
+      marketplace_order_items: {
+        Row: MarketplaceOrderItem
+        Insert: Omit<MarketplaceOrderItem, 'id'> & { id?: string }
+        Update: Partial<Omit<MarketplaceOrderItem, 'id' | 'order_id'>>
+      }
+      auto_reorder_rules: {
+        Row: AutoReorderRule
+        Insert: Omit<AutoReorderRule, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<AutoReorderRule, 'id' | 'profile_id'>>
+      }
     }
   }
+}
+
+// ============================================================================
+// MARKETPLACE TYPES
+// ============================================================================
+
+export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+
+export interface Supplier {
+  id: string
+  name: string
+  contact_email: string | null
+  contact_phone: string | null
+  website: string | null
+  logo_url: string | null
+  description: string | null
+  min_order_amount: number
+  delivery_days_min: number
+  delivery_days_max: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface SupplierProduct {
+  id: string
+  supplier_id: string
+  tobacco_id: string
+  brand: string
+  flavor: string
+  sku: string | null
+  price: number
+  package_grams: number
+  in_stock: boolean
+  created_at: string
+}
+
+export interface MarketplaceOrder {
+  id: string
+  profile_id: string
+  supplier_id: string
+  order_number: string
+  status: OrderStatus
+  subtotal: number
+  shipping_cost: number
+  total: number
+  notes: string | null
+  estimated_delivery_date: string | null
+  actual_delivery_date: string | null
+  is_auto_order: boolean
+  created_at: string
+}
+
+export interface MarketplaceOrderItem {
+  id: string
+  order_id: string
+  supplier_product_id: string | null
+  tobacco_id: string
+  brand: string
+  flavor: string
+  quantity: number
+  unit_price: number
+  package_grams: number
+  total_price: number
+}
+
+export interface AutoReorderRule {
+  id: string
+  profile_id: string
+  tobacco_inventory_id: string
+  supplier_product_id: string
+  threshold_grams: number
+  reorder_quantity: number
+  is_enabled: boolean
+  last_triggered_at: string | null
+  created_at: string
+}
+
+// Extended marketplace types with relations
+export interface SupplierWithProducts extends Supplier {
+  products: SupplierProduct[]
+}
+
+export interface MarketplaceOrderWithItems extends MarketplaceOrder {
+  supplier: Supplier
+  order_items: MarketplaceOrderItem[]
+}
+
+// Cart types (client-side only, uses localStorage)
+export interface CartItem {
+  product: SupplierProduct
+  quantity: number
+}
+
+export interface Cart {
+  supplier: Supplier
+  items: CartItem[]
+  subtotal: number
 }
 
 // Subscription limits
@@ -218,6 +341,8 @@ export const SUBSCRIPTION_LIMITS = {
     session_history_days: 30,
     export: false,
     api_access: false,
+    marketplace: false,
+    auto_reorder: false,
   },
   pro: {
     inventory_items: Infinity,
@@ -225,6 +350,8 @@ export const SUBSCRIPTION_LIMITS = {
     session_history_days: Infinity,
     export: true,
     api_access: true,
+    marketplace: true,
+    auto_reorder: false,
   },
   enterprise: {
     inventory_items: Infinity,
@@ -232,5 +359,7 @@ export const SUBSCRIPTION_LIMITS = {
     session_history_days: Infinity,
     export: true,
     api_access: true,
+    marketplace: true,
+    auto_reorder: true,
   },
 } as const

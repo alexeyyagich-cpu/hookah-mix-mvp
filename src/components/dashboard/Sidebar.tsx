@@ -15,11 +15,21 @@ import {
   IconCalculator,
   IconLogout,
   IconSmoke,
+  IconShop,
+  IconLock,
 } from '@/components/Icons'
 
-const navigation = [
+interface NavItem {
+  name: string
+  href: string
+  Icon: React.ComponentType<{ size?: number }>
+  proOnly?: boolean
+}
+
+const navigation: NavItem[] = [
   { name: 'Обзор', href: '/dashboard', Icon: IconDashboard },
   { name: 'Инвентарь', href: '/inventory', Icon: IconInventory },
+  { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, proOnly: true },
   { name: 'Чаши', href: '/bowls', Icon: IconBowl },
   { name: 'Сессии', href: '/sessions', Icon: IconSession },
   { name: 'Статистика', href: '/statistics', Icon: IconChart },
@@ -73,8 +83,25 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           const Icon = item.Icon
+          const isLocked = item.proOnly && isFreeTier
+
+          if (isLocked) {
+            return (
+              <Link
+                key={item.name}
+                href="/pricing"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all"
+              >
+                <Icon size={20} />
+                {item.name}
+                <IconLock size={14} className="ml-auto" />
+              </Link>
+            )
+          }
+
           return (
             <Link
               key={item.name}

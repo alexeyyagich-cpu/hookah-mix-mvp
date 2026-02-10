@@ -1,0 +1,138 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
+import { OrderCard } from '@/components/marketplace/OrderCard'
+import { IconChevronLeft, IconPackage, IconShop } from '@/components/Icons'
+import type { OrderStatus } from '@/types/database'
+
+const STATUS_TABS: { key: OrderStatus | 'all'; label: string }[] = [
+  { key: 'all', label: 'Все' },
+  { key: 'pending', label: 'Ожидают' },
+  { key: 'confirmed', label: 'Подтверждены' },
+  { key: 'shipped', label: 'В пути' },
+  { key: 'delivered', label: 'Доставлены' },
+]
+
+export default function OrdersPage() {
+  const { orders, loading, error } = useMarketplaceOrders()
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
+
+  const filteredOrders = statusFilter === 'all'
+    ? orders
+    : orders.filter(o => o.status === statusFilter)
+
+  const countByStatus = (status: OrderStatus | 'all') => {
+    if (status === 'all') return orders.length
+    return orders.filter(o => o.status === status).length
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Back link */}
+      <Link
+        href="/marketplace"
+        className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
+      >
+        <IconChevronLeft size={20} />
+        Назад к маркетплейсу
+      </Link>
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <IconPackage size={28} className="text-[var(--color-primary)]" />
+          <div>
+            <h1 className="text-2xl font-bold">Мои заказы</h1>
+            <p className="text-[var(--color-textMuted)]">
+              {orders.length} заказов
+            </p>
+          </div>
+        </div>
+
+        <Link href="/marketplace" className="btn btn-primary flex items-center gap-2">
+          <IconShop size={18} />
+          Новый заказ
+        </Link>
+      </div>
+
+      {/* Status tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {STATUS_TABS.map(tab => {
+          const count = countByStatus(tab.key)
+          const isActive = statusFilter === tab.key
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                isActive
+                  ? 'bg-[var(--color-primary)] text-white'
+                  : 'bg-[var(--color-bgCard)] border border-[var(--color-border)] hover:bg-[var(--color-bgHover)]'
+              }`}
+            >
+              {tab.label}
+              {count > 0 && (
+                <span className={`ml-2 px-1.5 py-0.5 rounded text-xs ${
+                  isActive ? 'bg-white/20' : 'bg-[var(--color-bgHover)]'
+                }`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
+          <p className="text-[var(--color-danger)]">{error}</p>
+        </div>
+      )}
+
+      {/* Orders list */}
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="card p-4 animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[var(--color-bgHover)]" />
+                <div className="flex-1">
+                  <div className="h-4 bg-[var(--color-bgHover)] rounded w-1/4 mb-2" />
+                  <div className="h-3 bg-[var(--color-bgHover)] rounded w-1/3" />
+                </div>
+                <div className="h-6 bg-[var(--color-bgHover)] rounded w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="card p-8 text-center">
+          <IconPackage size={48} className="text-[var(--color-textMuted)] mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">
+            {statusFilter === 'all' ? 'Нет заказов' : 'Нет заказов с таким статусом'}
+          </h2>
+          <p className="text-[var(--color-textMuted)] mb-6">
+            {statusFilter === 'all'
+              ? 'Оформите первый заказ у поставщиков'
+              : 'Попробуйте выбрать другой фильтр'
+            }
+          </p>
+          {statusFilter === 'all' && (
+            <Link href="/marketplace" className="btn btn-primary">
+              Перейти к поставщикам
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredOrders.map(order => (
+            <OrderCard key={order.id} order={order} />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

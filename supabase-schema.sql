@@ -451,3 +451,159 @@ DROP TRIGGER IF EXISTS update_saved_mixes_updated_at ON public.saved_mixes;
 CREATE TRIGGER update_saved_mixes_updated_at
   BEFORE UPDATE ON public.saved_mixes
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================================
+-- MARKETPLACE: SUPPLIERS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.suppliers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  contact_email TEXT,
+  contact_phone TEXT,
+  website TEXT,
+  logo_url TEXT,
+  description TEXT,
+  min_order_amount DECIMAL(10,2) DEFAULT 0,
+  delivery_days_min INTEGER DEFAULT 1,
+  delivery_days_max INTEGER DEFAULT 7,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.suppliers ENABLE ROW LEVEL SECURITY;
+
+-- All authenticated users can view active suppliers
+CREATE POLICY "Authenticated users can view suppliers" ON public.suppliers
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_suppliers_updated_at ON public.suppliers;
+CREATE TRIGGER update_suppliers_updated_at
+  BEFORE UPDATE ON public.suppliers
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================================
+-- MARKETPLACE: SUPPLIER PRODUCTS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.supplier_products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  supplier_id UUID REFERENCES public.suppliers(id) ON DELETE CASCADE NOT NULL,
+  tobacco_id TEXT NOT NULL,
+  brand TEXT NOT NULL,
+  flavor TEXT NOT NULL,
+  sku TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  package_grams INTEGER DEFAULT 100,
+  in_stock BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.supplier_products ENABLE ROW LEVEL SECURITY;
+
+-- All authenticated users can view products
+CREATE POLICY "Authenticated users can view supplier products" ON public.supplier_products
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+
+-- Indexes
+CREATE INDEX idx_supplier_products_supplier_id ON public.supplier_products(supplier_id);
+CREATE INDEX idx_supplier_products_brand ON public.supplier_products(brand);
+CREATE INDEX idx_supplier_products_in_stock ON public.supplier_products(in_stock);
+
+-- ============================================================================
+-- MARKETPLACE: ORDERS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.marketplace_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  supplier_id UUID REFERENCES public.suppliers(id) NOT NULL,
+  order_number TEXT NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
+  subtotal DECIMAL(10,2) NOT NULL,
+  shipping_cost DECIMAL(10,2) DEFAULT 0,
+  total DECIMAL(10,2) NOT NULL,
+  notes TEXT,
+  estimated_delivery_date DATE,
+  actual_delivery_date DATE,
+  is_auto_order BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.marketplace_orders ENABLE ROW LEVEL SECURITY;
+
+-- Users can only manage their own orders
+CREATE POLICY "Users manage own marketplace orders" ON public.marketplace_orders
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Indexes
+CREATE INDEX idx_marketplace_orders_profile_id ON public.marketplace_orders(profile_id);
+CREATE INDEX idx_marketplace_orders_supplier_id ON public.marketplace_orders(supplier_id);
+CREATE INDEX idx_marketplace_orders_status ON public.marketplace_orders(status);
+CREATE INDEX idx_marketplace_orders_created_at ON public.marketplace_orders(created_at DESC);
+
+-- ============================================================================
+-- MARKETPLACE: ORDER ITEMS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.marketplace_order_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID REFERENCES public.marketplace_orders(id) ON DELETE CASCADE NOT NULL,
+  supplier_product_id UUID REFERENCES public.supplier_products(id),
+  tobacco_id TEXT NOT NULL,
+  brand TEXT NOT NULL,
+  flavor TEXT NOT NULL,
+  quantity INTEGER NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  package_grams INTEGER NOT NULL,
+  total_price DECIMAL(10,2) NOT NULL
+);
+
+-- RLS
+ALTER TABLE public.marketplace_order_items ENABLE ROW LEVEL SECURITY;
+
+-- Users can manage order items through orders
+CREATE POLICY "Users manage own order items" ON public.marketplace_order_items
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.marketplace_orders
+      WHERE marketplace_orders.id = marketplace_order_items.order_id
+      AND marketplace_orders.profile_id = auth.uid()
+    )
+  );
+
+-- Index
+CREATE INDEX idx_marketplace_order_items_order_id ON public.marketplace_order_items(order_id);
+
+-- ============================================================================
+-- MARKETPLACE: AUTO REORDER RULES TABLE (Enterprise)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.auto_reorder_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  tobacco_inventory_id UUID REFERENCES public.tobacco_inventory(id) ON DELETE CASCADE NOT NULL,
+  supplier_product_id UUID REFERENCES public.supplier_products(id) NOT NULL,
+  threshold_grams INTEGER NOT NULL,
+  reorder_quantity INTEGER NOT NULL,
+  is_enabled BOOLEAN DEFAULT true,
+  last_triggered_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tobacco_inventory_id)
+);
+
+-- RLS
+ALTER TABLE public.auto_reorder_rules ENABLE ROW LEVEL SECURITY;
+
+-- Users can only manage their own rules
+CREATE POLICY "Users manage own auto reorder rules" ON public.auto_reorder_rules
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Indexes
+CREATE INDEX idx_auto_reorder_rules_profile_id ON public.auto_reorder_rules(profile_id);
+CREATE INDEX idx_auto_reorder_rules_enabled ON public.auto_reorder_rules(is_enabled);
