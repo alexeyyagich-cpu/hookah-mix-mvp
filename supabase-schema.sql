@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS public.tobacco_inventory (
   flavor TEXT NOT NULL,
   quantity_grams DECIMAL NOT NULL DEFAULT 0,
   purchase_price DECIMAL,
+  package_grams DECIMAL DEFAULT 100,  -- Size of package the price applies to (25, 100, 250)
   purchase_date DATE,
   expiry_date DATE,
   notes TEXT,

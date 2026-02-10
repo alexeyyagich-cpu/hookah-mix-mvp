@@ -16,8 +16,9 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   const [selectedTobacco, setSelectedTobacco] = useState<string>('')
   const [brand, setBrand] = useState('')
   const [flavor, setFlavor] = useState('')
-  const [quantity, setQuantity] = useState('')
+  const [packageCount, setPackageCount] = useState('1')
   const [purchasePrice, setPurchasePrice] = useState('')
+  const [packageGrams, setPackageGrams] = useState('100')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -30,7 +31,11 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
       setSelectedTobacco(editingItem.tobacco_id)
       setBrand(editingItem.brand)
       setFlavor(editingItem.flavor)
-      setQuantity(editingItem.quantity_grams.toString())
+      const pkgGrams = editingItem.package_grams || 100
+      setPackageGrams(pkgGrams.toString())
+      // Calculate package count from total grams
+      const pkgCount = Math.round(editingItem.quantity_grams / pkgGrams * 10) / 10
+      setPackageCount(pkgCount.toString())
       setPurchasePrice(editingItem.purchase_price?.toString() || '')
       setNotes(editingItem.notes || '')
       setShowCatalog(false)
@@ -43,8 +48,9 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     setSelectedTobacco('')
     setBrand('')
     setFlavor('')
-    setQuantity('')
+    setPackageCount('1')
     setPurchasePrice('')
+    setPackageGrams('100')
     setNotes('')
     setSearchQuery('')
     setShowCatalog(true)
@@ -68,12 +74,16 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     e.preventDefault()
     setSaving(true)
 
+    const pkgGrams = parseFloat(packageGrams) || 100
+    const totalGrams = (parseFloat(packageCount) || 0) * pkgGrams
+
     await onSave({
       tobacco_id: selectedTobacco || `custom-${Date.now()}`,
       brand,
       flavor,
-      quantity_grams: parseFloat(quantity) || 0,
+      quantity_grams: totalGrams,
       purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
+      package_grams: pkgGrams,
       purchase_date: null,
       expiry_date: null,
       notes: notes || null,
@@ -208,30 +218,51 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium">Количество (г) *</label>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
+                      <label className="block text-sm font-medium">Размер упаковки</label>
+                      <select
+                        value={packageGrams}
+                        onChange={(e) => setPackageGrams(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                        placeholder="0"
-                        min="0"
-                        step="1"
-                        required
-                      />
+                      >
+                        <option value="25">25г</option>
+                        <option value="100">100г</option>
+                        <option value="200">200г</option>
+                        <option value="250">250г</option>
+                      </select>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium">Цена закупки</label>
+                      <label className="block text-sm font-medium">Количество упаковок *</label>
                       <input
                         type="number"
-                        value={purchasePrice}
-                        onChange={(e) => setPurchasePrice(e.target.value)}
+                        value={packageCount}
+                        onChange={(e) => setPackageCount(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                        placeholder="₽"
-                        min="0"
+                        placeholder="1"
+                        min="0.1"
+                        step="0.5"
+                        required
                       />
+                      <p className="text-xs text-[var(--color-textMuted)]">
+                        = {((parseFloat(packageCount) || 0) * (parseFloat(packageGrams) || 100)).toFixed(0)}г всего
+                      </p>
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">Цена закупки за упаковку</label>
+                    <input
+                      type="number"
+                      value={purchasePrice}
+                      onChange={(e) => setPurchasePrice(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                      placeholder="Цена за упаковку"
+                      min="0"
+                      step="0.01"
+                    />
+                    <p className="text-xs text-[var(--color-textMuted)]">
+                      Укажите цену за {packageGrams}г упаковку для расчёта себестоимости миксов
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -262,7 +293,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
             </button>
             <button
               onClick={handleSubmit}
-              disabled={!brand || !flavor || !quantity || saving}
+              disabled={!brand || !flavor || !packageCount || saving}
               className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Сохранение...' : isEditing ? 'Сохранить' : 'Добавить'}

@@ -9,14 +9,14 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
-// Demo data for testing
+// Demo data for testing (prices in EUR, package_grams = 100g default)
 const DEMO_INVENTORY: TobaccoInventory[] = [
-  { id: '1', profile_id: 'demo', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', quantity_grams: 180, purchase_price: 1500, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '2', profile_id: 'demo', tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', quantity_grams: 95, purchase_price: 1500, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '3', profile_id: 'demo', tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', quantity_grams: 220, purchase_price: 1800, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '4', profile_id: 'demo', tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', quantity_grams: 45, purchase_price: 1800, purchase_date: null, expiry_date: null, notes: 'Заканчивается!', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '5', profile_id: 'demo', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', quantity_grams: 150, purchase_price: 2200, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '6', profile_id: 'demo', tobacco_id: 'bb1', brand: 'Black Burn', flavor: 'Something Berry', quantity_grams: 0, purchase_price: 1400, purchase_date: null, expiry_date: null, notes: 'Нужно заказать', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '1', profile_id: 'demo', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', quantity_grams: 180, purchase_price: 15, package_grams: 100, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '2', profile_id: 'demo', tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', quantity_grams: 95, purchase_price: 15, package_grams: 100, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '3', profile_id: 'demo', tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', quantity_grams: 220, purchase_price: 18, package_grams: 100, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '4', profile_id: 'demo', tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', quantity_grams: 45, purchase_price: 18, package_grams: 100, purchase_date: null, expiry_date: null, notes: 'Заканчивается!', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '5', profile_id: 'demo', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', quantity_grams: 150, purchase_price: 22, package_grams: 100, purchase_date: null, expiry_date: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '6', profile_id: 'demo', tobacco_id: 'bb1', brand: 'Black Burn', flavor: 'Something Berry', quantity_grams: 0, purchase_price: 14, package_grams: 100, purchase_date: null, expiry_date: null, notes: 'Нужно заказать', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ]
 
 interface UseInventoryReturn {
@@ -92,10 +92,23 @@ export function useInventory(): UseInventoryReturn {
   const addTobacco = async (
     tobacco: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>
   ): Promise<TobaccoInventory | null> => {
-    if (!user || !supabase) return null
+    if (!user) return null
     if (!canAddMore) {
       setError(`Достигнут лимит (${itemsLimit} позиций). Обновите подписку для добавления больше табаков.`)
       return null
+    }
+
+    // Demo mode: add to local state
+    if (isDemoMode || !supabase) {
+      const newItem: TobaccoInventory = {
+        ...tobacco,
+        id: `demo-${Date.now()}`,
+        profile_id: 'demo',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+      setInventory(prev => [...prev, newItem])
+      return newItem
     }
 
     const { data, error: insertError } = await supabase
@@ -128,7 +141,17 @@ export function useInventory(): UseInventoryReturn {
   }
 
   const updateTobacco = async (id: string, updates: Partial<TobaccoInventory>): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    // Demo mode: update local state
+    if (isDemoMode || !supabase) {
+      setInventory(prev => prev.map(item =>
+        item.id === id
+          ? { ...item, ...updates, updated_at: new Date().toISOString() }
+          : item
+      ))
+      return true
+    }
 
     const { error: updateError } = await supabase
       .from('tobacco_inventory')
@@ -149,7 +172,13 @@ export function useInventory(): UseInventoryReturn {
   }
 
   const deleteTobacco = async (id: string): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    // Demo mode: delete from local state
+    if (isDemoMode || !supabase) {
+      setInventory(prev => prev.filter(item => item.id !== id))
+      return true
+    }
 
     // First delete related transactions
     await supabase
@@ -180,7 +209,7 @@ export function useInventory(): UseInventoryReturn {
     notes?: string,
     sessionId?: string
   ): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
 
     // Get current quantity
     const tobacco = inventory.find(t => t.id === id)
@@ -190,6 +219,16 @@ export function useInventory(): UseInventoryReturn {
     if (newQuantity < 0) {
       setError('Недостаточно табака на складе')
       return false
+    }
+
+    // Demo mode: update local state
+    if (isDemoMode || !supabase) {
+      setInventory(prev => prev.map(item =>
+        item.id === id
+          ? { ...item, quantity_grams: newQuantity, updated_at: new Date().toISOString() }
+          : item
+      ))
+      return true
     }
 
     // Update quantity

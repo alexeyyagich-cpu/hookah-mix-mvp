@@ -20,6 +20,7 @@ export interface TobaccoInventory {
   flavor: string
   quantity_grams: number
   purchase_price: number | null
+  package_grams: number | null  // Size of package the price applies to (25, 100, 250)
   purchase_date: string | null
   expiry_date: string | null
   notes: string | null

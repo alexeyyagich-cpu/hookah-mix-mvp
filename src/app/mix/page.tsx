@@ -30,7 +30,9 @@ import { useSavedMixes } from "@/lib/hooks/useSavedMixes";
 import { useGuests } from "@/lib/hooks/useGuests";
 import { SaveMixModal } from "@/components/mix/SaveMixModal";
 import { SavedMixesDrawer } from "@/components/mix/SavedMixesDrawer";
+import { MixCostBreakdown } from "@/components/mix/MixCostBreakdown";
 import { RecentGuests } from "@/components/guests/RecentGuests";
+import { useInventory } from "@/lib/hooks/useInventory";
 import type { MixSnapshot } from "@/types/database";
 import Link from "next/link";
 
@@ -74,6 +76,7 @@ export default function MixPage() {
   const { createSession } = useSessions();
   const { saveMix, incrementUsage } = useSavedMixes();
   const { recordVisit } = useGuests();
+  const { inventory, loading: inventoryLoading } = useInventory();
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([TOBACCOS[0].id, TOBACCOS[1].id]);
@@ -916,6 +919,18 @@ export default function MixPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Cost Breakdown - only show if logged in and inventory loaded */}
+                {user && !inventoryLoading && inventory.length > 0 && (
+                  <div className="pt-5 border-t" style={{ borderColor: "var(--color-border)" }}>
+                    <MixCostBreakdown
+                      items={items}
+                      totalGrams={20}
+                      inventory={inventory}
+                      currency="€"
+                    />
+                  </div>
+                )}
               </section>
             )}
           </div>
