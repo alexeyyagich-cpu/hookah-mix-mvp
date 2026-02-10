@@ -19,35 +19,33 @@ export function ConsumptionChart({ data }: ConsumptionChartProps) {
     )
   }
 
-  const maxGrams = Math.max(...data.map(d => d.grams), 1)
-  const maxSessions = Math.max(...data.map(d => d.sessions), 1)
+const maxGrams = Math.max(...data.map(d => d.grams), 1)
+  const chartHeight = 140 // Fixed height in pixels
 
   return (
     <div className="space-y-2">
       {/* Chart */}
-      <div className="relative h-40 flex items-end gap-2 px-1">
-        {data.map((day, index) => {
-          const barHeight = (day.grams / maxGrams) * 100
+      <div className="flex items-end gap-2 px-1" style={{ height: chartHeight }}>
+        {data.map((day) => {
+          const barHeight = Math.max((day.grams / maxGrams) * chartHeight, 4)
 
           return (
             <div
               key={day.date}
-              className="flex-1 flex flex-col items-center group relative"
-              style={{ height: '100%' }}
+              className="flex-1 flex flex-col justify-end items-center group relative"
+              style={{ height: chartHeight }}
             >
               {/* Tooltip - absolute positioned */}
-              <div className="absolute -top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
                 <div className="font-medium">{day.grams}г</div>
                 <div className="text-[var(--color-textMuted)]">{day.sessions} сес.</div>
               </div>
 
-              {/* Bar container - fills available height */}
-              <div className="flex-1 w-full flex items-end">
-                <div
-                  className="w-full rounded-t-md bg-[var(--color-primary)] hover:bg-[var(--color-primaryHover)] transition-all cursor-pointer min-h-[4px]"
-                  style={{ height: `${Math.max(barHeight, 3)}%` }}
-                />
-              </div>
+              {/* Bar */}
+              <div
+                className="w-full rounded-t-md bg-[var(--color-primary)] hover:bg-[var(--color-primaryHover)] transition-all cursor-pointer"
+                style={{ height: barHeight }}
+              />
             </div>
           )
         })}
