@@ -226,7 +226,6 @@ input[type="range"]::-moz-range-thumb {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
   border-radius: 20px;
-  padding: 24px;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
@@ -234,6 +233,11 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--color-borderAccent);
   background: color-mix(in srgb, var(--color-bgCard) 85%, transparent);
 }
+
+/* Card size variants - use these for consistent padding */
+.card-sm { padding: 16px; }  /* p-4 */
+.card-md { padding: 20px; }  /* p-5 - recommended default */
+.card-lg { padding: 24px; }  /* p-6 */
 
 .card-elevated {
   box-shadow: 0 4px 24px rgba(0,0,0,0.3);
@@ -316,6 +320,89 @@ input[type="range"]::-moz-range-thumb {
 .btn-ghost:hover {
   background: var(--color-bgHover);
   border-color: var(--color-borderAccent);
+}
+
+.btn-secondary {
+  background: var(--color-bgHover);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bgAccent);
+  border-color: var(--color-borderAccent);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: color-mix(in srgb, var(--color-danger) 85%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-danger) 40%, transparent);
+}
+
+.btn-danger:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-warning {
+  background: var(--color-warning);
+  color: var(--color-bg);
+}
+
+.btn-warning:hover {
+  background: color-mix(in srgb, var(--color-warning) 85%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-warning) 40%, transparent);
+}
+
+.btn-warning:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-success {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-success:hover {
+  background: color-mix(in srgb, var(--color-success) 85%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+
+.btn-success:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Button sizes */
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.btn-lg {
+  padding: 16px 28px;
+  font-size: 16px;
+  border-radius: 14px;
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* ========== TOBACCO CARD ========== */
