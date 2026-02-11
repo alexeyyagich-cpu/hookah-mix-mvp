@@ -1,11 +1,61 @@
 // Telegram Bot Client
 
+import { createHmac } from 'crypto'
 import type { TelegramNotification } from './types'
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
+const TELEGRAM_WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET
 const TELEGRAM_API_URL = 'https://api.telegram.org/bot'
 
 export const isTelegramConfigured = Boolean(TELEGRAM_BOT_TOKEN)
+export const webhookSecretConfigured = Boolean(TELEGRAM_WEBHOOK_SECRET)
+
+// Verify webhook request is from Telegram
+export function verifyWebhookSecret(secretHeader: string | null): boolean {
+  if (!TELEGRAM_WEBHOOK_SECRET) {
+    // If no secret configured, skip verification (dev mode)
+    console.warn('TELEGRAM_WEBHOOK_SECRET not configured - skipping verification')
+    return true
+  }
+  return secretHeader === TELEGRAM_WEBHOOK_SECRET
+}
+
+// Generate HMAC signature for connection tokens
+function generateTokenSignature(data: string): string {
+  const secret = TELEGRAM_WEBHOOK_SECRET || TELEGRAM_BOT_TOKEN || 'default-secret'
+  return createHmac('sha256', secret).update(data).digest('hex').slice(0, 16)
+}
+
+// Verify connection token signature
+export function verifyConnectionToken(token: string): { valid: boolean; profileId: string | null } {
+  try {
+    const decoded = Buffer.from(token, 'base64url').toString()
+    const parts = decoded.split(':')
+
+    if (parts.length !== 3) {
+      return { valid: false, profileId: null }
+    }
+
+    const [profileId, timestamp, signature] = parts
+
+    // Check timestamp - token valid for 1 hour
+    const tokenTime = parseInt(timestamp, 10)
+    const now = Date.now()
+    if (isNaN(tokenTime) || now - tokenTime > 3600000) {
+      return { valid: false, profileId: null }
+    }
+
+    // Verify signature
+    const expectedSignature = generateTokenSignature(`${profileId}:${timestamp}`)
+    if (signature !== expectedSignature) {
+      return { valid: false, profileId: null }
+    }
+
+    return { valid: true, profileId }
+  } catch {
+    return { valid: false, profileId: null }
+  }
+}
 
 async function callTelegramApi<T>(method: string, params: Record<string, unknown> = {}): Promise<T | null> {
   if (!TELEGRAM_BOT_TOKEN) {
@@ -129,12 +179,13 @@ ${stats.revenue ? `• Выручка: €${stats.revenue.toFixed(2)}` : ''}
 export function generateConnectLink(profileId: string): string {
   if (!TELEGRAM_BOT_TOKEN) return ''
 
-  // Extract bot username from token (first part before :)
-  // In production, you'd have the bot username in env vars
   const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'hookah_torus_bot'
 
-  // Create a unique connection token
-  const token = Buffer.from(`${profileId}:${Date.now()}`).toString('base64url')
+  // Create a signed connection token (profileId:timestamp:signature)
+  const timestamp = Date.now().toString()
+  const signature = generateTokenSignature(`${profileId}:${timestamp}`)
+  const tokenData = `${profileId}:${timestamp}:${signature}`
+  const token = Buffer.from(tokenData).toString('base64url')
 
   return `https://t.me/${botUsername}?start=${token}`
 }

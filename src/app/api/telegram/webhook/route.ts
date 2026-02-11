@@ -1,81 +1,133 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendMessage } from '@/lib/telegram/bot'
+import { sendMessage, verifyWebhookSecret, verifyConnectionToken } from '@/lib/telegram/bot'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import type { TelegramUpdate } from '@/lib/telegram/types'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
+// Max message length to process
+const MAX_MESSAGE_LENGTH = 1000
+
 export async function POST(request: NextRequest) {
+  // Rate limiting for webhook
+  const ip = getClientIp(request)
+  const rateCheck = checkRateLimit(`telegram:${ip}`, rateLimits.webhook)
+  if (!rateCheck.success) {
+    return rateLimitExceeded(rateCheck.resetIn)
+  }
+
+  // Verify webhook secret (X-Telegram-Bot-Api-Secret-Token header)
+  const secretHeader = request.headers.get('x-telegram-bot-api-secret-token')
+  if (!verifyWebhookSecret(secretHeader)) {
+    console.warn('Invalid Telegram webhook secret')
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const update: TelegramUpdate = await request.json()
 
+    // Only process message updates (ignore callback queries, etc.)
+    const message = update.message
+    if (!message) {
+      return NextResponse.json({ ok: true })
+    }
+
+    // Validate message has reasonable length
+    const messageText = message.text
+    if (messageText && messageText.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json({ ok: true }) // Silently ignore oversized messages
+    }
+
+    const chatId = message.chat.id
+
     // Handle /start command with connection token
-    if (update.message?.text?.startsWith('/start')) {
-      const token = update.message.text.split(' ')[1]
+    if (messageText?.startsWith('/start')) {
+      const token = messageText.split(' ')[1]
 
       if (token) {
-        // Decode the connection token
-        try {
-          const decoded = Buffer.from(token, 'base64url').toString()
-          const [profileId] = decoded.split(':')
+        // Verify the signed connection token
+        const { valid, profileId } = verifyConnectionToken(token)
 
-          if (profileId && supabaseUrl && supabaseServiceKey) {
-            const supabase = createClient(supabaseUrl, supabaseServiceKey)
+        if (!valid || !profileId) {
+          await sendMessage(
+            chatId,
+            '❌ <b>Ссылка устарела или недействительна</b>\n\nПолучите новую ссылку в разделе <b>Настройки</b> приложения.',
+            { parseMode: 'HTML' }
+          )
+          return NextResponse.json({ ok: true })
+        }
 
-            // Check if connection already exists
-            const { data: existing } = await supabase
-              .from('telegram_connections')
-              .select('id')
-              .eq('profile_id', profileId)
-              .single()
+        if (supabaseUrl && supabaseServiceKey) {
+          const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-            if (existing) {
-              // Update existing connection
-              await supabase
-                .from('telegram_connections')
-                .update({
-                  telegram_user_id: update.message.from?.id,
-                  telegram_username: update.message.from?.username || null,
-                  chat_id: update.message.chat.id,
-                  is_active: true,
-                  updated_at: new Date().toISOString(),
-                })
-                .eq('id', existing.id)
+          // Verify profile exists
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', profileId)
+            .single()
 
-              await sendMessage(
-                update.message.chat.id,
-                '✅ <b>Подключение обновлено!</b>\n\nВаш аккаунт Hookah Torus привязан к этому чату. Вы будете получать уведомления.',
-                { parseMode: 'HTML' }
-              )
-            } else {
-              // Create new connection
-              await supabase.from('telegram_connections').insert({
-                profile_id: profileId,
-                telegram_user_id: update.message.from?.id,
-                telegram_username: update.message.from?.username || null,
-                chat_id: update.message.chat.id,
-                is_active: true,
-                notifications_enabled: true,
-                low_stock_alerts: true,
-                session_reminders: false,
-                daily_summary: false,
-              })
-
-              await sendMessage(
-                update.message.chat.id,
-                '🎉 <b>Подключено!</b>\n\nВаш аккаунт Hookah Torus успешно привязан к Telegram.\n\nТеперь вы будете получать уведомления о:\n• Низком запасе табака\n• Обновлениях заказов\n\nНастройте уведомления в разделе <b>Настройки</b> приложения.',
-                { parseMode: 'HTML' }
-              )
-            }
+          if (!profile) {
+            await sendMessage(
+              chatId,
+              '❌ <b>Профиль не найден</b>\n\nПолучите новую ссылку в разделе <b>Настройки</b> приложения.',
+              { parseMode: 'HTML' }
+            )
+            return NextResponse.json({ ok: true })
           }
-        } catch (e) {
-          console.error('Failed to decode connection token:', e)
+
+          // Check if connection already exists
+          const { data: existing } = await supabase
+            .from('telegram_connections')
+            .select('id')
+            .eq('profile_id', profileId)
+            .single()
+
+          if (existing) {
+            // Update existing connection
+            await supabase
+              .from('telegram_connections')
+              .update({
+                telegram_user_id: message.from?.id,
+                telegram_username: message.from?.username || null,
+                chat_id: chatId,
+                is_active: true,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', existing.id)
+
+            await sendMessage(
+              chatId,
+              '✅ <b>Подключение обновлено!</b>\n\nВаш аккаунт Hookah Torus привязан к этому чату. Вы будете получать уведомления.',
+              { parseMode: 'HTML' }
+            )
+          } else {
+            // Create new connection
+            await supabase.from('telegram_connections').insert({
+              profile_id: profileId,
+              telegram_user_id: message.from?.id,
+              telegram_username: message.from?.username || null,
+              chat_id: chatId,
+              is_active: true,
+              notifications_enabled: true,
+              low_stock_alerts: true,
+              session_reminders: false,
+              daily_summary: false,
+            })
+
+            await sendMessage(
+              chatId,
+              '🎉 <b>Подключено!</b>\n\nВаш аккаунт Hookah Torus успешно привязан к Telegram.\n\nТеперь вы будете получать уведомления о:\n• Низком запасе табака\n• Обновлениях заказов\n\nНастройте уведомления в разделе <b>Настройки</b> приложения.',
+              { parseMode: 'HTML' }
+            )
+          }
         }
       } else {
         // Start without token - just welcome message
         await sendMessage(
-          update.message.chat.id,
+          chatId,
           '👋 <b>Добро пожаловать в Hookah Torus Bot!</b>\n\nЧтобы подключить бота к вашему аккаунту, используйте ссылку из раздела <b>Настройки</b> в приложении.',
           { parseMode: 'HTML' }
         )
@@ -83,19 +135,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle /status command
-    if (update.message?.text === '/status') {
+    if (messageText === '/status') {
       if (supabaseUrl && supabaseServiceKey) {
         const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
         const { data: connection } = await supabase
           .from('telegram_connections')
           .select('*, profiles(business_name)')
-          .eq('chat_id', update.message.chat.id)
+          .eq('chat_id', chatId)
           .single()
 
         if (connection) {
           await sendMessage(
-            update.message.chat.id,
+            chatId,
             `📊 <b>Статус подключения</b>\n\n` +
             `Заведение: ${connection.profiles?.business_name || 'Не указано'}\n` +
             `Уведомления: ${connection.notifications_enabled ? '✅' : '❌'}\n` +
@@ -106,7 +158,7 @@ export async function POST(request: NextRequest) {
           )
         } else {
           await sendMessage(
-            update.message.chat.id,
+            chatId,
             '❌ Telegram не подключён к аккаунту Hookah Torus.\n\nИспользуйте ссылку из настроек приложения для подключения.',
             { parseMode: 'HTML' }
           )
@@ -115,9 +167,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle /help command
-    if (update.message?.text === '/help') {
+    if (messageText === '/help') {
       await sendMessage(
-        update.message.chat.id,
+        chatId,
         '📖 <b>Доступные команды:</b>\n\n' +
         '/start - Начать или подключить аккаунт\n' +
         '/status - Проверить статус подключения\n' +
@@ -134,11 +186,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Verify webhook with GET request
-export async function GET(request: NextRequest) {
-  return NextResponse.json({
-    status: 'ok',
-    bot: 'Hookah Torus Bot',
-    configured: Boolean(process.env.TELEGRAM_BOT_TOKEN),
-  })
+// Health check endpoint - don't reveal sensitive configuration
+export async function GET() {
+  return NextResponse.json({ status: 'ok' })
 }
