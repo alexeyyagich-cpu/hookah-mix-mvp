@@ -407,6 +407,9 @@ export default function MixPage() {
 
   return (
     <div className="min-h-screen transition-theme relative overflow-hidden">
+      {/* Accessible page title */}
+      <h1 className="sr-only">Калькулятор миксов табака — создайте идеальный микс</h1>
+
       {/* Cinematic Smoke Background */}
       <SmokeCanvasBackground imageSrc="/images/hookah-hero.jpg" />
 
@@ -426,9 +429,9 @@ export default function MixPage() {
               </video>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-base font-semibold" style={{ color: "var(--color-text)" }}>
+              <div className="text-base font-semibold" style={{ color: "var(--color-text)" }}>
                 Hookah Torus
-              </h1>
+              </div>
               <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
                 Mix Calculator
               </p>
@@ -989,10 +992,11 @@ export default function MixPage() {
               </div>
               <button
                 onClick={() => setShowRecommendations(false)}
+                aria-label="Закрыть рекомендации"
                 className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--color-bgHover)] transition-colors"
                 style={{ color: "var(--color-textMuted)" }}
               >
-                ×
+                <span aria-hidden="true">×</span>
               </button>
             </div>
             <div className="space-y-2">
@@ -1105,10 +1109,11 @@ export default function MixPage() {
               </div>
               <button
                 onClick={() => setIsGuestsDrawerOpen(false)}
+                aria-label="Закрыть быстрый повтор"
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ background: "var(--color-bgHover)", color: "var(--color-textMuted)" }}
               >
-                ×
+                <span aria-hidden="true">×</span>
               </button>
             </div>
             <div className="p-4">
@@ -1133,26 +1138,26 @@ export default function MixPage() {
         >
           <button
             onClick={() => setIsSaveMixModalOpen(true)}
+            aria-label="Сохранить микс"
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-primary)",
               color: "var(--color-bg)",
             }}
-            title="Сохранить микс"
           >
-            <span>💾</span>
+            <span aria-hidden="true">💾</span>
             <span className="hidden sm:inline">Сохранить</span>
           </button>
           <button
             onClick={() => setIsQuickSessionOpen(true)}
+            aria-label="Записать сессию"
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-success)",
               color: "white",
             }}
-            title="Записать сессию"
           >
-            <span>📝</span>
+            <span aria-hidden="true">📝</span>
             <span className="hidden sm:inline">Сессия</span>
           </button>
         </div>

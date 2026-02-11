@@ -63,6 +63,8 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
       disabled={isDisabled}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      aria-label={`${tobacco.brand} ${tobacco.flavor}, крепость ${tobacco.strength}, жаростойкость ${tobacco.heatResistance}${isActive ? ', выбран' : ''}`}
+      aria-pressed={isActive}
       className={`
         tobacco-card group relative overflow-hidden
         ${isActive ? "active" : ""}
@@ -77,7 +79,7 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
         <div className="absolute inset-0 z-0">
           <Image
             src={imagePath}
-            alt=""
+            alt={`${tobacco.brand} ${tobacco.flavor}`}
             fill
             sizes="(max-width: 640px) 50vw, 33vw"
             className={`
@@ -170,8 +172,8 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
               ${hasImage ? "bg-black/40 border border-white/10" : ""}
             `}
             style={hasImage ? {
-              color: tobacco.strength >= 7 ? "#f87171" :
-                     tobacco.strength >= 4 ? "#fbbf24" : "#4ade80",
+              color: tobacco.strength >= 7 ? "var(--color-danger)" :
+                     tobacco.strength >= 4 ? "var(--color-warning)" : "var(--color-success)",
             } : {
               background: tobacco.strength >= 7 ? "color-mix(in srgb, var(--color-danger) 20%, transparent)" :
                           tobacco.strength >= 4 ? "color-mix(in srgb, var(--color-warning) 20%, transparent)" :

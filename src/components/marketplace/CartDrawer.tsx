@@ -51,21 +51,28 @@ export function CartDrawer({
       <div
         className="fixed inset-0 bg-black/50 z-40"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-[var(--color-bgCard)] border-l border-[var(--color-border)] shadow-xl z-50 flex flex-col animate-slideInRight">
+      <div
+        role="dialog"
+        aria-label="Корзина"
+        aria-modal="true"
+        className="fixed inset-y-0 right-0 w-full max-w-md bg-[var(--color-bgCard)] border-l border-[var(--color-border)] shadow-xl z-50 flex flex-col animate-slideInRight"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
           <h2 className="font-semibold text-lg flex items-center gap-2">
-            <IconCart size={20} />
+            <IconCart size={20} aria-hidden="true" />
             Корзина
           </h2>
           <button
             onClick={onClose}
+            aria-label="Закрыть корзину"
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
           >
-            <IconClose size={20} />
+            <IconClose size={20} aria-hidden="true" />
           </button>
         </div>
 

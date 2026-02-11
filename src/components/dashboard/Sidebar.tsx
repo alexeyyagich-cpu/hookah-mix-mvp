@@ -93,11 +93,12 @@ export function Sidebar() {
                 key={item.name}
                 href="/pricing"
                 onClick={() => setMobileOpen(false)}
+                aria-label={`${item.name} — доступно в Pro тарифе`}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all"
               >
-                <Icon size={20} />
+                <Icon size={20} aria-hidden="true" />
                 {item.name}
-                <IconLock size={14} className="ml-auto" />
+                <IconLock size={14} className="ml-auto" aria-hidden="true" />
               </Link>
             )
           }
@@ -107,13 +108,14 @@ export function Sidebar() {
               key={item.name}
               href={item.href}
               onClick={() => setMobileOpen(false)}
+              aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
                   ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                   : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
               }`}
             >
-              <Icon size={20} />
+              <Icon size={20} aria-hidden="true" />
               {item.name}
             </Link>
           )
@@ -141,14 +143,15 @@ export function Sidebar() {
           href="/mix"
           className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)] transition-colors"
         >
-          <IconCalculator size={20} />
+          <IconCalculator size={20} aria-hidden="true" />
           Калькулятор миксов
         </Link>
         <button
           onClick={() => signOut()}
+          aria-label="Выйти из аккаунта"
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
         >
-          <IconLogout size={20} />
+          <IconLogout size={20} aria-hidden="true" />
           Выйти
         </button>
       </div>
@@ -160,9 +163,11 @@ export function Sidebar() {
       {/* Mobile menu button */}
       <button
         onClick={() => setMobileOpen(true)}
+        aria-label="Открыть меню навигации"
+        aria-expanded={mobileOpen}
         className="lg:hidden fixed top-4 left-4 z-40 p-3 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg"
       >
-        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
@@ -172,20 +177,25 @@ export function Sidebar() {
         <div
           className="lg:hidden fixed inset-0 z-40 bg-black/50"
           onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Mobile sidebar */}
       <aside
+        role="dialog"
+        aria-label="Меню навигации"
+        aria-modal="true"
         className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-[var(--color-bgCard)] border-r border-[var(--color-border)] flex flex-col transform transition-transform ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <button
           onClick={() => setMobileOpen(false)}
+          aria-label="Закрыть меню навигации"
           className="absolute top-4 right-4 p-2 rounded-lg hover:bg-[var(--color-bgHover)]"
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

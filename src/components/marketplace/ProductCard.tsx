@@ -62,19 +62,21 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
       {product.in_stock && (
         <div className="mt-4 space-y-2">
           {/* Quantity selector */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" role="group" aria-label="Выбор количества">
             <button
               onClick={decrementQuantity}
+              aria-label="Уменьшить количество"
               className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
             >
-              <IconMinus size={16} />
+              <IconMinus size={16} aria-hidden="true" />
             </button>
-            <span className="w-8 text-center font-medium">{quantity}</span>
+            <span className="w-8 text-center font-medium" aria-live="polite">{quantity}</span>
             <button
               onClick={incrementQuantity}
+              aria-label="Увеличить количество"
               className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
             >
-              <IconPlus size={16} />
+              <IconPlus size={16} aria-hidden="true" />
             </button>
           </div>
 
@@ -82,9 +84,10 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
           <button
             onClick={handleAdd}
             disabled={!canAdd}
+            aria-label={canAdd ? `Добавить ${product.flavor} в корзину` : 'Товар от другого поставщика'}
             className={`w-full btn ${canAdd ? 'btn-primary' : 'btn-ghost opacity-50 cursor-not-allowed'} flex items-center justify-center gap-2`}
           >
-            <IconCart size={18} />
+            <IconCart size={18} aria-hidden="true" />
             {canAdd ? 'В корзину' : 'Другой поставщик'}
           </button>
 
