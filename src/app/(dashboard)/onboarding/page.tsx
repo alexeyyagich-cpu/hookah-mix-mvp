@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useOnboarding, type OnboardingStep } from '@/lib/hooks/useOnboarding'
 import { useAuth } from '@/lib/AuthContext'
@@ -8,6 +8,10 @@ import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { createClient } from '@/lib/supabase/client'
 import { IconBowl, IconInventory, IconCheck } from '@/components/Icons'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 const STEP_INFO: Record<OnboardingStep, { title: string; description: string; icon: string }> = {
   welcome: {
@@ -43,7 +47,7 @@ export default function OnboardingPage() {
   const { user, profile, refreshProfile } = useAuth()
   const { addBowl } = useBowls()
   const { addTobacco } = useInventory()
-  const supabase = createClient()
+  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Business step state
   const [businessName, setBusinessName] = useState('')
@@ -78,15 +82,17 @@ export default function OnboardingPage() {
     if (!user) return
     setSaving(true)
 
-    await supabase
-      .from('profiles')
-      .update({
-        business_name: businessName || null,
-        owner_name: ownerName || null,
-      })
-      .eq('id', user.id)
+    if (supabase) {
+      await supabase
+        .from('profiles')
+        .update({
+          business_name: businessName || null,
+          owner_name: ownerName || null,
+        })
+        .eq('id', user.id)
 
-    await refreshProfile()
+      await refreshProfile()
+    }
     setSaving(false)
     nextStep()
   }

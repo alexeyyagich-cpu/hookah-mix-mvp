@@ -7,6 +7,10 @@ import type { OnboardingStep } from '@/types/database'
 
 export type { OnboardingStep }
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+
 const STEPS_ORDER: OnboardingStep[] = ['welcome', 'business', 'bowl', 'tobacco', 'complete']
 
 interface OnboardingState {
@@ -42,7 +46,7 @@ export function useOnboarding(): UseOnboardingReturn {
   const [state, setState] = useState<OnboardingState>(DEFAULT_STATE)
   const [loading, setLoading] = useState(true)
   const { user, profile, refreshProfile, isDemoMode } = useAuth()
-  const supabase = useMemo(() => createClient(), [])
+  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Load onboarding state from profile metadata
   useEffect(() => {
@@ -63,6 +67,11 @@ export function useOnboarding(): UseOnboardingReturn {
 
     // Check if profile has onboarding data
     const loadOnboardingState = async () => {
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+
       try {
         const { data } = await supabase
           .from('profiles')
@@ -96,7 +105,7 @@ export function useOnboarding(): UseOnboardingReturn {
     onboarding_completed: boolean
     onboarding_skipped: boolean
   }>) => {
-    if (!user || isDemoMode) return
+    if (!user || isDemoMode || !supabase) return
 
     try {
       await supabase

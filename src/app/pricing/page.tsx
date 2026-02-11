@@ -35,7 +35,7 @@ const plans = [
   {
     id: 'pro',
     name: 'Pro',
-    priceMonthly: 990,
+    priceMonthly: 900,
     priceYearly: 9900,
     stripePriceMonthly: STRIPE_PRICES.pro_monthly,
     stripePriceYearly: STRIPE_PRICES.pro_yearly,
@@ -46,26 +46,28 @@ const plans = [
       { name: 'Типов чаш', value: '∞', included: true },
       { name: 'Полная статистика', included: true },
       { name: 'Маркетплейс', included: true },
-      { name: 'Управление командой', included: true },
       { name: 'Экспорт CSV/PDF', included: true },
+      { name: 'Email уведомления', included: true },
     ],
     isPopular: true,
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    priceMonthly: 2990,
+    priceMonthly: 2900,
     priceYearly: 29900,
     stripePriceMonthly: STRIPE_PRICES.enterprise_monthly,
     stripePriceYearly: STRIPE_PRICES.enterprise_yearly,
     description: 'Для сетей заведений',
     features: [
-      { name: 'Все из Pro', included: true },
+      { name: 'Всё из Pro', value: '+', included: true },
+      { name: 'Неограниченные локации', included: true },
+      { name: 'Управление командой', included: true },
       { name: 'Авто-заказ табака', included: true },
       { name: 'API доступ', included: true },
       { name: 'Кастомные интеграции', included: true },
-      { name: 'White-label опции', included: true },
-      { name: 'Приоритетная поддержка', included: true },
+      { name: 'White-label брендинг', included: true },
+      { name: 'Приоритетная поддержка 24/7', included: true },
       { name: 'Персональный менеджер', included: true },
     ],
   },
@@ -82,7 +84,7 @@ function PricingPageContent() {
 
   const formatPrice = (price: number) => {
     if (price === 0) return 'Бесплатно'
-    return `${(price / 100).toFixed(0)}₽`
+    return `$${(price / 100).toFixed(0)}`
   }
 
   const handleSelectPlan = async (plan: typeof plans[0]) => {
@@ -138,7 +140,7 @@ function PricingPageContent() {
     }
   }
 
-  const yearlyDiscount = Math.round((1 - 9900 / (990 * 12)) * 100)
+  const yearlyDiscount = Math.round((1 - 9900 / (900 * 12)) * 100)
 
   return (
     <div className="min-h-screen">
@@ -225,11 +227,11 @@ function PricingPageContent() {
             const priceDisplay = price === 0
               ? 'Бесплатно'
               : isYearly
-                ? `${(price / 100).toLocaleString('ru-RU')}₽/год`
-                : `${(price / 100).toLocaleString('ru-RU')}₽/мес`
+                ? `$${(price / 100).toLocaleString('en-US')}/год`
+                : `$${(price / 100).toLocaleString('en-US')}/мес`
 
             const monthlyEquivalent = isYearly && price > 0
-              ? `${Math.round(price / 12 / 100)}₽/мес`
+              ? `≈ $${Math.round(price / 12 / 100)}/мес`
               : null
 
             return (
@@ -267,7 +269,7 @@ function PricingPageContent() {
               },
               {
                 q: 'Какие способы оплаты доступны?',
-                a: 'Мы принимаем банковские карты (Visa, Mastercard, МИР) через безопасную платежную систему Stripe.',
+                a: 'Мы принимаем банковские карты (Visa, Mastercard, American Express) через безопасную платежную систему Stripe.',
               },
               {
                 q: 'Есть ли пробный период для Pro?',

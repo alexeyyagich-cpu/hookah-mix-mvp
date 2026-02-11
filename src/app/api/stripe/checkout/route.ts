@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe, STRIPE_PRICES } from '@/lib/stripe'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 // Create admin Supabase client for server-side operations (lazy init)
 let supabaseAdmin: SupabaseClient | null = null
@@ -27,6 +29,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verify authentication
+    const cookieStore = await cookies()
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { priceId, userId, email, isYearly } = body
 
@@ -34,6 +59,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      )
+    }
+
+    // SECURITY: Verify userId matches authenticated user
+    if (user.id !== userId) {
+      return NextResponse.json(
+        { error: 'Forbidden: Cannot perform action for another user' },
+        { status: 403 }
       )
     }
 
