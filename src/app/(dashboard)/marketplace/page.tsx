@@ -108,7 +108,7 @@ export default function MarketplacePage() {
           Нет доступных поставщиков
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4 isolate">
           {suppliers.map(supplier => (
             <SupplierCard key={supplier.id} supplier={supplier} />
           ))}

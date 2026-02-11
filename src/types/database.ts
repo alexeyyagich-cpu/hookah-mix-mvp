@@ -1,5 +1,8 @@
 export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
 
+// User roles for access control
+export type UserRole = 'owner' | 'staff' | 'guest'
+
 export interface Profile {
   id: string
   business_name: string | null
@@ -9,6 +12,26 @@ export interface Profile {
   logo_url: string | null
   subscription_tier: SubscriptionTier
   subscription_expires_at: string | null
+  role: UserRole
+  // For staff: reference to the owner's profile they belong to
+  owner_profile_id: string | null
+  // For guests: venue slug they registered through
+  venue_slug: string | null
+  // Stripe integration
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  created_at: string
+}
+
+// Staff invitation for team management
+export interface StaffInvitation {
+  id: string
+  owner_profile_id: string
+  email: string
+  token: string
+  role: 'staff'
+  expires_at: string
+  accepted_at: string | null
   created_at: string
 }
 
@@ -46,6 +69,7 @@ export interface Session {
   compatibility_score: number | null
   notes: string | null
   rating: number | null
+  duration_minutes: number | null
   created_at?: string
 }
 
@@ -97,6 +121,8 @@ export interface SavedMix {
   compatibility_score: number | null
   is_favorite: boolean
   usage_count: number
+  rating: number | null // 1-5 stars
+  notes: string | null // User notes about the mix
   created_at: string
 }
 
@@ -143,6 +169,28 @@ export interface Guest {
   updated_at: string
 }
 
+export type TableStatus = 'available' | 'occupied' | 'reserved' | 'cleaning'
+export type TableShape = 'circle' | 'square' | 'rectangle'
+
+export interface FloorTable {
+  id: string
+  profile_id: string
+  name: string
+  capacity: number
+  shape: TableShape
+  position_x: number
+  position_y: number
+  width: number
+  height: number
+  status: TableStatus
+  current_session_id: string | null
+  current_guest_name: string | null
+  session_start_time: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
 // Extended types with relations
 export interface SessionWithItems extends Session {
   session_items: SessionItem[]
@@ -178,7 +226,7 @@ export interface Database {
       }
       sessions: {
         Row: Session
-        Insert: Omit<Session, 'id'> & { id?: string }
+        Insert: Omit<Session, 'id'> & { id?: string; duration_minutes?: number | null }
         Update: Partial<Omit<Session, 'id' | 'profile_id'>>
       }
       session_items: {

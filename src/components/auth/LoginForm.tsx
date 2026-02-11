@@ -81,7 +81,7 @@ export function LoginForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="card space-y-6">
+      <form onSubmit={handleSubmit} className="card p-6 space-y-6">
         {error && (
           <div className="p-4 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)]">
             {error}

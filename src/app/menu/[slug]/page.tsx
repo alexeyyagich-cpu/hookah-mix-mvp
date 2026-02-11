@@ -156,7 +156,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {signatureMixes.map(mix => (
-                <div key={mix.id} className="card border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition-colors">
+                <div key={mix.id} className="card p-5 border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="font-semibold">{mix.name}</h3>
@@ -201,7 +201,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {popularMixes.map(mix => (
-                <div key={mix.id} className="card hover:border-[var(--color-border)] transition-colors">
+                <div key={mix.id} className="card p-5 hover:border-[var(--color-border)] transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="font-semibold">{mix.name}</h3>
@@ -300,7 +300,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
           {/* Tobacco List */}
           <div className="space-y-6">
             {filteredTobaccos.map(brandGroup => (
-              <div key={brandGroup.brand} className="card">
+              <div key={brandGroup.brand} className="card p-5">
                 <h3
                   className="text-lg font-bold mb-4 flex items-center gap-2"
                   style={{ color: BRAND_COLORS[brandGroup.brand] }}
@@ -341,7 +341,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
 
         {/* CTA */}
         <section className="mt-12">
-          <div className="card bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30 text-center">
+          <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30 text-center">
             <h3 className="text-xl font-bold mb-2">Не можете выбрать?</h3>
             <p className="text-[var(--color-textMuted)] mb-4">
               Попробуйте наш калькулятор миксов или спросите у кальянщика

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
+import { useRole, ROLE_LABELS, type Permission } from '@/lib/hooks/useRole'
 import {
   IconDashboard,
   IconInventory,
@@ -16,24 +17,30 @@ import {
   IconLogout,
   IconSmoke,
   IconShop,
+  IconFloor,
   IconLock,
+  IconUsers,
 } from '@/components/Icons'
 
 interface NavItem {
   name: string
   href: string
   Icon: React.ComponentType<{ size?: number }>
+  permission: Permission
   proOnly?: boolean
 }
 
+// Navigation items with required permissions
 const navigation: NavItem[] = [
-  { name: 'Обзор', href: '/dashboard', Icon: IconDashboard },
-  { name: 'Инвентарь', href: '/inventory', Icon: IconInventory },
-  { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, proOnly: true },
-  { name: 'Чаши', href: '/bowls', Icon: IconBowl },
-  { name: 'Сессии', href: '/sessions', Icon: IconSession },
-  { name: 'Статистика', href: '/statistics', Icon: IconChart },
-  { name: 'Настройки', href: '/settings', Icon: IconSettings },
+  { name: 'Обзор', href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
+  { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view' },
+  { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
+  { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
+  { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view' },
+  { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view' },
+  { name: 'Статистика', href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
+  { name: 'Команда', href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
+  { name: 'Настройки', href: '/settings', Icon: IconSettings, permission: 'settings.view' },
 ]
 
 export function Sidebar() {
@@ -41,6 +48,20 @@ export function Sidebar() {
   const pathname = usePathname()
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
+  const { role, hasPermission, isOwner, isStaff } = useRole()
+
+  // Filter navigation items by role permissions
+  const filteredNavigation = navigation.filter(item => {
+    // Check if user has permission for this item
+    if (!hasPermission(item.permission)) return false
+    // Team page only for owners
+    if (item.href === '/settings/team' && !isOwner) return false
+    // Settings main page - hide for staff (they don't have settings.view)
+    if (item.href === '/settings' && isStaff) return false
+    return true
+  })
+
+  const roleInfo = ROLE_LABELS[role]
 
   const NavContent = () => (
     <>
@@ -65,27 +86,42 @@ export function Sidebar() {
         </Link>
       </div>
 
-      {/* Business Info */}
+      {/* Business Info + Role */}
       <div className="p-4 border-b border-[var(--color-border)]">
         <div className="text-sm font-medium truncate">
           {profile?.business_name || 'Мое заведение'}
         </div>
         <div className="text-xs text-[var(--color-textMuted)] mt-1">
-          {profile?.owner_name || 'Владелец'}
+          {profile?.owner_name || 'Пользователь'}
         </div>
-        <div className="mt-2">
-          <span className={`badge ${isFreeTier ? 'badge-warning' : 'badge-success'}`}>
-            {tier.toUpperCase()}
+        <div className="mt-2 flex flex-wrap gap-2">
+          {/* Role badge */}
+          <span
+            className="badge"
+            style={{
+              background: isOwner
+                ? 'linear-gradient(135deg, var(--color-primary) 0%, #ec4899 100%)'
+                : 'var(--color-bgHover)',
+              color: isOwner ? 'white' : 'var(--color-text)',
+            }}
+          >
+            {roleInfo.emoji} {roleInfo.ru}
           </span>
+          {/* Subscription badge - only for owners */}
+          {isOwner && (
+            <span className={`badge ${isFreeTier ? 'badge-warning' : 'badge-success'}`}>
+              {tier.toUpperCase()}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation - filtered by role */}
       <nav className="flex-1 p-3 space-y-1">
-        {navigation.map((item) => {
+        {filteredNavigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
           const Icon = item.Icon
-          const isLocked = item.proOnly && isFreeTier
+          const isLocked = item.proOnly && isFreeTier && isOwner
 
           if (isLocked) {
             return (

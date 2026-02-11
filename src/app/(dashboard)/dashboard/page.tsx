@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '@/lib/AuthContext'
 import { useInventory } from '@/lib/hooks/useInventory'
@@ -9,6 +9,7 @@ import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
+import { triggerLowStockNotification } from '@/lib/hooks/usePushNotifications'
 import { StatsCard } from '@/components/dashboard/StatsCard'
 import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart'
 import { PopularFlavorsChart } from '@/components/dashboard/Charts/PopularFlavorsChart'
@@ -35,8 +36,33 @@ export default function DashboardPage() {
   const { isFreeTier, tier } = useSubscription()
   const { savedMixes } = useSavedMixes()
 
-  const lowStockCount = inventory.filter(item => item.quantity_grams < lowStockThreshold && item.quantity_grams > 0).length
+  const lowStockItems = inventory.filter(item => item.quantity_grams < lowStockThreshold && item.quantity_grams > 0)
+  const lowStockCount = lowStockItems.length
   const outOfStockCount = inventory.filter(item => item.quantity_grams <= 0).length
+
+  // Trigger push notification for low stock (once per session)
+  const notifiedRef = useRef(false)
+  useEffect(() => {
+    if (
+      notifiedRef.current ||
+      lowStockItems.length === 0 ||
+      !notificationSettings?.low_stock_enabled
+    ) return
+
+    // Delay to allow page to load first
+    const timer = setTimeout(() => {
+      triggerLowStockNotification(
+        lowStockItems.map(item => ({
+          brand: item.brand,
+          flavor: item.flavor,
+          quantity: item.quantity_grams,
+        }))
+      )
+      notifiedRef.current = true
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [lowStockItems, notificationSettings?.low_stock_enabled])
 
   // Background portal
   const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
@@ -151,7 +177,7 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Consumption Chart */}
-        <div className="card">
+        <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Расход табака</h2>
             <Link href="/statistics" className="text-sm text-[var(--color-primary)] hover:underline">
@@ -168,7 +194,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Popular Flavors */}
-        <div className="card">
+        <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Популярные вкусы</h2>
             <Link href="/statistics" className="text-sm text-[var(--color-primary)] hover:underline">
@@ -186,7 +212,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Sessions */}
-      <div className="card">
+      <div className="card p-5">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold">Последние сессии</h2>
           <Link href="/sessions" className="text-sm text-[var(--color-primary)] hover:underline">
@@ -244,7 +270,7 @@ export default function DashboardPage() {
 
       {/* Ending Soon Widget */}
       {endingSoon.length > 0 && (
-        <div className="card">
+        <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Скоро закончится</h2>
             <Link href="/inventory" className="text-sm text-[var(--color-primary)] hover:underline">
@@ -285,7 +311,7 @@ export default function DashboardPage() {
 
       {/* Favorite Mixes Widget */}
       {topMixes.length > 0 && (
-        <div className="card">
+        <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Популярные миксы</h2>
             <Link href="/mix" className="text-sm text-[var(--color-primary)] hover:underline">

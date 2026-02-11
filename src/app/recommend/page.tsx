@@ -370,19 +370,19 @@ export default function RecommendPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-24 relative z-10">
         {/* Guest Selection Section */}
         {user && (
-          <section className="card card-elevated mb-6">
-            <div className="flex items-center justify-between mb-4">
+          <section className="card card-elevated mb-8 p-6">
+            <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
                   Гость
                 </h2>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)' }}>
+                <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>
                   Выберите постоянного гостя или создайте нового
                 </p>
               </div>
               <button
                 onClick={() => setShowGuestModal(true)}
-                className="btn btn-primary text-sm flex items-center gap-1.5"
+                className="btn btn-primary text-sm flex items-center gap-2"
               >
                 <span>+</span>
                 <span className="hidden sm:inline">Новый гость</span>
@@ -505,20 +505,20 @@ export default function RecommendPage() {
         )}
 
         {/* Filter Panel */}
-        <section className="card card-elevated mb-6">
-          <div className="flex items-center justify-between mb-5">
+        <section className="card card-elevated mb-8 p-6">
+          <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
                 Предпочтения гостя
               </h2>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)' }}>
-                Выберите крепость и вкусовой профиль
+              <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>
+                Выберите крепость и вкусовой профиль для подбора
               </p>
             </div>
             {(hasValidPreferences || selectedTobaccos.length > 0) && (
               <button
                 onClick={resetFilters}
-                className="text-sm px-3 py-1.5 rounded-lg transition-colors hover:opacity-80"
+                className="text-sm px-4 py-2 rounded-xl transition-all hover:scale-105"
                 style={{
                   background: 'var(--color-bgHover)',
                   color: 'var(--color-textMuted)',
@@ -529,62 +529,125 @@ export default function RecommendPage() {
             )}
           </div>
 
-          {/* Strength Selection */}
-          <div className="mb-5">
+          {/* Strength Selection - Visual Meter Style */}
+          <div className="mb-6">
             <label
               className="text-sm font-medium mb-3 block"
               style={{ color: 'var(--color-textMuted)' }}
             >
               Крепость
             </label>
-            <div className="flex flex-wrap gap-2">
-              {getAllStrengthOptions().map(strength => {
+            <div className="grid grid-cols-3 gap-3">
+              {getAllStrengthOptions().map((strength, index) => {
                 const info = STRENGTH_LABELS[strength]
                 const isSelected = selectedStrength === strength
+                const strengthColors = {
+                  light: { bg: '#22c55e', label: 'Мягкий дым' },
+                  medium: { bg: '#f59e0b', label: 'Баланс' },
+                  strong: { bg: '#ef4444', label: 'Насыщенный' },
+                }
+                const colorInfo = strengthColors[strength as keyof typeof strengthColors]
+
                 return (
                   <button
                     key={strength}
                     onClick={() => setSelectedStrength(isSelected ? null : strength)}
-                    className={`pill ${isSelected ? 'pill-active' : ''}`}
-                    style={
+                    className={`relative p-4 rounded-xl border-2 transition-all ${
                       isSelected
-                        ? { background: 'var(--color-primary)', color: 'var(--color-bg)' }
-                        : {}
-                    }
+                        ? 'border-[var(--color-primary)] shadow-lg scale-[1.02]'
+                        : 'border-transparent hover:border-[var(--color-border)]'
+                    }`}
+                    style={{
+                      background: isSelected
+                        ? `linear-gradient(135deg, ${colorInfo.bg}20 0%, ${colorInfo.bg}10 100%)`
+                        : 'var(--color-bgHover)',
+                    }}
                   >
-                    <span>{info.emoji}</span>
-                    <span>{info.labelRu}</span>
+                    <div className="text-center">
+                      <span className="text-2xl mb-2 block">{info.emoji}</span>
+                      <span className="font-semibold text-sm block" style={{ color: 'var(--color-text)' }}>
+                        {info.labelRu}
+                      </span>
+                      <span className="text-xs mt-1 block" style={{ color: 'var(--color-textMuted)' }}>
+                        {colorInfo.label}
+                      </span>
+                      {/* Strength bar indicator */}
+                      <div className="flex gap-1 justify-center mt-3">
+                        {[1, 2, 3].map(level => (
+                          <div
+                            key={level}
+                            className="w-3 h-1.5 rounded-full transition-all"
+                            style={{
+                              background: level <= index + 1 ? colorInfo.bg : 'var(--color-border)',
+                              opacity: isSelected ? 1 : 0.6,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <div
+                        className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs"
+                        style={{ background: 'var(--color-primary)' }}
+                      >
+                        ✓
+                      </div>
+                    )}
                   </button>
                 )
               })}
             </div>
           </div>
 
-          {/* Flavor Profile Selection */}
-          <div className="mb-5">
+          {/* Flavor Profile Selection - Color-coded grid */}
+          <div className="mb-6">
             <label
               className="text-sm font-medium mb-3 block"
               style={{ color: 'var(--color-textMuted)' }}
             >
-              Вкусовой профиль (можно несколько)
+              Вкусовой профиль <span className="font-normal">(можно несколько)</span>
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {getAllFlavorProfiles().map(profile => {
                 const info = FLAVOR_PROFILE_LABELS[profile]
                 const isSelected = selectedProfiles.includes(profile)
+                // Color coding for each flavor type
+                const flavorColors: Record<string, string> = {
+                  fresh: '#06b6d4',   // cyan
+                  fruity: '#f43f5e',  // rose
+                  sweet: '#ec4899',   // pink
+                  citrus: '#fbbf24',  // amber
+                  spicy: '#84cc16',   // lime
+                  soda: '#a855f7',    // purple
+                }
+                const color = flavorColors[profile] || 'var(--color-primary)'
+
                 return (
                   <button
                     key={profile}
                     onClick={() => toggleProfile(profile)}
-                    className={`pill ${isSelected ? 'pill-active' : ''}`}
-                    style={
+                    className={`relative flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
                       isSelected
-                        ? { background: 'var(--color-primary)', color: 'var(--color-bg)' }
-                        : {}
-                    }
+                        ? 'border-current shadow-md'
+                        : 'border-transparent hover:border-[var(--color-border)]'
+                    }`}
+                    style={{
+                      background: isSelected
+                        ? `linear-gradient(135deg, ${color}25 0%, ${color}10 100%)`
+                        : 'var(--color-bgHover)',
+                      color: isSelected ? color : 'var(--color-text)',
+                    }}
                   >
-                    <span>{info.emoji}</span>
-                    <span>{info.labelRu}</span>
+                    <span className="text-lg">{info.emoji}</span>
+                    <span className="font-medium text-sm">{info.labelRu}</span>
+                    {isSelected && (
+                      <span
+                        className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px]"
+                        style={{ background: color }}
+                      >
+                        ✓
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -594,30 +657,49 @@ export default function RecommendPage() {
           {/* Inventory Toggle (Pro only) */}
           {user && isPro && (
             <div
-              className="pt-4 border-t flex items-center justify-between"
+              className="pt-5 mt-1 border-t"
               style={{ borderColor: 'var(--color-border)' }}
             >
-              <div>
-                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                  Учитывать инвентарь
-                </p>
-                <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                  Показывать только то, что есть в наличии
-                </p>
-              </div>
-              <button
-                onClick={() => setUseInventoryFilter(prev => !prev)}
-                className={`relative w-12 h-7 rounded-full transition-colors ${
-                  useInventoryFilter ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-bgHover)]'
-                }`}
-                disabled={inventoryLoading}
-              >
-                <span
-                  className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                    useInventoryFilter ? 'translate-x-6' : 'translate-x-1'
+              <label className="flex items-center justify-between cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors"
+                    style={{
+                      background: useInventoryFilter
+                        ? 'color-mix(in srgb, var(--color-success) 15%, transparent)'
+                        : 'var(--color-bgHover)',
+                    }}
+                  >
+                    <span className="text-lg">📦</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                      Учитывать инвентарь
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
+                      Только то, что есть в наличии
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setUseInventoryFilter(prev => !prev)}
+                  className={`relative w-12 h-7 rounded-full transition-all flex-shrink-0 ${
+                    useInventoryFilter
+                      ? 'bg-[var(--color-success)]'
+                      : 'bg-[var(--color-bgAccent)] border border-[var(--color-border)]'
                   }`}
-                />
-              </button>
+                  disabled={inventoryLoading}
+                  aria-label="Переключить учёт инвентаря"
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-5 h-5 rounded-full shadow-md transition-transform ${
+                      useInventoryFilter
+                        ? 'translate-x-5 bg-white'
+                        : 'translate-x-0 bg-[var(--color-textMuted)]'
+                    }`}
+                  />
+                </button>
+              </label>
             </div>
           )}
 
@@ -672,7 +754,7 @@ export default function RecommendPage() {
 
         {/* Mix Builder - shows when tobaccos are selected */}
         {selectedTobaccos.length > 0 && (
-          <section ref={mixBuilderRef} className="card card-elevated mb-6">
+          <section ref={mixBuilderRef} className="card card-elevated p-5 mb-6">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
@@ -798,7 +880,7 @@ export default function RecommendPage() {
         {/* Loading state */}
         {useInventoryFilter && inventoryLoading && (
           <div
-            className="card card-elevated text-center py-8 mb-6"
+            className="card card-elevated text-center p-5 py-8 mb-6"
             style={{ color: 'var(--color-textMuted)' }}
           >
             <div className="animate-spin text-2xl mb-3">⏳</div>
@@ -809,24 +891,46 @@ export default function RecommendPage() {
         {/* Results */}
         {!hasValidPreferences ? (
           <div
-            className="card card-elevated text-center py-12"
+            className="card card-elevated text-center p-5 py-16"
             style={{ color: 'var(--color-textMuted)' }}
           >
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-              <IconTarget size={32} />
+            {/* Animated gradient icon */}
+            <div
+              className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center relative overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary) 0%, #ec4899 100%)',
+                opacity: 0.9
+              }}
+            >
+              <IconTarget size={40} className="text-white relative z-10" />
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  background: 'radial-gradient(circle at 30% 30%, white 0%, transparent 60%)',
+                }}
+              />
             </div>
-            <p className="text-lg font-medium" style={{ color: 'var(--color-text)' }}>
+            <p className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
               Выберите предпочтения
             </p>
-            <p className="text-sm mt-1">
-              Укажите крепость и хотя бы один вкусовой профиль
+            <p className="text-sm max-w-xs mx-auto mb-6">
+              Укажите крепость и хотя бы один вкусовой профиль, чтобы получить персональные рекомендации
             </p>
+            {/* Quick hint badges */}
+            <div className="flex flex-wrap justify-center gap-2">
+              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--color-bgHover)' }}>
+                🌿 Выберите крепость выше
+              </span>
+              <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--color-bgHover)' }}>
+                🎯 Добавьте вкусовые профили
+              </span>
+            </div>
           </div>
         ) : (
           <div className="space-y-6">
             {/* Single Tobaccos */}
             {recommendations && recommendations.tobaccos.length > 0 && (
-              <section className="card card-elevated">
+              <section className="card card-elevated p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
                     Рекомендуемые табаки
@@ -868,7 +972,7 @@ export default function RecommendPage() {
 
             {/* Mixes */}
             {recommendations && recommendations.mixes.length > 0 && (
-              <section className="card card-elevated">
+              <section className="card card-elevated p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
                     Рекомендуемые миксы
@@ -901,7 +1005,7 @@ export default function RecommendPage() {
               recommendations.tobaccos.length === 0 &&
               recommendations.mixes.length === 0 && (
                 <div
-                  className="card card-elevated text-center py-12"
+                  className="card card-elevated text-center p-5 py-12"
                   style={{ color: 'var(--color-textMuted)' }}
                 >
                   <div className="text-4xl mb-4">😔</div>

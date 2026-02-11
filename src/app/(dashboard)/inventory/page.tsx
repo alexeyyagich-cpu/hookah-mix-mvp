@@ -8,9 +8,11 @@ import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { InventoryTable } from '@/components/dashboard/InventoryTable'
 import { AddTobaccoModal } from '@/components/dashboard/AddTobaccoModal'
+import { ScanButton } from '@/components/inventory/BarcodeScanner'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
 import { IconExport, IconChart, IconLock, IconPlus } from '@/components/Icons'
 import type { TobaccoInventory } from '@/types/database'
+import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 
 export default function InventoryPage() {
   const {
@@ -43,7 +45,15 @@ export default function InventoryPage() {
   const [editingItem, setEditingItem] = useState<TobaccoInventory | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const [scannedTobacco, setScannedTobacco] = useState<TobaccoBarcode | null>(null)
   const exportMenuRef = useRef<HTMLDivElement>(null)
+
+  // Handle barcode scan result
+  const handleScanResult = (tobacco: TobaccoBarcode) => {
+    setScannedTobacco(tobacco)
+    setEditingItem(null)
+    setModalOpen(true)
+  }
 
   // Close export menu when clicking outside
   useEffect(() => {
@@ -170,8 +180,21 @@ export default function InventoryPage() {
             )}
           </div>
 
+          {/* Barcode Scanner */}
+          {canAddMore && (
+            <ScanButton
+              onScanResult={handleScanResult}
+              onManualAdd={() => {
+                setScannedTobacco(null)
+                setEditingItem(null)
+                setModalOpen(true)
+              }}
+            />
+          )}
+
           <button
             onClick={() => {
+              setScannedTobacco(null)
               setEditingItem(null)
               setModalOpen(true)
             }}
@@ -260,10 +283,12 @@ export default function InventoryPage() {
         onClose={() => {
           setModalOpen(false)
           setEditingItem(null)
+          setScannedTobacco(null)
         }}
         onSave={handleSave}
         editingItem={editingItem}
         canAddMore={canAddMore}
+        scannedTobacco={scannedTobacco}
       />
     </div>
   )

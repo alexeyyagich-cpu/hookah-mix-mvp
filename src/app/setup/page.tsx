@@ -61,13 +61,13 @@ export default function SetupPage() {
                 HM
               </div>
               <h1 className="text-base font-semibold" style={{ color: "var(--color-text)" }}>
-                Setup Guide
+                Рекомендации
               </h1>
             </div>
             <div className="flex items-center gap-3">
               <ThemeSwitcher />
               <a href="/mix" className="btn btn-ghost text-sm">
-                ← Back
+                ← Назад
               </a>
             </div>
           </div>
@@ -82,13 +82,13 @@ export default function SetupPage() {
               <IconBowl size={40} color="var(--color-textMuted)" />
             </div>
             <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--color-text)" }}>
-              No Mix Created Yet
+              Микс ещё не создан
             </h2>
             <p className="mb-6" style={{ color: "var(--color-textMuted)" }}>
-              Create a mix first to get personalized setup recommendations.
+              Сначала создайте микс, чтобы получить персональные рекомендации.
             </p>
             <a href="/mix" className="btn btn-primary">
-              Create Mix →
+              Создать микс →
             </a>
           </div>
         </main>
@@ -111,9 +111,9 @@ export default function SetupPage() {
                  "color-mix(in srgb, var(--color-danger) 15%, transparent)";
 
   const riskMessages = {
-    low: "Safe to smoke. Standard heat management will work perfectly.",
-    medium: "Watch the heat carefully. Rotate coals regularly to prevent burning.",
-    high: "High risk of overheating! Start with fewer coals and increase gradually.",
+    low: "Безопасно для курения. Стандартный контроль жара подойдёт идеально.",
+    medium: "Следите за жаром внимательно. Вращайте угли регулярно.",
+    high: "Высокий риск перегрева! Начните с меньшего количества углей.",
   };
 
   return (
@@ -130,10 +130,10 @@ export default function SetupPage() {
             </div>
             <div>
               <h1 className="text-base font-semibold" style={{ color: "var(--color-text)" }}>
-                Setup Guide
+                Рекомендации
               </h1>
               <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
-                Personalized for your mix
+                Персонально для вашего микса
               </p>
             </div>
           </div>
@@ -151,10 +151,10 @@ export default function SetupPage() {
           {/* Left Column */}
           <div className="space-y-6 stagger-children">
             {/* Mix Summary */}
-            <section className="card card-elevated">
+            <section className="card card-elevated p-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--color-text)" }}>
                 <IconTarget size={20} color="var(--color-primary)" />
-                Your Mix
+                Ваш микс
               </h2>
               <div className="flex flex-wrap gap-2 mb-4">
                 {items.map((it, idx) => (
@@ -183,14 +183,14 @@ export default function SetupPage() {
                   <div className="mb-2" style={{ color: "var(--color-primary)" }}>
                     <IconStrength size={24} />
                   </div>
-                  <div className="label">Strength</div>
+                  <div className="label">Крепость</div>
                   <div className="value" style={{ color: "var(--color-text)" }}>{finalStrength}</div>
                 </div>
                 <div className="stat-card">
                   <div className="mb-2" style={{ color: "var(--color-warning)" }}>
                     <IconHeat size={24} />
                   </div>
-                  <div className="label">Heat Load</div>
+                  <div className="label">Жаростойкость</div>
                   <div className="value" style={{ color: "var(--color-text)" }}>{finalHeatLoad}</div>
                 </div>
               </div>
@@ -198,7 +198,7 @@ export default function SetupPage() {
 
             {/* Risk Warning */}
             <section
-              className="card card-elevated"
+              className="card card-elevated p-5"
               style={{ background: riskBg, borderColor: riskColor }}
             >
               <div className="flex items-center gap-3 mb-3">
@@ -214,7 +214,7 @@ export default function SetupPage() {
                 </div>
                 <div>
                   <p className="text-xs uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                    Overheating Risk
+                    Риск перегрева
                   </p>
                   <p className="text-xl font-bold uppercase" style={{ color: riskColor }}>
                     {overheatingRisk}
@@ -227,10 +227,10 @@ export default function SetupPage() {
             </section>
 
             {/* Setup Recommendations */}
-            <section className="card card-elevated">
+            <section className="card card-elevated p-5">
               <h2 className="text-lg font-semibold mb-5 flex items-center gap-2" style={{ color: "var(--color-text)" }}>
                 <IconSettings size={20} color="var(--color-primary)" />
-                Recommended Setup
+                Рекомендуемая забивка
               </h2>
 
               <div className="grid sm:grid-cols-2 gap-4">
@@ -245,7 +245,7 @@ export default function SetupPage() {
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                        Bowl Type
+                        Тип чаши
                       </p>
                       <p className="text-lg font-bold capitalize" style={{ color: "var(--color-text)" }}>
                         {setup.bowlType}
@@ -254,8 +254,8 @@ export default function SetupPage() {
                   </div>
                   <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
                     {setup.bowlType === "phunnel"
-                      ? "Better heat distribution for strong mixes. Prevents juice from dripping."
-                      : "Classic choice for lighter blends. Good airflow and easy to pack."}
+                      ? "Лучшее распределение жара для крепких миксов. Предотвращает стекание сиропа."
+                      : "Классический выбор для лёгких миксов. Хорошая тяга и простая забивка."}
                   </p>
                 </div>
 
@@ -270,7 +270,7 @@ export default function SetupPage() {
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                        Packing Style
+                        Тип забивки
                       </p>
                       <p className="text-lg font-bold capitalize" style={{ color: "var(--color-text)" }}>
                         {setup.packing}
@@ -279,8 +279,8 @@ export default function SetupPage() {
                   </div>
                   <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
                     {setup.packing === "classic"
-                      ? "Fluffy pack, don't press down. Leave small gap below foil."
-                      : "Dense pack above the rim. Best for heat-resistant tobaccos."}
+                      ? "Воздушная забивка, не утрамбовывайте. Оставьте зазор под фольгой."
+                      : "Плотная забивка выше края. Лучше для жаростойких табаков."}
                   </p>
                 </div>
 
@@ -295,17 +295,17 @@ export default function SetupPage() {
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                        Coals
+                        Угли
                       </p>
                       <p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>
-                        {setup.coals} pieces
+                        {setup.coals} шт
                       </p>
                     </div>
                   </div>
                   <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
                     {setup.coals === 3
-                      ? "Lighter heat for sensitive tobacco. Start with 3, add more if needed."
-                      : "Standard heat for resistant blends. Place evenly around the edge."}
+                      ? "Меньше жара для чувствительного табака. Начните с 3, добавьте при необходимости."
+                      : "Стандартный жар для жаростойких миксов. Разместите равномерно по краю."}
                   </p>
                 </div>
 
@@ -320,25 +320,25 @@ export default function SetupPage() {
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                        Heat-up Time
+                        Прогрев
                       </p>
                       <p className="text-lg font-bold" style={{ color: "var(--color-text)" }}>
-                        {setup.heatUpMinutes} minutes
+                        {setup.heatUpMinutes} мин
                       </p>
                     </div>
                   </div>
                   <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
-                    Wait before first puff for optimal taste. Let the tobacco warm evenly.
+                    Подождите перед первой затяжкой для лучшего вкуса. Дайте табаку прогреться равномерно.
                   </p>
                 </div>
               </div>
             </section>
 
             {/* Pro Tips */}
-            <section className="card card-elevated">
+            <section className="card card-elevated p-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--color-text)" }}>
                 <IconLightbulb size={20} color="var(--color-warning)" />
-                Pro Tips
+                Советы
               </h2>
               <ul className="space-y-3">
                 {finalStrength >= 7 && (
@@ -350,7 +350,7 @@ export default function SetupPage() {
                       <IconStrength size={16} color="var(--color-danger)" />
                     </div>
                     <span className="text-sm" style={{ color: "var(--color-text)" }}>
-                      This is a strong mix — take breaks between sessions to avoid discomfort.
+                      Это крепкий микс — делайте перерывы между сессиями.
                     </span>
                   </li>
                 )}
@@ -363,7 +363,7 @@ export default function SetupPage() {
                       <IconHeat size={16} color="var(--color-warning)" />
                     </div>
                     <span className="text-sm" style={{ color: "var(--color-text)" }}>
-                      Use a heat management device (Kaloud Lotus, etc.) for better control.
+                      Используйте калауд (Kaloud Lotus и т.д.) для лучшего контроля жара.
                     </span>
                   </li>
                 )}
@@ -376,7 +376,7 @@ export default function SetupPage() {
                       <IconBowl size={16} color="var(--color-primary)" />
                     </div>
                     <span className="text-sm" style={{ color: "var(--color-text)" }}>
-                      Keep the center hole clear when packing for proper airflow.
+                      Оставьте центральное отверстие открытым для правильной тяги.
                     </span>
                   </li>
                 )}
@@ -388,7 +388,7 @@ export default function SetupPage() {
                     <IconCoals size={16} color="var(--color-success)" />
                   </div>
                   <span className="text-sm" style={{ color: "var(--color-text)" }}>
-                    Rotate and ash coals every 10-15 minutes for even heat distribution.
+                    Вращайте и стряхивайте пепел с углей каждые 10-15 минут для равномерного жара.
                   </span>
                 </li>
               </ul>
@@ -400,7 +400,7 @@ export default function SetupPage() {
             <section className="card card-elevated lg:sticky lg:top-24">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--color-text)" }}>
                 <IconPalette size={20} color="var(--color-primary)" />
-                Flavor Match
+                Совместимость вкусов
               </h2>
 
               {/* Compatibility Ring */}
@@ -410,7 +410,7 @@ export default function SetupPage() {
                   color={compatColor}
                   size={180}
                   strokeWidth={14}
-                  label="Compatibility"
+                  label="Совместимость"
                   sublabel={compatibility.level}
                 />
               </div>
@@ -434,24 +434,24 @@ export default function SetupPage() {
               {/* Legend */}
               <div className="mt-6 pt-4 border-t" style={{ borderColor: "var(--color-border)" }}>
                 <p className="text-xs mb-3" style={{ color: "var(--color-textMuted)" }}>
-                  Compatibility levels:
+                  Уровни совместимости:
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full" style={{ background: "var(--color-success)" }} />
-                    <span style={{ color: "var(--color-textMuted)" }}>Perfect (90-100%)</span>
+                    <span style={{ color: "var(--color-textMuted)" }}>Отлично (90-100%)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full" style={{ background: "var(--color-primary)" }} />
-                    <span style={{ color: "var(--color-textMuted)" }}>Good (70-89%)</span>
+                    <span style={{ color: "var(--color-textMuted)" }}>Хорошо (70-89%)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full" style={{ background: "var(--color-warning)" }} />
-                    <span style={{ color: "var(--color-textMuted)" }}>Okay (50-69%)</span>
+                    <span style={{ color: "var(--color-textMuted)" }}>Норм (50-69%)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full" style={{ background: "var(--color-danger)" }} />
-                    <span style={{ color: "var(--color-textMuted)" }}>Poor (&lt;50%)</span>
+                    <span style={{ color: "var(--color-textMuted)" }}>Плохо (&lt;50%)</span>
                   </div>
                 </div>
               </div>
@@ -460,10 +460,10 @@ export default function SetupPage() {
         </div>
       </main>
 
-      {/* Keyboard hint */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+      {/* Keyboard hint - hidden on mobile */}
+      <div className="hidden lg:block fixed bottom-6 left-1/2 -translate-x-1/2 z-40 opacity-50 hover:opacity-100 transition-opacity">
         <div className="glass px-4 py-2 rounded-full text-xs flex items-center gap-3 border" style={{ borderColor: "var(--color-border)" }}>
-          <span style={{ color: "var(--color-textMuted)" }}>Theme:</span>
+          <span style={{ color: "var(--color-textMuted)" }}>Тема:</span>
           {["1", "2", "3"].map(k => (
             <kbd
               key={k}

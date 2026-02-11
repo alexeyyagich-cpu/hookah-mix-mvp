@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
 import { IconStar, IconMix, IconTrash } from '@/components/Icons'
+import { MixRating, MixNotes } from './MixRating'
 import type { SavedMix, SavedMixTobacco } from '@/types/database'
 
 interface SavedMixesDrawerProps {
@@ -11,11 +12,11 @@ interface SavedMixesDrawerProps {
   onSelectMix: (tobaccos: SavedMixTobacco[], mixId: string) => void
 }
 
-type SortOption = 'recent' | 'popular' | 'favorite'
+type SortOption = 'recent' | 'popular' | 'favorite' | 'rating'
 type FilterOption = 'all' | 'favorites'
 
 export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDrawerProps) {
-  const { savedMixes, loading, deleteMix, toggleFavorite, incrementUsage } = useSavedMixes()
+  const { savedMixes, loading, deleteMix, toggleFavorite, incrementUsage, updateMix } = useSavedMixes()
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [filterBy, setFilterBy] = useState<FilterOption>('all')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
@@ -32,6 +33,14 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           }
           return a.is_favorite ? -1 : 1
+        case 'rating':
+          // Sort by rating (nulls last), then by date
+          if (a.rating === null && b.rating === null) {
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          }
+          if (a.rating === null) return 1
+          if (b.rating === null) return -1
+          return b.rating - a.rating
         case 'recent':
         default:
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -134,6 +143,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
             >
               <option value="recent">По дате</option>
               <option value="popular">По популярности</option>
+              <option value="rating">По рейтингу</option>
               <option value="favorite">Избранные первыми</option>
             </select>
           </div>
@@ -178,6 +188,14 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                       <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
                         Использован {mix.usage_count}× • {new Date(mix.created_at).toLocaleDateString('ru-RU')}
                       </p>
+                      {/* Rating */}
+                      <div className="mt-2">
+                        <MixRating
+                          rating={mix.rating}
+                          onRate={(rating) => updateMix(mix.id, { rating })}
+                          size="sm"
+                        />
+                      </div>
                     </div>
                     {mix.compatibility_score !== null && (
                       <span
@@ -214,6 +232,15 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                         {t.flavor} ({t.percent}%)
                       </span>
                     ))}
+                  </div>
+
+                  {/* Notes */}
+                  <div className="mb-3">
+                    <MixNotes
+                      notes={mix.notes}
+                      onSave={(notes) => updateMix(mix.id, { notes: notes || null })}
+                      placeholder="Добавить заметку..."
+                    />
                   </div>
 
                   {/* Actions */}

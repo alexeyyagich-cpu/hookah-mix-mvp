@@ -22,6 +22,8 @@ const DEMO_MIXES: SavedMix[] = [
     compatibility_score: 92,
     is_favorite: true,
     usage_count: 15,
+    rating: 5,
+    notes: 'Идеальный микс для летнего вечера. Свежесть мяты отлично сочетается с Pinkman.',
     created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -35,6 +37,8 @@ const DEMO_MIXES: SavedMix[] = [
     compatibility_score: 85,
     is_favorite: false,
     usage_count: 8,
+    rating: 4,
+    notes: null,
     created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -49,6 +53,8 @@ const DEMO_MIXES: SavedMix[] = [
     compatibility_score: 78,
     is_favorite: true,
     usage_count: 5,
+    rating: null,
+    notes: 'Нужно попробовать с меньшим количеством мяты',
     created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ]
@@ -61,6 +67,7 @@ interface UseSavedMixesReturn {
   deleteMix: (id: string) => Promise<void>
   toggleFavorite: (id: string) => Promise<void>
   incrementUsage: (id: string) => Promise<void>
+  updateMix: (id: string, updates: { rating?: number | null; notes?: string | null; name?: string }) => Promise<void>
   refresh: () => Promise<void>
 }
 
@@ -126,6 +133,8 @@ export function useSavedMixes(): UseSavedMixesReturn {
         compatibility_score: compatibilityScore,
         is_favorite: false,
         usage_count: 0,
+        rating: null,
+        notes: null,
         created_at: new Date().toISOString(),
       }
       setSavedMixes(prev => [newMix, ...prev])
@@ -247,6 +256,39 @@ export function useSavedMixes(): UseSavedMixesReturn {
     }
   }, [user, supabase, savedMixes, isDemoMode])
 
+  const updateMix = useCallback(async (
+    id: string,
+    updates: { rating?: number | null; notes?: string | null; name?: string }
+  ) => {
+    if (isDemoMode) {
+      setSavedMixes(prev => prev.map(m =>
+        m.id === id ? { ...m, ...updates } : m
+      ))
+      return
+    }
+
+    if (!user || !supabase) return
+
+    setError(null)
+
+    try {
+      const { error: updateError } = await supabase
+        .from('saved_mixes')
+        .update(updates)
+        .eq('id', id)
+        .eq('profile_id', user.id)
+
+      if (updateError) throw updateError
+
+      setSavedMixes(prev => prev.map(m =>
+        m.id === id ? { ...m, ...updates } : m
+      ))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка обновления микса')
+      throw err
+    }
+  }, [user, supabase, isDemoMode])
+
   return {
     savedMixes,
     loading,
@@ -255,6 +297,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
     deleteMix,
     toggleFavorite,
     incrementUsage,
+    updateMix,
     refresh: fetchMixes,
   }
 }

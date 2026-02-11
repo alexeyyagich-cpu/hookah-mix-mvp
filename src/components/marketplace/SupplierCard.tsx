@@ -12,19 +12,19 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
   return (
     <Link
       href={`/marketplace/supplier/${supplier.id}`}
-      className="card p-6 hover:border-[var(--color-primary)]/50 transition-all group"
+      className="block p-6 bg-[var(--color-bgCard)] border border-[var(--color-border)] rounded-2xl hover:border-[var(--color-primary)]/50 transition-all group"
     >
       <div className="flex items-start gap-4">
-        {/* Logo placeholder */}
-        <div className="w-16 h-16 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center flex-shrink-0">
+        {/* Logo */}
+        <div className="w-12 h-12 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center flex-shrink-0 overflow-hidden">
           {supplier.logo_url ? (
             <img
               src={supplier.logo_url}
               alt={supplier.name}
-              className="w-full h-full object-cover rounded-xl"
+              className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-2xl font-bold text-[var(--color-primary)]">
+            <span className="text-lg font-bold text-[var(--color-primary)]">
               {supplier.name.charAt(0)}
             </span>
           )}

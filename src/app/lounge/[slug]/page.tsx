@@ -132,7 +132,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 -mt-20 relative z-10 pb-12">
         {/* Lounge Info Card */}
-        <div className="card mb-8">
+        <div className="card p-6 mb-8">
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Logo */}
             <div className="flex-shrink-0">
@@ -192,7 +192,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
         {/* Info Grid */}
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           {/* Address & Hours */}
-          <div className="card">
+          <div className="card p-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <IconTarget size={18} className="text-[var(--color-primary)]" />
               Адрес и время работы
@@ -219,7 +219,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
           </div>
 
           {/* Contacts */}
-          <div className="card">
+          <div className="card p-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <IconCalendar size={18} className="text-[var(--color-primary)]" />
               Контакты
@@ -259,7 +259,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {signatureMixes.map(mix => (
-                <div key={mix.id} className="card border-[var(--color-primary)]/30">
+                <div key={mix.id} className="card p-5 border-[var(--color-primary)]/30">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="font-semibold">{mix.name}</h3>
@@ -301,7 +301,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
         )}
 
         {/* CTA */}
-        <div className="card bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30 text-center">
+        <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30 text-center">
           <h3 className="text-xl font-bold mb-2">Хотите попробовать?</h3>
           <p className="text-[var(--color-textMuted)] mb-4">
             Посмотрите полное меню табаков или забронируйте столик
@@ -408,7 +408,7 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
               key={review.id}
               className="flex-shrink-0 w-[300px] sm:w-[350px] snap-center"
             >
-              <div className="card h-full border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-colors">
+              <div className="card p-5 h-full border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-colors">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-black flex-shrink-0">

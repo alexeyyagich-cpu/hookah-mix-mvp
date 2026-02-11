@@ -1,0 +1,217 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode'
+import { findTobaccoByBarcode, TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
+import { IconClose, IconScan } from '@/components/Icons'
+
+interface BarcodeScannerProps {
+  onScan: (tobacco: TobaccoBarcode) => void
+  onManualEntry: () => void
+  onClose: () => void
+}
+
+export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScannerProps) {
+  const [error, setError] = useState<string | null>(null)
+  const [scanning, setScanning] = useState(false)
+  const [lastScanned, setLastScanned] = useState<string | null>(null)
+  const [notFound, setNotFound] = useState(false)
+  const scannerRef = useRef<Html5Qrcode | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    const startScanner = async () => {
+      if (!containerRef.current) return
+
+      try {
+        const scanner = new Html5Qrcode('barcode-scanner')
+        scannerRef.current = scanner
+
+        await scanner.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 100 },
+            aspectRatio: 1.777,
+          },
+          (decodedText) => {
+            if (!mounted) return
+
+            // Avoid duplicate scans
+            if (decodedText === lastScanned) return
+            setLastScanned(decodedText)
+
+            // Look up in database
+            const tobacco = findTobaccoByBarcode(decodedText)
+
+            if (tobacco) {
+              // Found! Stop scanning and return result
+              scanner.stop().then(() => {
+                onScan(tobacco)
+              }).catch(console.error)
+            } else {
+              // Not found in database
+              setNotFound(true)
+              setTimeout(() => setNotFound(false), 2000)
+            }
+          },
+          (errorMessage) => {
+            // Ignore scan errors (happens when no barcode is visible)
+          }
+        )
+
+        if (mounted) {
+          setScanning(true)
+          setError(null)
+        }
+      } catch (err) {
+        console.error('Scanner error:', err)
+        if (mounted) {
+          if (err instanceof Error && err.message.includes('Permission')) {
+            setError('Нет доступа к камере. Разрешите доступ в настройках браузера.')
+          } else {
+            setError('Не удалось запустить сканер. Попробуйте ввести код вручную.')
+          }
+        }
+      }
+    }
+
+    startScanner()
+
+    return () => {
+      mounted = false
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(() => {})
+        scannerRef.current.clear()
+      }
+    }
+  }, [lastScanned, onScan])
+
+  const handleClose = () => {
+    if (scannerRef.current) {
+      scannerRef.current.stop().catch(() => {})
+    }
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 text-white">
+        <h2 className="text-lg font-semibold">Сканировать штрих-код</h2>
+        <button
+          onClick={handleClose}
+          className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+        >
+          <IconClose size={20} />
+        </button>
+      </div>
+
+      {/* Scanner viewport */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="relative w-full max-w-md">
+          {error ? (
+            <div className="bg-[var(--color-danger)]/20 border border-[var(--color-danger)]/50 rounded-xl p-6 text-center text-white">
+              <p className="mb-4">{error}</p>
+              <button
+                onClick={onManualEntry}
+                className="btn btn-primary"
+              >
+                Ввести вручную
+              </button>
+            </div>
+          ) : (
+            <>
+              <div
+                id="barcode-scanner"
+                ref={containerRef}
+                className="rounded-xl overflow-hidden bg-black"
+                style={{ minHeight: '300px' }}
+              />
+
+              {/* Scan overlay */}
+              <div className="absolute inset-0 pointer-events-none">
+                {/* Scan line animation */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-24 border-2 border-[var(--color-primary)] rounded-lg">
+                  <div className="absolute inset-x-0 top-0 h-0.5 bg-[var(--color-primary)] animate-scan" />
+                </div>
+              </div>
+
+              {/* Not found message */}
+              {notFound && (
+                <div className="absolute inset-x-0 bottom-4 text-center">
+                  <span className="px-4 py-2 rounded-full bg-[var(--color-warning)] text-white text-sm">
+                    Штрих-код не найден в базе
+                  </span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 space-y-3">
+        <p className="text-center text-white/70 text-sm">
+          Наведите камеру на штрих-код упаковки табака
+        </p>
+        <button
+          onClick={onManualEntry}
+          className="w-full btn btn-ghost text-white border-white/30"
+        >
+          Ввести вручную
+        </button>
+      </div>
+
+      {/* CSS for scan animation */}
+      <style jsx>{`
+        @keyframes scan {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(90px); }
+        }
+        .animate-scan {
+          animation: scan 2s ease-in-out infinite;
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// Button component to open scanner
+interface ScanButtonProps {
+  onScanResult: (tobacco: TobaccoBarcode) => void
+  onManualAdd: () => void
+}
+
+export function ScanButton({ onScanResult, onManualAdd }: ScanButtonProps) {
+  const [showScanner, setShowScanner] = useState(false)
+
+  return (
+    <>
+      <button
+        onClick={() => setShowScanner(true)}
+        className="btn btn-ghost flex items-center gap-2"
+        title="Сканировать штрих-код"
+      >
+        <IconScan size={18} />
+        <span className="hidden sm:inline">Сканировать</span>
+      </button>
+
+      {showScanner && (
+        <BarcodeScanner
+          onScan={(tobacco) => {
+            setShowScanner(false)
+            onScanResult(tobacco)
+          }}
+          onManualEntry={() => {
+            setShowScanner(false)
+            onManualAdd()
+          }}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+    </>
+  )
+}

@@ -432,25 +432,25 @@ export default function StatisticsPage() {
           {/* Charts Grid */}
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Consumption Over Time */}
-            <div className="card">
+            <div className="card p-5">
               <h2 className="text-lg font-semibold mb-6">Расход по дням</h2>
               <ConsumptionChart data={statistics.dailyConsumption} />
             </div>
 
             {/* Brand Distribution */}
-            <div className="card">
+            <div className="card p-5">
               <h2 className="text-lg font-semibold mb-6">Распределение по брендам</h2>
               <BrandPieChart data={statistics.consumptionByBrand} />
             </div>
 
             {/* Popular Flavors */}
-            <div className="card">
+            <div className="card p-5">
               <h2 className="text-lg font-semibold mb-6">Популярные вкусы</h2>
               <PopularFlavorsChart data={statistics.consumptionByFlavor} />
             </div>
 
             {/* Top Mixes */}
-            <div className="card">
+            <div className="card p-5">
               <h2 className="text-lg font-semibold mb-6">Популярные миксы</h2>
               {statistics.topMixes.length === 0 ? (
                 <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
@@ -486,7 +486,7 @@ export default function StatisticsPage() {
 
           {/* Low Stock Alert */}
           {statistics.lowStockItems.length > 0 && (
-            <div className="card">
+            <div className="card p-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <IconWarning size={20} className="text-[var(--color-warning)]" />
                 Заканчивающиеся табаки

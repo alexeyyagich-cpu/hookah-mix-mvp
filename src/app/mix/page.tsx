@@ -35,6 +35,7 @@ import { SavedMixesDrawer } from "@/components/mix/SavedMixesDrawer";
 import { MixCostBreakdown } from "@/components/mix/MixCostBreakdown";
 import { RecentGuests } from "@/components/guests/RecentGuests";
 import { useInventory } from "@/lib/hooks/useInventory";
+import { SessionTimer } from "@/components/session/SessionTimer";
 import type { MixSnapshot } from "@/types/database";
 import Link from "next/link";
 
@@ -96,6 +97,8 @@ export default function MixPage() {
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [isSlotMachineOpen, setIsSlotMachineOpen] = useState(false);
   const [isQuickSessionOpen, setIsQuickSessionOpen] = useState(false);
+  const [isTimerVisible, setIsTimerVisible] = useState(false);
+  const [sessionDuration, setSessionDuration] = useState(0);
   const skipNormalizationRef = React.useRef(false);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const mixRatioRef = React.useRef<HTMLDivElement>(null);
@@ -573,14 +576,14 @@ export default function MixPage() {
           {/* Left Column */}
           <div className="space-y-6">
             {/* Tobacco Selection */}
-            <section className="card card-elevated">
+            <section className="card card-elevated p-5">
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h2 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
-                    Select Tobaccos
+                    Выберите табак
                   </h2>
                   <p className="text-xs mt-0.5" style={{ color: "var(--color-textMuted)" }}>
-                    Choose 2-3 flavors for your mix
+                    Выберите 2-3 вкуса для микса
                   </p>
                 </div>
                 <span
@@ -671,7 +674,7 @@ export default function MixPage() {
             </section>
 
             {/* Mix Ratio */}
-            <section ref={mixRatioRef} className="card card-elevated">
+            <section ref={mixRatioRef} className="card card-elevated p-5">
               <h2 className="text-lg font-semibold mb-5" style={{ color: "var(--color-text)" }}>
                 Mix Ratio
               </h2>
@@ -735,7 +738,7 @@ export default function MixPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Visualization */}
-            <section className="card card-elevated">
+            <section className="card card-elevated p-5">
               <MixPieChart items={items} />
             </section>
 
@@ -948,10 +951,10 @@ export default function MixPage() {
         </div>
       </main>
 
-      {/* Keyboard hint */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+      {/* Keyboard hint - hidden on mobile, only visible on desktop */}
+      <div className="hidden lg:block fixed bottom-6 left-1/2 -translate-x-1/2 z-40 opacity-50 hover:opacity-100 transition-opacity">
         <div className="glass px-4 py-2 rounded-full text-xs flex items-center gap-3 border" style={{ borderColor: "var(--color-border)" }}>
-          <span style={{ color: "var(--color-textMuted)" }}>Theme:</span>
+          <span style={{ color: "var(--color-textMuted)" }}>Тема:</span>
           {["1", "2", "3"].map(k => (
             <kbd
               key={k}
@@ -1125,6 +1128,19 @@ export default function MixPage() {
         </>
       )}
 
+      {/* Floating Session Timer */}
+      {user && isTimerVisible && (
+        <div
+          className="fixed bottom-24 right-4 z-40 w-72 animate-fadeInUp"
+        >
+          <SessionTimer
+            onDurationChange={setSessionDuration}
+            notificationMinutes={45}
+            autoStart={false}
+          />
+        </div>
+      )}
+
       {/* Floating action bar for save actions */}
       {user && result && (
         <div
@@ -1135,6 +1151,22 @@ export default function MixPage() {
             border: "1px solid var(--color-border)",
           }}
         >
+          {/* Timer toggle button */}
+          <button
+            onClick={() => setIsTimerVisible(!isTimerVisible)}
+            aria-label={isTimerVisible ? "Скрыть таймер" : "Показать таймер"}
+            className={`h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all ${isTimerVisible ? 'animate-pulse' : ''}`}
+            style={{
+              background: isTimerVisible ? "var(--color-success)" : "var(--color-bgHover)",
+              color: isTimerVisible ? "white" : "var(--color-text)",
+            }}
+          >
+            <IconTimer size={18} />
+            {sessionDuration > 0 && (
+              <span className="tabular-nums">{sessionDuration}м</span>
+            )}
+          </button>
+
           <button
             onClick={() => setIsSaveMixModalOpen(true)}
             aria-label="Сохранить микс"

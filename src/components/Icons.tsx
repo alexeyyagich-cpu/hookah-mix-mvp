@@ -233,6 +233,28 @@ export function IconTarget({ size = 24, color = "currentColor", className }: Ico
   );
 }
 
+export function IconUsers({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="9" cy="7" r="3" stroke={color} strokeWidth="2" />
+      <path
+        d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle cx="17" cy="7" r="2.5" stroke={color} strokeWidth="2" opacity="0.6" />
+      <path
+        d="M21 21v-1.5a3 3 0 00-3-3h-1"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+    </svg>
+  );
+}
+
 export function IconPalette({ size = 24, color = "currentColor", className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
@@ -405,17 +427,6 @@ export function IconScale({ size = 24, color = "currentColor", className }: Icon
       <path d="M18 7L16 15H22L20 7" stroke={color} strokeWidth="2" strokeLinejoin="round" opacity="0.5" />
       <path d="M12 7V21" stroke={color} strokeWidth="2" strokeLinecap="round" />
       <path d="M8 21H16" stroke={color} strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-export function IconUsers({ size = 24, color = "currentColor", className }: IconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-      <circle cx="9" cy="7" r="4" stroke={color} strokeWidth="2" />
-      <path d="M3 21V19C3 16.7909 4.79086 15 7 15H11C13.2091 15 15 16.7909 15 19V21" stroke={color} strokeWidth="2" strokeLinecap="round" />
-      <circle cx="17" cy="7" r="3" stroke={color} strokeWidth="2" opacity="0.5" />
-      <path d="M17 14C19.2091 14 21 15.7909 21 18V21" stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.5" />
     </svg>
   );
 }
@@ -618,6 +629,19 @@ export function IconShop({ size = 24, color = "currentColor", className }: IconP
   );
 }
 
+export function IconFloor({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      {/* Floor plan layout icon */}
+      <rect x="3" y="3" width="18" height="18" rx="2" stroke={color} strokeWidth="2" />
+      <circle cx="8" cy="8" r="2.5" stroke={color} strokeWidth="1.5" opacity="0.7" />
+      <rect x="13" y="5" width="5" height="3" rx="1" stroke={color} strokeWidth="1.5" opacity="0.7" />
+      <rect x="5" y="14" width="6" height="4" rx="1" stroke={color} strokeWidth="1.5" opacity="0.7" />
+      <circle cx="16" cy="15" r="2" stroke={color} strokeWidth="1.5" opacity="0.7" />
+    </svg>
+  );
+}
+
 export function IconCart({ size = 24, color = "currentColor", className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
@@ -683,6 +707,42 @@ export function IconChevronLeft({ size = 24, color = "currentColor", className }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
       <path d="M15 6L9 12L15 18" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconMail({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth="2" />
+      <path d="M3 7L12 13L21 7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconScan({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      {/* Corner brackets */}
+      <path d="M4 8V6C4 4.89543 4.89543 4 6 4H8" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 4H18C19.1046 4 20 4.89543 20 6V8" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M20 16V18C20 19.1046 19.1046 20 18 20H16" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M8 20H6C4.89543 20 4 19.1046 4 18V16" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      {/* Scan line */}
+      <line x1="4" y1="12" x2="20" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconBarcode({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="3" y="4" width="2" height="16" fill={color} />
+      <rect x="7" y="4" width="1" height="16" fill={color} />
+      <rect x="10" y="4" width="2" height="16" fill={color} />
+      <rect x="14" y="4" width="1" height="16" fill={color} />
+      <rect x="17" y="4" width="3" height="16" fill={color} />
+      <rect x="21" y="4" width="1" height="16" fill={color} />
     </svg>
   );
 }

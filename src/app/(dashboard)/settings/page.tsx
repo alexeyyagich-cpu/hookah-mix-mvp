@@ -4,13 +4,17 @@ import { useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
+import { usePushNotifications } from '@/lib/hooks/usePushNotifications'
+import { useTelegram } from '@/lib/hooks/useTelegram'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 export default function SettingsPage() {
-  const { user, profile, refreshProfile, signOut } = useAuth()
+  const { user, profile, refreshProfile, signOut, isDemoMode } = useAuth()
   const { tier, isExpired, daysUntilExpiry } = useSubscription()
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings()
+  const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, loading: pushLoading, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
+  const { connection: telegramConnection, loading: telegramLoading, connectLink: telegramConnectLink, updateSettings: updateTelegramSettings, disconnect: disconnectTelegram } = useTelegram()
   const supabase = createClient()
 
   const [businessName, setBusinessName] = useState(profile?.business_name || '')
@@ -19,6 +23,7 @@ export default function SettingsPage() {
   const [address, setAddress] = useState(profile?.address || '')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [portalLoading, setPortalLoading] = useState(false)
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,6 +61,36 @@ export default function SettingsPage() {
     await signOut()
   }
 
+  const handleManageSubscription = async () => {
+    if (!user || isDemoMode) return
+
+    setPortalLoading(true)
+    try {
+      const response = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      })
+
+      const data = await response.json()
+
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        setMessage('Ошибка: ' + (data.error || 'Не удалось открыть портал'))
+        setTimeout(() => setMessage(''), 3000)
+      }
+    } catch (error) {
+      console.error('Portal error:', error)
+      setMessage('Ошибка при открытии портала подписки')
+      setTimeout(() => setMessage(''), 3000)
+    } finally {
+      setPortalLoading(false)
+    }
+  }
+
+  const hasActiveSubscription = profile?.stripe_subscription_id && tier !== 'free'
+
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
@@ -89,10 +124,27 @@ export default function SettingsPage() {
                 Обновите подписку для доступа к полному функционалу
               </p>
             )}
+            {hasActiveSubscription && (
+              <p className="text-sm text-[var(--color-textMuted)] mt-2">
+                Управляйте подпиской, измените тариф или отмените
+              </p>
+            )}
           </div>
-          <Link href="/pricing" className="btn btn-primary">
-            {tier === 'free' ? 'Обновить' : 'Управление'}
-          </Link>
+          <div className="flex gap-2">
+            {hasActiveSubscription ? (
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="btn btn-primary disabled:opacity-50"
+              >
+                {portalLoading ? 'Загрузка...' : 'Управление'}
+              </button>
+            ) : (
+              <Link href="/pricing" className="btn btn-primary">
+                {tier === 'free' ? 'Обновить' : 'Изменить тариф'}
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
@@ -233,7 +285,158 @@ export default function SettingsPage() {
               <span>200г</span>
             </div>
           </div>
+
+          {/* Push Notifications */}
+          {pushSupported && (
+            <>
+              <hr className="border-[var(--color-border)]" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium">Push-уведомления</h3>
+                  <p className="text-sm text-[var(--color-textMuted)]">
+                    {pushPermission === 'denied'
+                      ? 'Уведомления заблокированы в браузере'
+                      : 'Получать уведомления даже когда сайт закрыт'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => pushSubscribed ? unsubscribePush() : subscribePush()}
+                  disabled={pushLoading || pushPermission === 'denied'}
+                  className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
+                    pushSubscribed
+                      ? 'bg-[var(--color-primary)]'
+                      : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                      pushSubscribed ? 'left-7' : 'left-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              {pushSubscribed && (
+                <p className="text-xs text-[var(--color-success)] flex items-center gap-1">
+                  <span>✓</span> Push-уведомления включены
+                </p>
+              )}
+            </>
+          )}
         </div>
+      </div>
+
+      {/* Telegram Integration */}
+      <div className="card p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#0088cc] flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-3.083 11.783-3.083 11.783-.145.58-.515.748-.845.748-.511 0-.753-.342-1.258-.788l-3.255-2.548-.961.926c-.144.138-.264.254-.529.254-.294 0-.345-.108-.483-.365l-1.088-3.575-3.13-.972c-.567-.164-.575-.565.152-.851l12.178-4.688c.467-.182.9.114.751.676z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Telegram</h2>
+            <p className="text-sm text-[var(--color-textMuted)]">
+              Получайте уведомления в Telegram
+            </p>
+          </div>
+        </div>
+
+        {telegramLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : telegramConnection ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-success)]/10">
+              <span className="text-[var(--color-success)]">✓</span>
+              <span className="text-sm">
+                Подключён как <strong>@{telegramConnection.telegram_username || telegramConnection.telegram_user_id}</strong>
+              </span>
+            </div>
+
+            {/* Notification toggles */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Уведомления о низком остатке</span>
+                <button
+                  onClick={() => updateTelegramSettings({
+                    low_stock_alerts: !telegramConnection.low_stock_alerts
+                  })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                    telegramConnection.low_stock_alerts ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    telegramConnection.low_stock_alerts ? 'left-5' : 'left-0.5'
+                  }`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Напоминания о сессиях</span>
+                <button
+                  onClick={() => updateTelegramSettings({
+                    session_reminders: !telegramConnection.session_reminders
+                  })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                    telegramConnection.session_reminders ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    telegramConnection.session_reminders ? 'left-5' : 'left-0.5'
+                  }`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Ежедневный отчёт</span>
+                <button
+                  onClick={() => updateTelegramSettings({
+                    daily_summary: !telegramConnection.daily_summary
+                  })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                    telegramConnection.daily_summary ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    telegramConnection.daily_summary ? 'left-5' : 'left-0.5'
+                  }`} />
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={disconnectTelegram}
+              className="text-sm text-[var(--color-danger)] hover:underline"
+            >
+              Отключить Telegram
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--color-textMuted)]">
+              Подключите Telegram для получения уведомлений о низком запасе табака, статусах заказов и ежедневных отчётов.
+            </p>
+
+            {telegramConnectLink ? (
+              <a
+                href={telegramConnectLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0088cc] text-white font-medium hover:opacity-90 transition-opacity"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-3.083 11.783-3.083 11.783-.145.58-.515.748-.845.748-.511 0-.753-.342-1.258-.788l-3.255-2.548-.961.926c-.144.138-.264.254-.529.254-.294 0-.345-.108-.483-.365l-1.088-3.575-3.13-.972c-.567-.164-.575-.565.152-.851l12.178-4.688c.467-.182.9.114.751.676z"/>
+                </svg>
+                Подключить Telegram
+              </a>
+            ) : (
+              <p className="text-sm text-[var(--color-textMuted)] italic">
+                Telegram-бот не настроен. Добавьте TELEGRAM_BOT_TOKEN в переменные окружения.
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Danger Zone */}

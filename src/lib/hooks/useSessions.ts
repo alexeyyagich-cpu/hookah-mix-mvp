@@ -23,6 +23,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     compatibility_score: 92,
     notes: 'Отличный микс!',
     rating: 5,
+    duration_minutes: 52,
     session_items: [
       { id: '1', session_id: '1', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 10, percentage: 50 },
       { id: '2', session_id: '1', tobacco_inventory_id: '3', tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', grams_used: 10, percentage: 50 },
@@ -38,6 +39,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     compatibility_score: 85,
     notes: null,
     rating: 4,
+    duration_minutes: 45,
     session_items: [
       { id: '3', session_id: '2', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 12, percentage: 67 },
       { id: '4', session_id: '2', tobacco_inventory_id: '2', tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', grams_used: 6, percentage: 33 },
@@ -53,6 +55,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     compatibility_score: 78,
     notes: 'Попробовать с меньшей пропорцией мяты',
     rating: 3,
+    duration_minutes: null,
     session_items: [
       { id: '5', session_id: '3', tobacco_inventory_id: '4', tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', grams_used: 15, percentage: 100 },
     ],

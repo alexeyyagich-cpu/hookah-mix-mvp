@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { TOBACCOS } from '@/data/tobaccos'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
-import { IconSmoke } from '@/components/Icons'
+import { IconSmoke, IconTimer } from '@/components/Icons'
+import { SessionTimer } from '@/components/session/SessionTimer'
 import type { Session, SessionItem, TobaccoInventory } from '@/types/database'
 
 interface MixItem {
@@ -34,6 +35,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
   const [mixItems, setMixItems] = useState<MixItem[]>([])
   const [saving, setSaving] = useState(false)
   const [compatibilityScore, setCompatibilityScore] = useState<number | null>(null)
+  const [durationMinutes, setDurationMinutes] = useState<number>(0)
+  const [showTimer, setShowTimer] = useState(false)
 
   useEffect(() => {
     if (defaultBowl) {
@@ -84,6 +87,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
       compatibility_score: compatibilityScore,
       notes: notes || null,
       rating: null,
+      duration_minutes: durationMinutes > 0 ? durationMinutes : null,
     }
 
     const sessionItems: Omit<SessionItem, 'id' | 'session_id'>[] = mixItems.map(item => ({
@@ -227,6 +231,37 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             />
             <span className="text-sm">Списать табак со склада</span>
           </label>
+
+          {/* Session Timer */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium">Таймер сессии</label>
+              <button
+                type="button"
+                onClick={() => setShowTimer(!showTimer)}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-colors"
+                style={{
+                  background: showTimer ? 'var(--color-primary)' : 'var(--color-bgHover)',
+                  color: showTimer ? 'var(--color-bg)' : 'var(--color-textMuted)',
+                }}
+              >
+                <IconTimer size={14} />
+                {showTimer ? 'Скрыть' : 'Показать'}
+              </button>
+            </div>
+            {showTimer && (
+              <SessionTimer
+                onDurationChange={setDurationMinutes}
+                notificationMinutes={45}
+                autoStart={false}
+              />
+            )}
+            {!showTimer && durationMinutes > 0 && (
+              <div className="text-sm text-[var(--color-textMuted)]">
+                Длительность: {durationMinutes} мин
+              </div>
+            )}
+          </div>
 
           {/* Notes */}
           <div className="space-y-2">

@@ -31,6 +31,11 @@ const DEMO_PROFILE: Profile = {
   logo_url: null,
   subscription_tier: 'pro', // Pro for full demo experience
   subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  role: 'owner', // Demo user is owner by default
+  owner_profile_id: null,
+  venue_slug: null,
+  stripe_customer_id: null,
+  stripe_subscription_id: null,
   created_at: new Date().toISOString(),
 }
 

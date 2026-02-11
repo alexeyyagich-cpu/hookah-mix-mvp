@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
+import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 
 interface AddTobaccoModalProps {
   isOpen: boolean
@@ -10,9 +11,10 @@ interface AddTobaccoModalProps {
   onSave: (tobacco: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>) => Promise<void>
   editingItem?: TobaccoInventory | null
   canAddMore: boolean
+  scannedTobacco?: TobaccoBarcode | null
 }
 
-export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMore }: AddTobaccoModalProps) {
+export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMore, scannedTobacco }: AddTobaccoModalProps) {
   const [selectedTobacco, setSelectedTobacco] = useState<string>('')
   const [brand, setBrand] = useState('')
   const [flavor, setFlavor] = useState('')
@@ -39,10 +41,24 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
       setPurchasePrice(editingItem.purchase_price?.toString() || '')
       setNotes(editingItem.notes || '')
       setShowCatalog(false)
+    } else if (scannedTobacco) {
+      // Pre-fill from barcode scan
+      const catalogItem = TOBACCOS.find(
+        t => t.brand.toLowerCase() === scannedTobacco.brand.toLowerCase() &&
+             t.flavor.toLowerCase() === scannedTobacco.flavor.toLowerCase()
+      )
+      setSelectedTobacco(catalogItem?.id || `${scannedTobacco.brand}-${scannedTobacco.flavor}`)
+      setBrand(scannedTobacco.brand)
+      setFlavor(scannedTobacco.flavor)
+      setPackageGrams(scannedTobacco.packageGrams.toString())
+      setPackageCount('1')
+      setPurchasePrice('')
+      setNotes('Добавлено сканированием')
+      setShowCatalog(false)
     } else {
       resetForm()
     }
-  }, [editingItem, isOpen])
+  }, [editingItem, scannedTobacco, isOpen])
 
   const resetForm = () => {
     setSelectedTobacco('')

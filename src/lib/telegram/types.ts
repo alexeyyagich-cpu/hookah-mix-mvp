@@ -1,0 +1,77 @@
+// Telegram Bot Types
+
+export interface TelegramUser {
+  id: number
+  is_bot: boolean
+  first_name: string
+  last_name?: string
+  username?: string
+  language_code?: string
+}
+
+export interface TelegramChat {
+  id: number
+  type: 'private' | 'group' | 'supergroup' | 'channel'
+  title?: string
+  username?: string
+  first_name?: string
+  last_name?: string
+}
+
+export interface TelegramMessage {
+  message_id: number
+  from?: TelegramUser
+  chat: TelegramChat
+  date: number
+  text?: string
+}
+
+export interface TelegramUpdate {
+  update_id: number
+  message?: TelegramMessage
+  callback_query?: {
+    id: string
+    from: TelegramUser
+    message?: TelegramMessage
+    data?: string
+  }
+}
+
+export interface TelegramWebhookPayload {
+  update_id: number
+  message?: TelegramMessage
+  callback_query?: {
+    id: string
+    from: TelegramUser
+    message?: TelegramMessage
+    data?: string
+  }
+}
+
+export type NotificationType =
+  | 'low_stock'
+  | 'session_reminder'
+  | 'order_status'
+  | 'daily_summary'
+
+export interface TelegramNotification {
+  type: NotificationType
+  chatId: number
+  message: string
+  parseMode?: 'HTML' | 'Markdown' | 'MarkdownV2'
+}
+
+export interface TelegramConnection {
+  id: string
+  profile_id: string
+  telegram_user_id: number
+  telegram_username: string | null
+  chat_id: number
+  is_active: boolean
+  notifications_enabled: boolean
+  low_stock_alerts: boolean
+  session_reminders: boolean
+  daily_summary: boolean
+  created_at: string
+  updated_at: string
+}
