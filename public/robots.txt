@@ -1,0 +1,36 @@
+# Hookah Torus - Robots.txt
+# https://hookah-torus.com
+
+User-agent: *
+Allow: /
+Allow: /mix
+Allow: /recommend
+Allow: /pricing
+Allow: /setup
+Allow: /lounge
+Allow: /menu
+
+# Protected routes
+Disallow: /dashboard
+Disallow: /inventory
+Disallow: /sessions
+Disallow: /guests
+Disallow: /statistics
+Disallow: /settings
+Disallow: /marketplace
+Disallow: /api
+Disallow: /login
+Disallow: /register
+
+# Sitemap
+Sitemap: https://hookah-torus.com/sitemap.xml
+
+# Crawl delay for aggressive bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Crawl-delay: 10
