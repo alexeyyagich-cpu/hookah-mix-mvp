@@ -39,20 +39,13 @@ export const metadata: Metadata = {
     siteName: "Hookah Torus",
     title: "Hookah Torus — Калькулятор миксов и управление кальянной",
     description: "Создавайте идеальные миксы табака с AI-рекомендациями. Полная платформа для кальянных заведений.",
-    images: [
-      {
-        url: "/images/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Hookah Torus - Калькулятор миксов",
-      },
-    ],
+    // images auto-generated from opengraph-image.tsx
   },
   twitter: {
     card: "summary_large_image",
     title: "Hookah Torus — Калькулятор миксов",
     description: "Создавайте идеальные миксы табака с AI-рекомендациями",
-    images: ["/images/og-image.png"],
+    // images auto-generated from twitter-image.tsx
   },
   robots: {
     index: true,
