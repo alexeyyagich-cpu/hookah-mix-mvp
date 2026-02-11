@@ -16,6 +16,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   logo_url TEXT,
   subscription_tier TEXT DEFAULT 'free' CHECK (subscription_tier IN ('free', 'pro', 'enterprise')),
   subscription_expires_at TIMESTAMPTZ,
+  -- Onboarding state
+  onboarding_completed BOOLEAN DEFAULT false,
+  onboarding_skipped BOOLEAN DEFAULT false,
+  onboarding_step TEXT DEFAULT 'welcome' CHECK (onboarding_step IN ('welcome', 'business', 'bowl', 'tobacco', 'complete')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -607,3 +611,107 @@ CREATE POLICY "Users manage own auto reorder rules" ON public.auto_reorder_rules
 -- Indexes
 CREATE INDEX idx_auto_reorder_rules_profile_id ON public.auto_reorder_rules(profile_id);
 CREATE INDEX idx_auto_reorder_rules_enabled ON public.auto_reorder_rules(is_enabled);
+
+-- ============================================================================
+-- EMAIL SETTINGS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.email_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  email_notifications_enabled BOOLEAN DEFAULT true,
+  low_stock_email BOOLEAN DEFAULT true,
+  order_updates_email BOOLEAN DEFAULT true,
+  daily_summary_email BOOLEAN DEFAULT false,
+  marketing_email BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.email_settings ENABLE ROW LEVEL SECURITY;
+
+-- Users can only manage their own settings
+CREATE POLICY "Users manage own email settings" ON public.email_settings
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_email_settings_updated_at ON public.email_settings;
+CREATE TRIGGER update_email_settings_updated_at
+  BEFORE UPDATE ON public.email_settings
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================================
+-- TELEGRAM CONNECTIONS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.telegram_connections (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  telegram_user_id BIGINT NOT NULL,
+  telegram_username TEXT,
+  chat_id BIGINT NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  notifications_enabled BOOLEAN DEFAULT true,
+  low_stock_alerts BOOLEAN DEFAULT true,
+  session_reminders BOOLEAN DEFAULT false,
+  daily_summary BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.telegram_connections ENABLE ROW LEVEL SECURITY;
+
+-- Users can only manage their own telegram connection
+CREATE POLICY "Users manage own telegram connection" ON public.telegram_connections
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_telegram_connections_updated_at ON public.telegram_connections;
+CREATE TRIGGER update_telegram_connections_updated_at
+  BEFORE UPDATE ON public.telegram_connections
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Index
+CREATE INDEX idx_telegram_connections_chat_id ON public.telegram_connections(chat_id);
+
+-- ============================================================================
+-- FLOOR TABLES TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.floor_tables (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  capacity INTEGER DEFAULT 4,
+  shape TEXT DEFAULT 'circle' CHECK (shape IN ('circle', 'square', 'rectangle')),
+  position_x INTEGER DEFAULT 100,
+  position_y INTEGER DEFAULT 100,
+  width INTEGER DEFAULT 80,
+  height INTEGER DEFAULT 80,
+  status TEXT DEFAULT 'available' CHECK (status IN ('available', 'occupied', 'reserved', 'cleaning')),
+  current_session_id UUID REFERENCES public.sessions(id) ON DELETE SET NULL,
+  current_guest_name TEXT,
+  session_start_time TIMESTAMPTZ,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.floor_tables ENABLE ROW LEVEL SECURITY;
+
+-- Users can only manage their own tables
+CREATE POLICY "Users manage own floor tables" ON public.floor_tables
+  FOR ALL USING (auth.uid() = profile_id);
+
+-- Index
+CREATE INDEX idx_floor_tables_profile_id ON public.floor_tables(profile_id);
+CREATE INDEX idx_floor_tables_status ON public.floor_tables(status);
+
+-- Trigger for updated_at
+DROP TRIGGER IF EXISTS update_floor_tables_updated_at ON public.floor_tables;
+CREATE TRIGGER update_floor_tables_updated_at
+  BEFORE UPDATE ON public.floor_tables
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

@@ -21,6 +21,9 @@ const DEMO_STAFF: Profile[] = [
     venue_slug: null,
     stripe_customer_id: null,
     stripe_subscription_id: null,
+    onboarding_completed: true,
+    onboarding_skipped: false,
+    onboarding_step: null,
     created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -37,6 +40,9 @@ const DEMO_STAFF: Profile[] = [
     venue_slug: null,
     stripe_customer_id: null,
     stripe_subscription_id: null,
+    onboarding_completed: true,
+    onboarding_skipped: false,
+    onboarding_step: null,
     created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ]

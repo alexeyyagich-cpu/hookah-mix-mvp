@@ -3,6 +3,8 @@ export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
 // User roles for access control
 export type UserRole = 'owner' | 'staff' | 'guest'
 
+export type OnboardingStep = 'welcome' | 'business' | 'bowl' | 'tobacco' | 'complete'
+
 export interface Profile {
   id: string
   business_name: string | null
@@ -20,6 +22,10 @@ export interface Profile {
   // Stripe integration
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
+  // Onboarding state
+  onboarding_completed: boolean
+  onboarding_skipped: boolean
+  onboarding_step: OnboardingStep | null
   created_at: string
 }
 

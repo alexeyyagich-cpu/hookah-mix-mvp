@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Toaster, toast } from 'sonner'
 import { AuthGuard } from '@/components/auth/AuthGuard'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { BrandLoader } from '@/components/BrandLoader'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
+import { useOnboarding } from '@/lib/hooks/useOnboarding'
 
 function PageTransition() {
   const pathname = usePathname()
@@ -30,6 +31,42 @@ function PageTransition() {
       <BrandLoader size="lg" />
     </div>
   )
+}
+
+function OnboardingCheck({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const { shouldShowOnboarding, loading } = useOnboarding()
+
+  useEffect(() => {
+    // Don't redirect if still loading or already on onboarding page
+    if (loading || pathname === '/onboarding') return
+
+    // Redirect to onboarding if not completed
+    if (shouldShowOnboarding) {
+      router.push('/onboarding')
+    }
+  }, [loading, shouldShowOnboarding, pathname, router])
+
+  // Show loader while checking onboarding status
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-bg)]">
+        <BrandLoader size="lg" />
+      </div>
+    )
+  }
+
+  // If should show onboarding and not on onboarding page, don't render children
+  if (shouldShowOnboarding && pathname !== '/onboarding') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-bg)]">
+        <BrandLoader size="lg" />
+      </div>
+    )
+  }
+
+  return <>{children}</>
 }
 
 function LowStockNotifier() {
@@ -67,6 +104,36 @@ function LowStockNotifier() {
   return null
 }
 
+function DashboardContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isOnboarding = pathname === '/onboarding'
+
+  return (
+    <div className="min-h-screen bg-[var(--color-bg)] relative">
+      {/* Global background slot - pages can inject backgrounds here via portal or we check pathname */}
+      <div id="page-background" className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />
+      {!isOnboarding && <Sidebar />}
+      <main className={isOnboarding ? '' : 'lg:pl-72 relative'} style={{ zIndex: 1 }}>
+        <div className={isOnboarding ? '' : 'p-4 lg:p-8'}>
+          {children}
+        </div>
+      </main>
+      <PageTransition />
+      {!isOnboarding && <LowStockNotifier />}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'var(--color-bgCard)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
+          },
+        }}
+      />
+    </div>
+  )
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -74,28 +141,9 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-[var(--color-bg)] relative">
-        {/* Global background slot - pages can inject backgrounds here via portal or we check pathname */}
-        <div id="page-background" className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />
-        <Sidebar />
-        <main className="lg:pl-72 relative" style={{ zIndex: 1 }}>
-          <div className="p-4 lg:p-8">
-            {children}
-          </div>
-        </main>
-        <PageTransition />
-        <LowStockNotifier />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: 'var(--color-bgCard)',
-              color: 'var(--color-text)',
-              border: '1px solid var(--color-border)',
-            },
-          }}
-        />
-      </div>
+      <OnboardingCheck>
+        <DashboardContent>{children}</DashboardContent>
+      </OnboardingCheck>
     </AuthGuard>
   )
 }

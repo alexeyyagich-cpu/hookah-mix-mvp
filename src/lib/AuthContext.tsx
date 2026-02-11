@@ -36,6 +36,10 @@ const DEMO_PROFILE: Profile = {
   venue_slug: null,
   stripe_customer_id: null,
   stripe_subscription_id: null,
+  // Onboarding completed for demo
+  onboarding_completed: true,
+  onboarding_skipped: false,
+  onboarding_step: 'complete',
   created_at: new Date().toISOString(),
 }
 

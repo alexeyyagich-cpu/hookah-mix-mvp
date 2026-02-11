@@ -6,6 +6,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { usePushNotifications } from '@/lib/hooks/usePushNotifications'
 import { useTelegram } from '@/lib/hooks/useTelegram'
+import { useEmailSettings } from '@/lib/hooks/useEmailSettings'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings()
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, loading: pushLoading, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
   const { connection: telegramConnection, loading: telegramLoading, connectLink: telegramConnectLink, updateSettings: updateTelegramSettings, disconnect: disconnectTelegram } = useTelegram()
+  const { settings: emailSettings, loading: emailLoading, isConfigured: emailConfigured, updateSettings: updateEmailSettings } = useEmailSettings()
   const supabase = createClient()
 
   const [businessName, setBusinessName] = useState(profile?.business_name || '')
@@ -323,6 +325,112 @@ export default function SettingsPage() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Email Notifications */}
+      <div className="card p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Email-уведомления</h2>
+            <p className="text-sm text-[var(--color-textMuted)]">
+              Получайте важные уведомления на почту
+            </p>
+          </div>
+        </div>
+
+        {emailLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : !emailConfigured ? (
+          <p className="text-sm text-[var(--color-textMuted)] italic">
+            Email-сервис не настроен. Добавьте RESEND_API_KEY в переменные окружения.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {/* Master toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">Email-уведомления</h3>
+                <p className="text-sm text-[var(--color-textMuted)]">
+                  Включить отправку уведомлений на {user?.email}
+                </p>
+              </div>
+              <button
+                onClick={() => updateEmailSettings({
+                  email_notifications_enabled: !emailSettings?.email_notifications_enabled
+                })}
+                className={`relative w-12 h-6 rounded-full transition-colors ${
+                  emailSettings?.email_notifications_enabled
+                    ? 'bg-[var(--color-primary)]'
+                    : 'bg-[var(--color-border)]'
+                }`}
+              >
+                <span
+                  className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.email_notifications_enabled ? 'left-7' : 'left-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Individual toggles */}
+            <div className={emailSettings?.email_notifications_enabled ? 'space-y-3 pt-2' : 'space-y-3 pt-2 opacity-50 pointer-events-none'}>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Низкий запас табака</span>
+                <button
+                  onClick={() => updateEmailSettings({
+                    low_stock_email: !emailSettings?.low_stock_email
+                  })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                    emailSettings?.low_stock_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.low_stock_email ? 'left-5' : 'left-0.5'
+                  }`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Обновления заказов</span>
+                <button
+                  onClick={() => updateEmailSettings({
+                    order_updates_email: !emailSettings?.order_updates_email
+                  })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                    emailSettings?.order_updates_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.order_updates_email ? 'left-5' : 'left-0.5'
+                  }`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Ежедневный отчёт</span>
+                <button
+                  onClick={() => updateEmailSettings({
+                    daily_summary_email: !emailSettings?.daily_summary_email
+                  })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                    emailSettings?.daily_summary_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.daily_summary_email ? 'left-5' : 'left-0.5'
+                  }`} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Telegram Integration */}
