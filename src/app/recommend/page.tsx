@@ -419,10 +419,10 @@ export default function RecommendPage() {
                     setSelectedGuest(null)
                     resetFilters()
                   }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--color-bgHover)] transition-colors"
-                  style={{ color: 'var(--color-textMuted)' }}
+                  aria-label="Сбросить выбор гостя"
+                  className="icon-btn icon-btn-sm icon-btn-ghost"
                 >
-                  ×
+                  <span aria-hidden="true">×</span>
                 </button>
               </div>
             )}
@@ -717,10 +717,10 @@ export default function RecommendPage() {
                       </span>
                       <button
                         onClick={() => removeFromMix(tobacco.id)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--color-bgHover)] transition-colors"
-                        style={{ color: 'var(--color-danger)' }}
+                        aria-label={`Удалить ${tobacco.flavor} из микса`}
+                        className="icon-btn icon-btn-sm icon-btn-ghost icon-btn-danger"
                       >
-                        ×
+                        <span aria-hidden="true">×</span>
                       </button>
                     </div>
                   </div>
@@ -998,10 +998,10 @@ function GuestModal({
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--color-bgHover)] transition-colors"
-            style={{ color: 'var(--color-textMuted)' }}
+            aria-label="Закрыть модальное окно"
+            className="icon-btn icon-btn-sm icon-btn-ghost"
           >
-            ×
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 

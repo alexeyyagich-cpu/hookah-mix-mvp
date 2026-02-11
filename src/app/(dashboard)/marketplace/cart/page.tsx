@@ -100,19 +100,21 @@ export default function CartPage() {
 
                 {/* Quantity controls */}
                 <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2" role="group" aria-label="Изменить количество">
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
+                      aria-label="Уменьшить количество"
+                      className="icon-btn icon-btn-sm"
                     >
-                      <IconMinus size={16} />
+                      <IconMinus size={18} aria-hidden="true" />
                     </button>
-                    <span className="w-8 text-center font-medium">{item.quantity}</span>
+                    <span className="w-10 text-center font-medium" aria-live="polite">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
+                      aria-label="Увеличить количество"
+                      className="icon-btn icon-btn-sm"
                     >
-                      <IconPlus size={16} />
+                      <IconPlus size={18} aria-hidden="true" />
                     </button>
                   </div>
 
@@ -122,9 +124,10 @@ export default function CartPage() {
 
                   <button
                     onClick={() => removeFromCart(item.product.id)}
+                    aria-label={`Удалить ${item.product.flavor} из корзины`}
                     className="text-sm text-[var(--color-danger)] hover:underline flex items-center gap-1"
                   >
-                    <IconTrash size={14} />
+                    <IconTrash size={14} aria-hidden="true" />
                     Удалить
                   </button>
                 </div>

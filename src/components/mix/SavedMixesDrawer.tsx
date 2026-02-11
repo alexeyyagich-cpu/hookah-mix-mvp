@@ -87,10 +87,10 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[var(--color-bgHover)] transition-colors"
-            style={{ color: 'var(--color-textMuted)' }}
+            aria-label="Закрыть панель сохранённых миксов"
+            className="icon-btn icon-btn-sm icon-btn-ghost"
           >
-            ×
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 

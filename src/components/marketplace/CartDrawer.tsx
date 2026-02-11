@@ -70,7 +70,7 @@ export function CartDrawer({
           <button
             onClick={onClose}
             aria-label="Закрыть корзину"
-            className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+            className="icon-btn icon-btn-ghost"
           >
             <IconClose size={20} aria-hidden="true" />
           </button>
@@ -107,27 +107,30 @@ export function CartDrawer({
                     </div>
                     <button
                       onClick={() => removeFromCart(item.product.id)}
-                      className="p-1 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 rounded transition-colors"
+                      aria-label={`Удалить ${item.product.flavor} из корзины`}
+                      className="icon-btn icon-btn-sm icon-btn-ghost icon-btn-danger"
                     >
-                      <IconTrash size={18} />
+                      <IconTrash size={18} aria-hidden="true" />
                     </button>
                   </div>
 
                   {/* Quantity controls */}
                   <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" role="group" aria-label="Изменить количество">
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
+                        aria-label="Уменьшить количество"
+                        className="icon-btn icon-btn-sm"
                       >
-                        <IconMinus size={16} />
+                        <IconMinus size={18} aria-hidden="true" />
                       </button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
+                      <span className="w-10 text-center font-medium" aria-live="polite">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
+                        aria-label="Увеличить количество"
+                        className="icon-btn icon-btn-sm"
                       >
-                        <IconPlus size={16} />
+                        <IconPlus size={18} aria-hidden="true" />
                       </button>
                     </div>
                     <div className="font-semibold">

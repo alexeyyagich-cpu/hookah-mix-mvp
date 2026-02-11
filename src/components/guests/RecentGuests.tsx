@@ -142,10 +142,10 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
             </div>
             <button
               onClick={handleClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--color-bgHover)', color: 'var(--color-textMuted)' }}
+              aria-label="Закрыть информацию о госте"
+              className="icon-btn icon-btn-sm icon-btn-ghost"
             >
-              ×
+              <span aria-hidden="true">×</span>
             </button>
           </div>
 

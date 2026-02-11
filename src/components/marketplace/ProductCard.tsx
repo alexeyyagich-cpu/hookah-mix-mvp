@@ -66,17 +66,17 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
             <button
               onClick={decrementQuantity}
               aria-label="Уменьшить количество"
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
+              className="icon-btn icon-btn-sm"
             >
-              <IconMinus size={16} aria-hidden="true" />
+              <IconMinus size={18} aria-hidden="true" />
             </button>
-            <span className="w-8 text-center font-medium" aria-live="polite">{quantity}</span>
+            <span className="w-10 text-center font-medium" aria-live="polite">{quantity}</span>
             <button
               onClick={incrementQuantity}
               aria-label="Увеличить количество"
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors"
+              className="icon-btn icon-btn-sm"
             >
-              <IconPlus size={16} aria-hidden="true" />
+              <IconPlus size={18} aria-hidden="true" />
             </button>
           </div>
 
