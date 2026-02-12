@@ -746,17 +746,20 @@ export default function MixPage() {
             {result && (
               <section
                 ref={resultsRef}
-                className={`card card-elevated stagger-children ${result?.compatibility.level === "perfect" ? "animate-rainbow-border" : ""}`}
+                className={`card card-elevated p-5 stagger-children ${result?.compatibility.level === "perfect" ? "animate-rainbow-border" : ""}`}
                 style={{
                   overflow: "visible",
                   borderWidth: result?.compatibility.level === "perfect" ? "2px" : "1px",
                 }}
               >
                 {/* Compatibility Ring - Interactive */}
-                <div className={`flex flex-col items-center mb-6 pb-8 ${result?.compatibility.level === "perfect" ? "perfect-celebration" : ""}`}>
+                <div className={`flex flex-col items-center mb-2 pt-5 ${result?.compatibility.level === "perfect" ? "perfect-celebration" : ""}`}>
                   <div
                     className={result.compatibility.level === "perfect" ? "animate-pulse-glow" : ""}
-                    style={{ "--glow-color": compatColor } as React.CSSProperties}
+                    style={{
+                      "--glow-color": compatColor,
+                      display: "inline-flex",
+                    } as React.CSSProperties}
                   >
                     <ProgressRing
                       value={result.compatibility.score}

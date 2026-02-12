@@ -343,6 +343,15 @@ export function SmokeCanvasBackground({ imageSrc, disabled = false, className = 
           background: 'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.6) 100%)',
         }}
       />
+
+      {/* Layer 3: Bottom cover to hide any watermarks in the source image */}
+      <div
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '35%',
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(10,10,15,1) 35%)',
+        }}
+      />
     </div>
   )
 }
