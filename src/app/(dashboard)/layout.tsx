@@ -114,7 +114,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <div id="page-background" className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />
       {!isOnboarding && <Sidebar />}
       <main className={isOnboarding ? '' : 'lg:pl-72 relative'} style={{ zIndex: 1 }}>
-        <div className={isOnboarding ? '' : 'p-4 lg:p-8'}>
+        <div className={isOnboarding ? '' : 'p-4 pt-16 lg:p-8 lg:pt-8'}>
           {children}
         </div>
       </main>

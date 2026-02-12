@@ -1,5 +1,5 @@
 // Service Worker for Push Notifications + PWA Offline Caching
-const CACHE_NAME = 'hookah-torus-v8'
+const CACHE_NAME = 'hookah-torus-v10'
 
 // App shell URLs to precache
 const APP_SHELL_URLS = [

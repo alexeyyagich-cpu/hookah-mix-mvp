@@ -112,17 +112,17 @@ export default function LandingPage() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {user ? (
-              <Link href="/dashboard" className="btn btn-primary">
+              <Link href="/dashboard" className="btn btn-primary text-sm px-3 py-2 whitespace-nowrap">
                 Личный кабинет
               </Link>
             ) : (
               <>
-                <Link href="/login" className="btn btn-secondary hidden sm:inline-flex">
+                <Link href="/login" className="btn btn-secondary text-sm px-3 py-2 whitespace-nowrap">
                   Войти
                 </Link>
-                <Link href="/register" className="btn btn-primary">
+                <Link href="/register" className="btn btn-primary text-sm px-3 py-2 whitespace-nowrap">
                   Начать бесплатно
                 </Link>
               </>

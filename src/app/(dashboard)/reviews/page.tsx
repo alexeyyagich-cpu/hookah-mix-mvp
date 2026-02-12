@@ -60,7 +60,7 @@ export default function ReviewsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-2">
         {([
           ['all', `Все (${totalCount})`],
           ['published', `Опубликованные (${publishedCount})`],
@@ -69,7 +69,7 @@ export default function ReviewsPage() {
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
               filter === key
                 ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                 : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
