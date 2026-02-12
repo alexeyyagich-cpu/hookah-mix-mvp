@@ -289,7 +289,7 @@ export function SmokeCanvasBackground({ imageSrc, disabled = false, className = 
     const loadTexture = () => {
       const textureDataUrl = generateSmokeTexture()
       if (!textureDataUrl) {
-        console.warn('Failed to generate smoke texture, animation disabled')
+        // Failed to generate smoke texture, animation disabled
         return
       }
 

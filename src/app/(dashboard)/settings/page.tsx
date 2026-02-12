@@ -83,7 +83,7 @@ export default function SettingsPage() {
         setTimeout(() => setMessage(''), 3000)
       }
     } catch (error) {
-      console.error('Portal error:', error)
+      void error
       setMessage('Ошибка при открытии портала подписки')
       setTimeout(() => setMessage(''), 3000)
     } finally {

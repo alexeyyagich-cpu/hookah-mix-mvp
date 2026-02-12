@@ -76,8 +76,8 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
 
     navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('Service Worker registered:', registration.scope)
+      .then(() => {
+        // Service Worker registered
       })
       .catch((error) => {
         console.error('Service Worker registration failed:', error)
@@ -121,7 +121,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         })
       } catch (e) {
         // If VAPID fails, we'll use local notifications only
-        console.log('Push subscription skipped, using local notifications')
       }
 
       localStorage.setItem(PUSH_SUBSCRIBED_KEY, 'true')

@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { Supplier, SupplierWithProducts, SupplierProduct } from '@/types/database'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 // Demo data for testing
 const DEMO_SUPPLIERS: Supplier[] = [

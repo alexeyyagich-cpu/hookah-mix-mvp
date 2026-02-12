@@ -14,7 +14,7 @@ export const webhookSecretConfigured = Boolean(TELEGRAM_WEBHOOK_SECRET)
 export function verifyWebhookSecret(secretHeader: string | null): boolean {
   if (!TELEGRAM_WEBHOOK_SECRET) {
     // If no secret configured, skip verification (dev mode)
-    console.warn('TELEGRAM_WEBHOOK_SECRET not configured - skipping verification')
+    // TELEGRAM_WEBHOOK_SECRET not configured - skipping verification
     return true
   }
   return secretHeader === TELEGRAM_WEBHOOK_SECRET
@@ -59,7 +59,7 @@ export function verifyConnectionToken(token: string): { valid: boolean; profileI
 
 async function callTelegramApi<T>(method: string, params: Record<string, unknown> = {}): Promise<T | null> {
   if (!TELEGRAM_BOT_TOKEN) {
-    console.warn('Telegram bot token not configured')
+    // Telegram bot token not configured
     return null
   }
 

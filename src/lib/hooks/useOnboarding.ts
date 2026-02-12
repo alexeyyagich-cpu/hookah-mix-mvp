@@ -2,14 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { OnboardingStep } from '@/types/database'
 
 export type { OnboardingStep }
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 const STEPS_ORDER: OnboardingStep[] = ['welcome', 'business', 'bowl', 'tobacco', 'complete']
 

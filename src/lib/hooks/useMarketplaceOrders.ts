@@ -12,9 +12,7 @@ import type {
   Cart,
 } from '@/types/database'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+import { isSupabaseConfigured } from '@/lib/config'
 
 // Generate order number
 function generateOrderNumber(): string {

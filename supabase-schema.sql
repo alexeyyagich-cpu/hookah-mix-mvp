@@ -16,12 +16,26 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   logo_url TEXT,
   subscription_tier TEXT DEFAULT 'free' CHECK (subscription_tier IN ('free', 'pro', 'enterprise')),
   subscription_expires_at TIMESTAMPTZ,
+  -- Role-based access
+  role TEXT DEFAULT 'owner' CHECK (role IN ('owner', 'staff', 'guest')),
+  owner_profile_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  venue_slug TEXT,
+  -- Stripe integration
+  stripe_customer_id TEXT UNIQUE,
+  stripe_subscription_id TEXT,
   -- Onboarding state
   onboarding_completed BOOLEAN DEFAULT false,
   onboarding_skipped BOOLEAN DEFAULT false,
   onboarding_step TEXT DEFAULT 'welcome' CHECK (onboarding_step IN ('welcome', 'business', 'bowl', 'tobacco', 'complete')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration: If profiles table already exists, add new columns:
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'owner' CHECK (role IN ('owner', 'staff', 'guest'));
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS owner_profile_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS venue_slug TEXT;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT UNIQUE;
+-- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
 
 -- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -116,8 +130,11 @@ CREATE TABLE IF NOT EXISTS public.sessions (
   total_grams DECIMAL NOT NULL,
   compatibility_score INTEGER,
   notes TEXT,
-  rating INTEGER CHECK (rating >= 1 AND rating <= 5)
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  duration_minutes INTEGER
 );
+
+-- Migration: ALTER TABLE public.sessions ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
 
 -- Enable RLS
 ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
@@ -435,9 +452,14 @@ CREATE TABLE public.saved_mixes (
   compatibility_score INTEGER,
   is_favorite BOOLEAN DEFAULT false,
   usage_count INTEGER DEFAULT 0,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration: ALTER TABLE public.saved_mixes ADD COLUMN IF NOT EXISTS rating INTEGER CHECK (rating >= 1 AND rating <= 5);
+-- Migration: ALTER TABLE public.saved_mixes ADD COLUMN IF NOT EXISTS notes TEXT;
 
 -- RLS
 ALTER TABLE public.saved_mixes ENABLE ROW LEVEL SECURITY;
@@ -715,3 +737,34 @@ DROP TRIGGER IF EXISTS update_floor_tables_updated_at ON public.floor_tables;
 CREATE TRIGGER update_floor_tables_updated_at
   BEFORE UPDATE ON public.floor_tables
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================================
+-- STAFF INVITATIONS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.staff_invitations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  email TEXT NOT NULL,
+  token TEXT NOT NULL UNIQUE,
+  role TEXT DEFAULT 'staff' CHECK (role IN ('staff')),
+  expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days'),
+  accepted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.staff_invitations ENABLE ROW LEVEL SECURITY;
+
+-- Owners can manage their own invitations
+CREATE POLICY "Owners manage own invitations" ON public.staff_invitations
+  FOR ALL USING (auth.uid() = owner_profile_id);
+
+-- Anyone can read an invitation by token (for accepting)
+CREATE POLICY "Anyone can read invitation by token" ON public.staff_invitations
+  FOR SELECT USING (true);
+
+-- Indexes
+CREATE INDEX idx_staff_invitations_owner ON public.staff_invitations(owner_profile_id);
+CREATE INDEX idx_staff_invitations_token ON public.staff_invitations(token);
+CREATE INDEX idx_staff_invitations_email ON public.staff_invitations(email);

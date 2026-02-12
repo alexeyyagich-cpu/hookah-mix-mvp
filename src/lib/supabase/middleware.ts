@@ -1,12 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+import { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from '@/lib/config'
 
 export async function updateSession(request: NextRequest) {
   // Skip auth check if Supabase is not configured
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!isSupabaseConfigured) {
     return NextResponse.next({ request })
   }
 
@@ -52,6 +50,14 @@ export async function updateSession(request: NextRequest) {
     url.pathname = '/login'
     url.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(url)
+  }
+
+  // Public auth paths that don't require login
+  const publicAuthPaths = ['/forgot-password', '/update-password']
+  const isPublicAuthPath = publicAuthPaths.some(path => request.nextUrl.pathname === path)
+
+  if (isPublicAuthPath) {
+    return supabaseResponse
   }
 
   // Redirect authenticated users from auth pages to dashboard

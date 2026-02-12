@@ -384,7 +384,7 @@ export function cacheGuestsLocally(guests: Guest[]): void {
       cached_at: new Date().toISOString(),
     }))
   } catch (e) {
-    console.warn('Failed to cache guests locally:', e)
+    // Failed to cache guests locally
   }
 }
 
@@ -421,7 +421,7 @@ export function queueGuestUpdate(guestId: string, update: Partial<Guest>): void 
     })
     localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue))
   } catch (e) {
-    console.warn('Failed to queue guest update:', e)
+    // Failed to queue guest update
   }
 }
 

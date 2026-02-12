@@ -2,13 +2,10 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { calculateForecast, type ForecastResult } from '@/lib/utils/forecast'
 import type { SessionWithItems, TobaccoInventory, InventoryTransaction } from '@/types/database'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 // Demo bowl for sessions
 const DEMO_BOWL = { id: '1', profile_id: 'demo', name: 'Phunnel Large', capacity_grams: 20, is_default: true, created_at: new Date().toISOString() }

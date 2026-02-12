@@ -14,10 +14,10 @@ export const stripe = stripeSecretKey
 // Price IDs from Stripe Dashboard
 // These should be created in Stripe and the IDs added to .env
 export const STRIPE_PRICES = {
-  pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY!,
-  pro_yearly: process.env.STRIPE_PRICE_PRO_YEARLY!,
-  enterprise_monthly: process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY!,
-  enterprise_yearly: process.env.STRIPE_PRICE_ENTERPRISE_YEARLY!,
+  pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY!,
+  pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY!,
+  enterprise_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_MONTHLY!,
+  enterprise_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_YEARLY!,
 } as const
 
 // Subscription tier mapping

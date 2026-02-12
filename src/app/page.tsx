@@ -62,24 +62,21 @@ const benefits = [
   },
 ]
 
-const testimonials = [
+const howItWorks = [
   {
-    name: 'Александр К.',
-    role: 'Владелец Smoke House',
-    text: 'Раньше тратил час на инвентаризацию в конце недели. Теперь всё автоматически — остатки, расход, что заказывать.',
-    avatar: 'А',
+    step: '1',
+    title: 'Зарегистрируйтесь',
+    description: 'Создайте аккаунт за 30 секунд. Добавьте название заведения и начните работу.',
   },
   {
-    name: 'Мария С.',
-    role: 'Управляющая Cloud Nine',
-    text: 'Гости в восторге, что мы помним их любимые миксы. Это создаёт wow-эффект и повышает лояльность.',
-    avatar: 'М',
+    step: '2',
+    title: 'Добавьте табаки',
+    description: 'Внесите инвентарь вручную или отсканируйте штрих-код. Укажите остатки и цены закупки.',
   },
   {
-    name: 'Дмитрий В.',
-    role: 'Кальянный мастер',
-    text: 'AI-рекомендации реально работают. Открыл для себя комбинации, о которых бы сам не подумал.',
-    avatar: 'Д',
+    step: '3',
+    title: 'Работайте эффективнее',
+    description: 'Создавайте миксы, ведите сессии, следите за статистикой. Система сама считает расход и напомнит о заказе.',
   },
 ]
 
@@ -163,7 +160,7 @@ export default function LandingPage() {
             </div>
 
             <p className="mt-6 text-sm text-[var(--color-textMuted)]">
-              Уже используют 150+ заведений в Европе
+              Бесплатный старт за 2 минуты
             </p>
           </div>
         </div>
@@ -236,10 +233,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Результаты наших клиентов
+              Что вы получите
             </h2>
             <p className="text-xl text-[var(--color-textMuted)]">
-              Цифры говорят сами за себя
+              Конкретные преимущества для вашего бизнеса
             </p>
           </div>
 
@@ -257,33 +254,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* How It Works */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Что говорят <span className="text-[var(--color-warning)]">наши клиенты</span>
+              Как это <span className="text-[var(--color-warning)]">работает</span>
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="card p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-lg font-bold text-white">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-[var(--color-textMuted)]">{testimonial.role}</p>
-                  </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {howItWorks.map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-2xl font-bold text-white">
+                  {item.step}
                 </div>
-                <p className="text-[var(--color-textMuted)]">"{testimonial.text}"</p>
-                <div className="flex gap-0.5 mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className="text-[var(--color-warning)]">★</span>
-                  ))}
-                </div>
+                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <p className="text-[var(--color-textMuted)]">{item.description}</p>
               </div>
             ))}
           </div>
@@ -326,7 +313,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-[var(--color-border)]">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
@@ -351,44 +338,18 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Компания</h4>
-              <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
-                <li><a href="#" className="hover:text-[var(--color-text)]">О нас</a></li>
-                <li><a href="#" className="hover:text-[var(--color-text)]">Блог</a></li>
-                <li><a href="mailto:hello@hookah-torus.com" className="hover:text-[var(--color-text)]">Контакты</a></li>
-              </ul>
-            </div>
-
-            <div>
               <h4 className="font-semibold mb-4">Правовая информация</h4>
               <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
-                <li><a href="#" className="hover:text-[var(--color-text)]">Условия использования</a></li>
-                <li><a href="#" className="hover:text-[var(--color-text)]">Политика конфиденциальности</a></li>
+                <li><Link href="/legal/terms" className="hover:text-[var(--color-text)]">Условия использования</Link></li>
+                <li><Link href="/legal/privacy" className="hover:text-[var(--color-text)]">Политика конфиденциальности</Link></li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-[var(--color-border)] flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="pt-8 border-t border-[var(--color-border)] text-center">
             <p className="text-sm text-[var(--color-textMuted)]">
-              © 2025 Hookah Torus. Все права защищены.
+              &copy; {new Date().getFullYear()} Hookah Torus. Все права защищены.
             </p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)]">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)]">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-              </a>
-              <a href="#" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)]">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
-            </div>
           </div>
         </div>
       </footer>

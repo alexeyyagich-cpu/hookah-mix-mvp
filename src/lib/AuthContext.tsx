@@ -2,15 +2,9 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured, isDemoMode as DEMO_MODE } from '@/lib/config'
 import type { User, Session, SupabaseClient } from '@supabase/supabase-js'
 import type { Profile } from '@/types/database'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
-
-// Demo mode for testing without Supabase
-const DEMO_MODE = !isSupabaseConfigured
 
 // Demo user data for testing
 const DEMO_USER: User = {
@@ -55,6 +49,8 @@ interface AuthContextType {
   signOut: () => Promise<void>
   signInDemo: () => void
   refreshProfile: () => Promise<void>
+  resetPasswordForEmail: (email: string) => Promise<{ error: Error | null }>
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -180,6 +176,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession({ user: DEMO_USER } as Session)
   }
 
+  const resetPasswordForEmail = async (email: string) => {
+    if (!supabase) {
+      return { error: new Error('Supabase не настроен') }
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    })
+    return { error }
+  }
+
+  const updatePassword = async (newPassword: string) => {
+    if (!supabase) {
+      return { error: new Error('Supabase не настроен') }
+    }
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    return { error }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -194,6 +208,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signOut,
         signInDemo,
         refreshProfile,
+        resetPasswordForEmail,
+        updatePassword,
       }}
     >
       {children}

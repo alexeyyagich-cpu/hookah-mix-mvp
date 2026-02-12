@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`)
+        break
     }
 
     return NextResponse.json({ received: true })
@@ -132,7 +132,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return
   }
 
-  console.log(`Checkout completed for user: ${userId}`)
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
@@ -182,12 +181,9 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
 
     if (error) {
       console.error('Failed to update subscription:', error)
-    } else {
-      console.log(`Updated subscription for user ${userId}: ${tier} until ${expiresAt}`)
     }
   } else if (status === 'past_due' || status === 'unpaid') {
     // Keep the tier but mark as past due (could add a flag for this)
-    console.log(`Subscription past due for user ${userId}`)
   }
 }
 
@@ -218,17 +214,13 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
   if (error) {
     console.error('Failed to downgrade subscription:', error)
-  } else {
-    console.log(`Downgraded user ${profile.id} to free tier`)
   }
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
-  console.log(`Payment succeeded for invoice: ${invoice.id}`)
   // Could send confirmation email here
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  console.log(`Payment failed for invoice: ${invoice.id}`)
   // Could send payment failed email here
 }

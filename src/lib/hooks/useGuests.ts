@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { Guest, MixSnapshot, StrengthPreference, FlavorProfile } from '@/types/database'
 import {
@@ -11,10 +12,6 @@ import {
   getRecentGuests as getRecentGuestsFromList,
   searchGuests as searchGuestsFromList,
 } from '@/logic/quickRepeatEngine'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 // Demo data with mix snapshots for testing
 const DEMO_GUESTS: Guest[] = [

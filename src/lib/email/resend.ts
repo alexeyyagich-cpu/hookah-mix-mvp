@@ -18,7 +18,7 @@ interface SendEmailOptions {
 
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
   if (!resend) {
-    console.warn('Resend not configured, email not sent:', subject)
+    // Resend not configured, email not sent
     return { success: false, error: 'Email service not configured' }
   }
 

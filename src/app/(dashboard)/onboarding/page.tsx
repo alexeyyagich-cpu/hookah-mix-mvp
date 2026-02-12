@@ -7,11 +7,8 @@ import { useAuth } from '@/lib/AuthContext'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import { IconBowl, IconInventory, IconCheck } from '@/components/Icons'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 const STEP_INFO: Record<OnboardingStep, { title: string; description: string; icon: string }> = {
   welcome: {

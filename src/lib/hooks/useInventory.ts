@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 // Demo data for testing (prices in EUR, package_grams = 100g default)
 const DEMO_INVENTORY: TobaccoInventory[] = [

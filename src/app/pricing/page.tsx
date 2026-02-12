@@ -133,7 +133,7 @@ function PricingPageContent() {
         throw new Error(data.error || 'Failed to create checkout session')
       }
     } catch (error) {
-      console.error('Checkout error:', error)
+      void error
       alert('Ошибка при создании сессии оплаты. Попробуйте позже.')
     } finally {
       setLoadingPlan(null)

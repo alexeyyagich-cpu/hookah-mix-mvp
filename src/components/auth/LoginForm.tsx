@@ -133,12 +133,19 @@ export function LoginForm() {
           )}
         </button>
 
-        <p className="text-center text-[var(--color-textMuted)]">
-          Нет аккаунта?{' '}
-          <Link href="/register" className="text-[var(--color-primary)] hover:underline">
-            Зарегистрироваться
-          </Link>
-        </p>
+        <div className="text-center space-y-2">
+          <p className="text-[var(--color-textMuted)]">
+            <Link href="/forgot-password" className="text-[var(--color-primary)] hover:underline">
+              Забыли пароль?
+            </Link>
+          </p>
+          <p className="text-[var(--color-textMuted)]">
+            Нет аккаунта?{' '}
+            <Link href="/register" className="text-[var(--color-primary)] hover:underline">
+              Зарегистрироваться
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   )
