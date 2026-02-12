@@ -18,33 +18,33 @@ import {
 const DEMO_REVIEWS = [
   {
     id: '1',
-    author_name: 'Александр Петров',
+    author_name: 'Piotr Kowalski',
     rating: 5,
-    text: 'Лучшая кальянная в городе! Атмосфера на высоте, персонал всегда приветливый. Фирменные миксы просто огонь, особенно Signature Pink.',
+    text: 'Best hookah lounge in the city! Amazing atmosphere, always friendly staff. Signature mixes are fire, especially Signature Pink.',
   },
   {
     id: '2',
-    author_name: 'Мария Иванова',
+    author_name: 'Lena Schmidt',
     rating: 5,
-    text: 'Обожаю это место! Уютный интерьер, вкусные кальяны и отличная музыка. Рекомендую всем своим подписчикам.',
+    text: 'Love this place! Cozy interior, great hookahs and excellent music. Highly recommend to everyone.',
   },
   {
     id: '3',
-    author_name: 'Дмитрий Козлов',
+    author_name: 'Jakub Nowak',
     rating: 4,
-    text: 'Хороший выбор табаков и профессиональные кальянщики. Tropical Storm — мой фаворит. Приду ещё!',
+    text: 'Great tobacco selection and professional hookah masters. Tropical Storm is my favorite. Will come again!',
   },
   {
     id: '4',
-    author_name: 'Елена Смирнова',
+    author_name: 'Sophie Müller',
     rating: 5,
-    text: 'Праздновали здесь день рождения — всё было идеально! VIP-комната очень уютная, обслуживание на 5+.',
+    text: 'Celebrated a birthday here — everything was perfect! VIP room is very cozy, service is top-notch.',
   },
   {
     id: '5',
-    author_name: 'Артём Волков',
+    author_name: 'Marek Zielinski',
     rating: 5,
-    text: 'Качество забивки и сервис на высшем уровне. Терраса летом — отдельный кайф. Место must visit!',
+    text: 'Bowl packing quality and service at the highest level. The terrace in summer is amazing. A must visit!',
   },
 ]
 
@@ -597,7 +597,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="+7 999 123-45-67 (необязательно)"
+            placeholder="+48 512 345 678 (необязательно)"
             className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
           />
         </div>

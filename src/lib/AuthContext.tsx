@@ -20,8 +20,8 @@ const DEMO_PROFILE: Profile = {
   id: 'demo-user-id',
   business_name: 'Demo Lounge',
   owner_name: 'Demo User',
-  phone: '+1 234 567 890',
-  address: 'Demo Street 123',
+  phone: '+48 22 345 6789',
+  address: 'ul. Nowy Swiat 42, Warsaw',
   logo_url: null,
   subscription_tier: 'pro', // Pro for full demo experience
   subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),

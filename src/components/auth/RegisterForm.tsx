@@ -121,7 +121,7 @@ export function RegisterForm() {
             value={ownerName}
             onChange={(e) => setOwnerName(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-            placeholder="Иван Петров"
+            placeholder="Jan Kowalski"
           />
         </div>
 

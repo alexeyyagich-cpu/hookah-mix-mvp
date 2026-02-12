@@ -10,8 +10,8 @@ const DEMO_STAFF: Profile[] = [
   {
     id: 'demo-staff-1',
     business_name: null,
-    owner_name: 'Алексей Смирнов',
-    phone: '+7 999 123-45-67',
+    owner_name: 'Marek Zielinski',
+    phone: '+48 512 345 678',
     address: null,
     logo_url: null,
     subscription_tier: 'free',
@@ -29,8 +29,8 @@ const DEMO_STAFF: Profile[] = [
   {
     id: 'demo-staff-2',
     business_name: null,
-    owner_name: 'Мария Козлова',
-    phone: '+7 999 987-65-43',
+    owner_name: 'Laura Fischer',
+    phone: '+49 170 987 6543',
     address: null,
     logo_url: null,
     subscription_tier: 'free',

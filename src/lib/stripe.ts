@@ -51,8 +51,8 @@ export const PLANS = {
   pro: {
     name: 'Pro',
     nameRu: 'Pro',
-    price: 990, // рублей в месяц
-    priceYearly: 9900, // рублей в год (скидка ~17%)
+    price: 990, // EUR cents per month (9.90 EUR)
+    priceYearly: 9900, // EUR cents per year (99 EUR, ~17% discount)
     stripePriceMonthly: STRIPE_PRICES.pro_monthly,
     stripePriceYearly: STRIPE_PRICES.pro_yearly,
     features: [
@@ -77,8 +77,8 @@ export const PLANS = {
   enterprise: {
     name: 'Enterprise',
     nameRu: 'Enterprise',
-    price: 2990, // рублей в месяц
-    priceYearly: 29900, // рублей в год
+    price: 2990, // EUR cents per month (29.90 EUR)
+    priceYearly: 29900, // EUR cents per year (299 EUR)
     stripePriceMonthly: STRIPE_PRICES.enterprise_monthly,
     stripePriceYearly: STRIPE_PRICES.enterprise_yearly,
     features: [

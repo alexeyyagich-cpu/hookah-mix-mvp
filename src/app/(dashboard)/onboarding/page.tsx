@@ -215,7 +215,7 @@ export default function OnboardingPage() {
                   type="text"
                   value={ownerName}
                   onChange={(e) => setOwnerName(e.target.value)}
-                  placeholder="Иван Петров"
+                  placeholder="Jan Kowalski"
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                 />
               </div>

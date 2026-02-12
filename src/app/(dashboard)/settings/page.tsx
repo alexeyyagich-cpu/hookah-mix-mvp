@@ -196,7 +196,7 @@ export default function SettingsPage() {
               value={ownerName}
               onChange={(e) => setOwnerName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              placeholder="Иван Петров"
+              placeholder="Jan Kowalski"
             />
           </div>
         </div>
@@ -208,7 +208,7 @@ export default function SettingsPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="+1 (555) 123-4567"
+            placeholder="+48 22 123 4567"
           />
         </div>
 
@@ -219,7 +219,7 @@ export default function SettingsPage() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="123 Main Street, New York"
+            placeholder="ul. Nowy Swiat 42, Warsaw"
           />
         </div>
 
