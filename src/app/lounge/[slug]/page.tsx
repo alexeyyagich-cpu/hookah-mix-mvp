@@ -3,6 +3,8 @@
 import { use, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePublicLounge } from '@/lib/hooks/useLoungeProfile'
+import { usePublicReviews } from '@/lib/hooks/useReviews'
+import { usePublicReservation } from '@/lib/hooks/useReservations'
 import { LOUNGE_FEATURES } from '@/types/lounge'
 import { BrandLoader } from '@/components/BrandLoader'
 import {
@@ -12,40 +14,35 @@ import {
   IconCalendar,
 } from '@/components/Icons'
 
-// Demo reviews data
+// Fallback demo reviews (used when no real reviews loaded)
 const DEMO_REVIEWS = [
   {
     id: '1',
-    name: 'Александр Петров',
-    role: 'Постоянный гость',
+    author_name: 'Александр Петров',
     rating: 5,
     text: 'Лучшая кальянная в городе! Атмосфера на высоте, персонал всегда приветливый. Фирменные миксы просто огонь, особенно Signature Pink.',
   },
   {
     id: '2',
-    name: 'Мария Иванова',
-    role: 'Блогер',
+    author_name: 'Мария Иванова',
     rating: 5,
     text: 'Обожаю это место! Уютный интерьер, вкусные кальяны и отличная музыка. Рекомендую всем своим подписчикам.',
   },
   {
     id: '3',
-    name: 'Дмитрий Козлов',
-    role: 'Кальянный эксперт',
+    author_name: 'Дмитрий Козлов',
     rating: 4,
     text: 'Хороший выбор табаков и профессиональные кальянщики. Tropical Storm — мой фаворит. Приду ещё!',
   },
   {
     id: '4',
-    name: 'Елена Смирнова',
-    role: 'Гость',
+    author_name: 'Елена Смирнова',
     rating: 5,
     text: 'Праздновали здесь день рождения — всё было идеально! VIP-комната очень уютная, обслуживание на 5+.',
   },
   {
     id: '5',
-    name: 'Артём Волков',
-    role: 'Ценитель кальянов',
+    author_name: 'Артём Волков',
     rating: 5,
     text: 'Качество забивки и сервис на высшем уровне. Терраса летом — отдельный кайф. Место must visit!',
   },
@@ -64,6 +61,7 @@ const DAY_NAMES: Record<string, string> = {
 export default function LoungePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const { lounge, mixes, loading, error } = usePublicLounge(slug)
+  const { reviews: realReviews, submitReview, submitting: reviewSubmitting } = usePublicReviews(lounge?.profile_id)
 
   if (loading) {
     return (
@@ -91,7 +89,10 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
   }
 
   const signatureMixes = mixes.filter(m => m.is_signature)
-  const regularMixes = mixes.filter(m => !m.is_signature)
+  const displayReviews = realReviews.length > 0
+    ? realReviews.map(r => ({ id: r.id, author_name: r.author_name, rating: r.rating, text: r.text || '' }))
+    : DEMO_REVIEWS
+  const showReservationForm = lounge.features.includes('reservations')
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
@@ -297,7 +298,19 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
 
         {/* Reviews Section */}
         {lounge.reviews_count > 0 && (
-          <ReviewsCarousel reviewsCount={lounge.reviews_count} />
+          <ReviewsCarousel reviews={displayReviews} reviewsCount={lounge.reviews_count} />
+        )}
+
+        {/* Review Submission Form */}
+        <ReviewForm
+          profileId={lounge.profile_id}
+          onSubmit={submitReview}
+          submitting={reviewSubmitting}
+        />
+
+        {/* Reservation Form */}
+        {showReservationForm && (
+          <ReservationForm profileId={lounge.profile_id} />
         )}
 
         {/* CTA */}
@@ -329,8 +342,294 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
   )
 }
 
+// ============================================================================
+// Review Submission Form
+// ============================================================================
+
+function ReviewForm({
+  profileId,
+  onSubmit,
+  submitting,
+}: {
+  profileId: string
+  onSubmit: (review: { author_name: string; rating: number; text?: string }) => Promise<boolean>
+  submitting: boolean
+}) {
+  const [name, setName] = useState('')
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
+  const [text, setText] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || rating === 0) return
+
+    const success = await onSubmit({
+      author_name: name.trim(),
+      rating,
+      text: text.trim() || undefined,
+    })
+
+    if (success) {
+      setSubmitted(true)
+      setName('')
+      setRating(0)
+      setText('')
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="card p-6 mb-8 text-center">
+        <div className="text-4xl mb-3">🎉</div>
+        <h3 className="text-lg font-bold mb-1">Спасибо за отзыв!</h3>
+        <p className="text-[var(--color-textMuted)] text-sm">Ваш отзыв будет опубликован после модерации.</p>
+        <button
+          onClick={() => setSubmitted(false)}
+          className="mt-4 text-sm text-[var(--color-primary)] hover:underline"
+        >
+          Оставить ещё один отзыв
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="card p-6 mb-8">
+      <h3 className="text-lg font-bold mb-4">Оставить отзыв</h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Ваше имя *</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Как вас зовут?"
+            className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Оценка *</label>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                className="text-2xl transition-transform hover:scale-110"
+              >
+                <span className={star <= (hoverRating || rating) ? 'text-[var(--color-warning)]' : 'text-[var(--color-border)]'}>
+                  ★
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Текст отзыва</label>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Расскажите о своём впечатлении (необязательно)"
+            rows={3}
+            className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors resize-none"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={!name.trim() || rating === 0 || submitting}
+          className="btn btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {submitting ? 'Отправка...' : 'Отправить отзыв'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+// ============================================================================
+// Reservation Form
+// ============================================================================
+
+function ReservationForm({ profileId }: { profileId: string }) {
+  const { submitReservation, submitting, fetchSlots, occupiedSlots } = usePublicReservation(profileId)
+
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [date, setDate] = useState('')
+  const [time, setTime] = useState('')
+  const [guestCount, setGuestCount] = useState(2)
+  const [notes, setNotes] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  const today = new Date().toISOString().split('T')[0]
+
+  const timeSlots = [
+    '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+    '18:00', '18:30', '19:00', '19:30', '20:00', '20:30',
+    '21:00', '21:30', '22:00', '22:30', '23:00', '23:30',
+  ]
+
+  const occupiedTimes = new Set(
+    occupiedSlots.filter(s => s.date === date).map(s => s.time?.slice(0, 5))
+  )
+  const availableSlots = timeSlots.filter(t => !occupiedTimes.has(t))
+
+  const handleDateChange = (newDate: string) => {
+    setDate(newDate)
+    setTime('')
+    fetchSlots(newDate)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !date || !time) return
+
+    const success = await submitReservation({
+      guest_name: name.trim(),
+      guest_phone: phone.trim() || undefined,
+      guest_count: guestCount,
+      reservation_date: date,
+      reservation_time: time,
+      notes: notes.trim() || undefined,
+    })
+
+    if (success) {
+      setSubmitted(true)
+      setName('')
+      setPhone('')
+      setDate('')
+      setTime('')
+      setGuestCount(2)
+      setNotes('')
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="card p-6 mb-8 text-center">
+        <div className="text-4xl mb-3">📅</div>
+        <h3 className="text-lg font-bold mb-1">Ваша бронь отправлена!</h3>
+        <p className="text-[var(--color-textMuted)] text-sm">Ожидайте подтверждение от заведения.</p>
+        <button
+          onClick={() => setSubmitted(false)}
+          className="mt-4 text-sm text-[var(--color-primary)] hover:underline"
+        >
+          Создать ещё одну бронь
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="card p-6 mb-8">
+      <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+        <IconCalendar size={20} className="text-[var(--color-primary)]" />
+        Забронировать столик
+      </h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Дата *</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => handleDateChange(e.target.value)}
+              min={today}
+              className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Время *</label>
+            <select
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+              required
+              disabled={!date}
+            >
+              <option value="">Выберите время</option>
+              {availableSlots.map(slot => (
+                <option key={slot} value={slot}>{slot}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Ваше имя *</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Как вас зовут?"
+              className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Кол-во гостей *</label>
+            <input
+              type="number"
+              value={guestCount}
+              onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
+              min={1}
+              max={20}
+              className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Телефон</label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+7 999 123-45-67 (необязательно)"
+            className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Комментарий</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Особые пожелания (необязательно)"
+            rows={2}
+            className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors resize-none"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={!name.trim() || !date || !time || submitting}
+          className="btn btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {submitting ? 'Отправка...' : 'Забронировать столик'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+// ============================================================================
 // Reviews Carousel Component with scroll tracking
-function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
+// ============================================================================
+
+function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; author_name: string; rating: number; text: string | null }[]; reviewsCount: number }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [showLeftFade, setShowLeftFade] = useState(false)
@@ -341,14 +640,12 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
     const container = scrollRef.current
     const { scrollLeft, scrollWidth, clientWidth } = container
 
-    // Calculate active index based on scroll position
-    const cardWidth = 316 // card width (300) + gap (16)
+    const cardWidth = 316
     const maxScroll = scrollWidth - clientWidth
-    const scrollPercent = scrollLeft / maxScroll
-    const newIndex = Math.round(scrollPercent * (DEMO_REVIEWS.length - 1))
-    setActiveIndex(Math.max(0, Math.min(newIndex, DEMO_REVIEWS.length - 1)))
+    const scrollPercent = maxScroll > 0 ? scrollLeft / maxScroll : 0
+    const newIndex = Math.round(scrollPercent * (reviews.length - 1))
+    setActiveIndex(Math.max(0, Math.min(newIndex, reviews.length - 1)))
 
-    // Update fade visibility
     setShowLeftFade(scrollLeft > 20)
     setShowRightFade(scrollLeft < maxScroll - 20)
   }
@@ -358,7 +655,7 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
     const container = scrollRef.current
     const { scrollWidth, clientWidth } = container
     const maxScroll = scrollWidth - clientWidth
-    const targetScroll = (index / (DEMO_REVIEWS.length - 1)) * maxScroll
+    const targetScroll = (index / (reviews.length - 1)) * maxScroll
     container.scrollTo({
       left: targetScroll,
       behavior: 'smooth'
@@ -403,7 +700,7 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
           onScroll={handleScroll}
           className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide px-4"
         >
-          {DEMO_REVIEWS.map((review) => (
+          {reviews.map((review) => (
             <div
               key={review.id}
               className="flex-shrink-0 w-[300px] sm:w-[350px] snap-center"
@@ -412,11 +709,10 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-black flex-shrink-0">
-                    {review.name.charAt(0)}
+                    {review.author_name.charAt(0)}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-semibold truncate">{review.name}</p>
-                    <p className="text-xs text-[var(--color-textMuted)] truncate">{review.role}</p>
+                    <p className="font-semibold truncate">{review.author_name}</p>
                   </div>
                 </div>
 
@@ -433,9 +729,11 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
                 </div>
 
                 {/* Text */}
-                <p className="text-sm text-[var(--color-textMuted)] leading-relaxed">
-                  "{review.text}"
-                </p>
+                {review.text && (
+                  <p className="text-sm text-[var(--color-textMuted)] leading-relaxed">
+                    &ldquo;{review.text}&rdquo;
+                  </p>
+                )}
               </div>
             </div>
           ))}
@@ -443,7 +741,7 @@ function ReviewsCarousel({ reviewsCount }: { reviewsCount: number }) {
 
         {/* Scroll indicators - clickable dots */}
         <div className="flex justify-center gap-2 mt-4">
-          {DEMO_REVIEWS.map((_, i) => (
+          {reviews.map((_, i) => (
             <button
               key={i}
               onClick={() => scrollToIndex(i)}

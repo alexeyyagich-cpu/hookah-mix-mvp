@@ -1,15 +1,31 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { FloorPlan } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
-import { IconSettings } from '@/components/Icons'
-import type { FloorTable } from '@/types/database'
+import { useReservations } from '@/lib/hooks/useReservations'
+import { IconSettings, IconCalendar } from '@/components/Icons'
+import type { FloorTable, ReservationStatus } from '@/types/database'
+
+const STATUS_COLORS: Record<ReservationStatus, string> = {
+  pending: 'var(--color-warning)',
+  confirmed: 'var(--color-success)',
+  cancelled: 'var(--color-danger)',
+  completed: 'var(--color-textMuted)',
+}
 
 export default function FloorPage() {
   const { tables } = useFloorPlan()
+  const { reservations } = useReservations()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
+
+  const today = new Date().toISOString().split('T')[0]
+  const todayReservations = reservations
+    .filter(r => r.reservation_date === today && r.status !== 'cancelled' && r.status !== 'completed')
+    .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
+    .slice(0, 5)
 
   const stats = {
     total: tables.length,
@@ -65,6 +81,47 @@ export default function FloorPage() {
           <div className="text-sm text-[var(--color-textMuted)]">Бронь</div>
           <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">{stats.reserved}</div>
         </div>
+      </div>
+
+      {/* Today's Reservations Widget */}
+      <div className="card p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold flex items-center gap-2">
+            <IconCalendar size={18} className="text-[var(--color-primary)]" />
+            Бронирования на сегодня
+          </h2>
+          <Link
+            href="/floor/reservations"
+            className="text-sm text-[var(--color-primary)] hover:underline"
+          >
+            Все бронирования →
+          </Link>
+        </div>
+
+        {todayReservations.length === 0 ? (
+          <p className="text-sm text-[var(--color-textMuted)]">Нет бронирований на сегодня</p>
+        ) : (
+          <div className="space-y-2">
+            {todayReservations.map((r) => (
+              <div
+                key={r.id}
+                className="flex items-center justify-between py-2 px-3 rounded-xl bg-[var(--color-bgHover)]"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-mono font-semibold text-sm">{r.reservation_time.slice(0, 5)}</span>
+                  <span className="text-sm">{r.guest_name}</span>
+                  <span className="text-xs text-[var(--color-textMuted)]">{r.guest_count} чел.</span>
+                </div>
+                <span
+                  className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
+                  style={{ backgroundColor: STATUS_COLORS[r.status] }}
+                >
+                  {r.status === 'pending' ? 'Ожидает' : 'Подтверждён'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Floor Plan */}

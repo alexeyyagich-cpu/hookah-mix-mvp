@@ -20,6 +20,8 @@ import {
   IconFloor,
   IconLock,
   IconUsers,
+  IconStar,
+  IconCalendar,
 } from '@/components/Icons'
 
 interface NavItem {
@@ -35,6 +37,8 @@ const navigation: NavItem[] = [
   { name: 'Обзор', href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
   { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view' },
   { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
+  { name: 'Бронирования', href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
+  { name: 'Отзывы', href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
   { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
   { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view' },
   { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view' },

@@ -768,3 +768,90 @@ CREATE POLICY "Anyone can read invitation by token" ON public.staff_invitations
 CREATE INDEX idx_staff_invitations_owner ON public.staff_invitations(owner_profile_id);
 CREATE INDEX idx_staff_invitations_token ON public.staff_invitations(token);
 CREATE INDEX idx_staff_invitations_email ON public.staff_invitations(email);
+
+-- ============================================================================
+-- REVIEWS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  author_name TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  text TEXT,
+  is_published BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+-- Owner can see all their reviews (published + unpublished)
+CREATE POLICY "Owners view own reviews" ON public.reviews
+  FOR SELECT USING (auth.uid() = profile_id);
+
+-- Public can see published reviews
+CREATE POLICY "Public view published reviews" ON public.reviews
+  FOR SELECT USING (is_published = true);
+
+-- Anyone can submit a review
+CREATE POLICY "Anyone can insert reviews" ON public.reviews
+  FOR INSERT WITH CHECK (true);
+
+-- Only owner can update/delete their reviews
+CREATE POLICY "Owners update own reviews" ON public.reviews
+  FOR UPDATE USING (auth.uid() = profile_id);
+
+CREATE POLICY "Owners delete own reviews" ON public.reviews
+  FOR DELETE USING (auth.uid() = profile_id);
+
+-- Indexes
+CREATE INDEX idx_reviews_profile_id ON public.reviews(profile_id);
+CREATE INDEX idx_reviews_created_at ON public.reviews(created_at DESC);
+
+-- ============================================================================
+-- RESERVATIONS TABLE
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.reservations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  table_id UUID REFERENCES public.floor_tables(id) ON DELETE SET NULL,
+  guest_name TEXT NOT NULL,
+  guest_phone TEXT,
+  guest_count INTEGER NOT NULL DEFAULT 1,
+  reservation_date DATE NOT NULL,
+  reservation_time TIME NOT NULL,
+  duration_minutes INTEGER DEFAULT 120,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
+  notes TEXT,
+  source TEXT DEFAULT 'online' CHECK (source IN ('online', 'phone', 'walk_in')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE public.reservations ENABLE ROW LEVEL SECURITY;
+
+-- Owner can see all their reservations
+CREATE POLICY "Owners view own reservations" ON public.reservations
+  FOR SELECT USING (auth.uid() = profile_id);
+
+-- Public can check occupied slots (limited columns via app logic)
+CREATE POLICY "Public view reservation slots" ON public.reservations
+  FOR SELECT USING (status IN ('pending', 'confirmed'));
+
+-- Anyone can create a reservation (online booking)
+CREATE POLICY "Anyone can insert reservations" ON public.reservations
+  FOR INSERT WITH CHECK (true);
+
+-- Only owner can update/delete reservations
+CREATE POLICY "Owners update own reservations" ON public.reservations
+  FOR UPDATE USING (auth.uid() = profile_id);
+
+CREATE POLICY "Owners delete own reservations" ON public.reservations
+  FOR DELETE USING (auth.uid() = profile_id);
+
+-- Indexes
+CREATE INDEX idx_reservations_profile_id ON public.reservations(profile_id);
+CREATE INDEX idx_reservations_date ON public.reservations(reservation_date);
+CREATE INDEX idx_reservations_status ON public.reservations(status);

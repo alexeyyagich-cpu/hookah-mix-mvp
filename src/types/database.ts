@@ -175,6 +175,43 @@ export interface Guest {
   updated_at: string
 }
 
+// ============================================================================
+// REVIEWS TYPES
+// ============================================================================
+
+export interface Review {
+  id: string
+  profile_id: string
+  author_name: string
+  rating: number  // 1-5
+  text: string | null
+  is_published: boolean
+  created_at: string
+}
+
+// ============================================================================
+// RESERVATIONS TYPES
+// ============================================================================
+
+export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed'
+export type ReservationSource = 'online' | 'phone' | 'walk_in'
+
+export interface Reservation {
+  id: string
+  profile_id: string
+  table_id: string | null
+  guest_name: string
+  guest_phone: string | null
+  guest_count: number
+  reservation_date: string  // YYYY-MM-DD
+  reservation_time: string  // HH:MM
+  duration_minutes: number
+  status: ReservationStatus
+  notes: string | null
+  source: ReservationSource
+  created_at: string
+}
+
 export type TableStatus = 'available' | 'occupied' | 'reserved' | 'cleaning'
 export type TableShape = 'circle' | 'square' | 'rectangle'
 
@@ -284,6 +321,16 @@ export interface Database {
         Row: AutoReorderRule
         Insert: Omit<AutoReorderRule, 'id' | 'created_at'> & { id?: string; created_at?: string }
         Update: Partial<Omit<AutoReorderRule, 'id' | 'profile_id'>>
+      }
+      reviews: {
+        Row: Review
+        Insert: Omit<Review, 'id' | 'created_at' | 'is_published'> & { id?: string; created_at?: string; is_published?: boolean }
+        Update: Partial<Omit<Review, 'id' | 'profile_id'>>
+      }
+      reservations: {
+        Row: Reservation
+        Insert: Omit<Reservation, 'id' | 'created_at' | 'status' | 'duration_minutes'> & { id?: string; created_at?: string; status?: ReservationStatus; duration_minutes?: number }
+        Update: Partial<Omit<Reservation, 'id' | 'profile_id'>>
       }
     }
   }
