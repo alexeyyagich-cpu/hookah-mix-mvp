@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { IconBowl, IconInventory, IconCheck } from '@/components/Icons'
 import { TOBACCOS, getBrandNames, getFlavorsByBrand } from '@/data/tobaccos'
+import { getBowlBrands, getBowlsByBrand, type BowlPreset } from '@/data/bowls'
 
 const STEP_INFO: Record<OnboardingStep, { title: string; description: string; icon: string }> = {
   welcome: {
@@ -52,8 +53,10 @@ export default function OnboardingPage() {
   const [ownerName, setOwnerName] = useState('')
 
   // Bowl step state
-  const [bowlName, setBowlName] = useState('Phunnel')
-  const [bowlCapacity, setBowlCapacity] = useState('20')
+  const [bowlBrand, setBowlBrand] = useState('Oblako')
+  const [bowlModel, setBowlModel] = useState('')
+  const [bowlCapacity, setBowlCapacity] = useState('18')
+  const [isCustomBowl, setIsCustomBowl] = useState(false)
 
   // Tobacco step state
   const [tobaccoBrand, setTobaccoBrand] = useState('Darkside')
@@ -97,10 +100,11 @@ export default function OnboardingPage() {
   }
 
   const handleBowlSave = async () => {
+    if (!bowlModel) return
     setSaving(true)
     await addBowl({
-      name: bowlName,
-      capacity_grams: parseInt(bowlCapacity) || 20,
+      name: bowlModel,
+      capacity_grams: parseInt(bowlCapacity) || 18,
       is_default: true,
     })
     setSaving(false)
@@ -255,19 +259,54 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Название чаши</label>
+                <label className="block text-sm font-medium mb-2">Бренд</label>
                 <select
-                  value={bowlName}
-                  onChange={(e) => setBowlName(e.target.value)}
+                  value={bowlBrand}
+                  onChange={(e) => { setBowlBrand(e.target.value); setBowlModel(''); setIsCustomBowl(false); }}
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                 >
-                  <option value="Phunnel">Phunnel</option>
-                  <option value="Phunnel M">Phunnel M</option>
-                  <option value="Phunnel L">Phunnel L</option>
-                  <option value="Turkish">Turkish</option>
-                  <option value="Vortex">Vortex</option>
-                  <option value="Другая">Другая</option>
+                  {getBowlBrands().map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Модель</label>
+                {isCustomBowl ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={bowlModel}
+                      onChange={(e) => setBowlModel(e.target.value)}
+                      placeholder="Введите название чаши"
+                      className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { setIsCustomBowl(false); setBowlModel(''); }}
+                      className="px-3 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)]"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={bowlModel}
+                    onChange={(e) => {
+                      if (e.target.value === '__custom__') { setIsCustomBowl(true); setBowlModel(''); }
+                      else {
+                        setBowlModel(e.target.value);
+                        const preset = getBowlsByBrand(bowlBrand).find(b => b.name === e.target.value);
+                        if (preset) setBowlCapacity(String(preset.capacity));
+                      }
+                    }}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  >
+                    <option value="">Выберите модель...</option>
+                    {getBowlsByBrand(bowlBrand).map(b => (
+                      <option key={b.id} value={b.name}>{b.name} ({b.capacity}г)</option>
+                    ))}
+                    <option value="__custom__">Другая...</option>
+                  </select>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Вместимость (грамм)</label>
@@ -275,7 +314,7 @@ export default function OnboardingPage() {
                   type="number"
                   value={bowlCapacity}
                   onChange={(e) => setBowlCapacity(e.target.value)}
-                  min="10"
+                  min="5"
                   max="50"
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                 />
@@ -289,8 +328,8 @@ export default function OnboardingPage() {
                 </button>
                 <button
                   onClick={handleBowlSave}
-                  disabled={saving}
-                  className="btn btn-primary flex-1"
+                  disabled={saving || !bowlModel}
+                  className="btn btn-primary flex-1 disabled:opacity-50"
                 >
                   {saving ? 'Сохранение...' : 'Добавить чашу'}
                 </button>

@@ -121,9 +121,12 @@ export function Sidebar() {
       </div>
 
       {/* Navigation - filtered by role */}
-      <nav className="flex-1 p-3 space-y-1">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {filteredNavigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+          // Exact match, or prefix match only if no other nav item is a more specific match
+          const isActive = pathname === item.href ||
+            (pathname.startsWith(item.href + '/') &&
+             !filteredNavigation.some(n => n.href !== item.href && n.href.startsWith(item.href) && pathname.startsWith(n.href)))
           const Icon = item.Icon
           const isLocked = item.proOnly && isFreeTier && isOwner
 

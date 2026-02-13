@@ -6,6 +6,7 @@ import { useBowls } from '@/lib/hooks/useBowls'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
+import { BOWL_PRESETS } from '@/data/bowls'
 
 const BOWL_BACKGROUNDS = [
   '/images/bowl-bg-1.jpg',
@@ -191,12 +192,7 @@ export default function BowlsPage() {
         <div className="card p-6">
           <h3 className="font-semibold mb-4">Популярные чаши</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { name: 'Phunnel маленький', capacity: 15 },
-              { name: 'Phunnel средний', capacity: 20 },
-              { name: 'Phunnel большой', capacity: 25 },
-              { name: 'Turka', capacity: 18 },
-            ].map((preset) => (
+            {BOWL_PRESETS.slice(0, 8).map((preset) => (
               <button
                 key={preset.name}
                 onClick={async () => {
