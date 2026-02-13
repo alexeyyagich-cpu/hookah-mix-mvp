@@ -437,8 +437,8 @@ export interface Cart {
 // Subscription limits
 export const SUBSCRIPTION_LIMITS = {
   free: {
-    inventory_items: 10,
-    bowl_types: 1,
+    inventory_items: 20,
+    bowl_types: 3,
     session_history_days: 30,
     export: false,
     api_access: false,

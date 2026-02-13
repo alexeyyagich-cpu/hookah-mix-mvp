@@ -23,9 +23,9 @@ const plans = [
     priceYearly: 0,
     description: 'Для пробного использования',
     features: [
-      { name: 'Позиций в инвентаре', value: '10', included: true },
+      { name: 'Позиций в инвентаре', value: '20', included: true },
       { name: 'История сессий', value: '30 дней', included: true },
-      { name: 'Типов чаш', value: '1', included: true },
+      { name: 'Типов чаш', value: '3', included: true },
       { name: 'Базовая статистика', included: true },
       { name: 'Маркетплейс', included: false },
       { name: 'Управление командой', included: false },
