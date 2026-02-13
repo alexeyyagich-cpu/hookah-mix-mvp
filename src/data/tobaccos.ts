@@ -154,6 +154,53 @@ export const TOBACCOS: Tobacco[] = [
   { id: "ds18", brand: "Darkside", flavor: "Breaking Red", strength: 8, heatResistance: 8, color: "#DC2626", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
   { id: "ds19", brand: "Darkside", flavor: "Cosmo Flower", strength: 8, heatResistance: 8, color: "#F472B6", category: "herbal", pairsWith: ["citrus", "berry", "mint"] },
   { id: "ds20", brand: "Darkside", flavor: "Pinestar", strength: 8, heatResistance: 8, color: "#FDE047", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds21", brand: "Darkside", flavor: "Admiral Acbar", strength: 8, heatResistance: 8, color: "#38BDF8", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds22", brand: "Darkside", flavor: "Barvy Orange", strength: 8, heatResistance: 8, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "ds23", brand: "Darkside", flavor: "Basil Blast", strength: 8, heatResistance: 8, color: "#4ADE80", category: "herbal", pairsWith: ["citrus", "fruit", "berry"] },
+  { id: "ds24", brand: "Darkside", flavor: "Bassberry", strength: 8, heatResistance: 8, color: "#A855F7", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds25", brand: "Darkside", flavor: "Bergamonstr", strength: 8, heatResistance: 8, color: "#FBBF24", category: "citrus", pairsWith: ["mint", "berry", "herbal"] },
+  { id: "ds26", brand: "Darkside", flavor: "Blackcurrant", strength: 8, heatResistance: 8, color: "#581C87", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds27", brand: "Darkside", flavor: "Blueberry Blast", strength: 8, heatResistance: 8, color: "#6366F1", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds28", brand: "Darkside", flavor: "C.R.E.A.M. S.O.D.A.", strength: 8, heatResistance: 8, color: "#FEF3C7", category: "soda", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "ds29", brand: "Darkside", flavor: "Cherry Rocks", strength: 8, heatResistance: 8, color: "#DC2626", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds30", brand: "Darkside", flavor: "Code Cherry", strength: 8, heatResistance: 8, color: "#EF4444", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
+  { id: "ds31", brand: "Darkside", flavor: "Cosmos", strength: 8, heatResistance: 9, color: "#8B5CF6", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds32", brand: "Darkside", flavor: "Cyber Kiwi", strength: 8, heatResistance: 8, color: "#84CC16", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds33", brand: "Darkside", flavor: "Dark Icecream", strength: 8, heatResistance: 8, color: "#FDE68A", category: "dessert", pairsWith: ["fruit", "mint", "berry"] },
+  { id: "ds34", brand: "Darkside", flavor: "Dark Mint", strength: 8, heatResistance: 9, color: "#059669", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit", "soda", "dessert"] },
+  { id: "ds35", brand: "Darkside", flavor: "Dark Passion", strength: 8, heatResistance: 8, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds36", brand: "Darkside", flavor: "Darkside Cola", strength: 8, heatResistance: 8, color: "#7C2D12", category: "soda", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "ds37", brand: "Darkside", flavor: "Darksupra", strength: 8, heatResistance: 9, color: "#1E3A5F", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds38", brand: "Darkside", flavor: "Deep Blue Sea", strength: 8, heatResistance: 8, color: "#3B82F6", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds39", brand: "Darkside", flavor: "Desert Eagle", strength: 8, heatResistance: 8, color: "#D97706", category: "dessert", pairsWith: ["fruit", "mint", "spice"] },
+  { id: "ds40", brand: "Darkside", flavor: "Fruittallity", strength: 8, heatResistance: 8, color: "#F97316", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds41", brand: "Darkside", flavor: "Glitch Ice Tea", strength: 8, heatResistance: 8, color: "#A3E635", category: "herbal", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "ds42", brand: "Darkside", flavor: "Goal", strength: 8, heatResistance: 8, color: "#22C55E", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds43", brand: "Darkside", flavor: "Green Beam", strength: 8, heatResistance: 8, color: "#BEF264", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds44", brand: "Darkside", flavor: "Guava Rebel", strength: 8, heatResistance: 8, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds45", brand: "Darkside", flavor: "Honey Dust", strength: 8, heatResistance: 8, color: "#FBBF24", category: "dessert", pairsWith: ["fruit", "mint", "spice"] },
+  { id: "ds46", brand: "Darkside", flavor: "Ice Granny", strength: 8, heatResistance: 8, color: "#86EFAC", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds47", brand: "Darkside", flavor: "Kalee Grapefruit 2.0", strength: 8, heatResistance: 8, color: "#FB7185", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "ds48", brand: "Darkside", flavor: "Killer Milk", strength: 8, heatResistance: 8, color: "#F5F5F4", category: "dessert", pairsWith: ["fruit", "mint", "berry"] },
+  { id: "ds49", brand: "Darkside", flavor: "Lemonblast", strength: 8, heatResistance: 8, color: "#FDE047", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "ds50", brand: "Darkside", flavor: "Mango Lassi", strength: 8, heatResistance: 8, color: "#F59E0B", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds51", brand: "Darkside", flavor: "N0rdberry", strength: 8, heatResistance: 8, color: "#818CF8", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds52", brand: "Darkside", flavor: "Pineapple Pulse", strength: 8, heatResistance: 8, color: "#FACC15", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds53", brand: "Darkside", flavor: "Raf In The Jungle", strength: 8, heatResistance: 8, color: "#D4A574", category: "dessert", pairsWith: ["fruit", "mint", "tropical"] },
+  { id: "ds54", brand: "Darkside", flavor: "Red Alert", strength: 8, heatResistance: 8, color: "#EF4444", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds55", brand: "Darkside", flavor: "Red Rush", strength: 8, heatResistance: 8, color: "#DC2626", category: "soda", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "ds56", brand: "Darkside", flavor: "Red Zeppelin", strength: 8, heatResistance: 8, color: "#B91C1C", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds57", brand: "Darkside", flavor: "Redberry", strength: 8, heatResistance: 8, color: "#F87171", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds58", brand: "Darkside", flavor: "Rivers Of Blood", strength: 8, heatResistance: 8, color: "#991B1B", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds59", brand: "Darkside", flavor: "Space Jam", strength: 8, heatResistance: 8, color: "#7C3AED", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds60", brand: "Darkside", flavor: "Space Lychee", strength: 8, heatResistance: 8, color: "#F9A8D4", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds61", brand: "Darkside", flavor: "Strawberry Light", strength: 8, heatResistance: 8, color: "#FB7185", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ds62", brand: "Darkside", flavor: "Sweet Comet", strength: 8, heatResistance: 8, color: "#FBBF24", category: "candy", pairsWith: ["fruit", "berry", "mint"] },
+  { id: "ds63", brand: "Darkside", flavor: "Tropic Ray", strength: 8, heatResistance: 8, color: "#F97316", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds64", brand: "Darkside", flavor: "Virgin Melon", strength: 8, heatResistance: 8, color: "#A3E635", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds65", brand: "Darkside", flavor: "Virgin Peach", strength: 8, heatResistance: 8, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ds66", brand: "Darkside", flavor: "Waffle Shuffle", strength: 8, heatResistance: 8, color: "#D97706", category: "dessert", pairsWith: ["fruit", "mint", "berry"] },
+  { id: "ds67", brand: "Darkside", flavor: "Wildberry", strength: 8, heatResistance: 8, color: "#C026D3", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
 
   // === TANGIERS (Bold dark leaf, strong) ===
   { id: "tg1", brand: "Tangiers", flavor: "Cane Mint", strength: 9, heatResistance: 9, color: "#10B981", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit", "soda", "dessert"] },
@@ -245,6 +292,10 @@ export const TOBACCOS: Tobacco[] = [
 
 // Helper to filter by brand
 export const getBrandNames = () => [...new Set(TOBACCOS.map(t => t.brand))];
+
+// Helper to get flavors for a specific brand
+export const getFlavorsByBrand = (brand: string): string[] =>
+  TOBACCOS.filter(t => t.brand === brand).map(t => t.flavor);
 
 // Helper to filter by category
 export const getCategories = (): Category[] => [...new Set(TOBACCOS.map(t => t.category))];
@@ -368,6 +419,6 @@ export const getCategories = (): Category[] => [...new Set(TOBACCOS.map(t => t.c
    ─────────────────────────────────────────────────────────────────────────────
    Dataset version: 2.0.0
    Last updated: February 2026
-   Tobaccos: 120 | Brands: 7 | Categories: 10
+   Tobaccos: ~167 | Darkside: 67 | Brands: 7 | Categories: 10
    ─────────────────────────────────────────────────────────────────────────────
 */

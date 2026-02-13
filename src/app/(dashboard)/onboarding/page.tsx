@@ -9,6 +9,7 @@ import { useInventory } from '@/lib/hooks/useInventory'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { IconBowl, IconInventory, IconCheck } from '@/components/Icons'
+import { TOBACCOS, getBrandNames, getFlavorsByBrand } from '@/data/tobaccos'
 
 const STEP_INFO: Record<OnboardingStep, { title: string; description: string; icon: string }> = {
   welcome: {
@@ -58,6 +59,7 @@ export default function OnboardingPage() {
   const [tobaccoBrand, setTobaccoBrand] = useState('Darkside')
   const [tobaccoFlavor, setTobaccoFlavor] = useState('')
   const [tobaccoQuantity, setTobaccoQuantity] = useState('100')
+  const [isCustomFlavor, setIsCustomFlavor] = useState(false)
 
   const [saving, setSaving] = useState(false)
 
@@ -108,8 +110,9 @@ export default function OnboardingPage() {
   const handleTobaccoSave = async () => {
     if (!tobaccoFlavor) return
     setSaving(true)
+    const catalogItem = TOBACCOS.find(t => t.brand === tobaccoBrand && t.flavor === tobaccoFlavor)
     await addTobacco({
-      tobacco_id: `custom-${Date.now()}`,
+      tobacco_id: catalogItem?.id || `custom-${Date.now()}`,
       brand: tobaccoBrand,
       flavor: tobaccoFlavor,
       quantity_grams: parseInt(tobaccoQuantity) || 100,
@@ -313,28 +316,45 @@ export default function OnboardingPage() {
                 <label className="block text-sm font-medium mb-2">Бренд</label>
                 <select
                   value={tobaccoBrand}
-                  onChange={(e) => setTobaccoBrand(e.target.value)}
+                  onChange={(e) => { setTobaccoBrand(e.target.value); setTobaccoFlavor(''); setIsCustomFlavor(false); }}
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                 >
-                  <option value="Darkside">Darkside</option>
-                  <option value="Musthave">Musthave</option>
-                  <option value="Tangiers">Tangiers</option>
-                  <option value="Adalya">Adalya</option>
-                  <option value="Al Fakher">Al Fakher</option>
-                  <option value="Fumari">Fumari</option>
-                  <option value="Element">Element</option>
-                  <option value="Black Burn">Black Burn</option>
+                  {getBrandNames().map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Вкус</label>
-                <input
-                  type="text"
-                  value={tobaccoFlavor}
-                  onChange={(e) => setTobaccoFlavor(e.target.value)}
-                  placeholder="Supernova, Pinkman..."
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                />
+                {isCustomFlavor ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tobaccoFlavor}
+                      onChange={(e) => setTobaccoFlavor(e.target.value)}
+                      placeholder="Введите название вкуса"
+                      className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => { setIsCustomFlavor(false); setTobaccoFlavor(''); }}
+                      className="px-3 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)]"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    value={tobaccoFlavor}
+                    onChange={(e) => {
+                      if (e.target.value === '__custom__') { setIsCustomFlavor(true); setTobaccoFlavor(''); }
+                      else setTobaccoFlavor(e.target.value);
+                    }}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  >
+                    <option value="">Выберите вкус...</option>
+                    {getFlavorsByBrand(tobaccoBrand).map(f => <option key={f} value={f}>{f}</option>)}
+                    <option value="__custom__">Другой...</option>
+                  </select>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Количество (грамм)</label>
