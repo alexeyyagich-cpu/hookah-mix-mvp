@@ -295,7 +295,7 @@ export const getBrandNames = () => [...new Set(TOBACCOS.map(t => t.brand))];
 
 // Helper to get flavors for a specific brand
 export const getFlavorsByBrand = (brand: string): string[] =>
-  TOBACCOS.filter(t => t.brand === brand).map(t => t.flavor);
+  TOBACCOS.filter(t => t.brand === brand).map(t => t.flavor).sort((a, b) => a.localeCompare(b));
 
 // Helper to filter by category
 export const getCategories = (): Category[] => [...new Set(TOBACCOS.map(t => t.category))];

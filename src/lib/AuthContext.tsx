@@ -93,18 +93,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
+    let didSettle = false
+
+    // Safety timeout — never show spinner longer than 5s
+    const timeout = setTimeout(() => {
+      if (!didSettle) {
+        console.warn('Auth session loading timed out after 5s')
+        didSettle = true
+        setLoading(false)
+      }
+    }, 5000)
+
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setSession(session)
+        setUser(session?.user ?? null)
 
-      if (session?.user) {
-        const profileData = await fetchProfile(session.user.id)
-        setProfile(profileData)
+        if (session?.user) {
+          const profileData = await fetchProfile(session.user.id)
+          setProfile(profileData)
+        }
+      } catch (error) {
+        console.error('Failed to get initial session:', error)
+      } finally {
+        if (!didSettle) {
+          didSettle = true
+          setLoading(false)
+        }
+        clearTimeout(timeout)
       }
-
-      setLoading(false)
     }
 
     getInitialSession()
@@ -127,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 
     return () => {
+      clearTimeout(timeout)
       subscription.unsubscribe()
     }
   }, [supabase, fetchProfile])
