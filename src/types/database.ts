@@ -332,6 +332,21 @@ export interface Database {
         Insert: Omit<Reservation, 'id' | 'created_at' | 'status' | 'duration_minutes'> & { id?: string; created_at?: string; status?: ReservationStatus; duration_minutes?: number }
         Update: Partial<Omit<Reservation, 'id' | 'profile_id'>>
       }
+      r2o_connections: {
+        Row: R2OConnection
+        Insert: Omit<R2OConnection, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
+        Update: Partial<Omit<R2OConnection, 'id' | 'profile_id'>>
+      }
+      r2o_product_mappings: {
+        Row: R2OProductMapping
+        Insert: Omit<R2OProductMapping, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<R2OProductMapping, 'id' | 'profile_id'>>
+      }
+      r2o_sales_log: {
+        Row: R2OSalesLog
+        Insert: Omit<R2OSalesLog, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<R2OSalesLog, 'id' | 'profile_id'>>
+      }
     }
   }
 }
@@ -412,6 +427,49 @@ export interface AutoReorderRule {
   created_at: string
 }
 
+// ============================================================================
+// READY2ORDER (POS) TYPES
+// ============================================================================
+
+export type R2OConnectionStatus = 'connected' | 'disconnected' | 'error'
+export type R2OSyncStatus = 'synced' | 'pending' | 'error'
+
+export interface R2OConnection {
+  id: string
+  profile_id: string
+  encrypted_token: string
+  token_iv: string
+  status: R2OConnectionStatus
+  webhook_registered: boolean
+  product_group_id: number | null
+  last_sync_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface R2OProductMapping {
+  id: string
+  profile_id: string
+  tobacco_inventory_id: string
+  r2o_product_id: number
+  r2o_product_name: string
+  sync_status: R2OSyncStatus
+  last_synced_at: string | null
+  created_at: string
+}
+
+export interface R2OSalesLog {
+  id: string
+  profile_id: string
+  r2o_invoice_id: number
+  invoice_number: string
+  invoice_timestamp: string
+  total_price: number
+  items: unknown[]
+  processed: boolean
+  created_at: string
+}
+
 // Extended marketplace types with relations
 export interface SupplierWithProducts extends Supplier {
   products: SupplierProduct[]
@@ -444,6 +502,7 @@ export const SUBSCRIPTION_LIMITS = {
     api_access: false,
     marketplace: false,
     auto_reorder: false,
+    pos_integration: false,
   },
   pro: {
     inventory_items: Infinity,
@@ -453,6 +512,7 @@ export const SUBSCRIPTION_LIMITS = {
     api_access: true,
     marketplace: true,
     auto_reorder: false,
+    pos_integration: true,
   },
   enterprise: {
     inventory_items: Infinity,
@@ -462,5 +522,6 @@ export const SUBSCRIPTION_LIMITS = {
     api_access: true,
     marketplace: true,
     auto_reorder: true,
+    pos_integration: true,
   },
 } as const

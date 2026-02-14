@@ -1,0 +1,91 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { grantAccessToken } from '@/lib/ready2order/client'
+
+export async function POST(request: NextRequest) {
+  try {
+    const developerToken = process.env.R2O_DEVELOPER_TOKEN
+    if (!developerToken) {
+      return NextResponse.json(
+        { error: 'ready2order is not configured' },
+        { status: 500 }
+      )
+    }
+
+    // Verify authentication
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check subscription (Pro+ required)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, subscription_expires_at')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.subscription_tier === 'free') {
+      return NextResponse.json(
+        { error: 'Pro subscription required for POS integration' },
+        { status: 403 }
+      )
+    }
+
+    // Check if expired
+    if (profile.subscription_expires_at) {
+      const expires = new Date(profile.subscription_expires_at)
+      if (expires < new Date()) {
+        return NextResponse.json(
+          { error: 'Subscription expired' },
+          { status: 403 }
+        )
+      }
+    }
+
+    // Check if already connected
+    const { data: existing } = await supabase
+      .from('r2o_connections')
+      .select('id, status')
+      .eq('profile_id', user.id)
+      .single()
+
+    if (existing?.status === 'connected') {
+      return NextResponse.json(
+        { error: 'Already connected to ready2order' },
+        { status: 409 }
+      )
+    }
+
+    const body = await request.json().catch(() => ({}))
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
+    const redirectUri = body.redirectUri || `${appUrl}/api/r2o/callback`
+
+    // Request grant access from r2o
+    const grant = await grantAccessToken(developerToken, redirectUri)
+
+    return NextResponse.json({
+      grantAccessUri: grant.grantAccessUri,
+    })
+  } catch (error) {
+    console.error('r2o connect error:', error)
+    return NextResponse.json(
+      { error: 'Failed to initiate POS connection' },
+      { status: 500 }
+    )
+  }
+}

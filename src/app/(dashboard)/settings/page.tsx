@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
+import { useReady2Order } from '@/lib/hooks/useReady2Order'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { usePushNotifications } from '@/lib/hooks/usePushNotifications'
 import { useTelegram } from '@/lib/hooks/useTelegram'
@@ -12,7 +14,21 @@ import Link from 'next/link'
 
 export default function SettingsPage() {
   const { user, profile, refreshProfile, signOut, isDemoMode } = useAuth()
-  const { tier, isExpired, daysUntilExpiry } = useSubscription()
+  const { tier, isExpired, daysUntilExpiry, canUsePOS } = useSubscription()
+  const { connection: r2oConnection, loading: r2oLoading, error: r2oError, syncing: r2oSyncing, syncResult: r2oSyncResult, connect: r2oConnect, disconnect: r2oDisconnect, sync: r2oSync, refresh: r2oRefresh } = useReady2Order()
+  const searchParams = useSearchParams()
+
+  // Handle r2o callback redirect
+  useEffect(() => {
+    const r2oStatus = searchParams.get('r2o')
+    if (r2oStatus === 'connected') {
+      r2oRefresh()
+      // Clean up URL
+      window.history.replaceState({}, '', '/settings')
+    } else if (r2oStatus === 'error') {
+      window.history.replaceState({}, '', '/settings')
+    }
+  }, [searchParams, r2oRefresh])
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings()
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, loading: pushLoading, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
   const { connection: telegramConnection, loading: telegramLoading, connectLink: telegramConnectLink, updateSettings: updateTelegramSettings, disconnect: disconnectTelegram } = useTelegram()
@@ -429,6 +445,117 @@ export default function SettingsPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* POS Касса (ready2order) */}
+      <div className="card p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#00b341] flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">POS Касса (ready2order)</h2>
+            <p className="text-sm text-[var(--color-textMuted)]">
+              Синхронизация с кассовой системой ready2order
+            </p>
+          </div>
+        </div>
+
+        {!canUsePOS ? (
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--color-bgHover)]">
+            <svg className="w-5 h-5 text-[var(--color-textMuted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <div>
+              <p className="text-sm font-medium">Доступно на тарифе Pro</p>
+              <p className="text-xs text-[var(--color-textMuted)]">
+                Обновите подписку для интеграции с POS-системой
+              </p>
+            </div>
+            <Link href="/pricing" className="btn btn-primary btn-sm ml-auto">
+              Обновить
+            </Link>
+          </div>
+        ) : r2oLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : r2oConnection ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-success)]/10">
+              <span className="text-[var(--color-success)]">✓</span>
+              <span className="text-sm">
+                POS подключена
+                {r2oConnection.last_sync_at && (
+                  <span className="text-[var(--color-textMuted)]">
+                    {' '}· последняя синхронизация: {new Date(r2oConnection.last_sync_at).toLocaleString('ru-RU')}
+                  </span>
+                )}
+              </span>
+            </div>
+
+            {r2oError && (
+              <div className="p-3 rounded-xl bg-[var(--color-danger)]/10 text-[var(--color-danger)] text-sm">
+                {r2oError}
+              </div>
+            )}
+
+            {r2oSyncResult && (
+              <div className="p-3 rounded-xl bg-[var(--color-primary)]/10 text-sm">
+                Синхронизировано: {r2oSyncResult.synced} из {r2oSyncResult.total}
+                {r2oSyncResult.errors > 0 && (
+                  <span className="text-[var(--color-danger)]"> ({r2oSyncResult.errors} ошибок)</span>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={r2oSync}
+                disabled={r2oSyncing}
+                className="btn btn-primary disabled:opacity-50"
+              >
+                {r2oSyncing ? 'Синхронизация...' : 'Синхронизировать'}
+              </button>
+              <button
+                onClick={r2oDisconnect}
+                className="text-sm text-[var(--color-danger)] hover:underline"
+              >
+                Отключить POS
+              </button>
+            </div>
+
+            {!r2oConnection.webhook_registered && (
+              <p className="text-xs text-[var(--color-warning)]">
+                Вебхуки не зарегистрированы. Автоматическое списание при продажах недоступно.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--color-textMuted)]">
+              Подключите ready2order для автоматической синхронизации товаров, отслеживания продаж и управления остатками из кассы.
+            </p>
+
+            {r2oError && (
+              <div className="p-3 rounded-xl bg-[var(--color-danger)]/10 text-[var(--color-danger)] text-sm">
+                {r2oError}
+              </div>
+            )}
+
+            <button
+              onClick={r2oConnect}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00b341] text-white font-medium hover:opacity-90 transition-opacity"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Подключить POS
+            </button>
           </div>
         )}
       </div>
