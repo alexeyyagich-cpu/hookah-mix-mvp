@@ -1,0 +1,410 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, BarPortionUnit } from '@/types/database'
+import { COCKTAIL_METHOD_LABELS, GLASS_LABELS, RECIPE_PRESETS, type RecipePreset } from '@/data/bar-recipes'
+import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
+
+type RecipeInput = Omit<BarRecipe, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'>
+type IngredientInput = Omit<BarRecipeIngredient, 'id' | 'recipe_id' | 'created_at'>
+
+interface AddRecipeModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSave: (recipe: RecipeInput, ingredients: IngredientInput[]) => Promise<void>
+  editingRecipe?: BarRecipeWithIngredients | null
+}
+
+const METHODS: CocktailMethod[] = ['build', 'stir', 'shake', 'blend', 'layer', 'muddle']
+const GLASSES = Object.keys(GLASS_LABELS)
+const PORTION_UNITS: BarPortionUnit[] = ['ml', 'g', 'pcs', 'oz', 'cl', 'dash', 'barspoon', 'drop', 'slice', 'sprig', 'wedge', 'twist']
+
+interface IngredientRow {
+  key: string
+  ingredient_name: string
+  quantity: string
+  unit: BarPortionUnit
+  bar_inventory_id: string | null
+  is_optional: boolean
+}
+
+export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRecipeModalProps) {
+  const [mode, setMode] = useState<'preset' | 'custom'>('preset')
+  const [presetFilter, setPresetFilter] = useState('')
+
+  // Form state
+  const [name, setName] = useState('')
+  const [nameEn, setNameEn] = useState('')
+  const [description, setDescription] = useState('')
+  const [method, setMethod] = useState<CocktailMethod>('shake')
+  const [glass, setGlass] = useState('rocks')
+  const [garnish, setGarnish] = useState('')
+  const [menuPrice, setMenuPrice] = useState('')
+  const [difficulty, setDifficulty] = useState('1')
+  const [notes, setNotes] = useState('')
+  const [ingredients, setIngredients] = useState<IngredientRow[]>([])
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (editingRecipe) {
+      setMode('custom')
+      setName(editingRecipe.name)
+      setNameEn(editingRecipe.name_en || '')
+      setDescription(editingRecipe.description || '')
+      setMethod(editingRecipe.method || 'shake')
+      setGlass(editingRecipe.glass || 'rocks')
+      setGarnish(editingRecipe.garnish_description || '')
+      setMenuPrice(editingRecipe.menu_price?.toString() || '')
+      setDifficulty(editingRecipe.difficulty?.toString() || '1')
+      setNotes(editingRecipe.notes || '')
+      setIngredients(editingRecipe.ingredients.map(ing => ({
+        key: ing.id,
+        ingredient_name: ing.ingredient_name,
+        quantity: ing.quantity.toString(),
+        unit: ing.unit,
+        bar_inventory_id: ing.bar_inventory_id,
+        is_optional: ing.is_optional,
+      })))
+    } else {
+      setMode('preset')
+      resetForm()
+    }
+  }, [editingRecipe, isOpen])
+
+  const resetForm = () => {
+    setName('')
+    setNameEn('')
+    setDescription('')
+    setMethod('shake')
+    setGlass('rocks')
+    setGarnish('')
+    setMenuPrice('')
+    setDifficulty('1')
+    setNotes('')
+    setIngredients([])
+    setPresetFilter('')
+  }
+
+  const selectPreset = (preset: RecipePreset) => {
+    setMode('custom')
+    setName(preset.name)
+    setNameEn(preset.name_en)
+    setMethod(preset.method)
+    setGlass(preset.glass)
+    setGarnish(preset.garnish)
+    setDifficulty(preset.difficulty.toString())
+    setIngredients(preset.ingredients.map((ing, i) => ({
+      key: `preset-${i}`,
+      ingredient_name: ing.name,
+      quantity: ing.quantity.toString(),
+      unit: ing.unit,
+      bar_inventory_id: null,
+      is_optional: ing.is_optional || false,
+    })))
+  }
+
+  const addIngredientRow = () => {
+    setIngredients(prev => [...prev, {
+      key: `new-${Date.now()}`,
+      ingredient_name: '',
+      quantity: '',
+      unit: 'ml' as BarPortionUnit,
+      bar_inventory_id: null,
+      is_optional: false,
+    }])
+  }
+
+  const updateIngredient = (key: string, field: keyof IngredientRow, value: string | boolean | null) => {
+    setIngredients(prev => prev.map(ing =>
+      ing.key === key ? { ...ing, [field]: value } : ing
+    ))
+  }
+
+  const removeIngredient = (key: string) => {
+    setIngredients(prev => prev.filter(ing => ing.key !== key))
+  }
+
+  const moveIngredient = (key: string, direction: 'up' | 'down') => {
+    setIngredients(prev => {
+      const idx = prev.findIndex(ing => ing.key === key)
+      if (idx === -1) return prev
+      const newIdx = direction === 'up' ? idx - 1 : idx + 1
+      if (newIdx < 0 || newIdx >= prev.length) return prev
+      const copy = [...prev]
+      ;[copy[idx], copy[newIdx]] = [copy[newIdx], copy[idx]]
+      return copy
+    })
+  }
+
+  const filteredPresets = RECIPE_PRESETS.filter(p =>
+    p.name.toLowerCase().includes(presetFilter.toLowerCase()) ||
+    p.name_en.toLowerCase().includes(presetFilter.toLowerCase())
+  )
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || ingredients.length === 0) return
+
+    setSaving(true)
+
+    const recipe: RecipeInput = {
+      name: name.trim(),
+      name_en: nameEn.trim() || null,
+      description: description.trim() || null,
+      method,
+      glass,
+      garnish_description: garnish.trim() || null,
+      menu_price: menuPrice ? parseFloat(menuPrice) : null,
+      image_url: null,
+      serving_size_ml: null,
+      prep_time_seconds: null,
+      difficulty: parseInt(difficulty) || null,
+      notes: notes.trim() || null,
+    }
+
+    const ingredientInputs: IngredientInput[] = ingredients
+      .filter(ing => ing.ingredient_name.trim())
+      .map((ing, i) => ({
+        bar_inventory_id: ing.bar_inventory_id,
+        ingredient_name: ing.ingredient_name.trim(),
+        quantity: parseFloat(ing.quantity) || 0,
+        unit: ing.unit,
+        is_optional: ing.is_optional,
+        sort_order: i,
+      }))
+
+    await onSave(recipe, ingredientInputs)
+    setSaving(false)
+    onClose()
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
+        <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)]">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold">
+              {editingRecipe ? 'Редактировать рецепт' : 'Новый рецепт'}
+            </h2>
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {!editingRecipe && (
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => setMode('preset')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  mode === 'preset' ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
+                }`}
+              >
+                Из каталога
+              </button>
+              <button
+                onClick={() => setMode('custom')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  mode === 'custom' ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
+                }`}
+              >
+                Свой рецепт
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="p-6">
+          {mode === 'preset' && !editingRecipe ? (
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={presetFilter}
+                onChange={e => setPresetFilter(e.target.value)}
+                placeholder="Поиск коктейля..."
+                className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              />
+              <div className="space-y-1 max-h-[50vh] overflow-y-auto">
+                {filteredPresets.map(preset => (
+                  <button
+                    key={preset.id}
+                    onClick={() => selectPreset(preset)}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors text-left"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium">{preset.name}</div>
+                      <div className="text-xs text-[var(--color-textMuted)]">
+                        {preset.name_en} · {COCKTAIL_METHOD_LABELS[preset.method]} · {preset.ingredients.length} ингр.
+                      </div>
+                    </div>
+                    <svg className="w-4 h-4 text-[var(--color-textMuted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Название *</label>
+                  <input
+                    type="text" value={name} onChange={e => setName(e.target.value)} required
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    placeholder="Мохито"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">English name</label>
+                  <input
+                    type="text" value={nameEn} onChange={e => setNameEn(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    placeholder="Mojito"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Метод</label>
+                  <select value={method} onChange={e => setMethod(e.target.value as CocktailMethod)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  >
+                    {METHODS.map(m => <option key={m} value={m}>{COCKTAIL_METHOD_LABELS[m]}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Бокал</label>
+                  <select value={glass} onChange={e => setGlass(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  >
+                    {GLASSES.map(g => <option key={g} value={g}>{GLASS_LABELS[g]}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Сложность</label>
+                  <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  >
+                    <option value="1">Легко</option>
+                    <option value="2">Средне</option>
+                    <option value="3">Сложно</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Цена в меню (EUR)</label>
+                  <input
+                    type="number" step="0.01" value={menuPrice} onChange={e => setMenuPrice(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    placeholder="12.00"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Гарнир</label>
+                  <input
+                    type="text" value={garnish} onChange={e => setGarnish(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    placeholder="Мята, лайм"
+                  />
+                </div>
+              </div>
+
+              {/* Ingredients */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Ингредиенты *</label>
+                  <button type="button" onClick={addIngredientRow}
+                    className="text-xs text-[var(--color-primary)] hover:underline"
+                  >
+                    + Добавить
+                  </button>
+                </div>
+
+                {ingredients.length === 0 && (
+                  <p className="text-sm text-[var(--color-textMuted)] text-center py-4">
+                    Добавьте хотя бы один ингредиент
+                  </p>
+                )}
+
+                {ingredients.map((ing, idx) => (
+                  <div key={ing.key} className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-bgHover)]">
+                    <div className="flex flex-col gap-0.5">
+                      <button type="button" onClick={() => moveIngredient(ing.key, 'up')}
+                        disabled={idx === 0}
+                        className="text-xs text-[var(--color-textMuted)] disabled:opacity-30 hover:text-[var(--color-text)]"
+                      >
+                        ▲
+                      </button>
+                      <button type="button" onClick={() => moveIngredient(ing.key, 'down')}
+                        disabled={idx === ingredients.length - 1}
+                        className="text-xs text-[var(--color-textMuted)] disabled:opacity-30 hover:text-[var(--color-text)]"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={ing.ingredient_name}
+                      onChange={e => updateIngredient(ing.key, 'ingredient_name', e.target.value)}
+                      placeholder="Название"
+                      className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
+                    />
+                    <input
+                      type="number"
+                      step="any"
+                      value={ing.quantity}
+                      onChange={e => updateIngredient(ing.key, 'quantity', e.target.value)}
+                      placeholder="0"
+                      className="w-16 px-2 py-2 rounded-lg bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm text-right focus:border-[var(--color-primary)] focus:outline-none"
+                    />
+                    <select
+                      value={ing.unit}
+                      onChange={e => updateIngredient(ing.key, 'unit', e.target.value)}
+                      className="w-24 px-2 py-2 rounded-lg bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
+                    >
+                      {PORTION_UNITS.map(u => (
+                        <option key={u} value={u}>{BAR_PORTION_LABELS[u]}</option>
+                      ))}
+                    </select>
+                    <button type="button" onClick={() => removeIngredient(ing.key)}
+                      className="p-1 text-[var(--color-textMuted)] hover:text-[var(--color-danger)]"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Submit */}
+              <div className="flex gap-3 pt-2">
+                {!editingRecipe && (
+                  <button type="button" onClick={() => setMode('preset')} className="btn btn-ghost">
+                    Назад
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={saving || !name.trim() || ingredients.length === 0}
+                  className="btn btn-primary flex-1 disabled:opacity-50"
+                >
+                  {saving ? 'Сохранение...' : editingRecipe ? 'Сохранить' : 'Создать рецепт'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

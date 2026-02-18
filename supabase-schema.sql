@@ -999,3 +999,65 @@ CREATE POLICY "Users manage own bar transactions" ON public.bar_transactions
 CREATE INDEX idx_bar_transactions_profile_id ON public.bar_transactions(profile_id);
 CREATE INDEX idx_bar_transactions_inventory_id ON public.bar_transactions(bar_inventory_id);
 CREATE INDEX idx_bar_transactions_created_at ON public.bar_transactions(created_at DESC);
+
+-- ===========================================
+-- BAR RECIPES TABLE
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.bar_recipes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  name_en TEXT,
+  description TEXT,
+  method TEXT CHECK (method IN ('build', 'stir', 'shake', 'blend', 'layer', 'muddle')),
+  glass TEXT,
+  garnish_description TEXT,
+  menu_price DECIMAL,
+  is_on_menu BOOLEAN DEFAULT false,
+  is_favorite BOOLEAN DEFAULT false,
+  image_url TEXT,
+  serving_size_ml DECIMAL,
+  prep_time_seconds INTEGER,
+  difficulty INTEGER CHECK (difficulty BETWEEN 1 AND 3),
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.bar_recipes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own bar recipes" ON public.bar_recipes
+  FOR ALL USING (auth.uid() = profile_id);
+
+CREATE INDEX idx_bar_recipes_profile_id ON public.bar_recipes(profile_id);
+CREATE INDEX idx_bar_recipes_is_on_menu ON public.bar_recipes(profile_id, is_on_menu) WHERE is_on_menu = true;
+
+-- ===========================================
+-- BAR RECIPE INGREDIENTS TABLE
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.bar_recipe_ingredients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  recipe_id UUID REFERENCES public.bar_recipes(id) ON DELETE CASCADE NOT NULL,
+  bar_inventory_id UUID REFERENCES public.bar_inventory(id) ON DELETE SET NULL,
+  ingredient_name TEXT NOT NULL,
+  quantity DECIMAL NOT NULL DEFAULT 0,
+  unit TEXT NOT NULL DEFAULT 'ml',
+  is_optional BOOLEAN DEFAULT false,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.bar_recipe_ingredients ENABLE ROW LEVEL SECURITY;
+
+-- RLS: Allow access if user owns the parent recipe
+CREATE POLICY "Users manage own recipe ingredients" ON public.bar_recipe_ingredients
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.bar_recipes
+      WHERE bar_recipes.id = bar_recipe_ingredients.recipe_id
+        AND bar_recipes.profile_id = auth.uid()
+    )
+  );
+
+CREATE INDEX idx_bar_recipe_ingredients_recipe_id ON public.bar_recipe_ingredients(recipe_id);
+CREATE INDEX idx_bar_recipe_ingredients_inventory_id ON public.bar_recipe_ingredients(bar_inventory_id);

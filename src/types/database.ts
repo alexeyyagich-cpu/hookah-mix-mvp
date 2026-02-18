@@ -366,6 +366,27 @@ export interface Database {
         Insert: Omit<BarTransaction, 'id' | 'created_at'> & { id?: string; created_at?: string }
         Update: Partial<Omit<BarTransaction, 'id' | 'profile_id'>>
       }
+      bar_recipes: {
+        Row: BarRecipe
+        Insert: Omit<BarRecipe, 'id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          is_on_menu?: boolean
+          is_favorite?: boolean
+        }
+        Update: Partial<Omit<BarRecipe, 'id' | 'profile_id'>>
+      }
+      bar_recipe_ingredients: {
+        Row: BarRecipeIngredient
+        Insert: Omit<BarRecipeIngredient, 'id' | 'created_at' | 'is_optional' | 'sort_order'> & {
+          id?: string
+          created_at?: string
+          is_optional?: boolean
+          sort_order?: number
+        }
+        Update: Partial<Omit<BarRecipeIngredient, 'id' | 'recipe_id'>>
+      }
     }
   }
 }
@@ -537,6 +558,63 @@ export interface BarTransaction {
   related_sale_id: string | null
   notes: string | null
   created_at: string
+}
+
+export type CocktailMethod = 'build' | 'stir' | 'shake' | 'blend' | 'layer' | 'muddle'
+
+export interface BarRecipe {
+  id: string
+  profile_id: string
+  name: string
+  name_en: string | null
+  description: string | null
+  method: CocktailMethod | null
+  glass: string | null
+  garnish_description: string | null
+  menu_price: number | null
+  is_on_menu: boolean
+  is_favorite: boolean
+  image_url: string | null
+  serving_size_ml: number | null
+  prep_time_seconds: number | null
+  difficulty: number | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface BarRecipeIngredient {
+  id: string
+  recipe_id: string
+  bar_inventory_id: string | null
+  ingredient_name: string
+  quantity: number
+  unit: BarPortionUnit
+  is_optional: boolean
+  sort_order: number
+  created_at: string
+}
+
+export interface BarRecipeWithIngredients extends BarRecipe {
+  ingredients: BarRecipeIngredient[]
+}
+
+export interface RecipeCostBreakdown {
+  ingredient_name: string
+  quantity: number
+  unit: string
+  unit_cost: number
+  total_cost: number
+  in_stock: boolean
+}
+
+export interface RecipeCost {
+  recipe_id: string
+  total_cost: number
+  menu_price: number | null
+  margin: number | null
+  ingredients: RecipeCostBreakdown[]
+  all_in_stock: boolean
 }
 
 // Extended marketplace types with relations
