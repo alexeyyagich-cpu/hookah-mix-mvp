@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/AuthContext'
-import type { LoungeProfile, PublicMix, WorkingHours, LoungeFeature } from '@/types/lounge'
+import type { LoungeProfile, PublicMix, PublicBarRecipe, WorkingHours, LoungeFeature } from '@/types/lounge'
 
 // Demo lounge profile
 const DEMO_LOUNGE: LoungeProfile = {
@@ -174,10 +174,48 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
   }
 }
 
+// Demo cocktails for public menu
+const DEMO_BAR_RECIPES: PublicBarRecipe[] = [
+  {
+    id: 'pub-r1',
+    name: 'Мохито',
+    name_en: 'Mojito',
+    description: 'Освежающий кубинский коктейль с мятой и лаймом',
+    method: 'muddle',
+    glass: 'highball',
+    garnish_description: 'Мята, лайм',
+    menu_price: 12,
+    ingredients: ['Белый ром', 'Сок лайма', 'Сахарный сироп', 'Содовая', 'Мята'],
+  },
+  {
+    id: 'pub-r2',
+    name: 'Негрони',
+    name_en: 'Negroni',
+    description: 'Итальянская классика с горьковатым послевкусием',
+    method: 'stir',
+    glass: 'rocks',
+    garnish_description: 'Долька апельсина',
+    menu_price: 14,
+    ingredients: ['Джин', 'Кампари', 'Сладкий вермут'],
+  },
+  {
+    id: 'pub-r3',
+    name: 'Джин-Тоник',
+    name_en: 'Gin & Tonic',
+    description: null,
+    method: 'build',
+    glass: 'highball',
+    garnish_description: 'Долька лайма',
+    menu_price: 10,
+    ingredients: ['Джин', 'Тоник'],
+  },
+]
+
 // Hook for public lounge viewing (by slug)
 interface UsePublicLoungeReturn {
   lounge: LoungeProfile | null
   mixes: PublicMix[]
+  barRecipes: PublicBarRecipe[]
   loading: boolean
   error: string | null
 }
@@ -185,6 +223,7 @@ interface UsePublicLoungeReturn {
 export function usePublicLounge(slug: string): UsePublicLoungeReturn {
   const [lounge, setLounge] = useState<LoungeProfile | null>(null)
   const [mixes, setMixes] = useState<PublicMix[]>([])
+  const [barRecipes, setBarRecipes] = useState<PublicBarRecipe[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -193,13 +232,36 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
     if (slug === 'demo-lounge') {
       setLounge(DEMO_LOUNGE)
       setMixes(DEMO_MIXES)
+      setBarRecipes(DEMO_BAR_RECIPES)
       setLoading(false)
     } else {
-      // TODO: Fetch from Supabase by slug
-      setError('Заведение не найдено')
-      setLoading(false)
+      // Fetch from public menu API
+      fetch(`/api/public/menu/${slug}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Заведение не найдено')
+          return res.json()
+        })
+        .then(data => {
+          // Build a minimal lounge profile from API response
+          setLounge({
+            ...DEMO_LOUNGE,
+            slug,
+            name: data.venue.name || slug,
+            logo_url: data.venue.logo_url,
+            is_public: true,
+            show_menu: true,
+            show_prices: true,
+            show_popular_mixes: true,
+          })
+          setBarRecipes(data.barRecipes || [])
+          setLoading(false)
+        })
+        .catch(() => {
+          setError('Заведение не найдено')
+          setLoading(false)
+        })
     }
   }, [slug])
 
-  return { lounge, mixes, loading, error }
+  return { lounge, mixes, barRecipes, loading, error }
 }

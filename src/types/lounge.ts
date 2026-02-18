@@ -128,6 +128,19 @@ export interface City {
   longitude: number
 }
 
+// Public bar recipe for cocktail menu display
+export interface PublicBarRecipe {
+  id: string
+  name: string
+  name_en: string | null
+  description: string | null
+  method: string | null
+  glass: string | null
+  garnish_description: string | null
+  menu_price: number | null
+  ingredients: string[] // ingredient names only
+}
+
 // Public mix for menu display
 export interface PublicMix {
   id: string
