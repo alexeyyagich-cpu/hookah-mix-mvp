@@ -1061,3 +1061,31 @@ CREATE POLICY "Users manage own recipe ingredients" ON public.bar_recipe_ingredi
 
 CREATE INDEX idx_bar_recipe_ingredients_recipe_id ON public.bar_recipe_ingredients(recipe_id);
 CREATE INDEX idx_bar_recipe_ingredients_inventory_id ON public.bar_recipe_ingredients(bar_inventory_id);
+
+-- ===========================================
+-- BAR SALES TABLE
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.bar_sales (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  recipe_id UUID REFERENCES public.bar_recipes(id) ON DELETE SET NULL,
+  recipe_name TEXT NOT NULL,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  unit_price DECIMAL NOT NULL DEFAULT 0,
+  total_revenue DECIMAL NOT NULL DEFAULT 0,
+  total_cost DECIMAL NOT NULL DEFAULT 0,
+  margin_percent DECIMAL,
+  table_id UUID REFERENCES public.floor_tables(id) ON DELETE SET NULL,
+  guest_name TEXT,
+  notes TEXT,
+  sold_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.bar_sales ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own bar sales" ON public.bar_sales
+  FOR ALL USING (auth.uid() = profile_id);
+
+CREATE INDEX idx_bar_sales_profile_id ON public.bar_sales(profile_id);
+CREATE INDEX idx_bar_sales_sold_at ON public.bar_sales(profile_id, sold_at DESC);
+CREATE INDEX idx_bar_sales_recipe_id ON public.bar_sales(recipe_id);

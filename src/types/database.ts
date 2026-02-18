@@ -387,6 +387,11 @@ export interface Database {
         }
         Update: Partial<Omit<BarRecipeIngredient, 'id' | 'recipe_id'>>
       }
+      bar_sales: {
+        Row: BarSale
+        Insert: Omit<BarSale, 'id' | 'sold_at'> & { id?: string; sold_at?: string }
+        Update: Partial<Omit<BarSale, 'id' | 'profile_id'>>
+      }
     }
   }
 }
@@ -615,6 +620,37 @@ export interface RecipeCost {
   margin: number | null
   ingredients: RecipeCostBreakdown[]
   all_in_stock: boolean
+}
+
+// ============================================================================
+// BAR SALES TYPES
+// ============================================================================
+
+export interface BarSale {
+  id: string
+  profile_id: string
+  recipe_id: string | null
+  recipe_name: string
+  quantity: number
+  unit_price: number
+  total_revenue: number
+  total_cost: number
+  margin_percent: number | null
+  table_id: string | null
+  guest_name: string | null
+  notes: string | null
+  sold_at: string
+}
+
+export interface BarAnalytics {
+  totalRevenue: number
+  totalCost: number
+  totalProfit: number
+  totalSales: number
+  avgMargin: number | null
+  topCocktails: { name: string; count: number; revenue: number }[]
+  revenueByDay: { date: string; revenue: number; cost: number }[]
+  costByCategory: { category: string; cost: number }[]
 }
 
 // Extended marketplace types with relations
