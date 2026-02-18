@@ -22,7 +22,7 @@ export function useModules(): UseModulesReturn {
   const { user, profile, isDemoMode } = useAuth()
   const { limits } = useSubscription()
   const [loading, setLoading] = useState(false)
-  const [demoModules, setDemoModules] = useState<AppModule[]>(['hookah'])
+  const [demoModules, setDemoModules] = useState<AppModule[]>(['hookah', 'bar'])
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   const modules: AppModule[] = isDemoMode
