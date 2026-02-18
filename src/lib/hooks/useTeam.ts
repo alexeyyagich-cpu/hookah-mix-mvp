@@ -24,6 +24,7 @@ const DEMO_STAFF: Profile[] = [
     onboarding_completed: true,
     onboarding_skipped: false,
     onboarding_step: null,
+    active_modules: ['hookah'],
     created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -43,6 +44,7 @@ const DEMO_STAFF: Profile[] = [
     onboarding_completed: true,
     onboarding_skipped: false,
     onboarding_step: null,
+    active_modules: ['hookah'],
     created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ]

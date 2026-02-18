@@ -18,6 +18,7 @@ interface UseSubscriptionReturn {
   canUseMarketplace: boolean
   canUseAutoReorder: boolean
   canUsePOS: boolean
+  canUseBar: boolean
 }
 
 export function useSubscription(): UseSubscriptionReturn {
@@ -53,5 +54,6 @@ export function useSubscription(): UseSubscriptionReturn {
     canUseMarketplace: effectiveLimits.marketplace,
     canUseAutoReorder: effectiveLimits.auto_reorder,
     canUsePOS: effectiveLimits.pos_integration,
+    canUseBar: effectiveLimits.bar_module,
   }
 }

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
+import { useModules } from '@/lib/hooks/useModules'
 import { useRole, ROLE_LABELS, type Permission } from '@/lib/hooks/useRole'
+import type { AppModule } from '@/types/database'
 import {
   IconDashboard,
   IconInventory,
@@ -22,6 +24,10 @@ import {
   IconUsers,
   IconStar,
   IconCalendar,
+  IconBar,
+  IconCocktail,
+  IconMenuList,
+  IconCoin,
 } from '@/components/Icons'
 
 interface NavItem {
@@ -30,18 +36,26 @@ interface NavItem {
   Icon: React.ComponentType<{ size?: number }>
   permission: Permission
   proOnly?: boolean
+  module?: AppModule
 }
 
 // Navigation items with required permissions
 const navigation: NavItem[] = [
   { name: 'Обзор', href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
-  { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view' },
+  // Hookah module
+  { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view', module: 'hookah' },
   { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
   { name: 'Бронирования', href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
   { name: 'Отзывы', href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
   { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
-  { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view' },
-  { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view' },
+  { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view', module: 'hookah' },
+  { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view', module: 'hookah' },
+  // Bar module
+  { name: 'Бар: Склад', href: '/bar/inventory', Icon: IconBar, permission: 'bar.view', module: 'bar' },
+  { name: 'Бар: Рецепты', href: '/bar/recipes', Icon: IconCocktail, permission: 'bar.view', module: 'bar' },
+  { name: 'Бар: Меню', href: '/bar/menu', Icon: IconMenuList, permission: 'bar.view', module: 'bar' },
+  { name: 'Бар: Продажи', href: '/bar/sales', Icon: IconCoin, permission: 'bar.sales', module: 'bar' },
+  // Common
   { name: 'Статистика', href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
   { name: 'Команда', href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
   { name: 'Настройки', href: '/settings', Icon: IconSettings, permission: 'settings.view' },
@@ -53,11 +67,14 @@ export function Sidebar() {
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
   const { role, hasPermission, isOwner, isStaff } = useRole()
+  const { modules } = useModules()
 
-  // Filter navigation items by role permissions
+  // Filter navigation items by role permissions and active modules
   const filteredNavigation = navigation.filter(item => {
     // Check if user has permission for this item
     if (!hasPermission(item.permission)) return false
+    // Module gating: if item belongs to a module, check if that module is active
+    if (item.module && !modules.includes(item.module)) return false
     // Team page only for owners
     if (item.href === '/settings/team' && !isOwner) return false
     // Settings main page - hide for staff (they don't have settings.view)

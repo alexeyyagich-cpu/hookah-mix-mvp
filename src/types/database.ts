@@ -3,6 +3,9 @@ export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
 // User roles for access control
 export type UserRole = 'owner' | 'staff' | 'guest'
 
+// Module system - switchable feature areas
+export type AppModule = 'hookah' | 'bar' | 'kitchen'
+
 export type OnboardingStep = 'welcome' | 'business' | 'bowl' | 'tobacco' | 'complete'
 
 export interface Profile {
@@ -26,6 +29,8 @@ export interface Profile {
   onboarding_completed: boolean
   onboarding_skipped: boolean
   onboarding_step: OnboardingStep | null
+  // Active modules for this venue
+  active_modules: AppModule[]
   created_at: string
 }
 
@@ -347,6 +352,20 @@ export interface Database {
         Insert: Omit<R2OSalesLog, 'id' | 'created_at'> & { id?: string; created_at?: string }
         Update: Partial<Omit<R2OSalesLog, 'id' | 'profile_id'>>
       }
+      bar_inventory: {
+        Row: BarInventoryItem
+        Insert: Omit<BarInventoryItem, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<BarInventoryItem, 'id' | 'profile_id'>>
+      }
+      bar_transactions: {
+        Row: BarTransaction
+        Insert: Omit<BarTransaction, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<BarTransaction, 'id' | 'profile_id'>>
+      }
     }
   }
 }
@@ -470,6 +489,56 @@ export interface R2OSalesLog {
   created_at: string
 }
 
+// ============================================================================
+// BAR MODULE TYPES
+// ============================================================================
+
+export type BarIngredientCategory =
+  | 'spirit' | 'liqueur' | 'wine' | 'beer'
+  | 'mixer' | 'syrup' | 'juice' | 'bitter'
+  | 'garnish' | 'ice' | 'other'
+
+export type BarUnitType = 'ml' | 'g' | 'pcs'
+
+// Bartender-specific portion units (used in recipes, converted to base units)
+export type BarPortionUnit =
+  | 'ml' | 'g' | 'pcs'
+  | 'oz' | 'cl'
+  | 'dash' | 'barspoon' | 'drop'
+  | 'slice' | 'sprig' | 'wedge' | 'twist'
+
+export type BarTransactionType = 'purchase' | 'sale' | 'waste' | 'adjustment'
+
+export interface BarInventoryItem {
+  id: string
+  profile_id: string
+  name: string
+  brand: string | null
+  category: BarIngredientCategory
+  unit_type: BarUnitType
+  quantity: number
+  min_quantity: number
+  purchase_price: number | null
+  package_size: number
+  supplier_name: string | null
+  barcode: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface BarTransaction {
+  id: string
+  profile_id: string
+  bar_inventory_id: string
+  type: BarTransactionType
+  quantity: number
+  unit_type: BarUnitType
+  related_sale_id: string | null
+  notes: string | null
+  created_at: string
+}
+
 // Extended marketplace types with relations
 export interface SupplierWithProducts extends Supplier {
   products: SupplierProduct[]
@@ -503,6 +572,8 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: false,
     auto_reorder: false,
     pos_integration: false,
+    bar_module: false,
+    bar_inventory_items: 10,
   },
   pro: {
     inventory_items: Infinity,
@@ -513,6 +584,8 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: true,
     auto_reorder: false,
     pos_integration: true,
+    bar_module: true,
+    bar_inventory_items: Infinity,
   },
   enterprise: {
     inventory_items: Infinity,
@@ -523,5 +596,7 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: true,
     auto_reorder: true,
     pos_integration: true,
+    bar_module: true,
+    bar_inventory_items: Infinity,
   },
 } as const

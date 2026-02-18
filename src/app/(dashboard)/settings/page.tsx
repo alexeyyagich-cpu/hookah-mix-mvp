@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
+import { useModules } from '@/lib/hooks/useModules'
 import { useReady2Order } from '@/lib/hooks/useReady2Order'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { usePushNotifications } from '@/lib/hooks/usePushNotifications'
@@ -15,6 +16,7 @@ import Link from 'next/link'
 export default function SettingsPage() {
   const { user, profile, refreshProfile, signOut, isDemoMode } = useAuth()
   const { tier, isExpired, daysUntilExpiry, canUsePOS } = useSubscription()
+  const { modules, isBarActive, canActivateBar, toggleModule, loading: modulesLoading } = useModules()
   const { connection: r2oConnection, loading: r2oLoading, error: r2oError, syncing: r2oSyncing, syncResult: r2oSyncResult, connect: r2oConnect, disconnect: r2oDisconnect, sync: r2oSync, refresh: r2oRefresh } = useReady2Order()
   const searchParams = useSearchParams()
 
@@ -162,6 +164,71 @@ export default function SettingsPage() {
                 {tier === 'free' ? 'Обновить' : 'Изменить тариф'}
               </Link>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modules */}
+      <div className="card p-6 space-y-5">
+        <h2 className="text-lg font-semibold">Модули заведения</h2>
+        <p className="text-sm text-[var(--color-textMuted)]">
+          Включайте нужные разделы для вашего бизнеса
+        </p>
+
+        <div className="space-y-4">
+          {/* Hookah - always on */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🔥</span>
+              <div>
+                <h3 className="font-medium">Кальянная</h3>
+                <p className="text-xs text-[var(--color-textMuted)]">Табак, миксы, чаши, сессии</p>
+              </div>
+            </div>
+            <span className="text-xs text-[var(--color-success)] font-medium">Всегда активен</span>
+          </div>
+
+          {/* Bar */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🍸</span>
+              <div>
+                <h3 className="font-medium">Бар</h3>
+                <p className="text-xs text-[var(--color-textMuted)]">Ингредиенты, рецепты, меню, продажи</p>
+              </div>
+            </div>
+            {canActivateBar ? (
+              <button
+                onClick={() => toggleModule('bar')}
+                disabled={modulesLoading}
+                className={`relative w-12 h-6 rounded-full transition-colors ${
+                  isBarActive ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
+                }`}
+              >
+                <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                  isBarActive ? 'left-7' : 'left-1'
+                }`} />
+              </button>
+            ) : (
+              <Link href="/pricing" className="flex items-center gap-1 text-xs text-[var(--color-textMuted)]">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Pro
+              </Link>
+            )}
+          </div>
+
+          {/* Kitchen - coming soon */}
+          <div className="flex items-center justify-between opacity-50">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🍳</span>
+              <div>
+                <h3 className="font-medium">Кухня</h3>
+                <p className="text-xs text-[var(--color-textMuted)]">Продукты, рецепты, калькуляция</p>
+              </div>
+            </div>
+            <span className="text-xs text-[var(--color-textMuted)]">Скоро</span>
           </div>
         </div>
       </div>

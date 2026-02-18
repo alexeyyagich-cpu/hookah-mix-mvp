@@ -746,3 +746,50 @@ export function IconBarcode({ size = 24, color = "currentColor", className }: Ic
     </svg>
   );
 }
+
+// Bar module icons
+
+export function IconBar({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M8 2L1 12H15L8 2Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 12V20" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M4 20H12" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="18" cy="8" r="4" stroke={color} strokeWidth="2" />
+      <path d="M18 12V20" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconCocktail({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M8 2H20L14 10V18H16V20H8V18H10V10L4 2H8Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 6H17" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconMenuList({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M4 6H20" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M4 10H14" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M4 14H20" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <path d="M4 18H14" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="18" cy="10" r="2" fill={color} opacity="0.4" />
+      <circle cx="18" cy="18" r="2" fill={color} opacity="0.4" />
+    </svg>
+  );
+}
+
+export function IconModule({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" stroke={color} strokeWidth="2" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" stroke={color} strokeWidth="2" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" stroke={color} strokeWidth="2" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" stroke={color} strokeWidth="2" opacity="0.4" />
+    </svg>
+  );
+}

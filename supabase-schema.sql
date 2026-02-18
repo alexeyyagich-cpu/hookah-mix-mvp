@@ -936,3 +936,66 @@ CREATE POLICY "Users manage own r2o sales log" ON public.r2o_sales_log
 -- Indexes
 CREATE INDEX idx_r2o_sales_log_profile_id ON public.r2o_sales_log(profile_id);
 CREATE INDEX idx_r2o_sales_log_created_at ON public.r2o_sales_log(created_at DESC);
+
+-- ===========================================
+-- MODULE SYSTEM - Add active_modules to profiles
+-- ===========================================
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS active_modules JSONB DEFAULT '["hookah"]'::jsonb;
+
+-- ===========================================
+-- BAR INVENTORY TABLE
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.bar_inventory (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  brand TEXT,
+  category TEXT NOT NULL CHECK (category IN (
+    'spirit', 'liqueur', 'wine', 'beer',
+    'mixer', 'syrup', 'juice', 'bitter',
+    'garnish', 'ice', 'other'
+  )),
+  unit_type TEXT NOT NULL CHECK (unit_type IN ('ml', 'g', 'pcs')),
+  quantity DECIMAL NOT NULL DEFAULT 0,
+  min_quantity DECIMAL DEFAULT 0,
+  purchase_price DECIMAL,
+  package_size DECIMAL DEFAULT 1000,
+  supplier_name TEXT,
+  barcode TEXT,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.bar_inventory ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own bar inventory" ON public.bar_inventory
+  FOR ALL USING (auth.uid() = profile_id);
+
+CREATE INDEX idx_bar_inventory_profile_id ON public.bar_inventory(profile_id);
+CREATE INDEX idx_bar_inventory_category ON public.bar_inventory(category);
+
+-- ===========================================
+-- BAR TRANSACTIONS TABLE
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.bar_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  bar_inventory_id UUID REFERENCES public.bar_inventory(id) ON DELETE CASCADE NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('purchase', 'sale', 'waste', 'adjustment')),
+  quantity DECIMAL NOT NULL,
+  unit_type TEXT NOT NULL CHECK (unit_type IN ('ml', 'g', 'pcs')),
+  related_sale_id UUID,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.bar_transactions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own bar transactions" ON public.bar_transactions
+  FOR ALL USING (auth.uid() = profile_id);
+
+CREATE INDEX idx_bar_transactions_profile_id ON public.bar_transactions(profile_id);
+CREATE INDEX idx_bar_transactions_inventory_id ON public.bar_transactions(bar_inventory_id);
+CREATE INDEX idx_bar_transactions_created_at ON public.bar_transactions(created_at DESC);

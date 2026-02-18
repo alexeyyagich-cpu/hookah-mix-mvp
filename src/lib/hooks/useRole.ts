@@ -22,6 +22,9 @@ export type Permission =
   | 'guests.manage'
   | 'bowls.view'
   | 'bowls.edit'
+  | 'bar.view'
+  | 'bar.edit'
+  | 'bar.sales'
 
 // Role-based permissions matrix
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
@@ -42,6 +45,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'guests.manage',
     'bowls.view',
     'bowls.edit',
+    'bar.view',
+    'bar.edit',
+    'bar.sales',
   ],
   staff: [
     'dashboard.view',
@@ -57,6 +63,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'guests.manage',
     'bowls.view',
     // bowls.edit - NO
+    'bar.view',
+    // bar.edit - NO
+    // bar.sales - NO
   ],
   guest: [
     // Guests only access menu via /menu/[slug]
