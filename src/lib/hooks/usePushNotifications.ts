@@ -71,18 +71,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     checkSupport()
   }, [])
 
-  // Register service worker
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
-
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => {
-        // Service Worker registered
-      })
-      .catch((error) => {
-        console.error('Service Worker registration failed:', error)
-      })
-  }, [])
+  // SW registration is handled by ServiceWorkerRegistration component
 
   const subscribe = useCallback(async (): Promise<boolean> => {
     if (!state.isSupported) {

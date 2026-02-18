@@ -9,6 +9,8 @@ import { BrandLoader } from '@/components/BrandLoader'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { useOnboarding } from '@/lib/hooks/useOnboarding'
+import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
+import { InstallBanner } from '@/components/InstallBanner'
 
 function PageTransition() {
   const pathname = usePathname()
@@ -114,12 +116,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <div id="page-background" className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />
       {!isOnboarding && <Sidebar />}
       <main className={isOnboarding ? '' : 'lg:pl-72 relative'} style={{ zIndex: 1 }}>
+        {!isOnboarding && <InstallBanner />}
         <div className={isOnboarding ? '' : 'p-4 pt-16 lg:p-8 lg:pt-8'}>
           {children}
         </div>
       </main>
       <PageTransition />
       {!isOnboarding && <LowStockNotifier />}
+      <ServiceWorkerRegistration />
       <Toaster
         position="top-right"
         toastOptions={{

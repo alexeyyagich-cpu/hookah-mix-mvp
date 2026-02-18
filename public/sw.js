@@ -1,11 +1,15 @@
 // Service Worker for Push Notifications + PWA Offline Caching
-const CACHE_NAME = 'hookah-torus-v10'
+const CACHE_NAME = 'hookah-torus-v11'
 
 // App shell URLs to precache
 const APP_SHELL_URLS = [
   '/dashboard',
   '/mix',
   '/inventory',
+  '/bowls',
+  '/sessions',
+  '/kds',
+  '/statistics',
   '/offline',
 ]
 
@@ -19,7 +23,7 @@ self.addEventListener('install', (event) => {
       console.log('Precache failed (non-critical):', err)
     })
   )
-  self.skipWaiting()
+  // Do NOT call self.skipWaiting() here — controlled via SKIP_WAITING message
 })
 
 // Activate event — clean up old caches
@@ -34,6 +38,13 @@ self.addEventListener('activate', (event) => {
       )
     }).then(() => clients.claim())
   )
+})
+
+// Handle SKIP_WAITING message from client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
 })
 
 // Fetch event — network-first for pages, cache-first for static assets
