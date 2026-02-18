@@ -1089,3 +1089,38 @@ CREATE POLICY "Users manage own bar sales" ON public.bar_sales
 CREATE INDEX idx_bar_sales_profile_id ON public.bar_sales(profile_id);
 CREATE INDEX idx_bar_sales_sold_at ON public.bar_sales(profile_id, sold_at DESC);
 CREATE INDEX idx_bar_sales_recipe_id ON public.bar_sales(recipe_id);
+
+-- ===========================================
+-- KDS ORDERS TABLE
+-- ===========================================
+CREATE TABLE IF NOT EXISTS public.kds_orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  profile_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  table_id UUID REFERENCES public.floor_tables(id) ON DELETE SET NULL,
+  table_name TEXT,
+  guest_name TEXT,
+  type TEXT NOT NULL CHECK (type IN ('bar', 'hookah')),
+  items JSONB NOT NULL DEFAULT '[]',
+  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'preparing', 'ready', 'served', 'cancelled')),
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  completed_at TIMESTAMPTZ
+);
+
+ALTER TABLE public.kds_orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own kds_orders" ON public.kds_orders
+  FOR ALL USING (
+    profile_id = auth.uid()
+    OR profile_id IN (
+      SELECT p.owner_profile_id FROM public.profiles p WHERE p.id = auth.uid()
+    )
+    OR auth.uid() IN (
+      SELECT p.id FROM public.profiles p WHERE p.owner_profile_id = kds_orders.profile_id
+    )
+  );
+
+CREATE INDEX idx_kds_orders_active
+  ON public.kds_orders (profile_id, status)
+  WHERE status NOT IN ('served', 'cancelled');

@@ -78,6 +78,7 @@ const navigationGroups: NavGroup[] = [
     items: [
       { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
       { name: 'Бронирования', href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
+      { name: 'KDS Заказы', href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
       { name: 'Статистика', href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
       { name: 'Отчеты P&L', href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
     ],

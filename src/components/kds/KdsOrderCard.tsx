@@ -1,0 +1,163 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { IconTimer, IconCocktail, IconBowl, IconClose } from '@/components/Icons'
+import type { KdsOrder, KdsOrderStatus } from '@/types/database'
+
+interface KdsOrderCardProps {
+  order: KdsOrder
+  onAction: (orderId: string, newStatus: KdsOrderStatus) => Promise<void>
+  onCancel: (orderId: string) => Promise<void>
+}
+
+const NEXT_STATUS: Record<string, KdsOrderStatus> = {
+  new: 'preparing',
+  preparing: 'ready',
+  ready: 'served',
+}
+
+const ACTION_LABELS: Record<string, string> = {
+  new: 'Взять',
+  preparing: 'Готово',
+  ready: 'Подано',
+}
+
+const BORDER_COLORS: Record<string, string> = {
+  new: 'border-[var(--color-warning)]',
+  preparing: 'border-[var(--color-primary)]',
+  ready: 'border-[var(--color-success)]',
+}
+
+const ACTION_STYLES: Record<string, string> = {
+  new: 'bg-[var(--color-primary)] text-white hover:opacity-90',
+  preparing: 'bg-[var(--color-success)] text-white hover:opacity-90',
+  ready: 'border border-[var(--color-border)] text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]',
+}
+
+function formatElapsed(ms: number): string {
+  const totalMinutes = Math.floor(ms / 60000)
+  const seconds = Math.floor((ms % 60000) / 1000)
+  if (totalMinutes < 1) return `${seconds}с`
+  return `${totalMinutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+function getTimerColor(ms: number): string {
+  const minutes = ms / 60000
+  if (minutes < 5) return 'text-[var(--color-success)]'
+  if (minutes < 10) return 'text-[var(--color-warning)]'
+  return 'text-[var(--color-danger)]'
+}
+
+export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
+  const [elapsed, setElapsed] = useState(Date.now() - new Date(order.created_at).getTime())
+  const [acting, setActing] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsed(Date.now() - new Date(order.created_at).getTime())
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [order.created_at])
+
+  const handleAction = async () => {
+    const next = NEXT_STATUS[order.status]
+    if (!next) return
+    setActing(true)
+    try {
+      await onAction(order.id, next)
+    } finally {
+      setActing(false)
+    }
+  }
+
+  const handleCancel = async () => {
+    setActing(true)
+    try {
+      await onCancel(order.id)
+    } finally {
+      setActing(false)
+    }
+  }
+
+  const isBar = order.type === 'bar'
+  const canCancel = order.status === 'new' || order.status === 'preparing'
+
+  return (
+    <div className={`card border-l-4 ${BORDER_COLORS[order.status]} p-4 space-y-3 transition-all`}>
+      {/* Header: table + timer */}
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold truncate">
+            {order.table_name || 'Без стола'}
+          </div>
+          {order.guest_name && (
+            <div className="text-xs text-[var(--color-textMuted)] truncate">
+              {order.guest_name}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className={`flex items-center gap-1 text-sm font-mono font-medium ${getTimerColor(elapsed)}`}>
+            <IconTimer size={14} />
+            {formatElapsed(elapsed)}
+          </div>
+          {canCancel && (
+            <button
+              onClick={handleCancel}
+              disabled={acting}
+              className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
+              title="Отменить"
+            >
+              <IconClose size={14} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Type badge */}
+      <div className="flex items-center gap-1.5">
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
+          isBar
+            ? 'bg-indigo-500/10 text-indigo-400'
+            : 'bg-orange-500/10 text-orange-400'
+        }`}>
+          {isBar ? <IconCocktail size={12} /> : <IconBowl size={12} />}
+          {isBar ? 'Бар' : 'Кальянная'}
+        </span>
+      </div>
+
+      {/* Items */}
+      <div className="space-y-1.5">
+        {order.items.map((item, i) => (
+          <div key={i} className="flex items-start gap-2">
+            <span className="text-xs text-[var(--color-textMuted)] mt-0.5 w-4 flex-shrink-0">
+              {item.quantity > 1 ? `${item.quantity}x` : ''}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium">{item.name}</div>
+              {item.details && (
+                <div className="text-xs text-[var(--color-textMuted)]">{item.details}</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Notes */}
+      {order.notes && (
+        <div className="text-xs text-[var(--color-textMuted)] italic px-1">
+          {order.notes}
+        </div>
+      )}
+
+      {/* Action button */}
+      <button
+        onClick={handleAction}
+        disabled={acting}
+        className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${ACTION_STYLES[order.status]} ${acting ? 'opacity-50' : ''}`}
+      >
+        {acting ? '...' : ACTION_LABELS[order.status]}
+      </button>
+    </div>
+  )
+}

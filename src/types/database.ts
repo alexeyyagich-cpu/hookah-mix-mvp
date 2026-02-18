@@ -397,6 +397,17 @@ export interface Database {
         Insert: Omit<BarSale, 'id' | 'sold_at'> & { id?: string; sold_at?: string }
         Update: Partial<Omit<BarSale, 'id' | 'profile_id'>>
       }
+      kds_orders: {
+        Row: KdsOrder
+        Insert: Omit<KdsOrder, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'status'> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          completed_at?: string | null
+          status?: KdsOrderStatus
+        }
+        Update: Partial<Omit<KdsOrder, 'id' | 'profile_id'>>
+      }
     }
   }
 }
@@ -656,6 +667,34 @@ export interface BarAnalytics {
   topCocktails: { name: string; count: number; revenue: number }[]
   revenueByDay: { date: string; revenue: number; cost: number }[]
   costByCategory: { category: string; cost: number }[]
+}
+
+// ============================================================================
+// KDS (KITCHEN DISPLAY SYSTEM) TYPES
+// ============================================================================
+
+export type KdsOrderStatus = 'new' | 'preparing' | 'ready' | 'served' | 'cancelled'
+export type KdsOrderType = 'bar' | 'hookah'
+
+export interface KdsOrderItem {
+  name: string
+  quantity: number
+  details: string | null
+}
+
+export interface KdsOrder {
+  id: string
+  profile_id: string
+  table_id: string | null
+  table_name: string | null
+  guest_name: string | null
+  type: KdsOrderType
+  items: KdsOrderItem[]
+  status: KdsOrderStatus
+  notes: string | null
+  created_at: string
+  updated_at: string
+  completed_at: string | null
 }
 
 // Extended marketplace types with relations
