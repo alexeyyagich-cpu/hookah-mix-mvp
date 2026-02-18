@@ -1,0 +1,82 @@
+'use client'
+
+interface DayRevenue {
+  date: string
+  revenue: number
+  cost: number
+}
+
+interface BarRevenueChartProps {
+  data: DayRevenue[]
+}
+
+export function BarRevenueChart({ data }: BarRevenueChartProps) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
+        Нет данных для отображения
+      </div>
+    )
+  }
+
+  const maxRevenue = Math.max(...data.map(d => d.revenue), 1)
+  const chartHeight = 140
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-end gap-2 px-1" style={{ height: chartHeight }}>
+        {data.map((day) => {
+          const revenueHeight = Math.max((day.revenue / maxRevenue) * chartHeight, 4)
+          const costHeight = Math.max((day.cost / maxRevenue) * chartHeight, 2)
+
+          return (
+            <div
+              key={day.date}
+              className="flex-1 flex flex-col justify-end items-center group relative"
+              style={{ height: chartHeight }}
+            >
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
+                <div className="font-medium text-[var(--color-success)]">{day.revenue.toFixed(0)}€</div>
+                <div className="text-[var(--color-textMuted)]">Себ. {day.cost.toFixed(0)}€</div>
+              </div>
+
+              <div className="w-full relative">
+                <div
+                  className="w-full rounded-t-md bg-[var(--color-success)] hover:opacity-80 transition-all cursor-pointer"
+                  style={{ height: revenueHeight }}
+                />
+                <div
+                  className="w-full bg-[var(--color-danger)]/30 absolute bottom-0 left-0 rounded-t-md pointer-events-none"
+                  style={{ height: costHeight }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="flex gap-2 px-1">
+        {data.map((day, index) => (
+          <div key={day.date} className="flex-1 text-center">
+            {(data.length <= 7 || index === 0 || index === data.length - 1) && (
+              <div className="text-[10px] text-[var(--color-textMuted)]">
+                {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-center gap-6 text-sm text-[var(--color-textMuted)]">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm bg-[var(--color-success)]" />
+          Выручка
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-sm bg-[var(--color-danger)]/30" />
+          Себестоимость
+        </div>
+      </div>
+    </div>
+  )
+}
