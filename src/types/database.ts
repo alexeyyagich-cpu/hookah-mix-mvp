@@ -6,7 +6,10 @@ export type UserRole = 'owner' | 'staff' | 'guest'
 // Module system - switchable feature areas
 export type AppModule = 'hookah' | 'bar' | 'kitchen'
 
-export type OnboardingStep = 'welcome' | 'business' | 'bowl' | 'tobacco' | 'complete'
+// Business type — selected during onboarding
+export type BusinessType = 'hookah' | 'bar' | 'hookah_bar' | 'restaurant'
+
+export type OnboardingStep = 'welcome' | 'business_type' | 'business' | 'setup' | 'complete' | 'bowl' | 'tobacco'
 
 export interface Profile {
   id: string
@@ -29,6 +32,8 @@ export interface Profile {
   onboarding_completed: boolean
   onboarding_skipped: boolean
   onboarding_step: OnboardingStep | null
+  // Business type selected during onboarding
+  business_type: BusinessType | null
   // Active modules for this venue
   active_modules: AppModule[]
   created_at: string
@@ -686,7 +691,7 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: false,
     auto_reorder: false,
     pos_integration: false,
-    bar_module: false,
+    bar_module: true,
     bar_inventory_items: 10,
   },
   pro: {

@@ -4,17 +4,26 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
-import type { OnboardingStep } from '@/types/database'
+import type { OnboardingStep, BusinessType, AppModule } from '@/types/database'
 
-export type { OnboardingStep }
+export type { OnboardingStep, BusinessType }
 
-const STEPS_ORDER: OnboardingStep[] = ['welcome', 'business', 'bowl', 'tobacco', 'complete']
+const STEPS_ORDER: OnboardingStep[] = ['welcome', 'business_type', 'business', 'setup', 'complete']
+
+// Map old step values to new ones for backward compat
+function normalizeStep(step: string | null): OnboardingStep {
+  if (!step) return 'welcome'
+  if (step === 'bowl' || step === 'tobacco') return 'setup'
+  if (STEPS_ORDER.includes(step as OnboardingStep)) return step as OnboardingStep
+  return 'welcome'
+}
 
 interface OnboardingState {
   currentStep: OnboardingStep
   completedSteps: OnboardingStep[]
   isComplete: boolean
   skipped: boolean
+  businessType: BusinessType | null
 }
 
 interface UseOnboardingReturn {
@@ -29,6 +38,7 @@ interface UseOnboardingReturn {
   completeStep: (step: OnboardingStep) => Promise<void>
   skipOnboarding: () => Promise<void>
   finishOnboarding: () => Promise<void>
+  setBusinessType: (type: BusinessType) => Promise<void>
   shouldShowOnboarding: boolean
 }
 
@@ -37,6 +47,7 @@ const DEFAULT_STATE: OnboardingState = {
   completedSteps: [],
   isComplete: false,
   skipped: false,
+  businessType: null,
 }
 
 export function useOnboarding(): UseOnboardingReturn {
@@ -53,16 +64,15 @@ export function useOnboarding(): UseOnboardingReturn {
     }
 
     if (isDemoMode) {
-      // Demo mode - show onboarding as not completed for demo purposes
       setState({
         ...DEFAULT_STATE,
-        isComplete: true, // Skip onboarding in demo mode
+        isComplete: true,
+        businessType: 'hookah_bar',
       })
       setLoading(false)
       return
     }
 
-    // Check if profile has onboarding data
     const loadOnboardingState = async () => {
       if (!supabase) {
         setLoading(false)
@@ -72,16 +82,17 @@ export function useOnboarding(): UseOnboardingReturn {
       try {
         const { data } = await supabase
           .from('profiles')
-          .select('onboarding_completed, onboarding_skipped, onboarding_step')
+          .select('onboarding_completed, onboarding_skipped, onboarding_step, business_type')
           .eq('id', user.id)
           .single()
 
         if (data) {
           setState({
-            currentStep: (data.onboarding_step as OnboardingStep) || 'welcome',
+            currentStep: normalizeStep(data.onboarding_step),
             completedSteps: [],
             isComplete: data.onboarding_completed || false,
             skipped: data.onboarding_skipped || false,
+            businessType: (data.business_type as BusinessType) || null,
           })
         }
       } catch (error) {
@@ -97,11 +108,7 @@ export function useOnboarding(): UseOnboardingReturn {
   const totalSteps = STEPS_ORDER.length - 1 // Exclude 'complete'
   const progress = Math.round((currentStepIndex / totalSteps) * 100)
 
-  const saveState = useCallback(async (updates: Partial<{
-    onboarding_step: string
-    onboarding_completed: boolean
-    onboarding_skipped: boolean
-  }>) => {
+  const saveState = useCallback(async (updates: Record<string, unknown>) => {
     if (!user || isDemoMode || !supabase) return
 
     try {
@@ -149,6 +156,23 @@ export function useOnboarding(): UseOnboardingReturn {
     nextStep()
   }, [nextStep])
 
+  const setBusinessType = useCallback(async (type: BusinessType) => {
+    // Compute active modules from business type
+    const moduleMap: Record<BusinessType, AppModule[]> = {
+      hookah: ['hookah'],
+      bar: ['bar'],
+      hookah_bar: ['hookah', 'bar'],
+      restaurant: ['bar'],
+    }
+    const activeModules = moduleMap[type]
+
+    setState(prev => ({ ...prev, businessType: type }))
+    await saveState({
+      business_type: type,
+      active_modules: activeModules,
+    })
+  }, [saveState])
+
   const skipOnboarding = useCallback(async () => {
     setState(prev => ({
       ...prev,
@@ -190,6 +214,7 @@ export function useOnboarding(): UseOnboardingReturn {
     completeStep,
     skipOnboarding,
     finishOnboarding,
+    setBusinessType,
     shouldShowOnboarding,
   }
 }

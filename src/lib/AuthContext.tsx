@@ -34,6 +34,8 @@ const DEMO_PROFILE: Profile = {
   onboarding_completed: true,
   onboarding_skipped: false,
   onboarding_step: 'complete',
+  // Business type
+  business_type: 'hookah_bar',
   // Modules - all active for demo
   active_modules: ['hookah', 'bar'],
   created_at: new Date().toISOString(),

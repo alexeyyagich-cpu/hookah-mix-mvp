@@ -17,7 +17,6 @@ import {
   IconSettings,
   IconCalculator,
   IconLogout,
-  IconSmoke,
   IconShop,
   IconFloor,
   IconLock,
@@ -39,26 +38,57 @@ interface NavItem {
   module?: AppModule
 }
 
-// Navigation items with required permissions
-const navigation: NavItem[] = [
-  { name: 'Обзор', href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
-  // Hookah module
-  { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view', module: 'hookah' },
-  { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
-  { name: 'Бронирования', href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
-  { name: 'Отзывы', href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
-  { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
-  { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view', module: 'hookah' },
-  { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view', module: 'hookah' },
-  // Bar module
-  { name: 'Бар: Склад', href: '/bar/inventory', Icon: IconBar, permission: 'bar.view', module: 'bar' },
-  { name: 'Бар: Рецепты', href: '/bar/recipes', Icon: IconCocktail, permission: 'bar.view', module: 'bar' },
-  { name: 'Бар: Меню', href: '/bar/menu', Icon: IconMenuList, permission: 'bar.view', module: 'bar' },
-  { name: 'Бар: Продажи', href: '/bar/sales', Icon: IconCoin, permission: 'bar.sales', module: 'bar' },
-  // Common
-  { name: 'Статистика', href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
-  { name: 'Команда', href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
-  { name: 'Настройки', href: '/settings', Icon: IconSettings, permission: 'settings.view' },
+interface NavGroup {
+  label: string | null // null = no header
+  module?: AppModule // hide entire group if module inactive
+  items: NavItem[]
+}
+
+// Grouped navigation
+const navigationGroups: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { name: 'Обзор', href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
+    ],
+  },
+  {
+    label: 'КАЛЬЯННАЯ',
+    module: 'hookah',
+    items: [
+      { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view', module: 'hookah' },
+      { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view', module: 'hookah' },
+      { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view', module: 'hookah' },
+      { name: 'Калькулятор миксов', href: '/mix', Icon: IconCalculator, permission: 'dashboard.view', module: 'hookah' },
+    ],
+  },
+  {
+    label: 'БАР',
+    module: 'bar',
+    items: [
+      { name: 'Склад', href: '/bar/inventory', Icon: IconBar, permission: 'bar.view', module: 'bar' },
+      { name: 'Рецепты', href: '/bar/recipes', Icon: IconCocktail, permission: 'bar.view', module: 'bar' },
+      { name: 'Меню', href: '/bar/menu', Icon: IconMenuList, permission: 'bar.view', module: 'bar' },
+      { name: 'Продажи', href: '/bar/sales', Icon: IconCoin, permission: 'bar.sales', module: 'bar' },
+    ],
+  },
+  {
+    label: 'УПРАВЛЕНИЕ',
+    items: [
+      { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
+      { name: 'Бронирования', href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
+      { name: 'Статистика', href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
+    ],
+  },
+  {
+    label: 'ПРОЧЕЕ',
+    items: [
+      { name: 'Отзывы', href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
+      { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
+      { name: 'Команда', href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
+      { name: 'Настройки', href: '/settings', Icon: IconSettings, permission: 'settings.view' },
+    ],
+  },
 ]
 
 export function Sidebar() {
@@ -69,18 +99,27 @@ export function Sidebar() {
   const { role, hasPermission, isOwner, isStaff } = useRole()
   const { modules } = useModules()
 
-  // Filter navigation items by role permissions and active modules
-  const filteredNavigation = navigation.filter(item => {
-    // Check if user has permission for this item
-    if (!hasPermission(item.permission)) return false
-    // Module gating: if item belongs to a module, check if that module is active
-    if (item.module && !modules.includes(item.module)) return false
-    // Team page only for owners
-    if (item.href === '/settings/team' && !isOwner) return false
-    // Settings main page - hide for staff (they don't have settings.view)
-    if (item.href === '/settings' && isStaff) return false
-    return true
-  })
+  // Build flat list of all items for active-state matching
+  const allItems = navigationGroups.flatMap(g => g.items)
+
+  // Filter groups and items by role permissions and active modules
+  const filteredGroups = navigationGroups
+    .filter(group => {
+      // Hide entire group if its module is inactive
+      if (group.module && !modules.includes(group.module)) return false
+      return true
+    })
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item => {
+        if (!hasPermission(item.permission)) return false
+        if (item.module && !modules.includes(item.module)) return false
+        if (item.href === '/settings/team' && !isOwner) return false
+        if (item.href === '/settings' && isStaff) return false
+        return true
+      }),
+    }))
+    .filter(group => group.items.length > 0)
 
   const roleInfo = ROLE_LABELS[role]
 
@@ -137,49 +176,59 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation - filtered by role */}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {filteredNavigation.map((item) => {
-          // Exact match, or prefix match only if no other nav item is a more specific match
-          const isActive = pathname === item.href ||
-            (pathname.startsWith(item.href + '/') &&
-             !filteredNavigation.some(n => n.href !== item.href && n.href.startsWith(item.href) && pathname.startsWith(n.href)))
-          const Icon = item.Icon
-          const isLocked = item.proOnly && isFreeTier && isOwner
+      {/* Navigation - grouped by section */}
+      <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+        {filteredGroups.map((group, gi) => (
+          <div key={group.label || gi}>
+            {group.label && (
+              <div className="px-4 pt-2 pb-1 text-[10px] font-semibold text-[var(--color-textMuted)] uppercase tracking-widest">
+                {group.label}
+              </div>
+            )}
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const isActive = pathname === item.href ||
+                  (pathname.startsWith(item.href + '/') &&
+                   !allItems.some(n => n.href !== item.href && n.href.startsWith(item.href) && pathname.startsWith(n.href)))
+                const Icon = item.Icon
+                const isLocked = item.proOnly && isFreeTier && isOwner
 
-          if (isLocked) {
-            return (
-              <Link
-                key={item.name}
-                href="/pricing"
-                onClick={() => setMobileOpen(false)}
-                aria-label={`${item.name} — доступно в Pro тарифе`}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all"
-              >
-                <Icon size={20} aria-hidden="true" />
-                {item.name}
-                <IconLock size={14} className="ml-auto" aria-hidden="true" />
-              </Link>
-            )
-          }
+                if (isLocked) {
+                  return (
+                    <Link
+                      key={item.name}
+                      href="/pricing"
+                      onClick={() => setMobileOpen(false)}
+                      aria-label={`${item.name} — доступно в Pro тарифе`}
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all"
+                    >
+                      <Icon size={18} aria-hidden="true" />
+                      {item.name}
+                      <IconLock size={14} className="ml-auto" aria-hidden="true" />
+                    </Link>
+                  )
+                }
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              aria-current={isActive ? 'page' : undefined}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
-                  : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
-              }`}
-            >
-              <Icon size={20} aria-hidden="true" />
-              {item.name}
-            </Link>
-          )
-        })}
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                        : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
+                    }`}
+                  >
+                    <Icon size={18} aria-hidden="true" />
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Upgrade Banner */}
@@ -198,20 +247,13 @@ export function Sidebar() {
       )}
 
       {/* Bottom Actions */}
-      <div className="p-3 border-t border-[var(--color-border)] space-y-1">
-        <Link
-          href="/mix"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)] transition-colors"
-        >
-          <IconCalculator size={20} aria-hidden="true" />
-          Калькулятор миксов
-        </Link>
+      <div className="p-3 border-t border-[var(--color-border)]">
         <button
           onClick={() => signOut()}
           aria-label="Выйти из аккаунта"
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
         >
-          <IconLogout size={20} aria-hidden="true" />
+          <IconLogout size={18} aria-hidden="true" />
           Выйти
         </button>
       </div>

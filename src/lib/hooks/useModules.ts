@@ -25,9 +25,16 @@ export function useModules(): UseModulesReturn {
   const [demoModules, setDemoModules] = useState<AppModule[]>(['hookah', 'bar'])
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
+  // Business-type-aware default modules
+  const defaultModules: AppModule[] = profile?.business_type === 'bar'
+    ? ['bar']
+    : profile?.business_type === 'hookah_bar'
+      ? ['hookah', 'bar']
+      : ['hookah']
+
   const modules: AppModule[] = isDemoMode
     ? demoModules
-    : (profile?.active_modules || ['hookah'])
+    : (profile?.active_modules || defaultModules)
 
   const hasModule = useCallback((module: AppModule) => modules.includes(module), [modules])
 
@@ -36,15 +43,15 @@ export function useModules(): UseModulesReturn {
   const toggleModule = useCallback(async (module: AppModule): Promise<boolean> => {
     if (!user) return false
 
-    // Hookah is always on
-    if (module === 'hookah') return false
-
-    // Check subscription for bar
-    if (module === 'bar' && !canActivateBar) return false
-
+    // Can't disable the last active module
     const newModules = modules.includes(module)
       ? modules.filter(m => m !== module)
       : [...modules, module]
+
+    if (newModules.length === 0) return false
+
+    // Check subscription for bar
+    if (module === 'bar' && !modules.includes('bar') && !canActivateBar) return false
 
     // Demo mode: update local state
     if (isDemoMode || !supabase) {
