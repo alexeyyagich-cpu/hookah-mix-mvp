@@ -486,7 +486,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                         </div>
                         {lounge.show_prices && mix.price && (
                           <span className="text-lg font-bold text-[var(--color-primary)] whitespace-nowrap ml-2">
-                            ${mix.price}
+                            {mix.price}{'\u20AC'}
                           </span>
                         )}
                       </div>
@@ -526,7 +526,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                         </div>
                         {lounge.show_prices && mix.price && (
                           <span className="text-lg font-bold text-[var(--color-text)] whitespace-nowrap ml-2">
-                            ${mix.price}
+                            {mix.price}{'\u20AC'}
                           </span>
                         )}
                       </div>
