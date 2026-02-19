@@ -291,6 +291,18 @@ export const manage = {
   orEnterName: 'или введите имя',
   sessionActive: 'Сессия активна',
 
+  // One-Tap Serve
+  serveLastMix: 'Подать последний микс',
+  lastMixOf: (name: string) => `Последний микс ${name}`,
+  noSavedMix: (name: string) => `У ${name} нет сохранённого микса`,
+  deductFromStock: 'Списать со склада',
+  createNewMix: 'Создать новый микс',
+  serving: 'Подача...',
+  served: 'Подано!',
+  serveCoals: (n: number) => `${n} угля`,
+  servePacking: 'Забивка',
+  serveGrams: (n: number) => `${n}г`,
+
   // FloorPlan component
   addTableBtn: 'Добавить стол',
   noTablesEmpty: 'Нет столов',

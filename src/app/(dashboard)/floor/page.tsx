@@ -1,20 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
+import { useInventory } from '@/lib/hooks/useInventory'
+import { useSessions } from '@/lib/hooks/useSessions'
 import { IconSettings, IconCalendar } from '@/components/Icons'
 import { useTranslation, useLocale } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
+import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
-import type { FloorTable, ReservationStatus } from '@/types/database'
+import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
 
 const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',
@@ -32,13 +35,18 @@ export default function FloorPage() {
   const floorPlan = useFloorPlan()
   const { tables, setTableStatus, startSession, endSession, loading } = floorPlan
   const { reservations, assignTable, refresh: refreshReservations } = useReservations()
-  const { guests } = useGuests()
+  const { guests, recordVisit } = useGuests()
+  const { inventory } = useInventory()
+  const { createSession } = useSessions()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
   const [showQuickReserve, setShowQuickReserve] = useState(false)
   const [showLinkPicker, setShowLinkPicker] = useState(false)
   const [showGuestPicker, setShowGuestPicker] = useState(false)
   const [guestSearch, setGuestSearch] = useState('')
+  const [selectedGuestObj, setSelectedGuestObj] = useState<Guest | null>(null)
+  const [deductInventory, setDeductInventory] = useState(true)
+  const [serveStatus, setServeStatus] = useState<'idle' | 'serving' | 'served'>('idle')
   const [quickReserving, setQuickReserving] = useState(false)
   const [quickForm, setQuickForm] = useState({
     guest_name: '',
@@ -77,18 +85,37 @@ export default function FloorPage() {
     ? guests.filter(g => g.name.toLowerCase().includes(guestSearch.toLowerCase()))
     : guests.slice(0, 10)
 
+  // Recover guest object for occupied table (from state or by name match)
+  const occupiedGuest = useMemo(() => {
+    if (selectedGuestObj) return selectedGuestObj
+    if (activeSelectedTable?.status === 'occupied' && activeSelectedTable.current_guest_name) {
+      return guests.find(g => g.name === activeSelectedTable.current_guest_name) || null
+    }
+    return null
+  }, [selectedGuestObj, activeSelectedTable, guests])
+
+  // Quick-repeat result for the occupied guest
+  const serveRepeatResult = useMemo(() => {
+    if (!occupiedGuest || activeSelectedTable?.status !== 'occupied') return null
+    return quickRepeatGuest(occupiedGuest, inventory)
+  }, [occupiedGuest, activeSelectedTable, inventory])
+
   const handleTableSelect = (table: FloorTable) => {
     setSelectedTable(table)
     setShowQuickReserve(false)
     setShowLinkPicker(false)
     setShowGuestPicker(false)
     setGuestSearch('')
+    setSelectedGuestObj(null)
+    setServeStatus('idle')
   }
 
-  const handleStartSession = async (guestName: string) => {
+  const handleStartSession = async (guestName: string, guest?: Guest) => {
     if (!activeSelectedTable) return
     const sessionId = crypto.randomUUID()
     await startSession(activeSelectedTable.id, sessionId, guestName)
+    setSelectedGuestObj(guest || null)
+    setServeStatus('idle')
     setShowGuestPicker(false)
     setGuestSearch('')
   }
@@ -96,6 +123,63 @@ export default function FloorPage() {
   const handleEndSession = async () => {
     if (!activeSelectedTable) return
     await endSession(activeSelectedTable.id)
+    setSelectedGuestObj(null)
+    setServeStatus('idle')
+  }
+
+  const handleConfirmServe = async () => {
+    if (!serveRepeatResult || !serveRepeatResult.success || !occupiedGuest || !user) return
+    setServeStatus('serving')
+
+    try {
+      const { snapshot, tobaccos: resolvedTobaccos } = serveRepeatResult
+
+      // Build session items matching inventory
+      const sessionItems = resolvedTobaccos
+        .filter(rt => rt.available || rt.replacement)
+        .map(rt => {
+          const tobacco = rt.replacement || rt.tobacco
+          const invItem = inventory.find(
+            inv => inv.tobacco_id === tobacco.id ||
+              (inv.brand.toLowerCase() === tobacco.brand.toLowerCase() && inv.flavor.toLowerCase() === tobacco.flavor.toLowerCase())
+          )
+          const gramsUsed = Math.round((snapshot.total_grams * rt.percent) / 100)
+          return {
+            tobacco_inventory_id: invItem?.id || null,
+            tobacco_id: tobacco.id,
+            brand: tobacco.brand,
+            flavor: tobacco.flavor,
+            grams_used: gramsUsed,
+            percentage: rt.percent,
+          }
+        })
+
+      // Create session
+      await createSession(
+        {
+          bowl_type_id: null,
+          session_date: new Date().toISOString(),
+          total_grams: snapshot.total_grams,
+          compatibility_score: snapshot.compatibility_score,
+          notes: null,
+          rating: null,
+          duration_minutes: null,
+          created_by: user.id,
+          guest_id: occupiedGuest.id,
+        },
+        sessionItems,
+        deductInventory
+      )
+
+      // Record visit in guest CRM
+      await recordVisit(occupiedGuest.id, snapshot)
+
+      setServeStatus('served')
+      setTimeout(() => setServeStatus('idle'), 1500)
+    } catch (err) {
+      console.error('Serve error:', err)
+      setServeStatus('idle')
+    }
   }
 
   const handleQuickReserve = async () => {
@@ -384,6 +468,102 @@ export default function FloorPage() {
             </div>
           )}
 
+          {/* One-Tap Serve Panel */}
+          {activeSelectedTable.status === 'occupied' && occupiedGuest && serveRepeatResult && (
+            <div className="mb-4 p-4 rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/5">
+              {serveRepeatResult.success ? (
+                <>
+                  <h3 className="font-semibold text-sm mb-3">{tm.lastMixOf(occupiedGuest.name)}</h3>
+
+                  {/* Tobacco pills */}
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {serveRepeatResult.tobaccos.map((rt, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-1 rounded-full text-xs font-medium"
+                        style={{
+                          background: rt.tobacco.color + '20',
+                          color: rt.tobacco.color,
+                          border: `1px solid ${rt.tobacco.color}40`,
+                          opacity: rt.available ? 1 : 0.5,
+                          textDecoration: !rt.available && !rt.replacement ? 'line-through' : 'none',
+                        }}
+                      >
+                        {rt.tobacco.flavor} ({rt.percent}%)
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Mix details */}
+                  <p className="text-xs text-[var(--color-textMuted)] mb-2">
+                    {tm.serveGrams(serveRepeatResult.snapshot.total_grams)}
+                    {serveRepeatResult.snapshot.bowl_type && ` · ${serveRepeatResult.snapshot.bowl_type}`}
+                    {serveRepeatResult.snapshot.heat_setup && ` · ${tm.serveCoals(serveRepeatResult.snapshot.heat_setup.coals)}`}
+                  </p>
+
+                  {/* Warnings */}
+                  {serveRepeatResult.warnings.length > 0 && (
+                    <div className="mb-3 space-y-1">
+                      {serveRepeatResult.warnings.map((w, i) => (
+                        <p key={i} className="text-xs px-2 py-1 rounded-lg bg-[var(--color-warning)]/10 text-[var(--color-warning)]">
+                          {w.message}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Deduct toggle */}
+                  <label className="flex items-center gap-2 mb-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={deductInventory}
+                      onChange={(e) => setDeductInventory(e.target.checked)}
+                      className="w-4 h-4 rounded accent-[var(--color-success)]"
+                    />
+                    <span className="text-sm">{tm.deductFromStock}</span>
+                  </label>
+
+                  {/* Serve + Create new mix buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleConfirmServe}
+                      disabled={serveStatus !== 'idle'}
+                      className="flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
+                      style={{
+                        background: serveStatus === 'served' ? 'var(--color-success)' : 'var(--color-success)',
+                        color: 'white',
+                      }}
+                    >
+                      {serveStatus === 'serving' ? tm.serving :
+                       serveStatus === 'served' ? tm.served :
+                       tm.serveLastMix}
+                    </button>
+                    <Link
+                      href="/mix"
+                      className="flex-1 px-3 py-2.5 rounded-xl text-sm font-medium text-center transition-all"
+                      style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                    >
+                      {tm.createNewMix}
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-[var(--color-textMuted)] mb-3">
+                    {tm.noSavedMix(occupiedGuest.name)}
+                  </p>
+                  <Link
+                    href="/mix"
+                    className="block w-full px-3 py-2.5 rounded-xl text-sm font-medium text-center transition-all"
+                    style={{ background: 'var(--color-primary)', color: 'white' }}
+                  >
+                    {tm.createNewMix}
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Status change buttons */}
           <div className="grid grid-cols-2 gap-2">
             {([
@@ -451,10 +631,15 @@ export default function FloorPage() {
                   {filteredGuests.map(g => (
                     <button
                       key={g.id}
-                      onClick={() => handleStartSession(g.name)}
+                      onClick={() => handleStartSession(g.name, g)}
                       className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/10 transition-colors text-left text-sm"
                     >
-                      <span className="font-medium">{g.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{g.name}</span>
+                        {g.last_mix_snapshot && (
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--color-success)]/20 text-[var(--color-success)]">mix</span>
+                        )}
+                      </div>
                       {g.visit_count > 0 && (
                         <span className="text-xs text-[var(--color-textMuted)]">{g.visit_count}x</span>
                       )}
@@ -580,7 +765,7 @@ export default function FloorPage() {
           )}
 
           <button
-            onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false); setShowGuestPicker(false); setGuestSearch('') }}
+            onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false); setShowGuestPicker(false); setGuestSearch(''); setSelectedGuestObj(null); setServeStatus('idle') }}
             className="mt-3 px-4 py-2 rounded-xl text-sm w-full"
             style={{
               background: 'var(--color-bgHover)',

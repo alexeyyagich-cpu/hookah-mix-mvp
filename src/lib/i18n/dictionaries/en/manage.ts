@@ -285,6 +285,18 @@ export const manage: typeof ManageType = {
   orEnterName: 'or enter name',
   sessionActive: 'Session active',
 
+  // One-Tap Serve
+  serveLastMix: 'Serve last mix',
+  lastMixOf: (name: string) => `Last mix of ${name}`,
+  noSavedMix: (name: string) => `No saved mix for ${name}`,
+  deductFromStock: 'Deduct from stock',
+  createNewMix: 'Create new mix',
+  serving: 'Serving...',
+  served: 'Served!',
+  serveCoals: (n: number) => `${n} coals`,
+  servePacking: 'Packing',
+  serveGrams: (n: number) => `${n}g`,
+
   // FloorPlan component
   addTableBtn: 'Add table',
   noTablesEmpty: 'No tables',
