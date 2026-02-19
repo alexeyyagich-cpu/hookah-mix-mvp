@@ -38,6 +38,14 @@ export default function RecommendPage() {
   const t = useTranslation('hookah')
   const { locale } = useLocale()
   const router = useRouter()
+
+  const STRENGTH_LABEL_I18N: Record<StrengthPreference, string> = {
+    light: t.strengthLight, medium: t.strengthMedium, strong: t.strengthStrong,
+  }
+  const FLAVOR_LABEL_I18N: Record<FlavorProfile, string> = {
+    fresh: t.flavorFresh, fruity: t.flavorFruity, sweet: t.flavorSweet,
+    citrus: t.flavorCitrus, spicy: t.flavorSpicy, soda: t.flavorSoda,
+  }
   const { user, profile } = useAuth()
   const { inventory, loading: inventoryLoading } = useInventory()
   const { guests, loading: guestsLoading, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
@@ -477,7 +485,7 @@ export default function RecommendPage() {
                                 className="text-xs px-1.5 py-0.5 rounded"
                                 style={{ background: 'var(--color-bgHover)' }}
                               >
-                                {STRENGTH_LABELS[guest.strength_preference].emoji} {STRENGTH_LABELS[guest.strength_preference].labelRu}
+                                {STRENGTH_LABELS[guest.strength_preference].emoji} {STRENGTH_LABEL_I18N[guest.strength_preference]}
                               </span>
                             )}
                             {guest.flavor_profiles?.slice(0, 2).map(fp => (
@@ -571,7 +579,7 @@ export default function RecommendPage() {
                     <div className="text-center">
                       <span className="text-2xl mb-2 block">{info.emoji}</span>
                       <span className="font-semibold text-sm block" style={{ color: 'var(--color-text)' }}>
-                        {info.labelRu}
+                        {STRENGTH_LABEL_I18N[strength]}
                       </span>
                       <span className="text-xs mt-1 block" style={{ color: 'var(--color-textMuted)' }}>
                         {colorInfo.label}
@@ -644,7 +652,7 @@ export default function RecommendPage() {
                     }}
                   >
                     <span className="text-lg">{info.emoji}</span>
-                    <span className="font-medium text-sm">{info.labelRu}</span>
+                    <span className="font-medium text-sm">{FLAVOR_LABEL_I18N[profile]}</span>
                     {isSelected && (
                       <span
                         className="absolute top-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px]"
@@ -1064,6 +1072,15 @@ function GuestModal({
   initialData?: Guest
 }) {
   const t = useTranslation('hookah')
+
+  const STRENGTH_LABEL_I18N: Record<StrengthPreference, string> = {
+    light: t.strengthLight, medium: t.strengthMedium, strong: t.strengthStrong,
+  }
+  const FLAVOR_LABEL_I18N: Record<FlavorProfile, string> = {
+    fresh: t.flavorFresh, fruity: t.flavorFruity, sweet: t.flavorSweet,
+    citrus: t.flavorCitrus, spicy: t.flavorSpicy, soda: t.flavorSoda,
+  }
+
   const [name, setName] = useState(initialData?.name || '')
   const [phone, setPhone] = useState(initialData?.phone || '')
   const [notes, setNotes] = useState(initialData?.notes || '')
@@ -1177,7 +1194,7 @@ function GuestModal({
                     }
                   >
                     <span>{info.emoji}</span>
-                    <span>{info.labelRu}</span>
+                    <span>{STRENGTH_LABEL_I18N[s]}</span>
                   </button>
                 )
               })}
@@ -1206,7 +1223,7 @@ function GuestModal({
                     }
                   >
                     <span>{info.emoji}</span>
-                    <span>{info.labelRu}</span>
+                    <span>{FLAVOR_LABEL_I18N[fp]}</span>
                   </button>
                 )
               })}

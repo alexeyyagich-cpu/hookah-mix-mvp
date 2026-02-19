@@ -622,6 +622,17 @@ export const hookah: typeof HookahType = {
   menuCallBtn: 'Anrufen',
   menuFooter: 'Menue erstellt auf',
 
+  // Strength & flavor labels
+  strengthLight: 'Leicht',
+  strengthMedium: 'Mittel',
+  strengthStrong: 'Stark',
+  flavorFresh: 'Frisch/Kühl',
+  flavorFruity: 'Fruchtig',
+  flavorSweet: 'Süß',
+  flavorCitrus: 'Zitrus',
+  flavorSpicy: 'Würzig/Kräuter',
+  flavorSoda: 'Soda',
+
   // Units
   gramsShort: 'g',
   matchPercent: (score: number) => `${score}% Übereinstimmung`,

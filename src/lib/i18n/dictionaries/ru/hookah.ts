@@ -628,6 +628,17 @@ export const hookah = {
   menuCallBtn: 'Позвонить',
   menuFooter: 'Меню создано на платформе',
 
+  // Strength & flavor labels
+  strengthLight: 'Лёгкий',
+  strengthMedium: 'Средний',
+  strengthStrong: 'Крепкий',
+  flavorFresh: 'Свежий/Холодный',
+  flavorFruity: 'Фруктовый',
+  flavorSweet: 'Сладкий',
+  flavorCitrus: 'Цитрусовый',
+  flavorSpicy: 'Пряный/Травяной',
+  flavorSoda: 'Содовый',
+
   // Units
   gramsShort: 'г',
   matchPercent: (score: number) => `${score}% совпадение`,
