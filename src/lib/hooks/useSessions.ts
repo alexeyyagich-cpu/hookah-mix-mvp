@@ -15,6 +15,8 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   {
     id: '1',
     profile_id: 'demo',
+    created_by: null,
+    guest_id: null,
     bowl_type_id: '1',
     session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20,
@@ -31,6 +33,8 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   {
     id: '2',
     profile_id: 'demo',
+    created_by: null,
+    guest_id: null,
     bowl_type_id: '1',
     session_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 18,
@@ -47,6 +51,8 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   {
     id: '3',
     profile_id: 'demo',
+    created_by: null,
+    guest_id: null,
     bowl_type_id: '2',
     session_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 15,
@@ -146,12 +152,13 @@ export function useSessions(): UseSessionsReturn {
   ): Promise<Session | null> => {
     if (!user || !supabase) return null
 
-    // Create session
+    // Create session — created_by always tracks the actual logged-in user
     const { data: session, error: sessionError } = await supabase
       .from('sessions')
       .insert({
         ...sessionData,
         profile_id: user.id,
+        created_by: user.id,
         ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       })
       .select()

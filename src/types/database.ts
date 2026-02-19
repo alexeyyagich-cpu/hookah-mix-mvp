@@ -142,6 +142,8 @@ export interface BowlType {
 export interface Session {
   id: string
   profile_id: string
+  created_by: string | null
+  guest_id: string | null
   bowl_type_id: string | null
   session_date: string
   total_grams: number
@@ -748,6 +750,7 @@ export interface KdsOrderItem {
 export interface KdsOrder {
   id: string
   profile_id: string
+  created_by: string | null
   table_id: string | null
   table_name: string | null
   guest_name: string | null

@@ -84,6 +84,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
     const total = parseFloat(totalGrams) || 20
 
     const sessionData: Omit<Session, 'id' | 'profile_id'> = {
+      created_by: null,
+      guest_id: null,
       bowl_type_id: selectedBowl || null,
       session_date: new Date().toISOString(),
       total_grams: total,

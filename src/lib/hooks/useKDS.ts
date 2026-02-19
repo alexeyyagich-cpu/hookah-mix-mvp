@@ -12,6 +12,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
   {
     id: 'demo-kds-1',
     profile_id: 'demo',
+    created_by: null,
     table_id: '1',
     table_name: 'Стол 1',
     guest_name: 'Tomasz K.',
@@ -29,6 +30,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
   {
     id: 'demo-kds-2',
     profile_id: 'demo',
+    created_by: null,
     table_id: '3',
     table_name: 'VIP',
     guest_name: 'Max W.',
@@ -45,6 +47,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
   {
     id: 'demo-kds-3',
     profile_id: 'demo',
+    created_by: null,
     table_id: '5',
     table_name: 'Барная стойка',
     guest_name: 'Lena S.',
@@ -61,6 +64,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
   {
     id: 'demo-kds-4',
     profile_id: 'demo',
+    created_by: null,
     table_id: '1',
     table_name: 'Стол 1',
     guest_name: 'Tomasz K.',
@@ -77,6 +81,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
   {
     id: 'demo-kds-5',
     profile_id: 'demo',
+    created_by: null,
     table_id: '5',
     table_name: 'Барная стойка',
     guest_name: 'Lena S.',
@@ -223,6 +228,7 @@ export function useKDS(): UseKDSReturn {
 
     const orderData = {
       profile_id: effectiveProfileId,
+      created_by: user?.id || effectiveProfileId,
       ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       table_id: input.table_id,
       table_name: input.table_name,

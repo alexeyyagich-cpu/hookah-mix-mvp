@@ -277,6 +277,13 @@ export const manage: typeof ManageType = {
   reserveTimeLabel: 'Time',
   reserveBtn: 'Reserve',
   reserving: 'Reserving...',
+  startSessionBtn: 'Start session',
+  endSessionBtn: 'End session',
+  selectGuest: 'Select guest',
+  guestOptional: 'Guest (optional)',
+  noGuests: 'No guests',
+  orEnterName: 'or enter name',
+  sessionActive: 'Session active',
 
   // FloorPlan component
   addTableBtn: 'Add table',

@@ -283,6 +283,13 @@ export const manage = {
   reserveTimeLabel: 'Время',
   reserveBtn: 'Забронировать',
   reserving: 'Бронирование...',
+  startSessionBtn: 'Начать сессию',
+  endSessionBtn: 'Завершить сессию',
+  selectGuest: 'Выберите гостя',
+  guestOptional: 'Гость (опционально)',
+  noGuests: 'Нет гостей',
+  orEnterName: 'или введите имя',
+  sessionActive: 'Сессия активна',
 
   // FloorPlan component
   addTableBtn: 'Добавить стол',

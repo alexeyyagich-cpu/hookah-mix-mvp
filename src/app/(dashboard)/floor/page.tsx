@@ -8,6 +8,7 @@ import { useReservations } from '@/lib/hooks/useReservations'
 import { IconSettings, IconCalendar } from '@/components/Icons'
 import { useTranslation, useLocale } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
+import { useGuests } from '@/lib/hooks/useGuests'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
@@ -29,12 +30,15 @@ export default function FloorPage() {
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const floorPlan = useFloorPlan()
-  const { tables, setTableStatus, loading } = floorPlan
+  const { tables, setTableStatus, startSession, endSession, loading } = floorPlan
   const { reservations, assignTable, refresh: refreshReservations } = useReservations()
+  const { guests } = useGuests()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
   const [showQuickReserve, setShowQuickReserve] = useState(false)
   const [showLinkPicker, setShowLinkPicker] = useState(false)
+  const [showGuestPicker, setShowGuestPicker] = useState(false)
+  const [guestSearch, setGuestSearch] = useState('')
   const [quickReserving, setQuickReserving] = useState(false)
   const [quickForm, setQuickForm] = useState({
     guest_name: '',
@@ -68,10 +72,30 @@ export default function FloorPage() {
   // Unlinked today's reservations (for link picker)
   const unlinkedReservations = todayReservations.filter(r => !r.table_id)
 
+  // Filtered guests for picker
+  const filteredGuests = guestSearch.trim()
+    ? guests.filter(g => g.name.toLowerCase().includes(guestSearch.toLowerCase()))
+    : guests.slice(0, 10)
+
   const handleTableSelect = (table: FloorTable) => {
     setSelectedTable(table)
     setShowQuickReserve(false)
     setShowLinkPicker(false)
+    setShowGuestPicker(false)
+    setGuestSearch('')
+  }
+
+  const handleStartSession = async (guestName: string) => {
+    if (!activeSelectedTable) return
+    const sessionId = crypto.randomUUID()
+    await startSession(activeSelectedTable.id, sessionId, guestName)
+    setShowGuestPicker(false)
+    setGuestSearch('')
+  }
+
+  const handleEndSession = async () => {
+    if (!activeSelectedTable) return
+    await endSession(activeSelectedTable.id)
   }
 
   const handleQuickReserve = async () => {
@@ -343,6 +367,23 @@ export default function FloorPage() {
             </div>
           )}
 
+          {/* Session action buttons */}
+          {activeSelectedTable.status === 'occupied' && activeSelectedTable.session_start_time && (
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
+                <span className="text-sm font-medium text-[var(--color-primary)]">{tm.sessionActive}</span>
+              </div>
+              <button
+                onClick={handleEndSession}
+                className="w-full px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                style={{ background: 'var(--color-danger)', color: 'white' }}
+              >
+                {tm.endSessionBtn}
+              </button>
+            </div>
+          )}
+
           {/* Status change buttons */}
           <div className="grid grid-cols-2 gap-2">
             {([
@@ -354,15 +395,29 @@ export default function FloorPage() {
               <button
                 key={status}
                 onClick={async () => {
+                  if (status === 'occupied' && activeSelectedTable.status !== 'occupied') {
+                    // Show guest picker to start a proper session
+                    setShowGuestPicker(true)
+                    setShowQuickReserve(false)
+                    setShowLinkPicker(false)
+                    return
+                  }
                   if (status === 'reserved' && activeSelectedTable.status !== 'reserved') {
                     // Show quick reserve form instead of just toggling
                     setShowQuickReserve(true)
                     setShowLinkPicker(false)
+                    setShowGuestPicker(false)
                     return
                   }
                   if (status === 'available' && linkedReservation) {
                     // Unlink reservation when freeing table
                     await handleUnlinkReservation()
+                    return
+                  }
+                  if (status === 'available' && activeSelectedTable.session_start_time) {
+                    // End session when freeing table
+                    await handleEndSession()
+                    await setTableStatus(activeSelectedTable.id, 'available')
                     return
                   }
                   await setTableStatus(activeSelectedTable.id, status)
@@ -379,6 +434,52 @@ export default function FloorPage() {
               </button>
             ))}
           </div>
+
+          {/* Guest Picker (for starting session) */}
+          {showGuestPicker && (
+            <div className="mt-4 p-4 rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
+              <h3 className="font-semibold text-sm mb-3">{tm.guestOptional}</h3>
+              <input
+                type="text"
+                value={guestSearch}
+                onChange={(e) => setGuestSearch(e.target.value)}
+                placeholder={tm.guestNamePlaceholder}
+                className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm mb-2"
+              />
+              {filteredGuests.length > 0 && (
+                <div className="mb-2 max-h-40 overflow-y-auto space-y-1">
+                  {filteredGuests.map(g => (
+                    <button
+                      key={g.id}
+                      onClick={() => handleStartSession(g.name)}
+                      className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/10 transition-colors text-left text-sm"
+                    >
+                      <span className="font-medium">{g.name}</span>
+                      {g.visit_count > 0 && (
+                        <span className="text-xs text-[var(--color-textMuted)]">{g.visit_count}x</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setShowGuestPicker(false); setGuestSearch('') }}
+                  className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
+                  style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                >
+                  {tm.cancelBtn}
+                </button>
+                <button
+                  onClick={() => handleStartSession(guestSearch || '')}
+                  className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
+                  style={{ background: 'var(--color-primary)', color: 'white' }}
+                >
+                  {tm.startSessionBtn}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Quick Reserve Form */}
           {showQuickReserve && (
@@ -479,7 +580,7 @@ export default function FloorPage() {
           )}
 
           <button
-            onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false) }}
+            onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false); setShowGuestPicker(false); setGuestSearch('') }}
             className="mt-3 px-4 py-2 rounded-xl text-sm w-full"
             style={{
               background: 'var(--color-bgHover)',

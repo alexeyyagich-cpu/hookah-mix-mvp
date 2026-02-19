@@ -277,6 +277,13 @@ export const manage: typeof ManageType = {
   reserveTimeLabel: 'Uhrzeit',
   reserveBtn: 'Reservieren',
   reserving: 'Reservierung...',
+  startSessionBtn: 'Sitzung starten',
+  endSessionBtn: 'Sitzung beenden',
+  selectGuest: 'Gast auswählen',
+  guestOptional: 'Gast (optional)',
+  noGuests: 'Keine Gäste',
+  orEnterName: 'oder Namen eingeben',
+  sessionActive: 'Sitzung aktiv',
 
   // FloorPlan component
   addTableBtn: 'Tisch hinzufügen',

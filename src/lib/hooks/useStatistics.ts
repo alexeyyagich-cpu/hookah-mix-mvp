@@ -15,7 +15,7 @@ const DEMO_BOWL = { id: '1', profile_id: 'demo', name: 'Phunnel Large', capacity
 const DEMO_SESSIONS: SessionWithItems[] = [
   // Today - 2 sessions
   {
-    id: '1', profile_id: 'demo', bowl_type_id: '1',
+    id: '1', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     total_grams: 20, compatibility_score: 92, notes: null, rating: 5, duration_minutes: 52,
     session_items: [
@@ -25,7 +25,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     bowl_type: DEMO_BOWL,
   },
   {
-    id: '2', profile_id: 'demo', bowl_type_id: '1',
+    id: '2', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
     total_grams: 18, compatibility_score: 85, notes: null, rating: 4, duration_minutes: 45,
     session_items: [
@@ -36,7 +36,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   },
   // Yesterday - 3 sessions
   {
-    id: '3', profile_id: 'demo', bowl_type_id: '1',
+    id: '3', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20, compatibility_score: 90, notes: null, rating: 5, duration_minutes: 48,
     session_items: [
@@ -46,7 +46,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     bowl_type: DEMO_BOWL,
   },
   {
-    id: '4', profile_id: 'demo', bowl_type_id: '1',
+    id: '4', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 - 3 * 60 * 60 * 1000).toISOString(),
     total_grams: 18, compatibility_score: 82, notes: null, rating: 4, duration_minutes: 40,
     session_items: [
@@ -55,7 +55,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     bowl_type: DEMO_BOWL,
   },
   {
-    id: '5', profile_id: 'demo', bowl_type_id: '2',
+    id: '5', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '2',
     session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 - 6 * 60 * 60 * 1000).toISOString(),
     total_grams: 15, compatibility_score: 78, notes: null, rating: 3, duration_minutes: 35,
     session_items: [
@@ -65,7 +65,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   },
   // 2 days ago - 1 session
   {
-    id: '6', profile_id: 'demo', bowl_type_id: '1',
+    id: '6', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20, compatibility_score: 88, notes: null, rating: 4, duration_minutes: 50,
     session_items: [
@@ -76,7 +76,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   },
   // 3 days ago - 2 sessions
   {
-    id: '7', profile_id: 'demo', bowl_type_id: '1',
+    id: '7', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20, compatibility_score: 95, notes: 'Отличный микс!', rating: 5, duration_minutes: 55,
     session_items: [
@@ -86,7 +86,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     bowl_type: DEMO_BOWL,
   },
   {
-    id: '8', profile_id: 'demo', bowl_type_id: '1',
+    id: '8', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 - 4 * 60 * 60 * 1000).toISOString(),
     total_grams: 18, compatibility_score: 80, notes: null, rating: 4, duration_minutes: 42,
     session_items: [
@@ -97,7 +97,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   },
   // 5 days ago - 1 session
   {
-    id: '9', profile_id: 'demo', bowl_type_id: '1',
+    id: '9', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20, compatibility_score: 88, notes: null, rating: 4, duration_minutes: 47,
     session_items: [
@@ -108,7 +108,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   },
   // 6 days ago - 2 sessions
   {
-    id: '10', profile_id: 'demo', bowl_type_id: '1',
+    id: '10', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20, compatibility_score: 91, notes: null, rating: 5, duration_minutes: 53,
     session_items: [
@@ -118,7 +118,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     bowl_type: DEMO_BOWL,
   },
   {
-    id: '11', profile_id: 'demo', bowl_type_id: '2',
+    id: '11', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '2',
     session_date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000 - 5 * 60 * 60 * 1000).toISOString(),
     total_grams: 15, compatibility_score: 75, notes: null, rating: 3, duration_minutes: 30,
     session_items: [
