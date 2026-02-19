@@ -6,7 +6,8 @@ import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { OrgMember, InviteToken, OrgRole } from '@/types/database'
 
-// Demo team members for testing
+// Demo team members for presentation
+const D = 24 * 60 * 60 * 1000
 const DEMO_MEMBERS: OrgMember[] = [
   {
     id: 'demo-member-owner',
@@ -16,7 +17,7 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'owner',
     display_name: 'Demo User',
     is_active: true,
-    created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 90 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
@@ -27,7 +28,7 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'hookah_master',
     display_name: 'Marek Zielinski',
     is_active: true,
-    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 45 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
@@ -38,7 +39,29 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'bartender',
     display_name: 'Laura Fischer',
     is_active: true,
-    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 30 * D).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'demo-member-3',
+    organization_id: 'demo-org-id',
+    location_id: 'demo-location-id',
+    user_id: 'demo-staff-3',
+    role: 'manager',
+    display_name: 'Oksana Koval',
+    is_active: true,
+    created_at: new Date(Date.now() - 14 * D).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'demo-member-4',
+    organization_id: 'demo-org-id',
+    location_id: 'demo-location-id',
+    user_id: 'demo-staff-4',
+    role: 'cook',
+    display_name: 'Tomasz Nowak',
+    is_active: true,
+    created_at: new Date(Date.now() - 5 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
 ]
@@ -48,14 +71,14 @@ const DEMO_INVITATIONS: InviteToken[] = [
     id: 'demo-inv-1',
     organization_id: 'demo-org-id',
     location_id: 'demo-location-id',
-    email: 'new.staff@example.com',
-    role: 'hookah_master',
+    email: 'new.bartender@example.com',
+    role: 'bartender',
     token: 'demo-token-123',
     invited_by: 'demo-user-id',
-    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() + 5 * D).toISOString(),
     accepted_at: null,
     accepted_by: null,
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 2 * D).toISOString(),
   },
 ]
 

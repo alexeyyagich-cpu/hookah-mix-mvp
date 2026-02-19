@@ -500,6 +500,7 @@ export interface Shift {
   organization_id: string | null
   location_id: string | null
   opened_by: string
+  opened_by_name?: string | null
   opened_at: string
   closed_at: string | null
   starting_cash: number | null

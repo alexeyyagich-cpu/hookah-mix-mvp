@@ -153,6 +153,7 @@ export default function ShiftsPage() {
                   </p>
                   <p className="text-sm text-[var(--color-textMuted)]">
                     {tm.shiftDuration}: {formatDuration(now - new Date(activeShift.opened_at).getTime(), tm)}
+                    {activeShift.opened_by_name && ` · ${tm.openedByLabel}: ${activeShift.opened_by_name}`}
                   </p>
                 </div>
                 <button
@@ -235,8 +236,9 @@ export default function ShiftsPage() {
                           </span>
                         </div>
                         <div className="text-xs text-[var(--color-textMuted)]">
+                          {shift.opened_by_name && <>{shift.opened_by_name} · </>}
                           {tm.shiftSummary(recon.hookah.sessionsCount, recon.bar.salesCount)}
-                          {shift.closing_cash !== null && ` • ${shift.closing_cash}€`}
+                          {shift.closing_cash !== null && ` · ${shift.closing_cash}€`}
                         </div>
                       </div>
                       <button
