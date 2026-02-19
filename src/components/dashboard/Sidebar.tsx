@@ -30,6 +30,7 @@ import {
   IconMenuList,
   IconCoin,
   IconTrendUp,
+  IconTimer,
 } from '@/components/Icons'
 
 interface NavItem {
@@ -92,6 +93,7 @@ export function Sidebar() {
         { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
         { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
         { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
+        { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },
         { name: t.statistics, href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
         { name: t.pnlReports, href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
       ],

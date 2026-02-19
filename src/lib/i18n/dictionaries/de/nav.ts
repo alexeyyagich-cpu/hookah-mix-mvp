@@ -22,6 +22,7 @@ export const nav: typeof NavType = {
   floorPlan: 'Raumplan',
   reservations: 'Reservierungen',
   kdsOrders: 'KDS Bestellungen',
+  shifts: 'Schichten',
   statistics: 'Statistiken',
   pnlReports: 'GuV-Berichte',
   reviews: 'Bewertungen',

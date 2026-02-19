@@ -1246,3 +1246,43 @@ ALTER TABLE public.kds_orders ADD COLUMN IF NOT EXISTS created_by UUID REFERENCE
 CREATE INDEX IF NOT EXISTS idx_sessions_created_by ON public.sessions(created_by);
 CREATE INDEX IF NOT EXISTS idx_sessions_guest_id ON public.sessions(guest_id);
 CREATE INDEX IF NOT EXISTS idx_kds_orders_created_by ON public.kds_orders(created_by);
+
+-- ============================================================================
+-- SHIFTS & RECONCILIATION (NOT YET RUN)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.shifts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  profile_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+  location_id UUID REFERENCES public.locations(id) ON DELETE SET NULL,
+  opened_by UUID REFERENCES auth.users(id) NOT NULL,
+  opened_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  closed_at TIMESTAMPTZ,
+  starting_cash DECIMAL,
+  closing_cash DECIMAL,
+  open_notes TEXT,
+  close_notes TEXT,
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+ALTER TABLE public.shifts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own shifts" ON public.shifts
+  FOR ALL USING (
+    profile_id = auth.uid()
+    OR profile_id IN (
+      SELECT p.owner_profile_id FROM public.profiles p WHERE p.id = auth.uid()
+    )
+    OR auth.uid() IN (
+      SELECT p.id FROM public.profiles p WHERE p.owner_profile_id = shifts.profile_id
+    )
+  );
+
+CREATE INDEX IF NOT EXISTS idx_shifts_profile_status ON public.shifts(profile_id, status);
+CREATE INDEX IF NOT EXISTS idx_shifts_opened_at ON public.shifts(profile_id, opened_at DESC);
+-- Partial unique index: at most 1 open shift per profile
+CREATE UNIQUE INDEX IF NOT EXISTS idx_shifts_one_open_per_profile
+  ON public.shifts (profile_id) WHERE status = 'open';

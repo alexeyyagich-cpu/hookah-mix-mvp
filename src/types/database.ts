@@ -473,7 +473,71 @@ export interface Database {
         }
         Update: Partial<Omit<KdsOrder, 'id' | 'profile_id'>>
       }
+      shifts: {
+        Row: Shift
+        Insert: Omit<Shift, 'id' | 'created_at' | 'updated_at' | 'closed_at' | 'status'> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          closed_at?: string | null
+          status?: ShiftStatus
+        }
+        Update: Partial<Omit<Shift, 'id' | 'profile_id'>>
+      }
     }
+  }
+}
+
+// ============================================================================
+// SHIFTS & RECONCILIATION TYPES
+// ============================================================================
+
+export type ShiftStatus = 'open' | 'closed'
+
+export interface Shift {
+  id: string
+  profile_id: string
+  organization_id: string | null
+  location_id: string | null
+  opened_by: string
+  opened_at: string
+  closed_at: string | null
+  starting_cash: number | null
+  closing_cash: number | null
+  open_notes: string | null
+  close_notes: string | null
+  status: ShiftStatus
+  created_at: string
+  updated_at: string
+}
+
+export interface ShiftReconciliation {
+  hookah: {
+    sessionsCount: number
+    totalGrams: number
+    avgCompatibility: number | null
+    topTobaccos: { brand: string; flavor: string; grams: number }[]
+    tobaccoCost: number
+  }
+  bar: {
+    salesCount: number
+    totalRevenue: number
+    totalCost: number
+    profit: number
+    marginPercent: number | null
+    topCocktails: { name: string; count: number; revenue: number }[]
+  }
+  kds: {
+    totalOrders: number
+    byStatus: Record<string, number>
+    avgCompletionMinutes: number | null
+  }
+  cash: {
+    startingCash: number
+    barRevenue: number
+    expectedCash: number
+    actualCash: number | null
+    difference: number | null
   }
 }
 
