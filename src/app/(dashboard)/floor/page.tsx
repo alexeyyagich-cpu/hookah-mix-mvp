@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FloorPlan } from '@/components/floor/FloorPlan'
+import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { IconSettings, IconCalendar } from '@/components/Icons'
@@ -11,7 +11,7 @@ import { useTranslation, useLocale } from '@/lib/i18n'
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 import type { FloorTable, ReservationStatus } from '@/types/database'
 
-const STATUS_COLORS: Record<ReservationStatus, string> = {
+const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',
   confirmed: 'var(--color-success)',
   cancelled: 'var(--color-danger)',
@@ -22,7 +22,8 @@ export default function FloorPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
-  const { tables, setTableStatus } = useFloorPlan()
+  const floorPlan = useFloorPlan()
+  const { tables, setTableStatus, loading } = floorPlan
   const { reservations } = useReservations()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
@@ -39,6 +40,11 @@ export default function FloorPage() {
     occupied: tables.filter(t => t.status === 'occupied').length,
     reserved: tables.filter(t => t.status === 'reserved').length,
   }
+
+  // Keep selectedTable in sync with tables array
+  const activeSelectedTable = selectedTable
+    ? tables.find(t => t.id === selectedTable.id) || selectedTable
+    : null
 
   const handleTableSelect = (table: FloorTable) => {
     setSelectedTable(table)
@@ -120,7 +126,7 @@ export default function FloorPage() {
                 </div>
                 <span
                   className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
-                  style={{ backgroundColor: STATUS_COLORS[r.status] }}
+                  style={{ backgroundColor: RESERVATION_STATUS_COLORS[r.status] }}
                 >
                   {r.status === 'pending' ? tm.statusPending : tm.statusConfirmed}
                 </span>
@@ -130,62 +136,66 @@ export default function FloorPage() {
         )}
       </div>
 
-      {/* Floor Plan */}
+      {/* Floor Plan — single useFloorPlan instance passed as props */}
       <div className="card p-6">
         <FloorPlan
+          tables={tables}
+          loading={loading}
           editable={isEditMode}
           onTableSelect={handleTableSelect}
+          addTable={floorPlan.addTable}
+          updateTable={floorPlan.updateTable}
+          deleteTable={floorPlan.deleteTable}
+          moveTable={floorPlan.moveTable}
+          setTableStatus={floorPlan.setTableStatus}
         />
       </div>
 
       {/* Selected Table Info */}
-      {selectedTable && !isEditMode && (
+      {activeSelectedTable && !isEditMode && (
         <div
           className="card p-6"
           style={{
-            borderColor: selectedTable.status === 'available' ? 'var(--color-success)' :
-                         selectedTable.status === 'occupied' ? 'var(--color-primary)' :
-                         selectedTable.status === 'reserved' ? 'var(--color-warning)' :
+            borderColor: activeSelectedTable.status === 'available' ? 'var(--color-success)' :
+                         activeSelectedTable.status === 'occupied' ? 'var(--color-primary)' :
+                         activeSelectedTable.status === 'reserved' ? 'var(--color-warning)' :
                          'var(--color-border)',
             borderWidth: '2px',
           }}
         >
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold">{selectedTable.name}</h2>
+              <h2 className="text-xl font-bold">{activeSelectedTable.name}</h2>
               <p className="text-sm text-[var(--color-textMuted)]">
-                {tm.capacity(selectedTable.capacity)}
+                {tm.capacity(activeSelectedTable.capacity)}
               </p>
             </div>
             <span
               className="px-3 py-1 rounded-full text-sm font-medium"
               style={{
-                background: selectedTable.status === 'available' ? 'var(--color-success)' :
-                           selectedTable.status === 'occupied' ? 'var(--color-primary)' :
-                           selectedTable.status === 'reserved' ? 'var(--color-warning)' :
-                           'var(--color-textMuted)',
+                background: TABLE_STATUS_COLORS[activeSelectedTable.status].bg,
                 color: 'white',
               }}
             >
-              {selectedTable.status === 'available' ? tm.statusAvailable :
-               selectedTable.status === 'occupied' ? tm.statusOccupied :
-               selectedTable.status === 'reserved' ? tm.statusReserved :
+              {activeSelectedTable.status === 'available' ? tm.statusAvailable :
+               activeSelectedTable.status === 'occupied' ? tm.statusOccupied :
+               activeSelectedTable.status === 'reserved' ? tm.statusReserved :
                tm.statusCleaning}
             </span>
           </div>
 
-          {selectedTable.current_guest_name && (
+          {activeSelectedTable.current_guest_name && (
             <div className="mb-4">
               <p className="text-sm text-[var(--color-textMuted)]">{tm.currentGuest}</p>
-              <p className="font-medium">{selectedTable.current_guest_name}</p>
+              <p className="font-medium">{activeSelectedTable.current_guest_name}</p>
             </div>
           )}
 
-          {selectedTable.session_start_time && (
+          {activeSelectedTable.session_start_time && (
             <div className="mb-4">
               <p className="text-sm text-[var(--color-textMuted)]">{tm.sessionStart}</p>
               <p className="font-medium">
-                {new Date(selectedTable.session_start_time).toLocaleTimeString(LOCALE_MAP[locale] || 'ru-RU', {
+                {new Date(activeSelectedTable.session_start_time).toLocaleTimeString(LOCALE_MAP[locale] || 'ru-RU', {
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
@@ -193,9 +203,9 @@ export default function FloorPage() {
             </div>
           )}
 
-          {selectedTable.notes && (
+          {activeSelectedTable.notes && (
             <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <p className="text-sm text-[var(--color-textMuted)]">{selectedTable.notes}</p>
+              <p className="text-sm text-[var(--color-textMuted)]">{activeSelectedTable.notes}</p>
             </div>
           )}
 
@@ -210,15 +220,14 @@ export default function FloorPage() {
               <button
                 key={status}
                 onClick={async () => {
-                  await setTableStatus(selectedTable.id, status, status === 'reserved' ? selectedTable.current_guest_name : undefined)
-                  setSelectedTable({ ...selectedTable, status })
+                  await setTableStatus(activeSelectedTable.id, status)
                 }}
-                disabled={selectedTable.status === status}
+                disabled={activeSelectedTable.status === status}
                 className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{
-                  background: selectedTable.status === status ? color : 'var(--color-bgHover)',
-                  color: selectedTable.status === status ? 'white' : 'var(--color-text)',
-                  opacity: selectedTable.status === status ? 1 : 0.8,
+                  background: activeSelectedTable.status === status ? color : 'var(--color-bgHover)',
+                  color: activeSelectedTable.status === status ? 'white' : 'var(--color-text)',
+                  opacity: activeSelectedTable.status === status ? 1 : 0.8,
                 }}
               >
                 {label}

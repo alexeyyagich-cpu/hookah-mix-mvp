@@ -2,11 +2,10 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
-import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
-import { IconPlus, IconSettings } from '@/components/Icons'
+import { IconPlus } from '@/components/Icons'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
 
-const STATUS_COLORS: Record<TableStatus, { bg: string; border: string; text: string }> = {
+export const STATUS_COLORS: Record<TableStatus, { bg: string; border: string; text: string }> = {
   available: {
     bg: 'var(--color-success)',
     border: 'var(--color-success)',
@@ -30,13 +29,22 @@ const STATUS_COLORS: Record<TableStatus, { bg: string; border: string; text: str
 }
 
 interface FloorPlanProps {
+  tables: FloorTable[]
+  loading: boolean
   onTableSelect?: (table: FloorTable) => void
   editable?: boolean
+  addTable: (table: Omit<FloorTable, 'id' | 'profile_id' | 'created_at' | 'updated_at'>) => Promise<FloorTable | null>
+  updateTable: (id: string, updates: Partial<FloorTable>) => Promise<void>
+  deleteTable: (id: string) => Promise<void>
+  moveTable: (id: string, x: number, y: number) => Promise<void>
+  setTableStatus: (id: string, status: TableStatus, guestName?: string | null) => Promise<void>
 }
 
-export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
+export function FloorPlan({
+  tables, loading, onTableSelect, editable = false,
+  addTable, updateTable, deleteTable, moveTable, setTableStatus,
+}: FloorPlanProps) {
   const t = useTranslation('manage')
-  const { tables, loading, addTable, updateTable, deleteTable, moveTable, setTableStatus } = useFloorPlan()
 
   const STATUS_LABELS: Record<TableStatus, string> = {
     available: t.statusAvailable,
@@ -52,7 +60,6 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Unified pointer handling for mouse + touch
   const getPointerPos = (e: React.MouseEvent | React.TouchEvent) => {
     if ('touches' in e) {
       return { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -116,7 +123,6 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
   }, [draggedTable, dragOffset, isDragging, moveTable])
 
   const handleTableClick = useCallback((e: React.MouseEvent | React.TouchEvent, table: FloorTable) => {
-    // In edit mode, don't handle click if we just finished dragging
     if (isDragging) return
 
     setSelectedTable(table)
