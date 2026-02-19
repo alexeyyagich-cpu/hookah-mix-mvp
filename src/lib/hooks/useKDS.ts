@@ -26,6 +26,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     created_at: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
     completed_at: null,
+    source: 'guest_qr',
   },
   {
     id: 'demo-kds-2',
@@ -59,6 +60,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     created_at: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
     completed_at: null,
+    source: 'staff',
   },
   {
     id: 'demo-kds-3',
@@ -76,6 +78,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     created_at: new Date(Date.now() - 6 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
     completed_at: null,
+    source: 'staff',
   },
   {
     id: 'demo-kds-4',
@@ -109,6 +112,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     created_at: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
     completed_at: null,
+    source: 'staff',
   },
   {
     id: 'demo-kds-5',
@@ -126,6 +130,7 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     created_at: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
     completed_at: null,
+    source: 'staff',
   },
 ]
 
@@ -268,6 +273,7 @@ export function useKDS(): UseKDSReturn {
       type: input.type,
       items: input.items,
       notes: input.notes,
+      source: 'staff' as const,
     }
 
     if (isDemoMode || !supabase) {

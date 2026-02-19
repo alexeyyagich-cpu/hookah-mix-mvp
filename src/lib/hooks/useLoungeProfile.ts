@@ -211,11 +211,27 @@ const DEMO_BAR_RECIPES: PublicBarRecipe[] = [
   },
 ]
 
+// Public table info for QR ordering
+export interface PublicTable {
+  id: string
+  name: string
+}
+
+// Demo tables for demo-lounge
+const DEMO_TABLES: PublicTable[] = [
+  { id: '1', name: 'Стол 1' },
+  { id: '2', name: 'Стол 2' },
+  { id: '3', name: 'VIP' },
+  { id: '4', name: 'Стол 4' },
+  { id: '5', name: 'Барная стойка' },
+]
+
 // Hook for public lounge viewing (by slug)
 interface UsePublicLoungeReturn {
   lounge: LoungeProfile | null
   mixes: PublicMix[]
   barRecipes: PublicBarRecipe[]
+  tables: PublicTable[]
   loading: boolean
   error: string | null
 }
@@ -224,6 +240,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
   const [lounge, setLounge] = useState<LoungeProfile | null>(null)
   const [mixes, setMixes] = useState<PublicMix[]>([])
   const [barRecipes, setBarRecipes] = useState<PublicBarRecipe[]>([])
+  const [tables, setTables] = useState<PublicTable[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -233,6 +250,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
       setLounge(DEMO_LOUNGE)
       setMixes(DEMO_MIXES)
       setBarRecipes(DEMO_BAR_RECIPES)
+      setTables(DEMO_TABLES)
       setLoading(false)
     } else {
       // Fetch from public menu API
@@ -254,6 +272,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
             show_popular_mixes: true,
           })
           setBarRecipes(data.barRecipes || [])
+          setTables(data.tables || [])
           setLoading(false)
         })
         .catch(() => {
@@ -263,5 +282,5 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
     }
   }, [slug])
 
-  return { lounge, mixes, barRecipes, loading, error }
+  return { lounge, mixes, barRecipes, tables, loading, error }
 }

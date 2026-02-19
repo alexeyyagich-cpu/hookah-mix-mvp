@@ -93,8 +93,13 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
       {/* Header: table + timer */}
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <div className="font-semibold truncate">
+          <div className="font-semibold truncate flex items-center gap-1">
             {order.table_name || t.noTableLabel}
+            {order.source === 'guest_qr' && (
+              <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-bold rounded bg-teal-500/20 text-teal-400">
+                {t.guestQrBadge}
+              </span>
+            )}
           </div>
           {order.guest_name && (
             <div className="text-xs text-[var(--color-textMuted)] truncate">

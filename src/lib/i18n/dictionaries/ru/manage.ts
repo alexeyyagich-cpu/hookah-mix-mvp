@@ -492,4 +492,11 @@ export const manage = {
   minutesShort: 'мин',
   hoursShort: 'ч',
   shiftSummary: (sessions: number, sales: number) => `${sessions} сессий • ${sales} продаж`,
+
+  // Guest QR ordering
+  guestQrBadge: 'QR',
+  guestQrSource: 'Заказ от гостя',
+  downloadTableQr: 'Скачать QR',
+  tableQrDownloaded: 'QR-код скачан',
+  noVenueSlugForQr: 'Укажите slug заведения в настройках',
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
@@ -16,6 +16,8 @@ import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { QRCodeCanvas } from 'qrcode.react'
+import { toast } from 'sonner'
 
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
@@ -31,7 +33,7 @@ export default function FloorPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
-  const { user, isDemoMode } = useAuth()
+  const { user, isDemoMode, profile } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const floorPlan = useFloorPlan()
   const { tables, setTableStatus, startSession, endSession, loading } = floorPlan
@@ -49,6 +51,8 @@ export default function FloorPage() {
   const [selectedGuestObj, setSelectedGuestObj] = useState<Guest | null>(null)
   const [deductInventory, setDeductInventory] = useState(true)
   const [serveStatus, setServeStatus] = useState<'idle' | 'serving' | 'served'>('idle')
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null)
+  const [qrTableId, setQrTableId] = useState<string | null>(null)
   const [quickReserving, setQuickReserving] = useState(false)
   const [quickForm, setQuickForm] = useState({
     guest_name: '',
@@ -295,6 +299,25 @@ export default function FloorPage() {
     await setTableStatus(activeSelectedTable.id, 'available')
   }
 
+  const handleDownloadQr = useCallback((table: FloorTable) => {
+    if (!profile?.venue_slug) {
+      toast.error(tm.noVenueSlugForQr)
+      return
+    }
+    setQrTableId(table.id)
+    setTimeout(() => {
+      const canvas = qrCanvasRef.current
+      if (!canvas) return
+      const url = canvas.toDataURL('image/png')
+      const link = document.createElement('a')
+      link.download = `qr-${table.name}.png`
+      link.href = url
+      link.click()
+      setQrTableId(null)
+      toast.success(tm.tableQrDownloaded)
+    }, 100)
+  }, [profile?.venue_slug, tm])
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -412,7 +435,16 @@ export default function FloorPage() {
         >
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold">{activeSelectedTable.name}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold">{activeSelectedTable.name}</h2>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDownloadQr(activeSelectedTable); }}
+                  className="p-1 rounded text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bgCard)]"
+                  title={tm.downloadTableQr}
+                >
+                  QR
+                </button>
+              </div>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {tm.capacity(activeSelectedTable.capacity)}
               </p>
@@ -832,6 +864,18 @@ export default function FloorPage() {
             <li>{tm.editModeClick}</li>
             <li>{tm.editModeAdd}</li>
           </ul>
+        </div>
+      )}
+
+      {/* Hidden QR canvas for download */}
+      {qrTableId && profile?.venue_slug && (
+        <div className="fixed -left-[9999px]">
+          <QRCodeCanvas
+            ref={qrCanvasRef}
+            value={`https://hookahtorus.com/menu/${profile.venue_slug}?table=${qrTableId}`}
+            size={512}
+            level="M"
+          />
         </div>
       )}
     </div>

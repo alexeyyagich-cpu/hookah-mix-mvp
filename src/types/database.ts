@@ -844,6 +844,7 @@ export interface KdsOrder {
   created_at: string
   updated_at: string
   completed_at: string | null
+  source: 'staff' | 'guest_qr'
 }
 
 // Extended marketplace types with relations
@@ -879,6 +880,7 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: false,
     auto_reorder: false,
     pos_integration: false,
+    guest_qr_ordering: false,
     bar_module: true,
     bar_inventory_items: 10,
   },
@@ -891,6 +893,7 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: true,
     auto_reorder: false,
     pos_integration: true,
+    guest_qr_ordering: true,
     bar_module: true,
     bar_inventory_items: Infinity,
   },
@@ -903,6 +906,7 @@ export const SUBSCRIPTION_LIMITS = {
     marketplace: true,
     auto_reorder: true,
     pos_integration: true,
+    guest_qr_ordering: true,
     bar_module: true,
     bar_inventory_items: Infinity,
   },

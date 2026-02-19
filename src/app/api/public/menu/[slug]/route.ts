@@ -59,6 +59,13 @@ export async function GET(
     ingredients: ingredientMap[r.id] || [],
   }))
 
+  // Fetch floor tables for QR ordering
+  const { data: tables } = await supabase
+    .from('floor_tables')
+    .select('id, name')
+    .eq('profile_id', profile.id)
+    .order('name', { ascending: true })
+
   return NextResponse.json({
     venue: {
       name: profile.business_name,
@@ -67,5 +74,6 @@ export async function GET(
       slug: profile.venue_slug,
     },
     barRecipes,
+    tables: tables || [],
   })
 }

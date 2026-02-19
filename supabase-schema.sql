@@ -1286,3 +1286,10 @@ CREATE INDEX IF NOT EXISTS idx_shifts_opened_at ON public.shifts(profile_id, ope
 -- Partial unique index: at most 1 open shift per profile
 CREATE UNIQUE INDEX IF NOT EXISTS idx_shifts_one_open_per_profile
   ON public.shifts (profile_id) WHERE status = 'open';
+
+-- =============================================
+-- Guest QR Ordering — kds_orders.source column
+-- NOT YET RUN — run via Supabase SQL Editor
+-- =============================================
+ALTER TABLE public.kds_orders ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'staff'
+  CHECK (source IN ('staff', 'guest_qr'));

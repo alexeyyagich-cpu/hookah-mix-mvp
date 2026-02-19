@@ -486,4 +486,11 @@ export const manage: typeof ManageType = {
   minutesShort: 'Min.',
   hoursShort: 'Std',
   shiftSummary: (sessions: number, sales: number) => `${sessions} Sitzungen • ${sales} Verkäufe`,
+
+  // Guest QR ordering
+  guestQrBadge: 'QR',
+  guestQrSource: 'Gastbestellung',
+  downloadTableQr: 'QR herunterladen',
+  tableQrDownloaded: 'QR-Code heruntergeladen',
+  noVenueSlugForQr: 'Legen Sie zuerst den Venue-Slug in den Einstellungen fest',
 }
