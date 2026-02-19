@@ -230,7 +230,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         loading,
         isConfigured: isSupabaseConfigured,
-        isDemoMode: DEMO_MODE,
+        isDemoMode: DEMO_MODE || user?.email === 'demo@hookahtorus.com',
         signIn,
         signUp,
         signOut,

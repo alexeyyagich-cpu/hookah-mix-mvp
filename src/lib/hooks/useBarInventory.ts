@@ -7,15 +7,45 @@ import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { BarInventoryItem, BarTransaction, BarTransactionType } from '@/types/database'
 
+// Demo bar inventory — Leipzig hookah lounge
+const t = new Date().toISOString()
+const bi = (id: string, name: string, brand: string, cat: BarInventoryItem['category'], unit: string, qty: number, min: number, price: number, pkg: number, notes: string | null = null): BarInventoryItem => ({
+  id, profile_id: 'demo', name, brand, category: cat, unit_type: unit as BarInventoryItem['unit_type'],
+  quantity: qty, min_quantity: min, purchase_price: price, package_size: pkg,
+  supplier_name: null, barcode: null, notes, created_at: t, updated_at: t,
+})
+
 const DEMO_BAR_INVENTORY: BarInventoryItem[] = [
-  { id: 'b1', profile_id: 'demo', name: 'Абсолют Водка', brand: 'Absolut', category: 'spirit', unit_type: 'ml', quantity: 500, min_quantity: 200, purchase_price: 18, package_size: 700, supplier_name: null, barcode: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b2', profile_id: 'demo', name: 'Бифитер Джин', brand: 'Beefeater', category: 'spirit', unit_type: 'ml', quantity: 350, min_quantity: 200, purchase_price: 22, package_size: 700, supplier_name: null, barcode: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b3', profile_id: 'demo', name: 'Бакарди Белый Ром', brand: 'Bacardi', category: 'spirit', unit_type: 'ml', quantity: 600, min_quantity: 200, purchase_price: 16, package_size: 700, supplier_name: null, barcode: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b4', profile_id: 'demo', name: 'Сахарный сироп', brand: '', category: 'syrup', unit_type: 'ml', quantity: 800, min_quantity: 200, purchase_price: 5, package_size: 1000, supplier_name: null, barcode: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b5', profile_id: 'demo', name: 'Сок лайма', brand: '', category: 'juice', unit_type: 'ml', quantity: 150, min_quantity: 300, purchase_price: 4, package_size: 1000, supplier_name: null, barcode: null, notes: 'Заканчивается!', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b6', profile_id: 'demo', name: 'Лайм', brand: '', category: 'garnish', unit_type: 'pcs', quantity: 3, min_quantity: 5, purchase_price: 2, package_size: 10, supplier_name: null, barcode: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b7', profile_id: 'demo', name: 'Ангостура', brand: 'Angostura', category: 'bitter', unit_type: 'ml', quantity: 120, min_quantity: 50, purchase_price: 12, package_size: 200, supplier_name: null, barcode: null, notes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'b8', profile_id: 'demo', name: 'Тоник', brand: 'Schweppes', category: 'mixer', unit_type: 'ml', quantity: 0, min_quantity: 500, purchase_price: 3, package_size: 1000, supplier_name: null, barcode: null, notes: 'Нужно заказать', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  // Spirits
+  bi('b1', 'Бурбон Bulleit', 'Bulleit', 'spirit', 'ml', 450, 200, 28, 700),
+  bi('b2', 'Бифитер Джин', 'Beefeater', 'spirit', 'ml', 380, 200, 22, 700),
+  bi('b3', 'Бакарди Белый Ром', 'Bacardi', 'spirit', 'ml', 550, 200, 16, 700),
+  bi('b9', 'Абсолют Водка', 'Absolut', 'spirit', 'ml', 620, 200, 18, 700),
+  bi('b10', 'Текила Olmeca Blanco', 'Olmeca', 'spirit', 'ml', 320, 200, 20, 700),
+  bi('b11', 'Кампари', 'Campari', 'spirit', 'ml', 280, 150, 16, 700),
+  bi('b12', 'Апероль', 'Aperol', 'spirit', 'ml', 400, 200, 14, 700),
+  bi('b13', 'Кофейный ликёр Kahlúa', 'Kahlúa', 'spirit', 'ml', 350, 150, 18, 700),
+  // Syrups
+  bi('b4', 'Сахарный сироп', '', 'syrup', 'ml', 750, 200, 5, 1000),
+  bi('b14', 'Облепиховый сироп', '', 'syrup', 'ml', 300, 150, 8, 500, 'Для Leipzig Sour'),
+  bi('b15', 'Медовый сироп', '', 'syrup', 'ml', 400, 150, 6, 500),
+  bi('b16', 'Кокосовый сироп', '', 'syrup', 'ml', 350, 100, 7, 500),
+  // Juices
+  bi('b5', 'Сок лайма (фреш)', '', 'juice', 'ml', 120, 300, 4, 1000, 'Заканчивается!'),
+  bi('b17', 'Сок лимона (фреш)', '', 'juice', 'ml', 200, 300, 4, 1000),
+  bi('b18', 'Ананасовый сок', '', 'juice', 'ml', 600, 300, 3, 1000),
+  bi('b19', 'Маракуйя пюре', '', 'juice', 'ml', 250, 150, 12, 500),
+  // Mixers
+  bi('b8', 'Тоник Schweppes', 'Schweppes', 'mixer', 'ml', 0, 500, 3, 1000, 'Нужно заказать!'),
+  bi('b20', 'Содовая', '', 'mixer', 'ml', 1500, 500, 2, 1000),
+  bi('b21', 'Имбирное пиво', 'Fever-Tree', 'mixer', 'ml', 800, 300, 5, 500),
+  bi('b22', 'Кола', 'Coca-Cola', 'mixer', 'ml', 1000, 500, 2, 1000),
+  bi('b23', 'Просекко', 'Zonin', 'mixer', 'ml', 500, 300, 8, 750),
+  // Bitters & Garnish
+  bi('b7', 'Ангостура биттерс', 'Angostura', 'bitter', 'ml', 120, 50, 12, 200),
+  bi('b6', 'Лайм', '', 'garnish', 'pcs', 4, 10, 0.3, 1, 'Закупить'),
+  bi('b24', 'Мята свежая', '', 'garnish', 'pcs', 25, 10, 0.1, 1),
+  bi('b25', 'Апельсин', '', 'garnish', 'pcs', 6, 5, 0.4, 1),
 ]
 
 interface UseBarInventoryReturn {
