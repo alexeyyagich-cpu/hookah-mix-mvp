@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
+import { useSubscription } from '@/lib/hooks/useSubscription'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
+import { IconExport, IconLock, IconChart } from '@/components/Icons'
+import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
 import { useTranslation, useLocale } from '@/lib/i18n'
 
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
@@ -15,11 +18,35 @@ export default function BarSalesPage() {
   const { locale } = useLocale()
   const { sales, loading, error, recordSale, deleteSale, getAnalytics } = useBarSales()
   const { recipes, calculateCost } = useBarRecipes()
+  const { canExport } = useSubscription()
 
   const [period, setPeriod] = useState<Period>(7)
   const [tab, setTab] = useState<'sell' | 'log' | 'analytics'>('sell')
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const exportMenuRef = useRef<HTMLDivElement>(null)
 
   const analytics = useMemo(() => getAnalytics(period), [getAnalytics, period])
+
+  // Close export menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+        setExportMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleExport = (format: 'csv' | 'pdf') => {
+    if (!canExport || periodSales.length === 0) return
+    if (format === 'csv') {
+      exportBarSalesCSV(periodSales)
+    } else {
+      exportBarSalesPDF(periodSales, analytics, period)
+    }
+    setExportMenuOpen(false)
+  }
 
   const handleSell = async (recipe: Parameters<typeof recordSale>[0]) => {
     await recordSale(recipe)
@@ -50,15 +77,49 @@ export default function BarSalesPage() {
             {tb.salesSubtitle}
           </p>
         </div>
-        <select
-          value={period}
-          onChange={e => setPeriod(Number(e.target.value) as Period)}
-          className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
-        >
-          <option value={7}>{tb.days7}</option>
-          <option value={14}>{tb.days14}</option>
-          <option value={30}>{tb.days30}</option>
-        </select>
+        <div className="flex items-center gap-2">
+          {/* Export Button with Dropdown */}
+          <div className="relative" ref={exportMenuRef}>
+            <button
+              onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
+              disabled={!canExport || periodSales.length === 0}
+              className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              title={canExport ? tb.exportSales : tb.exportProOnly}
+            >
+              <IconExport size={18} />
+              {!canExport && <IconLock size={14} />}
+            </button>
+
+            {exportMenuOpen && canExport && (
+              <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
+                >
+                  <IconChart size={16} />
+                  {tb.exportSalesCSV}
+                </button>
+                <button
+                  onClick={() => handleExport('pdf')}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
+                >
+                  <IconExport size={16} />
+                  {tb.exportSalesPDF}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <select
+            value={period}
+            onChange={e => setPeriod(Number(e.target.value) as Period)}
+            className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
+          >
+            <option value={7}>{tb.days7}</option>
+            <option value={14}>{tb.days14}</option>
+            <option value={30}>{tb.days30}</option>
+          </select>
+        </div>
       </div>
 
       {/* Stats Cards */}

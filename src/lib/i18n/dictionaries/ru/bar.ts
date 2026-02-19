@@ -297,4 +297,10 @@ export const bar = {
   glassCopperMug: 'Медная кружка',
   glassTiki: 'Тики',
   glassOther: 'Другой',
+
+  // Export
+  exportSales: 'Экспорт продаж',
+  exportSalesCSV: 'Скачать CSV',
+  exportSalesPDF: 'Скачать PDF',
+  exportProOnly: 'Экспорт доступен в Pro',
 }

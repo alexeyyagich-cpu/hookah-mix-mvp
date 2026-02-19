@@ -292,4 +292,10 @@ export const bar: typeof BarType = {
   glassCopperMug: 'Copper mug',
   glassTiki: 'Tiki',
   glassOther: 'Other',
+
+  // Export
+  exportSales: 'Export sales',
+  exportSalesCSV: 'Download CSV',
+  exportSalesPDF: 'Download PDF',
+  exportProOnly: 'Export available in Pro',
 } as const

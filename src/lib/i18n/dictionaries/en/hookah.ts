@@ -98,6 +98,8 @@ export const hookah: typeof HookahType = {
   availableOnPro: 'Available on Pro',
   exportCSV: 'Export CSV',
   exportPDF: 'Export PDF',
+  exportSessions: 'Export sessions',
+  exportProOnly: 'Export available in Pro',
   inWarehouse: 'In stock',
   runningLow: 'Running low',
   limitReached: 'Limit reached',

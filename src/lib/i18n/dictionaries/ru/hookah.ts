@@ -104,6 +104,8 @@ export const hookah = {
   availableOnPro: 'Доступно на Pro',
   exportCSV: 'Экспорт CSV',
   exportPDF: 'Экспорт PDF',
+  exportSessions: 'Экспорт сессий',
+  exportProOnly: 'Экспорт доступен в Pro',
   inWarehouse: 'На складе',
   runningLow: 'Заканчиваются',
   limitReached: 'Достигнут лимит',

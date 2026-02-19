@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
-import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus } from '@/components/Icons'
+import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus, IconExport, IconLock, IconChart } from '@/components/Icons'
+import { exportSessionsCSV, exportSessionsPDF } from '@/lib/utils/exportReport'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
 import { useTranslation, useLocale } from '@/lib/i18n'
@@ -17,10 +18,12 @@ export default function SessionsPage() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const { sessions, loading, error, updateSession, deleteSession } = useSessions()
-  const { isFreeTier } = useSubscription()
+  const { isFreeTier, canExport } = useSubscription()
 
   const [filter, setFilter] = useState('')
   const [selectedSession, setSelectedSession] = useState<SessionWithItems | null>(null)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const exportMenuRef = useRef<HTMLDivElement>(null)
 
   // Background portal
   const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
@@ -29,12 +32,33 @@ export default function SessionsPage() {
     return () => setBgContainer(null)
   }, [])
 
+  // Close export menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+        setExportMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const filteredSessions = sessions.filter(session =>
     session.session_items?.some(item =>
       item.brand.toLowerCase().includes(filter.toLowerCase()) ||
       item.flavor.toLowerCase().includes(filter.toLowerCase())
     )
   )
+
+  const handleExport = (format: 'csv' | 'pdf') => {
+    if (!canExport || filteredSessions.length === 0) return
+    if (format === 'csv') {
+      exportSessionsCSV(filteredSessions)
+    } else {
+      exportSessionsPDF(filteredSessions)
+    }
+    setExportMenuOpen(false)
+  }
 
   const handleRate = async (id: string, rating: number) => {
     await updateSession(id, { rating })
@@ -71,10 +95,44 @@ export default function SessionsPage() {
             {isFreeTier && ` ${t.sessionsFreeTierNotice}`}
           </p>
         </div>
-        <Link href="/mix" className="btn btn-primary flex items-center gap-2">
-          <IconPlus size={18} />
-          {t.createSession}
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Export Button with Dropdown */}
+          <div className="relative" ref={exportMenuRef}>
+            <button
+              onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
+              disabled={!canExport || sessions.length === 0}
+              className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              title={canExport ? t.exportSessions : t.exportProOnly}
+            >
+              <IconExport size={18} />
+              {!canExport && <IconLock size={14} />}
+            </button>
+
+            {exportMenuOpen && canExport && (
+              <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
+                >
+                  <IconChart size={16} />
+                  {t.exportCSV}
+                </button>
+                <button
+                  onClick={() => handleExport('pdf')}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
+                >
+                  <IconExport size={16} />
+                  {t.exportPDF}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <Link href="/mix" className="btn btn-primary flex items-center gap-2">
+            <IconPlus size={18} />
+            {t.createSession}
+          </Link>
+        </div>
       </div>
 
       {/* Free Tier Notice */}

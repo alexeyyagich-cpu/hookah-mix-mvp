@@ -1,6 +1,6 @@
 'use client'
 
-import type { TobaccoInventory, SessionWithItems } from '@/types/database'
+import type { TobaccoInventory, SessionWithItems, BarSale, BarAnalytics } from '@/types/database'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -313,4 +313,174 @@ export function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThresh
   }
 
   doc.save(`hookah-inventory-${getDateString()}.pdf`)
+}
+
+// ========================================
+// BAR SALES EXPORTS
+// ========================================
+
+export function exportBarSalesCSV(sales: BarSale[]) {
+  const headers = ['Дата/Время', 'Коктейль', 'Кол-во', 'Выручка (€)', 'Себестоимость (€)', 'Маржа (%)']
+  const rows = sales.map(sale => [
+    new Date(sale.sold_at).toLocaleString('ru-RU'),
+    `"${sale.recipe_name}"`,
+    sale.quantity.toString(),
+    sale.total_revenue.toFixed(2),
+    sale.total_cost.toFixed(2),
+    sale.margin_percent !== null ? sale.margin_percent.toFixed(1) : '-',
+  ])
+
+  const csv = [headers, ...rows].map(row => row.join(',')).join('\n')
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+  downloadFile(blob, `bar-sales-${getDateString()}.csv`)
+}
+
+export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number) {
+  const doc = new jsPDF()
+
+  // Title
+  doc.setFontSize(20)
+  doc.text('Hookah Torus — Продажи бара', 105, 20, { align: 'center' })
+
+  // Subtitle
+  doc.setFontSize(10)
+  doc.setTextColor(100)
+  doc.text(`Период: последние ${period} дней | Дата: ${new Date().toLocaleDateString('ru-RU')}`, 105, 28, { align: 'center' })
+
+  // Summary
+  doc.setFontSize(14)
+  doc.setTextColor(0)
+  doc.text('Итого', 14, 42)
+
+  autoTable(doc, {
+    startY: 46,
+    head: [['Показатель', 'Значение']],
+    body: [
+      ['Выручка', `${analytics.totalRevenue.toFixed(2)}€`],
+      ['Себестоимость', `${analytics.totalCost.toFixed(2)}€`],
+      ['Прибыль', `${analytics.totalProfit.toFixed(2)}€`],
+      ['Продажи', `${analytics.totalSales}`],
+      ['Средняя маржа', analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(1)}%` : '—'],
+    ],
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+  })
+
+  let currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+
+  // Top cocktails
+  if (analytics.topCocktails.length > 0) {
+    doc.setFontSize(14)
+    doc.text('Популярные коктейли', 14, currentY)
+
+    autoTable(doc, {
+      startY: currentY + 4,
+      head: [['Коктейль', 'Продаж', 'Выручка']],
+      body: analytics.topCocktails.map(c => [c.name, c.count.toString(), `${c.revenue.toFixed(2)}€`]),
+      theme: 'striped',
+      headStyles: { fillColor: [99, 102, 241] },
+    })
+
+    currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+  }
+
+  // Sales log
+  if (sales.length > 0) {
+    if (currentY > 250) {
+      doc.addPage()
+      currentY = 20
+    }
+
+    doc.setFontSize(14)
+    doc.text('Журнал продаж', 14, currentY)
+
+    autoTable(doc, {
+      startY: currentY + 4,
+      head: [['Дата/Время', 'Коктейль', 'Кол-во', 'Выручка', 'Себест.', 'Маржа']],
+      body: sales.map(sale => [
+        new Date(sale.sold_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+        sale.recipe_name,
+        sale.quantity.toString(),
+        `${sale.total_revenue.toFixed(2)}€`,
+        `${sale.total_cost.toFixed(2)}€`,
+        sale.margin_percent !== null ? `${sale.margin_percent.toFixed(0)}%` : '—',
+      ]),
+      theme: 'striped',
+      headStyles: { fillColor: [99, 102, 241] },
+    })
+  }
+
+  // Footer
+  const pageCount = doc.getNumberOfPages()
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i)
+    doc.setFontSize(8)
+    doc.setTextColor(150)
+    doc.text(
+      `Hookah Torus | Сгенерировано: ${new Date().toLocaleString('ru-RU')} | Страница ${i} из ${pageCount}`,
+      105,
+      290,
+      { align: 'center' }
+    )
+  }
+
+  doc.save(`bar-sales-${getDateString()}.pdf`)
+}
+
+// ========================================
+// SESSIONS PDF EXPORT
+// ========================================
+
+export function exportSessionsPDF(sessions: SessionWithItems[]) {
+  const doc = new jsPDF()
+
+  // Title
+  doc.setFontSize(20)
+  doc.text('Hookah Torus — История сессий', 105, 20, { align: 'center' })
+
+  // Subtitle
+  doc.setFontSize(10)
+  doc.setTextColor(100)
+  doc.text(`Дата: ${new Date().toLocaleDateString('ru-RU')} | Всего сессий: ${sessions.length}`, 105, 28, { align: 'center' })
+
+  // Sessions table
+  doc.setFontSize(14)
+  doc.setTextColor(0)
+  doc.text('Сессии', 14, 42)
+
+  autoTable(doc, {
+    startY: 46,
+    head: [['Дата', 'Микс', 'Всего (г)', 'Совмест.', 'Оценка']],
+    body: sessions.map(session => {
+      const mix = session.session_items?.map(i => `${i.flavor} (${i.percentage}%)`).join(' + ') || '-'
+      return [
+        new Date(session.session_date).toLocaleDateString('ru-RU'),
+        mix,
+        session.total_grams.toString(),
+        session.compatibility_score ? `${session.compatibility_score}%` : '-',
+        session.rating ? `${session.rating}/5` : '-',
+      ]
+    }),
+    theme: 'striped',
+    headStyles: { fillColor: [99, 102, 241] },
+    columnStyles: {
+      1: { cellWidth: 70 }, // Mix column wider
+    },
+  })
+
+  // Footer
+  const pageCount = doc.getNumberOfPages()
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i)
+    doc.setFontSize(8)
+    doc.setTextColor(150)
+    doc.text(
+      `Hookah Torus | Сгенерировано: ${new Date().toLocaleString('ru-RU')} | Страница ${i} из ${pageCount}`,
+      105,
+      290,
+      { align: 'center' }
+    )
+  }
+
+  doc.save(`hookah-sessions-${getDateString()}.pdf`)
 }
