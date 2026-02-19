@@ -1184,7 +1184,7 @@ CREATE TABLE IF NOT EXISTS public.invite_tokens (
   location_id UUID REFERENCES public.locations(id) ON DELETE SET NULL,
   email TEXT NOT NULL,
   role TEXT NOT NULL CHECK (role IN ('manager', 'hookah_master', 'bartender', 'cook')),
-  token TEXT NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(32), 'hex'),
+  token TEXT NOT NULL UNIQUE DEFAULT replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', ''),
   invited_by UUID REFERENCES auth.users(id) NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days'),
   accepted_at TIMESTAMPTZ,
