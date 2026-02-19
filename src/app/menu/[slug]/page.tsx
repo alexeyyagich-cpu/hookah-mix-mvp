@@ -715,7 +715,7 @@ function MenuPageInner({ slug }: { slug: string }) {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 {hasTobaccoMenu && (
-                  <Link href="/mix" className="btn btn-primary">{t.menuMixCalculator}</Link>
+                  <Link href={`/mix?from=menu&venue=${slug}`} className="btn btn-primary">{t.menuMixCalculator}</Link>
                 )}
                 {lounge.phone && (
                   <a href={`tel:${lounge.phone}`} className="btn btn-ghost">{t.menuCallBtn}</a>

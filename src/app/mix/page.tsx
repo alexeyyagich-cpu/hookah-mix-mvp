@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { TOBACCOS, getBrandNames, getCategories, type Category } from "@/data/tobaccos";
 import MixPieChart from "@/components/MixPieChart";
 import ProgressRing from "@/components/ProgressRing";
@@ -75,10 +76,16 @@ function roundToInt(v: number) {
   return Math.max(0, Math.min(100, Math.round(v)));
 }
 
-export default function MixPage() {
+function MixPageInner() {
   const t = useTranslation('hookah');
   const { theme } = useTheme();
   const { user, profile } = useAuth();
+  const searchParams = useSearchParams();
+
+  // Guest mode: visitor came from public menu, hide management UI
+  const isGuestMode = searchParams.get('from') === 'menu';
+  const venueSlug = searchParams.get('venue');
+  const isBusinessUser = !!user && !isGuestMode;
 
   // Category labels from i18n
   const CATEGORY_LABELS: Record<Category, string> = useMemo(() => ({
@@ -507,7 +514,7 @@ export default function MixPage() {
                       <IconMix size={16} />
                       <span>{t.mixMixRecipes}</span>
                     </button>
-                    {user && (
+                    {isBusinessUser && (
                       <button
                         onClick={() => { setIsSavedMixesDrawerOpen(true); setIsMixesMenuOpen(false); }}
                         className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors border-t"
@@ -522,8 +529,8 @@ export default function MixPage() {
               )}
             </div>
 
-            {/* Гости (только для авторизованных) */}
-            {user && (
+            {/* Гости (только для бизнес-пользователей, не в гостевом режиме) */}
+            {isBusinessUser && (
               <button
                 onClick={() => setIsGuestsDrawerOpen(true)}
                 className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
@@ -550,7 +557,12 @@ export default function MixPage() {
             <div className="hidden sm:block w-px h-6 mx-1" style={{ background: "var(--color-border)" }} />
 
             <ThemeSwitcher />
-            {user ? (
+            {isGuestMode && venueSlug ? (
+              <Link href={`/menu/${venueSlug}`} className="btn btn-primary text-sm px-2 sm:px-3">
+                <span className="hidden sm:inline">{'\u2190'} {t.backToMenu}</span>
+                <span className="sm:hidden">{'\u2190'}</span>
+              </Link>
+            ) : user ? (
               <Link href="/dashboard" className="btn btn-primary text-sm px-2 sm:px-3">
                 <span className="sm:hidden">👤</span>
                 <span className="hidden sm:inline">{t.mixNavDashboard}</span>
@@ -1095,8 +1107,8 @@ export default function MixPage() {
         />
       )}
 
-      {/* Saved Mixes Drawer for authenticated users */}
-      {user && (
+      {/* Saved Mixes Drawer for business users */}
+      {isBusinessUser && (
         <SavedMixesDrawer
           isOpen={isSavedMixesDrawerOpen}
           onClose={() => setIsSavedMixesDrawerOpen(false)}
@@ -1105,7 +1117,7 @@ export default function MixPage() {
       )}
 
       {/* Guests Drawer for Quick Repeat */}
-      {user && isGuestsDrawerOpen && (
+      {isBusinessUser && isGuestsDrawerOpen && (
         <>
           {/* Backdrop */}
           <div
@@ -1149,7 +1161,7 @@ export default function MixPage() {
       )}
 
       {/* Floating Session Timer */}
-      {user && isTimerVisible && (
+      {isBusinessUser && isTimerVisible && (
         <div
           className="fixed bottom-24 right-4 z-40 w-72 animate-fadeInUp"
         >
@@ -1162,7 +1174,7 @@ export default function MixPage() {
       )}
 
       {/* Floating action bar for save actions */}
-      {user && result && (
+      {isBusinessUser && result && (
         <div
           className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 p-2 rounded-full shadow-lg z-40"
           style={{
@@ -1214,5 +1226,13 @@ export default function MixPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MixPage() {
+  return (
+    <Suspense>
+      <MixPageInner />
+    </Suspense>
   );
 }
