@@ -37,6 +37,7 @@ import { RecentGuests } from "@/components/guests/RecentGuests";
 import { useInventory } from "@/lib/hooks/useInventory";
 import { SessionTimer } from "@/components/session/SessionTimer";
 import type { MixSnapshot } from "@/types/database";
+import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 
 const BRANDS = getBrandNames();
@@ -74,6 +75,7 @@ function roundToInt(v: number) {
 }
 
 export default function MixPage() {
+  const t = useTranslation('hookah');
   const { theme } = useTheme();
   const { user, profile } = useAuth();
   const { createSession } = useSessions();
@@ -411,7 +413,7 @@ export default function MixPage() {
   return (
     <div className="min-h-screen transition-theme relative overflow-hidden">
       {/* Accessible page title */}
-      <h1 className="sr-only">Калькулятор миксов табака — создайте идеальный микс</h1>
+      <h1 className="sr-only">{t.mixTitle}</h1>
 
       {/* Cinematic Smoke Background */}
       <SmokeCanvasBackground imageSrc="/images/hookah-hero.jpg" />
@@ -600,7 +602,7 @@ export default function MixPage() {
                   onClick={() => setSelectedBrand(null)}
                   className={`pill ${selectedBrand === null ? "pill-active" : ""}`}
                 >
-                  Все бренды
+                  {t.allBrands}
                 </button>
                 {BRANDS.map(brand => (
                   <button

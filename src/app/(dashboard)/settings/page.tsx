@@ -10,6 +10,8 @@ import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { usePushNotifications } from '@/lib/hooks/usePushNotifications'
 import { useTelegram } from '@/lib/hooks/useTelegram'
 import { useEmailSettings } from '@/lib/hooks/useEmailSettings'
+import { useLocale, useTranslation, LOCALES, LOCALE_LABELS } from '@/lib/i18n'
+import type { Locale } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/client'
 import { QRCodeCanvas } from 'qrcode.react'
 import Link from 'next/link'
@@ -20,13 +22,15 @@ export default function SettingsPage() {
   const { modules, isHookahActive, isBarActive, canActivateBar, toggleModule, loading: modulesLoading } = useModules()
   const { connection: r2oConnection, loading: r2oLoading, error: r2oError, syncing: r2oSyncing, syncResult: r2oSyncResult, connect: r2oConnect, disconnect: r2oDisconnect, sync: r2oSync, refresh: r2oRefresh } = useReady2Order()
   const searchParams = useSearchParams()
+  const { locale, setLocale } = useLocale()
+  const ts = useTranslation('settings')
+  const tc = useTranslation('common')
 
   // Handle r2o callback redirect
   useEffect(() => {
     const r2oStatus = searchParams.get('r2o')
     if (r2oStatus === 'connected') {
       r2oRefresh()
-      // Clean up URL
       window.history.replaceState({}, '', '/settings')
     } else if (r2oStatus === 'error') {
       window.history.replaceState({}, '', '/settings')
@@ -54,6 +58,13 @@ export default function SettingsPage() {
 
   const menuUrl = venueSlug ? `https://hookahtorus.com/menu/${venueSlug}` : ''
 
+  const handleLocaleChange = useCallback(async (newLocale: Locale) => {
+    setLocale(newLocale)
+    if (user && !isDemoMode) {
+      await supabase.from('profiles').update({ locale: newLocale }).eq('id', user.id)
+    }
+  }, [user, isDemoMode, supabase, setLocale])
+
   const handleSaveSlug = useCallback(async () => {
     if (!user) return
     setSlugSaving(true)
@@ -63,7 +74,7 @@ export default function SettingsPage() {
     setVenueSlug(slug)
 
     if (!slug) {
-      setSlugMessage('Введите URL для меню')
+      setSlugMessage(ts.slugEmpty)
       setSlugSaving(false)
       return
     }
@@ -74,20 +85,20 @@ export default function SettingsPage() {
       .eq('id', user.id)
 
     if (error) {
-      setSlugMessage(error.message.includes('unique') ? 'Этот URL уже занят' : 'Ошибка: ' + error.message)
+      setSlugMessage(error.message.includes('unique') ? ts.slugTaken : tc.error + ': ' + error.message)
     } else {
-      setSlugMessage('URL сохранён!')
+      setSlugMessage(ts.slugSaved)
       await refreshProfile()
     }
     setSlugSaving(false)
     setTimeout(() => setSlugMessage(''), 3000)
-  }, [user, venueSlug, supabase, refreshProfile])
+  }, [user, venueSlug, supabase, refreshProfile, ts, tc])
 
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(menuUrl)
-    setSlugMessage('URL скопирован!')
+    setSlugMessage(ts.slugCopied)
     setTimeout(() => setSlugMessage(''), 2000)
-  }, [menuUrl])
+  }, [menuUrl, ts])
 
   const handleDownloadQR = useCallback(() => {
     const canvas = qrRef.current
@@ -117,9 +128,9 @@ export default function SettingsPage() {
       .eq('id', user.id)
 
     if (error) {
-      setMessage('Ошибка сохранения: ' + error.message)
+      setMessage(tc.errorSaving + ': ' + error.message)
     } else {
-      setMessage('Настройки сохранены!')
+      setMessage(ts.saved)
       await refreshProfile()
     }
 
@@ -128,10 +139,8 @@ export default function SettingsPage() {
   }
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Вы уверены? Все данные будут удалены безвозвратно.')) return
-    if (!confirm('Это действие нельзя отменить. Продолжить?')) return
-
-    // In production, this would call an API to delete the account
+    if (!confirm(ts.deleteConfirm1)) return
+    if (!confirm(ts.deleteConfirm2)) return
     await signOut()
   }
 
@@ -151,12 +160,12 @@ export default function SettingsPage() {
       if (data.url) {
         window.location.href = data.url
       } else {
-        setMessage('Ошибка: ' + (data.error || 'Не удалось открыть портал'))
+        setMessage(tc.error + ': ' + (data.error || ts.portalError))
         setTimeout(() => setMessage(''), 3000)
       }
     } catch (error) {
       void error
-      setMessage('Ошибка при открытии портала подписки')
+      setMessage(ts.portalOpenError)
       setTimeout(() => setMessage(''), 3000)
     } finally {
       setPortalLoading(false)
@@ -169,38 +178,65 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Настройки</h1>
+        <h1 className="text-2xl font-bold">{ts.title}</h1>
         <p className="text-[var(--color-textMuted)]">
-          Управление профилем и подпиской
+          {ts.subtitle}
         </p>
+      </div>
+
+      {/* Language Selector */}
+      <div className="card p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">{ts.language}</h2>
+          <p className="text-sm text-[var(--color-textMuted)]">{ts.languageDescription}</p>
+        </div>
+        <div className="flex gap-2">
+          {LOCALES.map((loc) => {
+            const info = LOCALE_LABELS[loc]
+            return (
+              <button
+                key={loc}
+                onClick={() => handleLocaleChange(loc)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  locale === loc
+                    ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                    : 'bg-[var(--color-bgHover)] text-[var(--color-text)] hover:bg-[var(--color-border)]'
+                }`}
+              >
+                <span>{info.flag}</span>
+                <span>{info.name}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Subscription Status */}
       <div className="card p-6">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold mb-1">Подписка</h2>
+            <h2 className="text-lg font-semibold mb-1">{ts.subscription}</h2>
             <div className="flex items-center gap-2">
               <span className={`badge ${tier === 'free' ? 'badge-warning' : 'badge-success'}`}>
                 {tier.toUpperCase()}
               </span>
               {isExpired && (
-                <span className="badge badge-danger">Истекла</span>
+                <span className="badge badge-danger">{ts.expired}</span>
               )}
               {daysUntilExpiry !== null && daysUntilExpiry <= 7 && !isExpired && (
                 <span className="text-sm text-[var(--color-warning)]">
-                  Истекает через {daysUntilExpiry} дн.
+                  {ts.expiresIn(daysUntilExpiry)}
                 </span>
               )}
             </div>
             {tier === 'free' && (
               <p className="text-sm text-[var(--color-textMuted)] mt-2">
-                Обновите подписку для доступа к полному функционалу
+                {ts.upgradeForFull}
               </p>
             )}
             {hasActiveSubscription && (
               <p className="text-sm text-[var(--color-textMuted)] mt-2">
-                Управляйте подпиской, измените тариф или отмените
+                {ts.manageSubscription}
               </p>
             )}
           </div>
@@ -211,11 +247,11 @@ export default function SettingsPage() {
                 disabled={portalLoading}
                 className="btn btn-primary disabled:opacity-50"
               >
-                {portalLoading ? 'Загрузка...' : 'Управление'}
+                {portalLoading ? tc.loading : ts.manage}
               </button>
             ) : (
               <Link href="/pricing" className="btn btn-primary">
-                {tier === 'free' ? 'Обновить' : 'Изменить тариф'}
+                {tier === 'free' ? tc.upgrade : ts.changePlan}
               </Link>
             )}
           </div>
@@ -224,9 +260,9 @@ export default function SettingsPage() {
 
       {/* Modules */}
       <div className="card p-6 space-y-5">
-        <h2 className="text-lg font-semibold">Модули заведения</h2>
+        <h2 className="text-lg font-semibold">{ts.venueModules}</h2>
         <p className="text-sm text-[var(--color-textMuted)]">
-          Включайте нужные разделы для вашего бизнеса
+          {ts.modulesDescription}
         </p>
 
         <div className="space-y-4">
@@ -235,14 +271,14 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <span className="text-xl">🔥</span>
               <div>
-                <h3 className="font-medium">Кальянная</h3>
-                <p className="text-xs text-[var(--color-textMuted)]">Табак, миксы, чаши, сессии</p>
+                <h3 className="font-medium">{ts.hookahModule}</h3>
+                <p className="text-xs text-[var(--color-textMuted)]">{ts.hookahModuleDesc}</p>
               </div>
             </div>
             <button
               onClick={() => toggleModule('hookah')}
               disabled={modulesLoading || (isHookahActive && !isBarActive)}
-              title={isHookahActive && !isBarActive ? 'Нельзя отключить единственный модуль' : undefined}
+              title={isHookahActive && !isBarActive ? ts.cannotDisableSingle : undefined}
               className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                 isHookahActive ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
               }`}
@@ -258,14 +294,14 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <span className="text-xl">🍸</span>
               <div>
-                <h3 className="font-medium">Бар</h3>
-                <p className="text-xs text-[var(--color-textMuted)]">Ингредиенты, рецепты, меню, продажи</p>
+                <h3 className="font-medium">{ts.barModule}</h3>
+                <p className="text-xs text-[var(--color-textMuted)]">{ts.barModuleDesc}</p>
               </div>
             </div>
             <button
               onClick={() => toggleModule('bar')}
               disabled={modulesLoading || (isBarActive && !isHookahActive)}
-              title={isBarActive && !isHookahActive ? 'Нельзя отключить единственный модуль' : undefined}
+              title={isBarActive && !isHookahActive ? ts.cannotDisableSingle : undefined}
               className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                 isBarActive ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
               }`}
@@ -281,22 +317,22 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <span className="text-xl">🍳</span>
               <div>
-                <h3 className="font-medium">Кухня</h3>
-                <p className="text-xs text-[var(--color-textMuted)]">Продукты, рецепты, калькуляция</p>
+                <h3 className="font-medium">{ts.kitchenModule}</h3>
+                <p className="text-xs text-[var(--color-textMuted)]">{ts.kitchenModuleDesc}</p>
               </div>
             </div>
-            <span className="text-xs text-[var(--color-textMuted)]">Скоро</span>
+            <span className="text-xs text-[var(--color-textMuted)]">{tc.soon}</span>
           </div>
         </div>
       </div>
 
       {/* Profile Form */}
       <form onSubmit={handleSave} className="card p-6 space-y-5">
-        <h2 className="text-lg font-semibold">Профиль заведения</h2>
+        <h2 className="text-lg font-semibold">{ts.venueProfile}</h2>
 
         {message && (
           <div className={`p-4 rounded-lg ${
-            message.includes('Ошибка')
+            message.includes(tc.error)
               ? 'bg-[var(--color-danger)]/10 text-[var(--color-danger)]'
               : 'bg-[var(--color-success)]/10 text-[var(--color-success)]'
           }`}>
@@ -305,7 +341,7 @@ export default function SettingsPage() {
         )}
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Email</label>
+          <label className="block text-sm font-medium">{ts.emailLabel}</label>
           <input
             type="email"
             value={user?.email || ''}
@@ -313,13 +349,13 @@ export default function SettingsPage() {
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-[var(--color-textMuted)] cursor-not-allowed"
           />
           <p className="text-xs text-[var(--color-textMuted)]">
-            Email нельзя изменить
+            {ts.emailCannotChange}
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Название заведения</label>
+            <label className="block text-sm font-medium">{ts.businessNameLabel}</label>
             <input
               type="text"
               value={businessName}
@@ -330,7 +366,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Имя владельца</label>
+            <label className="block text-sm font-medium">{ts.ownerNameLabel}</label>
             <input
               type="text"
               value={ownerName}
@@ -342,7 +378,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Телефон</label>
+          <label className="block text-sm font-medium">{ts.phoneLabel}</label>
           <input
             type="tel"
             value={phone}
@@ -353,7 +389,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Адрес</label>
+          <label className="block text-sm font-medium">{ts.addressLabel}</label>
           <input
             type="text"
             value={address}
@@ -368,7 +404,7 @@ export default function SettingsPage() {
           disabled={saving}
           className="btn btn-primary disabled:opacity-50"
         >
-          {saving ? 'Сохранение...' : 'Сохранить изменения'}
+          {saving ? tc.saving : tc.save}
         </button>
       </form>
 
@@ -381,16 +417,16 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">QR-меню</h2>
+            <h2 className="text-lg font-semibold">{ts.qrMenu}</h2>
             <p className="text-sm text-[var(--color-textMuted)]">
-              Публичное меню по QR-коду для гостей
+              {ts.qrMenuDesc}
             </p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="block text-sm font-medium">URL вашего меню</label>
+            <label className="block text-sm font-medium">{ts.menuUrl}</label>
             <div className="flex gap-2">
               <div className="flex-1 flex items-center rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] overflow-hidden">
                 <span className="px-3 text-sm text-[var(--color-textMuted)] whitespace-nowrap border-r border-[var(--color-border)]">
@@ -409,16 +445,16 @@ export default function SettingsPage() {
                 disabled={slugSaving}
                 className="btn btn-primary disabled:opacity-50 whitespace-nowrap"
               >
-                {slugSaving ? '...' : 'Сохранить'}
+                {slugSaving ? '...' : ts.saveSlug}
               </button>
             </div>
             {slugMessage && (
-              <p className={`text-sm ${slugMessage.includes('Ошибка') || slugMessage.includes('занят') || slugMessage.includes('Введите') ? 'text-[var(--color-danger)]' : 'text-[var(--color-success)]'}`}>
+              <p className={`text-sm ${slugMessage === ts.slugSaved || slugMessage === ts.slugCopied ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
                 {slugMessage}
               </p>
             )}
             <p className="text-xs text-[var(--color-textMuted)]">
-              Латинские буквы, цифры и дефис. Например: my-lounge
+              {ts.slugHint}
             </p>
           </div>
 
@@ -447,15 +483,15 @@ export default function SettingsPage() {
 
               <div className="flex gap-3">
                 <button onClick={handleCopyUrl} className="btn btn-ghost text-sm">
-                  Копировать URL
+                  {ts.copyUrl}
                 </button>
                 <button onClick={handleDownloadQR} className="btn btn-primary text-sm">
-                  Скачать QR
+                  {ts.downloadQr}
                 </button>
               </div>
 
               <p className="text-xs text-[var(--color-textMuted)] text-center">
-                Распечатайте QR-код и разместите на столах — гости смогут открыть меню с телефона
+                {ts.qrPrintHint}
               </p>
             </div>
           )}
@@ -464,15 +500,15 @@ export default function SettingsPage() {
 
       {/* Notification Settings */}
       <div className="card p-6 space-y-5">
-        <h2 className="text-lg font-semibold">Уведомления</h2>
+        <h2 className="text-lg font-semibold">{ts.notifications}</h2>
 
         <div className="space-y-4">
           {/* Low Stock Toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium">Уведомления о низком остатке</h3>
+              <h3 className="font-medium">{ts.lowStockNotifications}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Показывать уведомления при входе, если табак заканчивается
+                {ts.lowStockDesc}
               </p>
             </div>
             <button
@@ -496,9 +532,9 @@ export default function SettingsPage() {
           {/* Threshold Slider */}
           <div className={notificationSettings?.low_stock_enabled ? '' : 'opacity-50 pointer-events-none'}>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium">Порог предупреждения</label>
+              <label className="block text-sm font-medium">{ts.warningThreshold}</label>
               <span className="text-sm font-bold text-[var(--color-primary)]">
-                {notificationSettings?.low_stock_threshold || 50}г
+                {notificationSettings?.low_stock_threshold || 50}{tc.grams}
               </span>
             </div>
             <input
@@ -513,8 +549,8 @@ export default function SettingsPage() {
               className="w-full"
             />
             <div className="flex justify-between text-xs text-[var(--color-textMuted)] mt-1">
-              <span>10г</span>
-              <span>200г</span>
+              <span>10{tc.grams}</span>
+              <span>200{tc.grams}</span>
             </div>
           </div>
 
@@ -524,11 +560,11 @@ export default function SettingsPage() {
               <hr className="border-[var(--color-border)]" />
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium">Push-уведомления</h3>
+                  <h3 className="font-medium">{ts.pushNotifications}</h3>
                   <p className="text-sm text-[var(--color-textMuted)]">
                     {pushPermission === 'denied'
-                      ? 'Уведомления заблокированы в браузере'
-                      : 'Получать уведомления даже когда сайт закрыт'}
+                      ? ts.pushBlocked
+                      : ts.pushDescription}
                   </p>
                 </div>
                 <button
@@ -549,7 +585,7 @@ export default function SettingsPage() {
               </div>
               {pushSubscribed && (
                 <p className="text-xs text-[var(--color-success)] flex items-center gap-1">
-                  <span>✓</span> Push-уведомления включены
+                  <span>✓</span> {ts.pushEnabled}
                 </p>
               )}
             </>
@@ -566,9 +602,9 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Email-уведомления</h2>
+            <h2 className="text-lg font-semibold">{ts.emailNotifications}</h2>
             <p className="text-sm text-[var(--color-textMuted)]">
-              Получайте важные уведомления на почту
+              {ts.emailNotifDesc}
             </p>
           </div>
         </div>
@@ -579,16 +615,16 @@ export default function SettingsPage() {
           </div>
         ) : !emailConfigured ? (
           <p className="text-sm text-[var(--color-textMuted)] italic">
-            Email-сервис не настроен. Добавьте RESEND_API_KEY в переменные окружения.
+            {ts.emailNotConfigured}
           </p>
         ) : (
           <div className="space-y-4">
             {/* Master toggle */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Email-уведомления</h3>
+                <h3 className="font-medium">{ts.emailNotifications}</h3>
                 <p className="text-sm text-[var(--color-textMuted)]">
-                  Включить отправку уведомлений на {user?.email}
+                  {ts.emailToggleDesc(user?.email || '')}
                 </p>
               </div>
               <button
@@ -612,7 +648,7 @@ export default function SettingsPage() {
             {/* Individual toggles */}
             <div className={emailSettings?.email_notifications_enabled ? 'space-y-3 pt-2' : 'space-y-3 pt-2 opacity-50 pointer-events-none'}>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Низкий запас табака</span>
+                <span className="text-sm">{ts.lowStockEmail}</span>
                 <button
                   onClick={() => updateEmailSettings({
                     low_stock_email: !emailSettings?.low_stock_email
@@ -628,7 +664,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Обновления заказов</span>
+                <span className="text-sm">{ts.orderUpdatesEmail}</span>
                 <button
                   onClick={() => updateEmailSettings({
                     order_updates_email: !emailSettings?.order_updates_email
@@ -644,7 +680,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Ежедневный отчёт</span>
+                <span className="text-sm">{ts.dailySummaryEmail}</span>
                 <button
                   onClick={() => updateEmailSettings({
                     daily_summary_email: !emailSettings?.daily_summary_email
@@ -672,9 +708,9 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">POS Касса (ready2order)</h2>
+            <h2 className="text-lg font-semibold">{ts.posTitle}</h2>
             <p className="text-sm text-[var(--color-textMuted)]">
-              Синхронизация с кассовой системой ready2order
+              {ts.posDesc}
             </p>
           </div>
         </div>
@@ -685,13 +721,13 @@ export default function SettingsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
             <div>
-              <p className="text-sm font-medium">Доступно на тарифе Pro</p>
+              <p className="text-sm font-medium">{ts.posProOnly}</p>
               <p className="text-xs text-[var(--color-textMuted)]">
-                Обновите подписку для интеграции с POS-системой
+                {ts.posProUpgrade}
               </p>
             </div>
             <Link href="/pricing" className="btn btn-primary btn-sm ml-auto">
-              Обновить
+              {tc.upgrade}
             </Link>
           </div>
         ) : r2oLoading ? (
@@ -703,10 +739,10 @@ export default function SettingsPage() {
             <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-success)]/10">
               <span className="text-[var(--color-success)]">✓</span>
               <span className="text-sm">
-                POS подключена
+                {ts.posConnected}
                 {r2oConnection.last_sync_at && (
                   <span className="text-[var(--color-textMuted)]">
-                    {' '}· последняя синхронизация: {new Date(r2oConnection.last_sync_at).toLocaleString('ru-RU')}
+                    {' '}· {ts.lastSync}: {new Date(r2oConnection.last_sync_at).toLocaleString(locale)}
                   </span>
                 )}
               </span>
@@ -720,9 +756,9 @@ export default function SettingsPage() {
 
             {r2oSyncResult && (
               <div className="p-3 rounded-xl bg-[var(--color-primary)]/10 text-sm">
-                Синхронизировано: {r2oSyncResult.synced} из {r2oSyncResult.total}
+                {ts.synced(r2oSyncResult.synced, r2oSyncResult.total)}
                 {r2oSyncResult.errors > 0 && (
-                  <span className="text-[var(--color-danger)]"> ({r2oSyncResult.errors} ошибок)</span>
+                  <span className="text-[var(--color-danger)]"> {ts.syncErrors(r2oSyncResult.errors)}</span>
                 )}
               </div>
             )}
@@ -733,26 +769,26 @@ export default function SettingsPage() {
                 disabled={r2oSyncing}
                 className="btn btn-primary disabled:opacity-50"
               >
-                {r2oSyncing ? 'Синхронизация...' : 'Синхронизировать'}
+                {r2oSyncing ? ts.syncing : ts.sync}
               </button>
               <button
                 onClick={r2oDisconnect}
                 className="text-sm text-[var(--color-danger)] hover:underline"
               >
-                Отключить POS
+                {ts.disconnectPos}
               </button>
             </div>
 
             {!r2oConnection.webhook_registered && (
               <p className="text-xs text-[var(--color-warning)]">
-                Вебхуки не зарегистрированы. Автоматическое списание при продажах недоступно.
+                {ts.webhooksNotRegistered}
               </p>
             )}
           </div>
         ) : (
           <div className="space-y-4">
             <p className="text-sm text-[var(--color-textMuted)]">
-              Подключите ready2order для автоматической синхронизации товаров, отслеживания продаж и управления остатками из кассы.
+              {ts.posConnectDesc}
             </p>
 
             {r2oError && (
@@ -768,7 +804,7 @@ export default function SettingsPage() {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Подключить POS
+              {ts.connectPos}
             </button>
           </div>
         )}
@@ -783,9 +819,9 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Telegram</h2>
+            <h2 className="text-lg font-semibold">{ts.telegram}</h2>
             <p className="text-sm text-[var(--color-textMuted)]">
-              Получайте уведомления в Telegram
+              {ts.telegramDesc}
             </p>
           </div>
         </div>
@@ -799,14 +835,14 @@ export default function SettingsPage() {
             <div className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-success)]/10">
               <span className="text-[var(--color-success)]">✓</span>
               <span className="text-sm">
-                Подключён как <strong>@{telegramConnection.telegram_username || telegramConnection.telegram_user_id}</strong>
+                {ts.telegramConnected(telegramConnection.telegram_username || String(telegramConnection.telegram_user_id))}
               </span>
             </div>
 
             {/* Notification toggles */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Уведомления о низком остатке</span>
+                <span className="text-sm">{ts.telegramLowStock}</span>
                 <button
                   onClick={() => updateTelegramSettings({
                     low_stock_alerts: !telegramConnection.low_stock_alerts
@@ -822,7 +858,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Напоминания о сессиях</span>
+                <span className="text-sm">{ts.telegramSessions}</span>
                 <button
                   onClick={() => updateTelegramSettings({
                     session_reminders: !telegramConnection.session_reminders
@@ -838,7 +874,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm">Ежедневный отчёт</span>
+                <span className="text-sm">{ts.telegramDaily}</span>
                 <button
                   onClick={() => updateTelegramSettings({
                     daily_summary: !telegramConnection.daily_summary
@@ -858,13 +894,13 @@ export default function SettingsPage() {
               onClick={disconnectTelegram}
               className="text-sm text-[var(--color-danger)] hover:underline"
             >
-              Отключить Telegram
+              {ts.disconnectTelegram}
             </button>
           </div>
         ) : (
           <div className="space-y-4">
             <p className="text-sm text-[var(--color-textMuted)]">
-              Подключите Telegram для получения уведомлений о низком запасе табака, статусах заказов и ежедневных отчётов.
+              {ts.telegramConnectDesc}
             </p>
 
             {telegramConnectLink ? (
@@ -877,11 +913,11 @@ export default function SettingsPage() {
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-3.083 11.783-3.083 11.783-.145.58-.515.748-.845.748-.511 0-.753-.342-1.258-.788l-3.255-2.548-.961.926c-.144.138-.264.254-.529.254-.294 0-.345-.108-.483-.365l-1.088-3.575-3.13-.972c-.567-.164-.575-.565.152-.851l12.178-4.688c.467-.182.9.114.751.676z"/>
                 </svg>
-                Подключить Telegram
+                {ts.connectTelegram}
               </a>
             ) : (
               <p className="text-sm text-[var(--color-textMuted)] italic">
-                Telegram-бот не настроен. Добавьте TELEGRAM_BOT_TOKEN в переменные окружения.
+                {ts.telegramNotConfigured}
               </p>
             )}
           </div>
@@ -891,22 +927,22 @@ export default function SettingsPage() {
       {/* Danger Zone */}
       <div className="card p-6 border-[var(--color-danger)]/30">
         <h2 className="text-lg font-semibold text-[var(--color-danger)] mb-4">
-          Опасная зона
+          {ts.dangerZone}
         </h2>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium">Выйти из аккаунта</h3>
+              <h3 className="font-medium">{ts.logoutTitle}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Вы будете разлогинены на этом устройстве
+                {ts.logoutDesc}
               </p>
             </div>
             <button
               onClick={() => signOut()}
               className="btn btn-ghost border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
             >
-              Выйти
+              {ts.logout}
             </button>
           </div>
 
@@ -914,16 +950,16 @@ export default function SettingsPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium">Удалить аккаунт</h3>
+              <h3 className="font-medium">{ts.deleteAccount}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Все данные будут удалены безвозвратно
+                {ts.deleteAccountDesc}
               </p>
             </div>
             <button
               onClick={handleDeleteAccount}
               className="btn bg-[var(--color-danger)] text-white hover:opacity-80"
             >
-              Удалить аккаунт
+              {ts.deleteAccount}
             </button>
           </div>
         </div>

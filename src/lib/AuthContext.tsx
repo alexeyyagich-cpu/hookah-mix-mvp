@@ -38,6 +38,7 @@ const DEMO_PROFILE: Profile = {
   business_type: 'hookah_bar',
   // Modules - all active for demo
   active_modules: ['hookah', 'bar'],
+  locale: 'ru',
   created_at: new Date().toISOString(),
 }
 

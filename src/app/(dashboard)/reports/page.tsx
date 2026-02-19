@@ -18,11 +18,13 @@ import {
   IconLock,
   IconCocktail,
 } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 
 type ModuleFilter = 'all' | 'bar' | 'hookah'
 
 export default function ReportsPage() {
+  const tm = useTranslation('manage')
   const { data, loading, selectedPreset, setSelectedPreset, period } = usePnL()
   const { isHookahActive, isBarActive } = useModules()
   const { isFreeTier, canExport } = useSubscription()
@@ -88,9 +90,9 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Отчет P&L</h1>
+          <h1 className="text-2xl font-bold">{tm.reportsTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            Прибыль и убытки за период
+            {tm.reportsDescription}
           </p>
         </div>
 

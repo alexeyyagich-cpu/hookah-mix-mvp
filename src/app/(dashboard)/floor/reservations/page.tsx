@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconTrash } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import type { ReservationStatus } from '@/types/database'
 
 const STATUS_LABELS: Record<ReservationStatus, string> = {
@@ -24,6 +25,7 @@ const STATUS_COLORS: Record<ReservationStatus, string> = {
 type StatusFilter = 'all' | ReservationStatus
 
 export default function ReservationsPage() {
+  const tm = useTranslation('manage')
   const { reservations, loading, updateStatus, assignTable, deleteReservation } = useReservations()
   const { tables } = useFloorPlan()
 
@@ -66,7 +68,7 @@ export default function ReservationsPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <IconCalendar size={24} className="text-[var(--color-primary)]" />
-            Бронирования
+            {tm.reservationsTitle}
           </h1>
           <p className="text-[var(--color-textMuted)] mt-1">
             {filteredReservations.length} бронирований
@@ -76,14 +78,14 @@ export default function ReservationsPage() {
           href="/floor"
           className="text-sm text-[var(--color-primary)] hover:underline"
         >
-          ← План зала
+          ← {tm.floorTitle}
         </Link>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div>
-          <label className="block text-xs text-[var(--color-textMuted)] mb-1">Дата</label>
+          <label className="block text-xs text-[var(--color-textMuted)] mb-1">{tm.date}</label>
           <input
             type="date"
             value={dateFilter}
@@ -120,7 +122,7 @@ export default function ReservationsPage() {
       {filteredReservations.length === 0 ? (
         <div className="card p-12 text-center">
           <div className="text-4xl mb-3">📅</div>
-          <h3 className="text-lg font-semibold mb-2">Нет бронирований</h3>
+          <h3 className="text-lg font-semibold mb-2">{tm.noReservations}</h3>
           <p className="text-[var(--color-textMuted)] text-sm">
             На выбранную дату нет бронирований.
           </p>
@@ -202,7 +204,7 @@ export default function ReservationsPage() {
                           onClick={() => updateStatus(reservation.id, 'confirmed')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-success)]/20 text-[var(--color-success)] hover:bg-[var(--color-success)]/30 transition-colors"
                         >
-                          Подтвердить
+                          {tm.confirmReservation}
                         </button>
                       )}
                       {(reservation.status === 'pending' || reservation.status === 'confirmed') && (

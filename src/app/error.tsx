@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 export default function GlobalError({
   error,
@@ -9,6 +10,8 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const tc = useTranslation('common')
+
   useEffect(() => {
     console.error('Unhandled error:', error)
   }, [error])
@@ -21,9 +24,9 @@ export default function GlobalError({
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold mb-2">Что-то пошло не так</h1>
+          <h1 className="text-2xl font-bold mb-2">{tc.errorGeneric}</h1>
           <p className="text-[var(--color-textMuted)]">
-            Произошла непредвиденная ошибка. Попробуйте обновить страницу.
+            {tc.errorPage.description}
           </p>
         </div>
 
@@ -32,16 +35,16 @@ export default function GlobalError({
             onClick={reset}
             className="btn btn-primary px-6 py-3"
           >
-            Попробовать снова
+            {tc.retry}
           </button>
           <a href="/" className="btn btn-secondary px-6 py-3">
-            На главную
+            {tc.notFound.goHome}
           </a>
         </div>
 
         {error.digest && (
           <p className="text-xs text-[var(--color-textMuted)]">
-            Код ошибки: {error.digest}
+            {tc.errorPage.errorCode} {error.digest}
           </p>
         )}
       </div>

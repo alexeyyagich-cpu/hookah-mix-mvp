@@ -6,6 +6,7 @@ import { FloorPlan } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { IconSettings, IconCalendar } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import type { FloorTable, ReservationStatus } from '@/types/database'
 
 const STATUS_COLORS: Record<ReservationStatus, string> = {
@@ -16,6 +17,8 @@ const STATUS_COLORS: Record<ReservationStatus, string> = {
 }
 
 export default function FloorPage() {
+  const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { tables } = useFloorPlan()
   const { reservations } = useReservations()
   const [isEditMode, setIsEditMode] = useState(false)
@@ -43,7 +46,7 @@ export default function FloorPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">План зала</h1>
+          <h1 className="text-2xl font-bold">{tm.floorTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {stats.available} свободных из {stats.total} столов
           </p>
@@ -59,7 +62,7 @@ export default function FloorPage() {
           }}
         >
           <IconSettings size={18} />
-          {isEditMode ? 'Готово' : 'Редактировать'}
+          {isEditMode ? tm.ready : tc.edit}
         </button>
       </div>
 
@@ -161,16 +164,16 @@ export default function FloorPage() {
                 color: 'white',
               }}
             >
-              {selectedTable.status === 'available' ? 'Свободен' :
-               selectedTable.status === 'occupied' ? 'Занят' :
-               selectedTable.status === 'reserved' ? 'Забронирован' :
-               'Уборка'}
+              {selectedTable.status === 'available' ? tm.statusAvailable :
+               selectedTable.status === 'occupied' ? tm.statusOccupied :
+               selectedTable.status === 'reserved' ? tm.statusReserved :
+               tm.statusCleaning}
             </span>
           </div>
 
           {selectedTable.current_guest_name && (
             <div className="mb-4">
-              <p className="text-sm text-[var(--color-textMuted)]">Гость</p>
+              <p className="text-sm text-[var(--color-textMuted)]">{tm.currentGuest}</p>
               <p className="font-medium">{selectedTable.current_guest_name}</p>
             </div>
           )}
@@ -201,7 +204,7 @@ export default function FloorPage() {
               color: 'var(--color-text)',
             }}
           >
-            Закрыть
+            {tc.close}
           </button>
         </div>
       )}

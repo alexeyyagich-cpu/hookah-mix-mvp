@@ -1,0 +1,189 @@
+export const auth = {
+  // Login
+  loginTitle: 'Вход',
+  loginSubtitle: 'Войдите в свой бизнес-кабинет',
+  email: 'Email',
+  password: 'Пароль',
+  login: 'Войти',
+  loggingIn: 'Вход...',
+  invalidCredentials: 'Неверный email или пароль',
+  forgotPassword: 'Забыли пароль?',
+  noAccount: 'Нет аккаунта?',
+  register: 'Зарегистрироваться',
+
+  // Demo
+  demoMode: 'Демо-режим',
+  demoDescription: 'Supabase не настроен. Попробуйте демо-версию!',
+  demoLogin: 'Войти в демо-режим',
+
+  // Register
+  registerTitle: 'Регистрация',
+  registerSubtitle: 'Создайте аккаунт для вашего заведения',
+  businessName: 'Название заведения',
+  ownerName: 'Ваше имя',
+  confirmPassword: 'Подтвердите пароль',
+  createAccount: 'Создать аккаунт',
+  creatingAccount: 'Создание аккаунта...',
+  hasAccount: 'Уже есть аккаунт?',
+  passwordMismatch: 'Пароли не совпадают',
+  passwordTooShort: 'Пароль должен содержать минимум 6 символов',
+  passwordPlaceholder: 'Минимум 6 символов',
+  repeatPasswordPlaceholder: 'Повторите пароль',
+
+  // Email confirmation
+  checkEmail: 'Проверьте почту',
+  emailSentTo: (email: string) => `Мы отправили письмо на ${email}.`,
+  confirmEmailText: 'Перейдите по ссылке в письме для подтверждения аккаунта.',
+  backToLogin: 'Вернуться к входу',
+
+  // Forgot password
+  forgotTitle: 'Восстановление пароля',
+  forgotSubtitle: 'Введите email для получения ссылки на сброс пароля',
+  sendLink: 'Отправить ссылку',
+  sending: 'Отправка...',
+  emailSent: 'Письмо отправлено',
+  checkEmailReset: (email: string) => `Проверьте почту ${email} и перейдите по ссылке для установки нового пароля.`,
+  rememberPassword: 'Вспомнили пароль?',
+
+  // Update password
+  newPasswordTitle: 'Новый пароль',
+  newPasswordSubtitle: 'Установите новый пароль для вашего аккаунта',
+  newPassword: 'Новый пароль',
+  setPassword: 'Установить пароль',
+  passwordUpdated: 'Пароль обновлён',
+  redirecting: 'Перенаправляем в личный кабинет...',
+
+  // Landing page — Navigation
+  navFeatures: 'Возможности',
+  navBenefits: 'Преимущества',
+  navPricing: 'Тарифы',
+  navCalculator: 'Калькулятор',
+  dashboard: 'Личный кабинет',
+  signIn: 'Войти',
+  startFree: 'Начать бесплатно',
+
+  // Landing page — Hero
+  heroBadge: 'Бесплатный старт — без карты',
+  heroTitle1: 'Управляйте кальянной',
+  heroTitle2: ' как профи',
+  heroSubtitle: 'Учёт табака, создание миксов с AI, аналитика и гостевая база — всё в одном приложении для вашего заведения',
+  heroCta: 'Попробовать бесплатно',
+  heroCtaCalculator: 'Открыть калькулятор',
+  heroNote: 'Бесплатный старт за 2 минуты',
+
+  // Landing page — Features
+  featuresTitle1: 'Всё что нужно для ',
+  featuresTitle2: 'эффективной работы',
+  featuresSubtitle: 'Инструменты, которые экономят время и увеличивают прибыль',
+  feature1Title: 'Учёт инвентаря',
+  feature1Desc: 'Отслеживайте остатки табака в реальном времени. Уведомления о низком остатке и прогноз расхода.',
+  feature2Title: 'Калькулятор миксов',
+  feature2Desc: 'Создавайте идеальные миксы с AI-рекомендациями. Сохраняйте любимые рецепты.',
+  feature3Title: 'Аналитика',
+  feature3Desc: 'Детальная статистика: популярные вкусы, расход по брендам, сравнение периодов.',
+  feature4Title: 'История сессий',
+  feature4Desc: 'Полная история всех кальянов. Оценки, заметки, повторение лучших миксов.',
+  feature5Title: 'Гостевая база',
+  feature5Desc: 'Запоминайте предпочтения гостей. Персонализированный сервис без лишних вопросов.',
+  feature6Title: 'Публичное меню',
+  feature6Desc: 'QR-код для гостей с вашим меню табаков и фирменными миксами.',
+
+  // Landing page — Benefits
+  benefitsTitle: 'Что вы получите',
+  benefitsSubtitle: 'Конкретные преимущества для вашего бизнеса',
+  benefit1Stat: '-30%',
+  benefit1Label: 'расхода табака',
+  benefit1Desc: 'Точный учёт исключает потери и перерасход',
+  benefit2Stat: '2x',
+  benefit2Label: 'быстрее обслуживание',
+  benefit2Desc: 'Готовые миксы и история предпочтений гостей',
+  benefit3Stat: '100%',
+  benefit3Label: 'контроль склада',
+  benefit3Desc: 'Всегда знаете что заканчивается и когда заказывать',
+
+  // Landing page — How it works
+  howTitle1: 'Как это ',
+  howTitle2: 'работает',
+  step1Title: 'Зарегистрируйтесь',
+  step1Desc: 'Создайте аккаунт за 30 секунд. Добавьте название заведения и начните работу.',
+  step2Title: 'Добавьте табаки',
+  step2Desc: 'Внесите инвентарь вручную или отсканируйте штрих-код. Укажите остатки и цены закупки.',
+  step3Title: 'Работайте эффективнее',
+  step3Desc: 'Создавайте миксы, ведите сессии, следите за статистикой. Система сама считает расход и напомнит о заказе.',
+
+  // Landing page — CTA
+  ctaTitle: 'Готовы начать?',
+  ctaSubtitle: 'Бесплатный тариф — навсегда. Без скрытых платежей и обязательств.',
+  ctaButton: 'Создать аккаунт',
+  ctaComparePlans: 'Сравнить тарифы',
+  ctaFreeStart: 'Бесплатный старт',
+  ctaNoCard: 'Без карты',
+  ctaCancelAnytime: 'Отмена в любой момент',
+
+  // Landing page — Footer
+  footerDescription: 'Платформа для управления кальянным бизнесом',
+  footerProduct: 'Продукт',
+  footerMixCalculator: 'Калькулятор миксов',
+  footerAiRecommendations: 'AI Рекомендации',
+  footerPricing: 'Тарифы',
+  footerLegal: 'Правовая информация',
+  footerTerms: 'Условия использования',
+  footerPrivacy: 'Политика конфиденциальности',
+  footerCopyright: (year: number) => `© ${year} Hookah Torus. Все права защищены.`,
+
+  // Pricing page
+  pricingHeroSubtitle: 'Инструменты для учета табака, анализа сессий и оптимизации работы вашего заведения',
+  paymentCanceled: 'Оплата была отменена. Выберите тариф, чтобы попробовать снова.',
+  billingMonthly: 'Ежемесячно',
+  billingYearly: 'Ежегодно',
+  priceFree: 'Бесплатно',
+  pricePerYear: (price: string) => `${price}/год`,
+  pricePerMonth: (price: string) => `${price}/мес`,
+  priceMonthlyEquiv: (price: string) => `≈ ${price}/мес`,
+  subscribe: 'Подключить',
+  stripeNotConfigured: 'Stripe не настроен. Добавьте STRIPE_PRICE_* в переменные окружения.',
+  paymentError: 'Ошибка при создании сессии оплаты. Попробуйте позже.',
+
+  // Pricing page — Plan descriptions
+  planDescFree: 'Для пробного использования',
+  planDescPro: 'Для активных заведений',
+  planDescEnterprise: 'Для сетей заведений',
+
+  // Pricing page — Feature names
+  featureInventoryItems: 'Позиций в инвентаре',
+  featureSessionHistory: 'История сессий',
+  featureSessionDays: (days: string) => `${days} дней`,
+  featureBowlTypes: 'Типов чаш',
+  featureBasicStats: 'Базовая статистика',
+  featureMarketplace: 'Маркетплейс',
+  featureTeamManagement: 'Управление командой',
+  featureApiAccess: 'API доступ',
+  featureFullStats: 'Полная статистика',
+  featureExportCsvPdf: 'Экспорт CSV/PDF',
+  featureEmailNotifications: 'Email уведомления',
+  featureAllFromPro: 'Всё из Pro',
+  featureUnlimitedLocations: 'Неограниченные локации',
+  featureAutoOrder: 'Авто-заказ табака',
+  featureCustomIntegrations: 'Кастомные интеграции',
+  featureWhiteLabel: 'White-label брендинг',
+  featurePrioritySupport: 'Приоритетная поддержка 24/7',
+  featurePersonalManager: 'Персональный менеджер',
+
+  // Pricing page — FAQ
+  faqTitle: 'Часто задаваемые вопросы',
+  faqQ1: 'Могу ли я отменить подписку?',
+  faqA1: 'Да, вы можете отменить подписку в любой момент из личного кабинета. Доступ сохранится до конца оплаченного периода.',
+  faqQ2: 'Какие способы оплаты доступны?',
+  faqA2: 'Мы принимаем банковские карты (Visa, Mastercard, American Express) через безопасную платежную систему Stripe.',
+  faqQ3: 'Есть ли пробный период для Pro?',
+  faqA3: 'Да, для новых пользователей доступен 14-дневный пробный период Pro без ограничений и без карты.',
+  faqQ4: 'Могу ли я перейти на другой тариф?',
+  faqA4: 'Да, вы можете повысить или понизить тариф в любой момент через личный кабинет.',
+  faqQ5: 'Что будет с моими данными при понижении тарифа?',
+  faqA5: 'Ваши данные сохранятся, но доступ к некоторым функциям будет ограничен согласно выбранному тарифу.',
+  faqQ6: 'Возможен ли возврат средств?',
+  faqA6: 'Да, в течение 14 дней после оплаты вы можете запросить полный возврат средств.',
+
+  // Pricing page — Contact
+  contactCta: 'Есть вопросы? Напишите нам',
+}

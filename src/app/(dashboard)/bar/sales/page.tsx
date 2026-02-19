@@ -4,10 +4,12 @@ import { useState, useMemo } from 'react'
 import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
+import { useTranslation } from '@/lib/i18n'
 
 type Period = 7 | 14 | 30
 
 export default function BarSalesPage() {
+  const tb = useTranslation('bar')
   const { sales, loading, error, recordSale, deleteSale, getAnalytics } = useBarSales()
   const { recipes, calculateCost } = useBarRecipes()
 
@@ -40,7 +42,7 @@ export default function BarSalesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Продажи бара</h1>
+          <h1 className="text-2xl font-bold">{tb.salesTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             Быстрые продажи, автосписание и аналитика
           </p>
@@ -59,11 +61,11 @@ export default function BarSalesPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Выручка</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.revenue}</div>
           <div className="text-2xl font-bold mt-1">{analytics.totalRevenue.toFixed(0)}€</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Прибыль</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.profit}</div>
           <div className="text-2xl font-bold text-[var(--color-success)] mt-1">
             {analytics.totalProfit.toFixed(0)}€
           </div>
@@ -73,7 +75,7 @@ export default function BarSalesPage() {
           <div className="text-2xl font-bold mt-1">{analytics.totalSales}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Средняя маржа</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.margin}</div>
           <div className={`text-2xl font-bold mt-1 ${
             analytics.avgMargin !== null
               ? analytics.avgMargin >= 60 ? 'text-[var(--color-success)]' : analytics.avgMargin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
@@ -89,7 +91,7 @@ export default function BarSalesPage() {
         {([
           { key: 'sell' as const, label: 'Продажа' },
           { key: 'log' as const, label: 'Журнал' },
-          { key: 'analytics' as const, label: 'Аналитика' },
+          { key: 'analytics' as const, label: tb.analytics },
         ]).map(t => (
           <button
             key={t.key}
@@ -233,10 +235,10 @@ export default function BarSalesPage() {
                     })}
                     <div className="flex items-center gap-4 pt-2 text-xs text-[var(--color-textMuted)]">
                       <span className="flex items-center gap-1">
-                        <span className="w-3 h-3 rounded bg-[var(--color-primary)]/20" /> Выручка
+                        <span className="w-3 h-3 rounded bg-[var(--color-primary)]/20" /> {tb.revenue}
                       </span>
                       <span className="flex items-center gap-1">
-                        <span className="w-3 h-3 rounded bg-[var(--color-danger)]/30" /> Себестоимость
+                        <span className="w-3 h-3 rounded bg-[var(--color-danger)]/30" /> {tb.cost}
                       </span>
                     </div>
                   </div>

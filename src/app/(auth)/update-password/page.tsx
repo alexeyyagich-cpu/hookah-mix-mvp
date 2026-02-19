@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState('')
@@ -13,18 +14,19 @@ export default function UpdatePasswordPage() {
   const [success, setSuccess] = useState(false)
   const { updatePassword } = useAuth()
   const router = useRouter()
+  const t = useTranslation('auth')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
     if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов')
+      setError(t.passwordTooShort)
       return
     }
 
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают')
+      setError(t.passwordMismatch)
       return
     }
 
@@ -51,9 +53,9 @@ export default function UpdatePasswordPage() {
             <source src="/images/logo-animated.mp4" type="video/mp4" />
           </video>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Новый пароль</h1>
+        <h1 className="text-3xl font-bold mb-2">{t.newPasswordTitle}</h1>
         <p className="text-[var(--color-textMuted)]">
-          Установите новый пароль для вашего аккаунта
+          {t.newPasswordSubtitle}
         </p>
       </div>
 
@@ -62,9 +64,9 @@ export default function UpdatePasswordPage() {
           <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-success)]/10 flex items-center justify-center">
             <span className="text-3xl text-[var(--color-success)]">✓</span>
           </div>
-          <h2 className="text-xl font-semibold">Пароль обновлён</h2>
+          <h2 className="text-xl font-semibold">{t.passwordUpdated}</h2>
           <p className="text-[var(--color-textMuted)]">
-            Перенаправляем в личный кабинет...
+            {t.redirecting}
           </p>
         </div>
       ) : (
@@ -77,7 +79,7 @@ export default function UpdatePasswordPage() {
 
           <div className="space-y-2">
             <label htmlFor="password" className="block text-sm font-medium">
-              Новый пароль
+              {t.newPassword}
             </label>
             <input
               id="password"
@@ -85,7 +87,7 @@ export default function UpdatePasswordPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-              placeholder="Минимум 6 символов"
+              placeholder={t.passwordPlaceholder}
               required
               minLength={6}
             />
@@ -93,7 +95,7 @@ export default function UpdatePasswordPage() {
 
           <div className="space-y-2">
             <label htmlFor="confirmPassword" className="block text-sm font-medium">
-              Подтвердите пароль
+              {t.confirmPassword}
             </label>
             <input
               id="confirmPassword"
@@ -101,7 +103,7 @@ export default function UpdatePasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-              placeholder="Повторите пароль"
+              placeholder={t.repeatPasswordPlaceholder}
               required
             />
           </div>
@@ -114,16 +116,16 @@ export default function UpdatePasswordPage() {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Сохранение...
+                {t.sending}
               </span>
             ) : (
-              'Установить пароль'
+              t.setPassword
             )}
           </button>
 
           <p className="text-center text-[var(--color-textMuted)]">
             <Link href="/login" className="text-[var(--color-primary)] hover:underline">
-              Вернуться к входу
+              {t.backToLogin}
             </Link>
           </p>
         </form>

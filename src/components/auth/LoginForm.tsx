@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -11,6 +12,7 @@ export function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn, signInDemo, isDemoMode } = useAuth()
+  const t = useTranslation('auth')
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/dashboard'
@@ -24,7 +26,7 @@ export function LoginForm() {
 
     if (signInError) {
       setError(signInError.message === 'Invalid login credentials'
-        ? 'Неверный email или пароль'
+        ? t.invalidCredentials
         : signInError.message)
       setLoading(false)
       return
@@ -53,9 +55,9 @@ export function LoginForm() {
             <source src="/images/logo-animated.mp4" type="video/mp4" />
           </video>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Вход</h1>
+        <h1 className="text-3xl font-bold mb-2">{t.loginTitle}</h1>
         <p className="text-[var(--color-textMuted)]">
-          Войдите в свой бизнес-кабинет
+          {t.loginSubtitle}
         </p>
       </div>
 
@@ -65,9 +67,9 @@ export function LoginForm() {
           <div className="flex items-center gap-3 mb-3">
             <span className="text-2xl">🎮</span>
             <div>
-              <h3 className="font-semibold">Демо-режим</h3>
+              <h3 className="font-semibold">{t.demoMode}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Supabase не настроен. Попробуйте демо-версию!
+                {t.demoDescription}
               </p>
             </div>
           </div>
@@ -76,7 +78,7 @@ export function LoginForm() {
             onClick={handleDemoLogin}
             className="w-full btn btn-primary py-3"
           >
-            🚀 Войти в демо-режим
+            {t.demoLogin}
           </button>
         </div>
       )}
@@ -90,7 +92,7 @@ export function LoginForm() {
 
         <div className="space-y-2">
           <label htmlFor="email" className="block text-sm font-medium">
-            Email
+            {t.email}
           </label>
           <input
             id="email"
@@ -105,7 +107,7 @@ export function LoginForm() {
 
         <div className="space-y-2">
           <label htmlFor="password" className="block text-sm font-medium">
-            Пароль
+            {t.password}
           </label>
           <input
             id="password"
@@ -126,23 +128,23 @@ export function LoginForm() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              Вход...
+              {t.loggingIn}
             </span>
           ) : (
-            'Войти'
+            t.login
           )}
         </button>
 
         <div className="text-center space-y-2">
           <p className="text-[var(--color-textMuted)]">
             <Link href="/forgot-password" className="text-[var(--color-primary)] hover:underline">
-              Забыли пароль?
+              {t.forgotPassword}
             </Link>
           </p>
           <p className="text-[var(--color-textMuted)]">
-            Нет аккаунта?{' '}
+            {t.noAccount}{' '}
             <Link href="/register" className="text-[var(--color-primary)] hover:underline">
-              Зарегистрироваться
+              {t.register}
             </Link>
           </p>
         </div>

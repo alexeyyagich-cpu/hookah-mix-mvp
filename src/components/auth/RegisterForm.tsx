@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 
 export function RegisterForm() {
   const [email, setEmail] = useState('')
@@ -16,18 +17,19 @@ export function RegisterForm() {
   const [success, setSuccess] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
+  const t = useTranslation('auth')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
     if (password !== confirmPassword) {
-      setError('Пароли не совпадают')
+      setError(t.passwordMismatch)
       return
     }
 
     if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов')
+      setError(t.passwordTooShort)
       return
     }
 
@@ -56,13 +58,13 @@ export function RegisterForm() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold">Проверьте почту</h2>
+          <h2 className="text-2xl font-bold">{t.checkEmail}</h2>
           <p className="text-[var(--color-textMuted)]">
-            Мы отправили письмо на <span className="text-[var(--color-text)]">{email}</span>.
-            Перейдите по ссылке в письме для подтверждения аккаунта.
+            {t.emailSentTo(email)}{' '}
+            {t.confirmEmailText}
           </p>
           <Link href="/login" className="btn btn-primary w-full py-4">
-            Вернуться к входу
+            {t.backToLogin}
           </Link>
         </div>
       </div>
@@ -84,9 +86,9 @@ export function RegisterForm() {
             <source src="/images/logo-animated.mp4" type="video/mp4" />
           </video>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Регистрация</h1>
+        <h1 className="text-3xl font-bold mb-2">{t.registerTitle}</h1>
         <p className="text-[var(--color-textMuted)]">
-          Создайте аккаунт для вашего заведения
+          {t.registerSubtitle}
         </p>
       </div>
 
@@ -99,7 +101,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <label htmlFor="businessName" className="block text-sm font-medium">
-            Название заведения
+            {t.businessName}
           </label>
           <input
             id="businessName"
@@ -113,7 +115,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <label htmlFor="ownerName" className="block text-sm font-medium">
-            Ваше имя
+            {t.ownerName}
           </label>
           <input
             id="ownerName"
@@ -127,7 +129,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <label htmlFor="email" className="block text-sm font-medium">
-            Email <span className="text-[var(--color-danger)]">*</span>
+            {t.email} <span className="text-[var(--color-danger)]">*</span>
           </label>
           <input
             id="email"
@@ -142,7 +144,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <label htmlFor="password" className="block text-sm font-medium">
-            Пароль <span className="text-[var(--color-danger)]">*</span>
+            {t.password} <span className="text-[var(--color-danger)]">*</span>
           </label>
           <input
             id="password"
@@ -150,14 +152,14 @@ export function RegisterForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-            placeholder="Минимум 6 символов"
+            placeholder={t.passwordPlaceholder}
             required
           />
         </div>
 
         <div className="space-y-2">
           <label htmlFor="confirmPassword" className="block text-sm font-medium">
-            Подтвердите пароль <span className="text-[var(--color-danger)]">*</span>
+            {t.confirmPassword} <span className="text-[var(--color-danger)]">*</span>
           </label>
           <input
             id="confirmPassword"
@@ -165,7 +167,7 @@ export function RegisterForm() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-            placeholder="Повторите пароль"
+            placeholder={t.repeatPasswordPlaceholder}
             required
           />
         </div>
@@ -178,17 +180,17 @@ export function RegisterForm() {
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-              Создание аккаунта...
+              {t.creatingAccount}
             </span>
           ) : (
-            'Создать аккаунт'
+            t.createAccount
           )}
         </button>
 
         <p className="text-center text-[var(--color-textMuted)]">
-          Уже есть аккаунт?{' '}
+          {t.hasAccount}{' '}
           <Link href="/login" className="text-[var(--color-primary)] hover:underline">
-            Войти
+            {t.login}
           </Link>
         </p>
       </form>

@@ -4,8 +4,10 @@ import { useState, useMemo } from 'react'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_LABELS, COCKTAIL_METHOD_EMOJI, GLASS_LABELS, DIFFICULTY_LABELS } from '@/data/bar-recipes'
 import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
+import { useTranslation } from '@/lib/i18n'
 
 export default function BarMenuPage() {
+  const tb = useTranslation('bar')
   const {
     recipes,
     loading,
@@ -69,7 +71,7 @@ export default function BarMenuPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Меню бара</h1>
+          <h1 className="text-2xl font-bold">{tb.menuTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {menuRecipes.length} позиций в меню
             {avgPrice !== null && ` · средняя цена ${avgPrice.toFixed(0)}€`}
@@ -123,7 +125,7 @@ export default function BarMenuPage() {
       ) : menuRecipes.length === 0 ? (
         <div className="card p-12 text-center">
           <div className="text-4xl mb-3">📋</div>
-          <h3 className="text-lg font-semibold mb-2">Меню пусто</h3>
+          <h3 className="text-lg font-semibold mb-2">{tb.menuEmpty}</h3>
           <p className="text-[var(--color-textMuted)] max-w-md mx-auto">
             Перейдите в раздел &laquo;Рецепты&raquo; и добавьте коктейли в меню, нажав кнопку &laquo;Добавить в меню&raquo;.
           </p>

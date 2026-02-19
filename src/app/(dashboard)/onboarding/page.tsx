@@ -11,6 +11,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { IconCheck } from '@/components/Icons'
 import { TOBACCOS, getBrandNames, getFlavorsByBrand } from '@/data/tobaccos'
 import { getBowlBrands, getBowlsByBrand } from '@/data/bowls'
+import { useTranslation } from '@/lib/i18n'
 
 const STEP_INFO: Record<OnboardingStep, { title: string; description: string }> = {
   welcome: {
@@ -46,6 +47,8 @@ const BUSINESS_TYPES: { type: BusinessType; icon: string; title: string; descrip
 ]
 
 export default function OnboardingPage() {
+  const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const router = useRouter()
   const { state, loading, currentStepIndex, totalSteps, progress, nextStep, prevStep, skipOnboarding, finishOnboarding, setBusinessType } = useOnboarding()
   const { user, profile, refreshProfile } = useAuth()
@@ -205,7 +208,7 @@ export default function OnboardingPage() {
               onClick={skipOnboarding}
               className="text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
             >
-              Пропустить
+              {t.skip}
             </button>
           </div>
           <div className="h-1.5 bg-[var(--color-bgHover)] rounded-full overflow-hidden">
@@ -283,14 +286,14 @@ export default function OnboardingPage() {
 
               <div className="flex gap-3 pt-2">
                 <button onClick={prevStep} className="btn btn-ghost flex-1">
-                  Назад
+                  {tc.back}
                 </button>
                 <button
                   onClick={handleBusinessTypeContinue}
                   disabled={!selectedType || saving}
                   className="btn btn-primary flex-1 disabled:opacity-50"
                 >
-                  {saving ? 'Сохранение...' : 'Продолжить'}
+                  {saving ? tc.saving : tc.next}
                 </button>
               </div>
             </div>
@@ -321,14 +324,14 @@ export default function OnboardingPage() {
               </div>
               <div className="flex gap-3 pt-4">
                 <button onClick={prevStep} className="btn btn-ghost flex-1">
-                  Назад
+                  {tc.back}
                 </button>
                 <button
                   onClick={handleBusinessSave}
                   disabled={saving}
                   className="btn btn-primary flex-1"
                 >
-                  {saving ? 'Сохранение...' : 'Продолжить'}
+                  {saving ? tc.saving : tc.next}
                 </button>
               </div>
             </div>
@@ -440,7 +443,7 @@ export default function OnboardingPage() {
                       disabled={saving}
                       className="btn btn-ghost w-full text-[var(--color-primary)] disabled:opacity-50"
                     >
-                      {saving ? 'Сохранение...' : '+ Добавить чашу'}
+                      {saving ? tc.saving : `+ ${t.addBowl}`}
                     </button>
                   )}
 
@@ -513,7 +516,7 @@ export default function OnboardingPage() {
                       disabled={saving}
                       className="btn btn-ghost w-full text-[var(--color-primary)] disabled:opacity-50"
                     >
-                      {saving ? 'Сохранение...' : '+ Добавить табак'}
+                      {saving ? tc.saving : `+ ${t.addTobacco}`}
                     </button>
                   )}
                 </div>
@@ -558,13 +561,13 @@ export default function OnboardingPage() {
               {/* Navigation */}
               <div className="flex gap-3 pt-4">
                 <button onClick={prevStep} className="btn btn-ghost flex-1">
-                  Назад
+                  {tc.back}
                 </button>
                 <button
                   onClick={handleSetupFinish}
                   className="btn btn-primary flex-1"
                 >
-                  Завершить настройку
+                  {t.finish}
                 </button>
               </div>
             </div>

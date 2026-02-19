@@ -9,6 +9,7 @@ import { BrandLoader } from '@/components/BrandLoader'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { useOnboarding } from '@/lib/hooks/useOnboarding'
+import { useTranslation } from '@/lib/i18n'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { InstallBanner } from '@/components/InstallBanner'
 
@@ -74,6 +75,7 @@ function OnboardingCheck({ children }: { children: React.ReactNode }) {
 function LowStockNotifier() {
   const { inventory } = useInventory()
   const { settings } = useNotificationSettings()
+  const tc = useTranslation('common')
   const hasShownRef = useRef(false)
 
   useEffect(() => {
@@ -87,21 +89,21 @@ function LowStockNotifier() {
     const outOfStockItems = inventory.filter(item => item.quantity_grams <= 0)
 
     if (outOfStockItems.length > 0) {
-      toast.error(`${outOfStockItems.length} позиций закончились!`, {
+      toast.error(tc.lowStock.outOfStock.replace('{count}', String(outOfStockItems.length)), {
         description: outOfStockItems.slice(0, 3).map(i => `${i.brand} ${i.flavor}`).join(', ') +
           (outOfStockItems.length > 3 ? '...' : ''),
         duration: 6000,
       })
       hasShownRef.current = true
     } else if (lowStockItems.length > 0) {
-      toast.warning(`${lowStockItems.length} позиций на исходе`, {
-        description: lowStockItems.slice(0, 3).map(i => `${i.brand} ${i.flavor} (${i.quantity_grams.toFixed(0)}г)`).join(', ') +
+      toast.warning(tc.lowStock.lowStock.replace('{count}', String(lowStockItems.length)), {
+        description: lowStockItems.slice(0, 3).map(i => `${i.brand} ${i.flavor} (${i.quantity_grams.toFixed(0)}${tc.grams})`).join(', ') +
           (lowStockItems.length > 3 ? '...' : ''),
         duration: 5000,
       })
       hasShownRef.current = true
     }
-  }, [inventory, settings])
+  }, [inventory, settings, tc])
 
   return null
 }

@@ -2,8 +2,11 @@
 
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n'
 
 export function ServiceWorkerRegistration() {
+  const tc = useTranslation('common')
+
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
 
@@ -19,10 +22,10 @@ export function ServiceWorkerRegistration() {
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New version available — show toast
-            toast('Доступно обновление', {
-              description: 'Нажмите чтобы обновить приложение',
+            toast(tc.sw.updateAvailable, {
+              description: tc.sw.updateDescription,
               action: {
-                label: 'Обновить',
+                label: tc.sw.update,
                 onClick: () => {
                   newWorker.postMessage({ type: 'SKIP_WAITING' })
                   window.location.reload()
@@ -47,7 +50,7 @@ export function ServiceWorkerRegistration() {
         window.location.reload()
       }
     })
-  }, [])
+  }, [tc])
 
   return null
 }

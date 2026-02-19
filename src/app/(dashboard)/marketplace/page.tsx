@@ -8,8 +8,10 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SupplierCard } from '@/components/marketplace/SupplierCard'
 import { CartDrawer } from '@/components/marketplace/CartDrawer'
 import { IconShop, IconCart, IconPackage, IconLock } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 export default function MarketplacePage() {
+  const tmk = useTranslation('market')
   const { suppliers, loading, error } = useSuppliers()
   const { cart, cartItemCount, updateQuantity, removeFromCart, clearCart } = useCart()
   const { tier, canUseMarketplace } = useSubscription()
@@ -21,7 +23,7 @@ export default function MarketplacePage() {
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <IconShop size={28} className="text-[var(--color-primary)]" />
-          <h1 className="text-2xl font-bold">Маркетплейс</h1>
+          <h1 className="text-2xl font-bold">{tmk.title}</h1>
         </div>
 
         <div className="card p-8 text-center">
@@ -48,7 +50,7 @@ export default function MarketplacePage() {
         <div className="flex items-center gap-3">
           <IconShop size={28} className="text-[var(--color-primary)]" />
           <div>
-            <h1 className="text-2xl font-bold">Маркетплейс</h1>
+            <h1 className="text-2xl font-bold">{tmk.title}</h1>
             <p className="text-[var(--color-textMuted)]">
               Заказывайте табак у проверенных поставщиков
             </p>
@@ -62,7 +64,7 @@ export default function MarketplacePage() {
             className="btn btn-ghost flex items-center gap-2"
           >
             <IconPackage size={18} />
-            Заказы
+            {tmk.ordersTitle}
           </Link>
 
           {/* Cart button */}

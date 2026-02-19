@@ -6,6 +6,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { PricingCard } from '@/components/pricing/PricingCard'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n'
 
 // Stripe price IDs (from environment)
 const STRIPE_PRICES = {
@@ -74,6 +75,7 @@ const plans = [
 ]
 
 function PricingPageContent() {
+  const tm = useTranslation('manage')
   const { user } = useAuth()
   const { tier } = useSubscription()
   const searchParams = useSearchParams()
@@ -83,7 +85,7 @@ function PricingPageContent() {
   const canceled = searchParams.get('canceled')
 
   const formatPrice = (price: number) => {
-    if (price === 0) return 'Бесплатно'
+    if (price === 0) return tm.free
     return `$${(price / 100).toFixed(0)}`
   }
 
@@ -184,7 +186,7 @@ function PricingPageContent() {
         {/* Hero */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">
-            Выберите подходящий тариф
+            {tm.pricingSubtitle}
           </h1>
           <p className="text-xl text-[var(--color-textMuted)] max-w-2xl mx-auto">
             Инструменты для учета табака, анализа сессий и оптимизации работы вашего заведения
@@ -248,7 +250,7 @@ function PricingPageContent() {
                 onSelect={() => handleSelectPlan(plan)}
                 buttonText={
                   tier === plan.id
-                    ? 'Текущий тариф'
+                    ? tm.currentPlan
                     : price === 0
                       ? 'Начать бесплатно'
                       : 'Подключить'

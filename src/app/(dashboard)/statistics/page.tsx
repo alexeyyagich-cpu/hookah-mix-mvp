@@ -23,10 +23,12 @@ import {
   IconExport,
   IconWarning,
 } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 type ViewMode = 'overview' | 'comparison'
 
 export default function StatisticsPage() {
+  const tm = useTranslation('manage')
   const { settings: notificationSettings } = useNotificationSettings()
   const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
   const { statistics, loading, error, dateRange, setDateRange } = useStatistics({ lowStockThreshold })
@@ -118,7 +120,7 @@ export default function StatisticsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Статистика</h1>
+          <h1 className="text-2xl font-bold">{tm.statsTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             Аналитика потребления и популярных миксов
           </p>
@@ -193,14 +195,14 @@ export default function StatisticsPage() {
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
                   <IconChart size={16} />
-                  Экспорт CSV
+                  {tm.exportCsv}
                 </button>
                 <button
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
                   <IconExport size={16} />
-                  Экспорт PDF
+                  {tm.exportPdf}
                 </button>
               </div>
             )}
@@ -445,7 +447,7 @@ export default function StatisticsPage() {
 
             {/* Popular Flavors */}
             <div className="card p-5">
-              <h2 className="text-lg font-semibold mb-6">Популярные вкусы</h2>
+              <h2 className="text-lg font-semibold mb-6">{tm.topFlavors}</h2>
               <PopularFlavorsChart data={statistics.consumptionByFlavor} />
             </div>
 

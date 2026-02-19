@@ -8,8 +8,11 @@ import { SessionCard } from '@/components/dashboard/SessionCard'
 import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus } from '@/components/Icons'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n'
 
 export default function SessionsPage() {
+  const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const { sessions, loading, error, updateSession, deleteSession } = useSessions()
   const { isFreeTier } = useSubscription()
 
@@ -59,7 +62,7 @@ export default function SessionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">История сессий</h1>
+          <h1 className="text-2xl font-bold">{t.sessionHistory}</h1>
           <p className="text-[var(--color-textMuted)]">
             {sessions.length} сессий
             {isFreeTier && ' за последние 30 дней'}
@@ -130,7 +133,7 @@ export default function SessionsPage() {
             <IconSmoke size={32} className="text-[var(--color-textMuted)]" />
           </div>
           <h3 className="text-lg font-semibold mb-2">
-            {filter ? 'Ничего не найдено' : 'Нет сессий'}
+            {filter ? t.noResults : t.noSessions}
           </h3>
           <p className="text-[var(--color-textMuted)] mb-4">
             {filter
@@ -240,7 +243,7 @@ export default function SessionsPage() {
               {/* Notes */}
               {selectedSession.notes && (
                 <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
-                  <h4 className="font-medium mb-2">Заметки</h4>
+                  <h4 className="font-medium mb-2">{t.sessionNotes}</h4>
                   <p className="text-[var(--color-textMuted)]">{selectedSession.notes}</p>
                 </div>
               )}
@@ -251,7 +254,7 @@ export default function SessionsPage() {
                 onClick={() => setSelectedSession(null)}
                 className="btn btn-ghost"
               >
-                Закрыть
+                {tc.close}
               </button>
             </div>
           </div>

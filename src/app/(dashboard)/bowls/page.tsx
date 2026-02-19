@@ -7,6 +7,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
+import { useTranslation } from '@/lib/i18n'
 
 const BOWL_BACKGROUNDS = [
   '/images/bowl-bg-1.jpg',
@@ -15,6 +16,8 @@ const BOWL_BACKGROUNDS = [
 ]
 
 export default function BowlsPage() {
+  const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const {
     bowls,
     loading,
@@ -113,7 +116,7 @@ export default function BowlsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Типы чаш</h1>
+          <h1 className="text-2xl font-bold">{t.bowlsTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             Управляйте чашами для точного расчета граммовки
           </p>
@@ -123,7 +126,7 @@ export default function BowlsPage() {
           className="btn btn-primary"
           disabled={!canAddMore}
         >
-          + Добавить чашу
+          + {t.addBowl}
         </button>
       </div>
 
@@ -160,17 +163,17 @@ export default function BowlsPage() {
       {loading ? (
         <div className="card p-12 text-center">
           <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 text-[var(--color-textMuted)]">Загрузка...</p>
+          <p className="mt-4 text-[var(--color-textMuted)]">{tc.loading}</p>
         </div>
       ) : bowls.length === 0 ? (
         <div className="card p-12 text-center">
           <div className="text-5xl mb-4">🥣</div>
-          <h3 className="text-lg font-semibold mb-2">Нет добавленных чаш</h3>
+          <h3 className="text-lg font-semibold mb-2">{t.noBowls}</h3>
           <p className="text-[var(--color-textMuted)] mb-4">
             Добавьте первую чашу для точного расчета граммовки при создании сессий
           </p>
           <button onClick={() => openModal()} className="btn btn-primary">
-            + Добавить чашу
+            + {t.addBowl}
           </button>
         </div>
       ) : (
@@ -190,7 +193,7 @@ export default function BowlsPage() {
       {/* Preset Suggestions */}
       {bowls.length === 0 && (
         <div className="card p-6">
-          <h3 className="font-semibold mb-4">Популярные чаши</h3>
+          <h3 className="font-semibold mb-4">{t.bowlPresets}</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {BOWL_PRESETS.slice(0, 8).map((preset) => (
               <button
@@ -221,7 +224,7 @@ export default function BowlsPage() {
           <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 className="text-xl font-bold">
-                {editingBowl ? 'Редактировать чашу' : 'Добавить чашу'}
+                {editingBowl ? 'Редактировать чашу' : t.addBowl}
               </h2>
               <button
                 onClick={closeModal}
@@ -233,7 +236,7 @@ export default function BowlsPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium">Название</label>
+                <label className="block text-sm font-medium">{t.bowlName}</label>
                 <input
                   type="text"
                   value={name}
@@ -245,7 +248,7 @@ export default function BowlsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium">Вместимость (г)</label>
+                <label className="block text-sm font-medium">{t.bowlCapacity} ({tc.grams})</label>
                 <input
                   type="number"
                   value={capacity}
@@ -264,14 +267,14 @@ export default function BowlsPage() {
                   onClick={closeModal}
                   className="flex-1 btn btn-ghost"
                 >
-                  Отмена
+                  {tc.cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={!name || !capacity || saving}
                   className="flex-1 btn btn-primary disabled:opacity-50"
                 >
-                  {saving ? 'Сохранение...' : editingBowl ? 'Сохранить' : 'Добавить'}
+                  {saving ? tc.saving : editingBowl ? tc.save : tc.add}
                 </button>
               </div>
             </form>

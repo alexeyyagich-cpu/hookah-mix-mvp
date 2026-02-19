@@ -6,9 +6,11 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
 import { AddBarIngredientModal } from '@/components/bar/AddBarIngredientModal'
 import { BAR_UNIT_LABELS } from '@/data/bar-ingredients'
+import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
 
 export default function BarInventoryPage() {
+  const t = useTranslation('bar')
   const {
     inventory,
     loading,
@@ -63,7 +65,7 @@ export default function BarInventoryPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Склад бара</h1>
+          <h1 className="text-2xl font-bold">{t.inventoryTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {totalItems} позиций
             {isFreeTier && ` из ${itemsLimit}`}
@@ -78,7 +80,7 @@ export default function BarInventoryPage() {
           className="btn btn-primary"
           disabled={!canAddMore}
         >
-          + Добавить ингредиент
+          + {t.addIngredient}
         </button>
       </div>
 

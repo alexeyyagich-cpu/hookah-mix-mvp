@@ -1,11 +1,15 @@
+'use client'
+
 import Link from 'next/link'
-import { IconSmoke } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const tc = useTranslation('common')
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -20,7 +24,7 @@ export default function AuthLayout({
             Hookah Torus
           </Link>
           <Link href="/mix" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-            Калькулятор миксов
+            {tc.auth.mixCalculator}
           </Link>
         </div>
       </header>
@@ -32,7 +36,7 @@ export default function AuthLayout({
 
       {/* Footer */}
       <footer className="p-4 text-center text-sm text-[var(--color-textMuted)]">
-        <p>Hookah Torus — сервис для кальянных заведений</p>
+        <p>{tc.auth.footerText}</p>
       </footer>
     </div>
   )

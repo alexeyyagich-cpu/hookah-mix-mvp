@@ -11,10 +11,12 @@ import { AddTobaccoModal } from '@/components/dashboard/AddTobaccoModal'
 import { ScanButton } from '@/components/inventory/BarcodeScanner'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
 import { IconExport, IconChart, IconLock, IconPlus } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 
 export default function InventoryPage() {
+  const t = useTranslation('hookah')
   const {
     inventory,
     loading,
@@ -140,7 +142,7 @@ export default function InventoryPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Инвентарь табака</h1>
+          <h1 className="text-2xl font-bold">{t.inventoryTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {inventory.length} позиций
             {isFreeTier && ` из ${itemsLimit}`}
@@ -201,7 +203,7 @@ export default function InventoryPage() {
             className="btn btn-primary"
             disabled={!canAddMore}
           >
-            + Добавить табак
+            + {t.addTobacco}
           </button>
         </div>
       </div>
@@ -209,7 +211,7 @@ export default function InventoryPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Всего позиций</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.totalItems}</div>
           <div className="text-2xl font-bold mt-1">{inventory.length}</div>
         </div>
         <div className="card p-4">
@@ -223,7 +225,7 @@ export default function InventoryPage() {
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Закончились</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.outOfStock}</div>
           <div className="text-2xl font-bold text-[var(--color-danger)] mt-1">
             {inventory.filter(i => i.quantity_grams <= 0).length}
           </div>

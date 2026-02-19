@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from '@/lib/i18n'
+
 interface PricingFeature {
   name: string
   included: boolean
@@ -29,8 +31,10 @@ export function PricingCard({
   isCurrent,
   isLoading,
   onSelect,
-  buttonText = 'Выбрать',
+  buttonText,
 }: PricingCardProps) {
+  const tc = useTranslation('common')
+  const resolvedButtonText = buttonText ?? tc.pricing.select
   return (
     <div
       className={`card relative p-6 flex flex-col ${
@@ -41,7 +45,7 @@ export function PricingCard({
       {isPopular && !isCurrent && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="px-4 py-1 rounded-full bg-[var(--color-primary)] text-[var(--color-bg)] text-xs font-semibold">
-            Популярный
+            {tc.pricing.popular}
           </span>
         </div>
       )}
@@ -50,7 +54,7 @@ export function PricingCard({
       {isCurrent && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="px-4 py-1 rounded-full bg-[var(--color-success)] text-white text-xs font-semibold">
-            Ваш тариф
+            {tc.pricing.currentPlan}
           </span>
         </div>
       )}

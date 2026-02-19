@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/ThemeContext";
 import { AuthProvider } from "@/lib/AuthContext";
+import { LocaleProviderBridge } from "@/lib/i18n/LocaleProviderBridge";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -142,7 +143,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <LocaleProviderBridge>
+            <ThemeProvider>{children}</ThemeProvider>
+          </LocaleProviderBridge>
         </AuthProvider>
       </body>
     </html>

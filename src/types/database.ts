@@ -36,6 +36,8 @@ export interface Profile {
   business_type: BusinessType | null
   // Active modules for this venue
   active_modules: AppModule[]
+  // UI locale preference
+  locale: string | null
   created_at: string
 }
 

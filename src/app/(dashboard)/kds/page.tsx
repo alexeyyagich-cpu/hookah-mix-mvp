@@ -8,12 +8,14 @@ import { useModules } from '@/lib/hooks/useModules'
 import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
 import { IconPlus, IconMenuList } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import type { KdsOrderStatus, KdsOrderType } from '@/types/database'
 
 type TypeFilter = 'all' | 'bar' | 'hookah'
 type MobileColumn = 'new' | 'preparing' | 'ready'
 
 export default function KdsPage() {
+  const tm = useTranslation('manage')
   const { orders, loading, error, createOrder, updateStatus, cancelOrder } = useKDS()
   const { tables } = useFloorPlan()
   const { recipes } = useBarRecipes()
@@ -45,9 +47,9 @@ export default function KdsPage() {
   const activeCount = orders.length
 
   const columns: { key: MobileColumn; label: string; dot: string; orders: typeof newOrders }[] = [
-    { key: 'new', label: 'Новые', dot: 'bg-[var(--color-warning)]', orders: newOrders },
-    { key: 'preparing', label: 'Готовится', dot: 'bg-[var(--color-primary)]', orders: preparingOrders },
-    { key: 'ready', label: 'Готово', dot: 'bg-[var(--color-success)]', orders: readyOrders },
+    { key: 'new', label: tm.newOrders, dot: 'bg-[var(--color-warning)]', orders: newOrders },
+    { key: 'preparing', label: tm.preparing, dot: 'bg-[var(--color-primary)]', orders: preparingOrders },
+    { key: 'ready', label: tm.ready, dot: 'bg-[var(--color-success)]', orders: readyOrders },
   ]
 
   return (
@@ -55,11 +57,11 @@ export default function KdsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">KDS Заказы</h1>
+          <h1 className="text-2xl font-bold">{tm.kdsTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {activeCount > 0
-              ? `${activeCount} активных заказов`
-              : 'Нет активных заказов'}
+              ? tm.activeOrders(activeCount)
+              : tm.noActiveOrders}
           </p>
         </div>
         <button
@@ -67,7 +69,7 @@ export default function KdsPage() {
           className="btn btn-primary flex items-center gap-2"
         >
           <IconPlus size={18} />
-          Новый заказ
+          {tm.newOrder}
         </button>
       </div>
 
@@ -112,15 +114,15 @@ export default function KdsPage() {
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
             <IconMenuList size={32} className="text-[var(--color-textMuted)]" />
           </div>
-          <h3 className="text-lg font-semibold mb-2">Нет активных заказов</h3>
+          <h3 className="text-lg font-semibold mb-2">{tm.noActiveOrders}</h3>
           <p className="text-[var(--color-textMuted)] mb-4">
-            Создайте первый заказ, чтобы он появился на доске
+            {tm.createOrderDesc}
           </p>
           <button
             onClick={() => setModalOpen(true)}
             className="btn btn-primary"
           >
-            Создать заказ
+            {tm.createOrder}
           </button>
         </div>
       ) : (

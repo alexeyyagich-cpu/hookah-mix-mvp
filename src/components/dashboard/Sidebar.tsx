@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useModules } from '@/lib/hooks/useModules'
 import { useRole, ROLE_LABELS, type Permission } from '@/lib/hooks/useRole'
+import { useTranslation } from '@/lib/i18n'
 import type { AppModule } from '@/types/database'
 import {
   IconDashboard,
@@ -45,62 +46,63 @@ interface NavGroup {
   items: NavItem[]
 }
 
-// Grouped navigation
-const navigationGroups: NavGroup[] = [
-  {
-    label: null,
-    items: [
-      { name: 'Обзор', href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
-    ],
-  },
-  {
-    label: 'КАЛЬЯННАЯ',
-    module: 'hookah',
-    items: [
-      { name: 'Инвентарь', href: '/inventory', Icon: IconInventory, permission: 'inventory.view', module: 'hookah' },
-      { name: 'Чаши', href: '/bowls', Icon: IconBowl, permission: 'bowls.view', module: 'hookah' },
-      { name: 'Сессии', href: '/sessions', Icon: IconSession, permission: 'sessions.view', module: 'hookah' },
-      { name: 'Калькулятор миксов', href: '/mix', Icon: IconCalculator, permission: 'dashboard.view', module: 'hookah' },
-    ],
-  },
-  {
-    label: 'БАР',
-    module: 'bar',
-    items: [
-      { name: 'Склад', href: '/bar/inventory', Icon: IconBar, permission: 'bar.view', module: 'bar' },
-      { name: 'Рецепты', href: '/bar/recipes', Icon: IconCocktail, permission: 'bar.view', module: 'bar' },
-      { name: 'Меню', href: '/bar/menu', Icon: IconMenuList, permission: 'bar.view', module: 'bar' },
-      { name: 'Продажи', href: '/bar/sales', Icon: IconCoin, permission: 'bar.sales', module: 'bar' },
-    ],
-  },
-  {
-    label: 'УПРАВЛЕНИЕ',
-    items: [
-      { name: 'План зала', href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
-      { name: 'Бронирования', href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
-      { name: 'KDS Заказы', href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
-      { name: 'Статистика', href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
-      { name: 'Отчеты P&L', href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
-    ],
-  },
-  {
-    label: 'ПРОЧЕЕ',
-    items: [
-      { name: 'Отзывы', href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
-      { name: 'Маркетплейс', href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
-      { name: 'Команда', href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
-      { name: 'Настройки', href: '/settings', Icon: IconSettings, permission: 'settings.view' },
-    ],
-  },
-]
-
 export function Sidebar() {
+  const t = useTranslation('nav')
+  const tc = useTranslation('common')
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
   const { role, hasPermission, isOwner, isStaff } = useRole()
   const { modules } = useModules()
+
+  const navigationGroups: NavGroup[] = [
+    {
+      label: null,
+      items: [
+        { name: t.overview, href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
+      ],
+    },
+    {
+      label: t.hookahGroup,
+      module: 'hookah',
+      items: [
+        { name: t.inventory, href: '/inventory', Icon: IconInventory, permission: 'inventory.view', module: 'hookah' },
+        { name: t.bowls, href: '/bowls', Icon: IconBowl, permission: 'bowls.view', module: 'hookah' },
+        { name: t.sessions, href: '/sessions', Icon: IconSession, permission: 'sessions.view', module: 'hookah' },
+        { name: t.mixCalculator, href: '/mix', Icon: IconCalculator, permission: 'dashboard.view', module: 'hookah' },
+      ],
+    },
+    {
+      label: t.barGroup,
+      module: 'bar',
+      items: [
+        { name: t.warehouse, href: '/bar/inventory', Icon: IconBar, permission: 'bar.view', module: 'bar' },
+        { name: t.recipes, href: '/bar/recipes', Icon: IconCocktail, permission: 'bar.view', module: 'bar' },
+        { name: t.menu, href: '/bar/menu', Icon: IconMenuList, permission: 'bar.view', module: 'bar' },
+        { name: t.sales, href: '/bar/sales', Icon: IconCoin, permission: 'bar.sales', module: 'bar' },
+      ],
+    },
+    {
+      label: t.managementGroup,
+      items: [
+        { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
+        { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
+        { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
+        { name: t.statistics, href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
+        { name: t.pnlReports, href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
+      ],
+    },
+    {
+      label: t.otherGroup,
+      items: [
+        { name: t.reviews, href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
+        { name: t.marketplace, href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
+        { name: t.team, href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
+        { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view' },
+      ],
+    },
+  ]
 
   // Build flat list of all items for active-state matching
   const allItems = navigationGroups.flatMap(g => g.items)
@@ -144,7 +146,7 @@ export function Sidebar() {
           </div>
           <div>
             <div className="font-bold">Hookah Torus</div>
-            <div className="text-xs text-[var(--color-textMuted)]">← На главную</div>
+            <div className="text-xs text-[var(--color-textMuted)]">{t.home}</div>
           </div>
         </Link>
       </div>
@@ -152,10 +154,10 @@ export function Sidebar() {
       {/* Business Info + Role */}
       <div className="p-4 border-b border-[var(--color-border)]">
         <div className="text-sm font-medium truncate">
-          {profile?.business_name || 'Мое заведение'}
+          {profile?.business_name || t.defaultBusiness}
         </div>
         <div className="text-xs text-[var(--color-textMuted)] mt-1">
-          {profile?.owner_name || 'Пользователь'}
+          {profile?.owner_name || t.defaultUser}
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {/* Role badge */}
@@ -168,7 +170,7 @@ export function Sidebar() {
               color: isOwner ? 'white' : 'var(--color-text)',
             }}
           >
-            {roleInfo.emoji} {roleInfo.ru}
+            {roleInfo.emoji} {tc.roles[role]}
           </span>
           {/* Subscription badge - only for owners */}
           {isOwner && (
@@ -202,7 +204,7 @@ export function Sidebar() {
                       key={item.name}
                       href="/pricing"
                       onClick={() => setMobileOpen(false)}
-                      aria-label={`${item.name} — доступно в Pro тарифе`}
+                      aria-label={t.proOnlyLabel(item.name)}
                       className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all"
                     >
                       <Icon size={18} aria-hidden="true" />
@@ -241,9 +243,9 @@ export function Sidebar() {
             href="/pricing"
             className="block p-4 rounded-xl bg-gradient-to-r from-[var(--color-primary)]/20 to-purple-500/20 border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition-colors"
           >
-            <div className="text-sm font-semibold mb-1">Обновить до Pro</div>
+            <div className="text-sm font-semibold mb-1">{t.upgradeToPro}</div>
             <div className="text-xs text-[var(--color-textMuted)]">
-              Безлимитный инвентарь и полная статистика
+              {t.upgradeDescription}
             </div>
           </Link>
         </div>
@@ -253,11 +255,11 @@ export function Sidebar() {
       <div className="p-3 border-t border-[var(--color-border)]">
         <button
           onClick={() => signOut()}
-          aria-label="Выйти из аккаунта"
+          aria-label={t.logoutLabel}
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
         >
           <IconLogout size={18} aria-hidden="true" />
-          Выйти
+          {t.logout}
         </button>
       </div>
     </>
@@ -268,7 +270,7 @@ export function Sidebar() {
       {/* Mobile menu button */}
       <button
         onClick={() => setMobileOpen(true)}
-        aria-label="Открыть меню навигации"
+        aria-label={t.openNav}
         aria-expanded={mobileOpen}
         className="lg:hidden fixed top-4 left-4 z-40 p-3 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg"
       >
@@ -289,7 +291,7 @@ export function Sidebar() {
       {/* Mobile sidebar */}
       <aside
         role="dialog"
-        aria-label="Меню навигации"
+        aria-label={t.openNav}
         aria-modal="true"
         className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-[var(--color-bgCard)] border-r border-[var(--color-border)] flex flex-col transform transition-transform ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
@@ -297,7 +299,7 @@ export function Sidebar() {
       >
         <button
           onClick={() => setMobileOpen(false)}
-          aria-label="Закрыть меню навигации"
+          aria-label={t.closeNav}
           className="absolute top-4 right-4 p-2 rounded-lg hover:bg-[var(--color-bgHover)]"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

@@ -1,0 +1,40 @@
+import type { nav as NavType } from '../ru/nav'
+
+export const nav: typeof NavType = {
+  home: '← Startseite',
+  defaultBusiness: 'Mein Lokal',
+  defaultUser: 'Benutzer',
+
+  hookahGroup: 'SHISHA',
+  barGroup: 'BAR',
+  managementGroup: 'VERWALTUNG',
+  otherGroup: 'SONSTIGES',
+
+  overview: 'Übersicht',
+  inventory: 'Inventar',
+  bowls: 'Köpfe',
+  sessions: 'Sitzungen',
+  mixCalculator: 'Mix-Rechner',
+  warehouse: 'Lager',
+  recipes: 'Rezepte',
+  menu: 'Speisekarte',
+  sales: 'Verkäufe',
+  floorPlan: 'Raumplan',
+  reservations: 'Reservierungen',
+  kdsOrders: 'KDS Bestellungen',
+  statistics: 'Statistiken',
+  pnlReports: 'GuV-Berichte',
+  reviews: 'Bewertungen',
+  marketplace: 'Marktplatz',
+  team: 'Team',
+  settings: 'Einstellungen',
+
+  upgradeToPro: 'Auf Pro upgraden',
+  upgradeDescription: 'Unbegrenztes Inventar und volle Statistiken',
+  logout: 'Abmelden',
+
+  openNav: 'Navigationsmenü öffnen',
+  closeNav: 'Navigationsmenü schließen',
+  logoutLabel: 'Vom Konto abmelden',
+  proOnlyLabel: (name: string) => `${name} — verfügbar im Pro-Tarif`,
+} as const

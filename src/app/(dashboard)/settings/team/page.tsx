@@ -4,9 +4,12 @@ import { useState } from 'react'
 import { useTeam } from '@/lib/hooks/useTeam'
 import { useRole } from '@/lib/hooks/useRole'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import { useRouter } from 'next/navigation'
 
 export default function TeamPage() {
+  const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const router = useRouter()
   const { isOwner } = useRole()
   const { staff, invitations, loading, error, inviteStaff, removeStaff, cancelInvitation, resendInvitation } = useTeam()
@@ -92,10 +95,10 @@ export default function TeamPage() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <IconUsers size={28} />
-            Команда
+            {tm.teamTitle}
           </h1>
           <p className="text-[var(--color-textMuted)] mt-1">
-            Управление сотрудниками заведения
+            {tm.teamDescription}
           </p>
         </div>
         <button
@@ -103,7 +106,7 @@ export default function TeamPage() {
           className="btn btn-primary flex items-center gap-2"
         >
           <IconPlus size={18} />
-          Пригласить
+          {tm.inviteMember}
         </button>
       </div>
 
@@ -125,7 +128,7 @@ export default function TeamPage() {
               <IconUsers size={32} className="text-[var(--color-textMuted)]" />
             </div>
             <p className="text-[var(--color-textMuted)] mb-2">
-              В команде пока нет сотрудников
+              {tm.noTeamMembers}
             </p>
             <p className="text-sm text-[var(--color-textMuted)]">
               Пригласите кальянщиков для совместной работы
@@ -258,7 +261,7 @@ export default function TeamPage() {
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="card w-full max-w-md p-6">
-            <h2 className="text-xl font-bold mb-4">Пригласить сотрудника</h2>
+            <h2 className="text-xl font-bold mb-4">{tm.inviteMember}</h2>
 
             <form onSubmit={handleInvite} className="space-y-4">
               <div>
@@ -293,7 +296,7 @@ export default function TeamPage() {
                   }}
                   className="btn btn-ghost flex-1"
                 >
-                  Отмена
+                  {tc.cancel}
                 </button>
                 <button
                   type="submit"

@@ -1,0 +1,113 @@
+export const settings = {
+  title: 'Настройки',
+  subtitle: 'Управление профилем и подпиской',
+
+  // Language
+  language: 'Язык',
+  languageDescription: 'Выберите язык интерфейса',
+
+  // Subscription
+  subscription: 'Подписка',
+  expired: 'Истекла',
+  expiresIn: (days: number) => `Истекает через ${days} дн.`,
+  upgradeForFull: 'Обновите подписку для доступа к полному функционалу',
+  manageSubscription: 'Управляйте подпиской, измените тариф или отмените',
+  manage: 'Управление',
+  changePlan: 'Изменить тариф',
+
+  // Modules
+  venueModules: 'Модули заведения',
+  modulesDescription: 'Включайте нужные разделы для вашего бизнеса',
+  hookahModule: 'Кальянная',
+  hookahModuleDesc: 'Табак, миксы, чаши, сессии',
+  barModule: 'Бар',
+  barModuleDesc: 'Ингредиенты, рецепты, меню, продажи',
+  kitchenModule: 'Кухня',
+  kitchenModuleDesc: 'Продукты, рецепты, калькуляция',
+  cannotDisableSingle: 'Нельзя отключить единственный модуль',
+
+  // Profile
+  venueProfile: 'Профиль заведения',
+  emailLabel: 'Email',
+  emailCannotChange: 'Email нельзя изменить',
+  businessNameLabel: 'Название заведения',
+  ownerNameLabel: 'Имя владельца',
+  phoneLabel: 'Телефон',
+  addressLabel: 'Адрес',
+  saved: 'Настройки сохранены!',
+
+  // QR Menu
+  qrMenu: 'QR-меню',
+  qrMenuDesc: 'Публичное меню по QR-коду для гостей',
+  menuUrl: 'URL вашего меню',
+  saveSlug: 'Сохранить',
+  slugSaved: 'URL сохранён!',
+  slugCopied: 'URL скопирован!',
+  slugTaken: 'Этот URL уже занят',
+  slugEmpty: 'Введите URL для меню',
+  slugHint: 'Латинские буквы, цифры и дефис. Например: my-lounge',
+  copyUrl: 'Копировать URL',
+  downloadQr: 'Скачать QR',
+  qrPrintHint: 'Распечатайте QR-код и разместите на столах — гости смогут открыть меню с телефона',
+
+  // Notifications
+  notifications: 'Уведомления',
+  lowStockNotifications: 'Уведомления о низком остатке',
+  lowStockDesc: 'Показывать уведомления при входе, если табак заканчивается',
+  warningThreshold: 'Порог предупреждения',
+
+  // Push
+  pushNotifications: 'Push-уведомления',
+  pushBlocked: 'Уведомления заблокированы в браузере',
+  pushDescription: 'Получать уведомления даже когда сайт закрыт',
+  pushEnabled: 'Push-уведомления включены',
+
+  // Email notifications
+  emailNotifications: 'Email-уведомления',
+  emailNotifDesc: 'Получайте важные уведомления на почту',
+  emailNotConfigured: 'Email-сервис не настроен. Добавьте RESEND_API_KEY в переменные окружения.',
+  emailToggleDesc: (email: string) => `Включить отправку уведомлений на ${email}`,
+  lowStockEmail: 'Низкий запас табака',
+  orderUpdatesEmail: 'Обновления заказов',
+  dailySummaryEmail: 'Ежедневный отчёт',
+
+  // POS
+  posTitle: 'POS Касса (ready2order)',
+  posDesc: 'Синхронизация с кассовой системой ready2order',
+  posProOnly: 'Доступно на тарифе Pro',
+  posProUpgrade: 'Обновите подписку для интеграции с POS-системой',
+  posConnected: 'POS подключена',
+  lastSync: 'последняя синхронизация',
+  synced: (count: number, total: number) => `Синхронизировано: ${count} из ${total}`,
+  syncErrors: (count: number) => `(${count} ошибок)`,
+  sync: 'Синхронизировать',
+  syncing: 'Синхронизация...',
+  disconnectPos: 'Отключить POS',
+  webhooksNotRegistered: 'Вебхуки не зарегистрированы. Автоматическое списание при продажах недоступно.',
+  posConnectDesc: 'Подключите ready2order для автоматической синхронизации товаров, отслеживания продаж и управления остатками из кассы.',
+  connectPos: 'Подключить POS',
+
+  // Telegram
+  telegram: 'Telegram',
+  telegramDesc: 'Получайте уведомления в Telegram',
+  telegramConnected: (username: string) => `Подключён как @${username}`,
+  telegramLowStock: 'Уведомления о низком остатке',
+  telegramSessions: 'Напоминания о сессиях',
+  telegramDaily: 'Ежедневный отчёт',
+  disconnectTelegram: 'Отключить Telegram',
+  telegramConnectDesc: 'Подключите Telegram для получения уведомлений о низком запасе табака, статусах заказов и ежедневных отчётов.',
+  connectTelegram: 'Подключить Telegram',
+  telegramNotConfigured: 'Telegram-бот не настроен. Добавьте TELEGRAM_BOT_TOKEN в переменные окружения.',
+
+  // Danger zone
+  dangerZone: 'Опасная зона',
+  logoutTitle: 'Выйти из аккаунта',
+  logoutDesc: 'Вы будете разлогинены на этом устройстве',
+  logout: 'Выйти',
+  deleteAccount: 'Удалить аккаунт',
+  deleteAccountDesc: 'Все данные будут удалены безвозвратно',
+  deleteConfirm1: 'Вы уверены? Все данные будут удалены безвозвратно.',
+  deleteConfirm2: 'Это действие нельзя отменить. Продолжить?',
+  portalError: 'Не удалось открыть портал',
+  portalOpenError: 'Ошибка при открытии портала подписки',
+}

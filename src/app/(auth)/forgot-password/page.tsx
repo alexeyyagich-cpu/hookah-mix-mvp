@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -10,6 +11,7 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const { resetPasswordForEmail } = useAuth()
+  const t = useTranslation('auth')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,9 +38,9 @@ export default function ForgotPasswordPage() {
             <source src="/images/logo-animated.mp4" type="video/mp4" />
           </video>
         </div>
-        <h1 className="text-3xl font-bold mb-2">Восстановление пароля</h1>
+        <h1 className="text-3xl font-bold mb-2">{t.forgotTitle}</h1>
         <p className="text-[var(--color-textMuted)]">
-          Введите email для получения ссылки на сброс пароля
+          {t.forgotSubtitle}
         </p>
       </div>
 
@@ -47,12 +49,12 @@ export default function ForgotPasswordPage() {
           <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-success)]/10 flex items-center justify-center">
             <span className="text-3xl text-[var(--color-success)]">✓</span>
           </div>
-          <h2 className="text-xl font-semibold">Письмо отправлено</h2>
+          <h2 className="text-xl font-semibold">{t.emailSent}</h2>
           <p className="text-[var(--color-textMuted)]">
-            Проверьте почту <strong>{email}</strong> и перейдите по ссылке для установки нового пароля.
+            {t.checkEmailReset(email)}
           </p>
           <Link href="/login" className="btn btn-secondary inline-block mt-4">
-            Вернуться к входу
+            {t.backToLogin}
           </Link>
         </div>
       ) : (
@@ -65,7 +67,7 @@ export default function ForgotPasswordPage() {
 
           <div className="space-y-2">
             <label htmlFor="email" className="block text-sm font-medium">
-              Email
+              {t.email}
             </label>
             <input
               id="email"
@@ -86,17 +88,17 @@ export default function ForgotPasswordPage() {
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Отправка...
+                {t.sending}
               </span>
             ) : (
-              'Отправить ссылку'
+              t.sendLink
             )}
           </button>
 
           <p className="text-center text-[var(--color-textMuted)]">
-            Вспомнили пароль?{' '}
+            {t.rememberPassword}{' '}
             <Link href="/login" className="text-[var(--color-primary)] hover:underline">
-              Войти
+              {t.login}
             </Link>
           </p>
         </form>

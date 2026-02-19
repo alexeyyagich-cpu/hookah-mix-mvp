@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 type Filter = 'all' | 'published' | 'hidden'
 
 export default function ReviewsPage() {
+  const tm = useTranslation('manage')
   const { reviews, loading, averageRating, totalCount, togglePublished, deleteReview } = useReviews()
   const [filter, setFilter] = useState<Filter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -44,7 +46,7 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Отзывы</h1>
+          <h1 className="text-2xl font-bold">{tm.reviewsTitle}</h1>
           <div className="flex items-center gap-3 text-[var(--color-textMuted)] mt-1">
             {totalCount > 0 && (
               <>

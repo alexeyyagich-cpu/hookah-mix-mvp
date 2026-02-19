@@ -6,12 +6,14 @@ import { RecipeCard } from '@/components/bar/RecipeCard'
 import { CostCalculator } from '@/components/bar/CostCalculator'
 import { AddRecipeModal } from '@/components/bar/AddRecipeModal'
 import { COCKTAIL_METHOD_LABELS } from '@/data/bar-recipes'
+import { useTranslation } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, CocktailMethod } from '@/types/database'
 
 type FilterMethod = CocktailMethod | 'all'
 type FilterMenu = 'all' | 'on_menu' | 'favorites'
 
 export default function BarRecipesPage() {
+  const tb = useTranslation('bar')
   const {
     recipes,
     loading,
@@ -98,7 +100,7 @@ export default function BarRecipesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Рецепты коктейлей</h1>
+          <h1 className="text-2xl font-bold">{tb.recipesTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {totalRecipes} рецептов · {onMenuCount} в меню
             {avgMargin !== null && ` · средняя маржа ${avgMargin.toFixed(0)}%`}
@@ -147,7 +149,7 @@ export default function BarRecipesPage() {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Поиск рецепта..."
+          placeholder={tb.searchRecipes}
           className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         />
         <select
@@ -187,7 +189,7 @@ export default function BarRecipesPage() {
         <div className="card p-12 text-center">
           <div className="text-4xl mb-3">🍹</div>
           <h3 className="text-lg font-semibold mb-2">
-            {recipes.length === 0 ? 'Нет рецептов' : 'Ничего не найдено'}
+            {recipes.length === 0 ? tb.noRecipes : 'Ничего не найдено'}
           </h3>
           <p className="text-[var(--color-textMuted)] max-w-md mx-auto mb-4">
             {recipes.length === 0
