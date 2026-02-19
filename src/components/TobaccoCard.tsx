@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { useTranslation } from "@/lib/i18n";
 import { type Tobacco, getFlavorImage } from "@/data/tobaccos";
 import { IconStrength, IconHeat } from "@/components/Icons";
 
@@ -51,6 +52,7 @@ type Props = {
 // =============================================================================
 
 export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: Props) {
+  const tc = useTranslation('common');
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -63,7 +65,7 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
       disabled={isDisabled}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      aria-label={`${tobacco.brand} ${tobacco.flavor}, крепость ${tobacco.strength}, жаростойкость ${tobacco.heatResistance}${isActive ? ', выбран' : ''}`}
+      aria-label={`${tobacco.brand} ${tobacco.flavor}, ${tc.tobaccoCard.strength} ${tobacco.strength}, ${tc.tobaccoCard.heatResistance} ${tobacco.heatResistance}${isActive ? `, ${tc.tobaccoCard.selected}` : ''}`}
       aria-pressed={isActive}
       className={`
         tobacco-card group relative overflow-hidden

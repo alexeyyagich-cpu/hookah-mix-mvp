@@ -4,12 +4,15 @@ import { useState, useMemo } from 'react'
 import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 type Period = 7 | 14 | 30
 
 export default function BarSalesPage() {
   const tb = useTranslation('bar')
+  const { locale } = useLocale()
   const { sales, loading, error, recordSale, deleteSale, getAnalytics } = useBarSales()
   const { recipes, calculateCost } = useBarRecipes()
 
@@ -31,7 +34,7 @@ export default function BarSalesPage() {
 
   const formatTime = (iso: string) => {
     const d = new Date(iso)
-    return d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+    return d.toLocaleString(LOCALE_MAP[locale] || 'ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
   }
 
   // Revenue chart — simple bar chart with CSS
@@ -44,7 +47,7 @@ export default function BarSalesPage() {
         <div>
           <h1 className="text-2xl font-bold">{tb.salesTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            Быстрые продажи, автосписание и аналитика
+            {tb.salesSubtitle}
           </p>
         </div>
         <select
@@ -52,9 +55,9 @@ export default function BarSalesPage() {
           onChange={e => setPeriod(Number(e.target.value) as Period)}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >
-          <option value={7}>7 дней</option>
-          <option value={14}>14 дней</option>
-          <option value={30}>30 дней</option>
+          <option value={7}>{tb.days7}</option>
+          <option value={14}>{tb.days14}</option>
+          <option value={30}>{tb.days30}</option>
         </select>
       </div>
 
@@ -71,7 +74,7 @@ export default function BarSalesPage() {
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Продано порций</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.portionsSold}</div>
           <div className="text-2xl font-bold mt-1">{analytics.totalSales}</div>
         </div>
         <div className="card p-4">
@@ -89,8 +92,8 @@ export default function BarSalesPage() {
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[var(--color-border)]">
         {([
-          { key: 'sell' as const, label: 'Продажа' },
-          { key: 'log' as const, label: 'Журнал' },
+          { key: 'sell' as const, label: tb.tabSell },
+          { key: 'log' as const, label: tb.tabLog },
           { key: 'analytics' as const, label: tb.analytics },
         ]).map(t => (
           <button
@@ -136,18 +139,18 @@ export default function BarSalesPage() {
               {periodSales.length === 0 ? (
                 <div className="p-12 text-center">
                   <div className="text-4xl mb-3">📝</div>
-                  <p className="text-[var(--color-textMuted)]">Нет продаж за выбранный период</p>
+                  <p className="text-[var(--color-textMuted)]">{tb.noSalesForPeriod}</p>
                 </div>
               ) : (
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[var(--color-border)]">
-                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Время</th>
-                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Коктейль</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Кол-во</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Выручка</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Себест.</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Маржа</th>
+                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thTime}</th>
+                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thCocktail}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thQty}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thRevenue}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thCost}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thMargin}</th>
                       <th className="text-center px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase w-16"></th>
                     </tr>
                   </thead>
@@ -181,7 +184,7 @@ export default function BarSalesPage() {
                             <button
                               onClick={() => deleteSale(sale.id)}
                               className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
-                              title="Удалить"
+                              title={tb.deleteTitle}
                             >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -202,9 +205,9 @@ export default function BarSalesPage() {
             <div className="space-y-6">
               {/* Revenue Chart */}
               <div className="card p-5">
-                <h3 className="font-semibold mb-4">Выручка по дням</h3>
+                <h3 className="font-semibold mb-4">{tb.revenueByDay}</h3>
                 {analytics.revenueByDay.length === 0 ? (
-                  <p className="text-sm text-[var(--color-textMuted)] text-center py-4">Нет данных</p>
+                  <p className="text-sm text-[var(--color-textMuted)] text-center py-4">{tb.noData}</p>
                 ) : (
                   <div className="space-y-2">
                     {analytics.revenueByDay.map(day => {
@@ -214,7 +217,7 @@ export default function BarSalesPage() {
                       return (
                         <div key={day.date} className="flex items-center gap-3">
                           <span className="text-xs text-[var(--color-textMuted)] w-12 flex-shrink-0">
-                            {new Date(day.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}
+                            {new Date(day.date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', { day: '2-digit', month: '2-digit' })}
                           </span>
                           <div className="flex-1 relative h-6 rounded-lg bg-[var(--color-bgHover)] overflow-hidden">
                             <div
@@ -247,9 +250,9 @@ export default function BarSalesPage() {
 
               {/* Top Cocktails */}
               <div className="card p-5">
-                <h3 className="font-semibold mb-4">Топ коктейлей</h3>
+                <h3 className="font-semibold mb-4">{tb.topCocktails}</h3>
                 {analytics.topCocktails.length === 0 ? (
-                  <p className="text-sm text-[var(--color-textMuted)] text-center py-4">Нет данных</p>
+                  <p className="text-sm text-[var(--color-textMuted)] text-center py-4">{tb.noData}</p>
                 ) : (
                   <div className="space-y-3">
                     {analytics.topCocktails.map((cocktail, i) => {
@@ -263,7 +266,7 @@ export default function BarSalesPage() {
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-sm font-medium truncate">{cocktail.name}</span>
                               <span className="text-xs text-[var(--color-textMuted)] ml-2">
-                                {cocktail.count} шт · {cocktail.revenue.toFixed(0)}€
+                                {cocktail.count} {tb.pcsUnit} · {cocktail.revenue.toFixed(0)}€
                               </span>
                             </div>
                             <div className="h-2 rounded-full bg-[var(--color-bgHover)] overflow-hidden">
@@ -283,39 +286,39 @@ export default function BarSalesPage() {
               {/* Summary */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="card p-5">
-                  <h3 className="font-semibold mb-3">Сводка за {period} дней</h3>
+                  <h3 className="font-semibold mb-3">{tb.summaryFor(period)}</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-textMuted)]">Выручка</span>
+                      <span className="text-[var(--color-textMuted)]">{tb.revenueLabel}</span>
                       <span className="font-mono font-semibold">{analytics.totalRevenue.toFixed(2)}€</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-textMuted)]">Себестоимость</span>
+                      <span className="text-[var(--color-textMuted)]">{tb.costPriceLabel}</span>
                       <span className="font-mono text-[var(--color-danger)]">{analytics.totalCost.toFixed(2)}€</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-[var(--color-border)]">
-                      <span className="font-medium">Прибыль</span>
+                      <span className="font-medium">{tb.profitLabel}</span>
                       <span className="font-mono font-bold text-[var(--color-success)]">{analytics.totalProfit.toFixed(2)}€</span>
                     </div>
                   </div>
                 </div>
                 <div className="card p-5">
-                  <h3 className="font-semibold mb-3">Средние показатели</h3>
+                  <h3 className="font-semibold mb-3">{tb.avgIndicators}</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-textMuted)]">Продаж в день</span>
+                      <span className="text-[var(--color-textMuted)]">{tb.salesPerDay}</span>
                       <span className="font-mono font-semibold">
                         {period > 0 ? (analytics.totalSales / period).toFixed(1) : '0'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-textMuted)]">Выручка в день</span>
+                      <span className="text-[var(--color-textMuted)]">{tb.revenuePerDay}</span>
                       <span className="font-mono font-semibold">
                         {period > 0 ? (analytics.totalRevenue / period).toFixed(0) : '0'}€
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[var(--color-textMuted)]">Средний чек</span>
+                      <span className="text-[var(--color-textMuted)]">{tb.avgCheck}</span>
                       <span className="font-mono font-semibold">
                         {analytics.totalSales > 0
                           ? (analytics.totalRevenue / analytics.totalSales).toFixed(2)

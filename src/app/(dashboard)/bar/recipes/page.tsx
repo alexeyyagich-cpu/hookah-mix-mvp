@@ -5,7 +5,6 @@ import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { RecipeCard } from '@/components/bar/RecipeCard'
 import { CostCalculator } from '@/components/bar/CostCalculator'
 import { AddRecipeModal } from '@/components/bar/AddRecipeModal'
-import { COCKTAIL_METHOD_LABELS } from '@/data/bar-recipes'
 import { useTranslation } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, CocktailMethod } from '@/types/database'
 
@@ -14,6 +13,12 @@ type FilterMenu = 'all' | 'on_menu' | 'favorites'
 
 export default function BarRecipesPage() {
   const tb = useTranslation('bar')
+
+  const METHOD_LABELS: Record<string, string> = {
+    build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
+    blend: tb.methodBlend, layer: tb.methodLayer, muddle: tb.methodMuddle,
+  }
+
   const {
     recipes,
     loading,
@@ -102,8 +107,8 @@ export default function BarRecipesPage() {
         <div>
           <h1 className="text-2xl font-bold">{tb.recipesTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {totalRecipes} рецептов · {onMenuCount} в меню
-            {avgMargin !== null && ` · средняя маржа ${avgMargin.toFixed(0)}%`}
+            {tb.recipesCount(totalRecipes)} · {onMenuCount} {tb.inMenu}
+            {avgMargin !== null && ` · ${tb.avgMarginLabel(avgMargin.toFixed(0))}`}
           </p>
         </div>
         <button
@@ -113,22 +118,22 @@ export default function BarRecipesPage() {
           }}
           className="btn btn-primary"
         >
-          + Новый рецепт
+          + {tb.newRecipe}
         </button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Всего рецептов</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.totalRecipes}</div>
           <div className="text-2xl font-bold mt-1">{totalRecipes}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">В меню</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.onMenu}</div>
           <div className="text-2xl font-bold text-[var(--color-success)] mt-1">{onMenuCount}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Средняя маржа</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.avgMargin}</div>
           <div className={`text-2xl font-bold mt-1 ${
             avgMargin !== null
               ? avgMargin >= 60 ? 'text-[var(--color-success)]' : avgMargin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
@@ -138,7 +143,7 @@ export default function BarRecipesPage() {
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Избранные</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.favorites}</div>
           <div className="text-2xl font-bold mt-1">{recipes.filter(r => r.is_favorite).length}</div>
         </div>
       </div>
@@ -157,8 +162,8 @@ export default function BarRecipesPage() {
           onChange={e => setFilterMethod(e.target.value as FilterMethod)}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >
-          <option value="all">Все методы</option>
-          {Object.entries(COCKTAIL_METHOD_LABELS).map(([key, label]) => (
+          <option value="all">{tb.allMethods}</option>
+          {Object.entries(METHOD_LABELS).map(([key, label]) => (
             <option key={key} value={key}>{label}</option>
           ))}
         </select>
@@ -167,9 +172,9 @@ export default function BarRecipesPage() {
           onChange={e => setFilterMenu(e.target.value as FilterMenu)}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >
-          <option value="all">Все рецепты</option>
-          <option value="on_menu">В меню</option>
-          <option value="favorites">Избранные</option>
+          <option value="all">{tb.allRecipes}</option>
+          <option value="on_menu">{tb.onMenu}</option>
+          <option value="favorites">{tb.favorites}</option>
         </select>
       </div>
 
@@ -189,17 +194,17 @@ export default function BarRecipesPage() {
         <div className="card p-12 text-center">
           <div className="text-4xl mb-3">🍹</div>
           <h3 className="text-lg font-semibold mb-2">
-            {recipes.length === 0 ? tb.noRecipes : 'Ничего не найдено'}
+            {recipes.length === 0 ? tb.noRecipes : tb.nothingFound}
           </h3>
           <p className="text-[var(--color-textMuted)] max-w-md mx-auto mb-4">
             {recipes.length === 0
-              ? 'Создайте первый рецепт или импортируйте из каталога классических коктейлей.'
-              : 'Попробуйте изменить фильтры или поисковый запрос.'
+              ? tb.createFirstOrImport
+              : tb.tryChangingFilters
             }
           </p>
           {recipes.length === 0 && (
             <button onClick={() => setModalOpen(true)} className="btn btn-primary">
-              + Создать рецепт
+              + {tb.createRecipe}
             </button>
           )}
         </div>

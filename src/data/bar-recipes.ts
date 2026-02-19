@@ -1,14 +1,5 @@
 import type { CocktailMethod, BarPortionUnit } from '@/types/database'
 
-export const COCKTAIL_METHOD_LABELS: Record<CocktailMethod, string> = {
-  build: 'Билд',
-  stir: 'Стир',
-  shake: 'Шейк',
-  blend: 'Блендер',
-  layer: 'Лейер',
-  muddle: 'Мадл',
-}
-
 export const COCKTAIL_METHOD_EMOJI: Record<CocktailMethod, string> = {
   build: '\u{1F37A}',
   stir: '\u{1F944}',
@@ -16,28 +7,6 @@ export const COCKTAIL_METHOD_EMOJI: Record<CocktailMethod, string> = {
   blend: '\u{26A1}',
   layer: '\u{1F308}',
   muddle: '\u{1FAA8}',
-}
-
-export const GLASS_LABELS: Record<string, string> = {
-  highball: 'Хайбол',
-  rocks: 'Рокс',
-  coupe: 'Купе',
-  flute: 'Флют',
-  martini: 'Мартини',
-  collins: 'Коллинз',
-  hurricane: 'Харрикейн',
-  shot: 'Шот',
-  wine: 'Бокал для вина',
-  beer: 'Пивной бокал',
-  copper_mug: 'Медная кружка',
-  tiki: 'Тики',
-  other: 'Другой',
-}
-
-export const DIFFICULTY_LABELS: Record<number, string> = {
-  1: 'Легко',
-  2: 'Средне',
-  3: 'Сложно',
 }
 
 export interface RecipePresetIngredient {

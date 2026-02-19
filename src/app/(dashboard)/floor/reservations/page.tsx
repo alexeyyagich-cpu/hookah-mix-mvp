@@ -5,15 +5,10 @@ import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconTrash } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { ReservationStatus } from '@/types/database'
 
-const STATUS_LABELS: Record<ReservationStatus, string> = {
-  pending: 'Ожидает',
-  confirmed: 'Подтверждён',
-  cancelled: 'Отменён',
-  completed: 'Завершён',
-}
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 const STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',
@@ -26,7 +21,15 @@ type StatusFilter = 'all' | ReservationStatus
 
 export default function ReservationsPage() {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
   const { reservations, loading, updateStatus, assignTable, deleteReservation } = useReservations()
+
+  const STATUS_LABELS: Record<ReservationStatus, string> = {
+    pending: tm.statusPending,
+    confirmed: tm.statusConfirmed,
+    cancelled: tm.statusCancelled,
+    completed: tm.statusCompleted,
+  }
   const { tables } = useFloorPlan()
 
   const today = new Date().toISOString().split('T')[0]
@@ -71,7 +74,7 @@ export default function ReservationsPage() {
             {tm.reservationsTitle}
           </h1>
           <p className="text-[var(--color-textMuted)] mt-1">
-            {filteredReservations.length} бронирований
+            {tm.reservationsCount(filteredReservations.length)}
           </p>
         </div>
         <Link
@@ -94,13 +97,13 @@ export default function ReservationsPage() {
           />
         </div>
         <div>
-          <label className="block text-xs text-[var(--color-textMuted)] mb-1">Статус</label>
+          <label className="block text-xs text-[var(--color-textMuted)] mb-1">{tm.filterStatus}</label>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {([
-              ['all', 'Все'],
-              ['pending', 'Ожидает'],
-              ['confirmed', 'Подтверждён'],
-              ['cancelled', 'Отменён'],
+              ['all', tm.filterAll],
+              ['pending', tm.statusPending],
+              ['confirmed', tm.statusConfirmed],
+              ['cancelled', tm.statusCancelled],
             ] as [StatusFilter, string][]).map(([key, label]) => (
               <button
                 key={key}
@@ -124,7 +127,7 @@ export default function ReservationsPage() {
           <div className="text-4xl mb-3">📅</div>
           <h3 className="text-lg font-semibold mb-2">{tm.noReservations}</h3>
           <p className="text-[var(--color-textMuted)] text-sm">
-            На выбранную дату нет бронирований.
+            {tm.noReservationsForDate}
           </p>
         </div>
       ) : (
@@ -139,7 +142,7 @@ export default function ReservationsPage() {
                   <div className="flex-shrink-0 text-center sm:w-20">
                     <div className="text-2xl font-bold">{reservation.reservation_time.slice(0, 5)}</div>
                     <div className="text-xs text-[var(--color-textMuted)]">
-                      {new Date(reservation.reservation_date + 'T00:00:00').toLocaleDateString('ru-RU', {
+                      {new Date(reservation.reservation_date + 'T00:00:00').toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
                         day: 'numeric',
                         month: 'short',
                       })}
@@ -152,11 +155,11 @@ export default function ReservationsPage() {
                       <div>
                         <p className="font-semibold">{reservation.guest_name}</p>
                         <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-[var(--color-textMuted)]">
-                          <span>{reservation.guest_count} чел.</span>
+                          <span>{reservation.guest_count} {tm.guestCountShort}</span>
                           {reservation.guest_phone && <span>{reservation.guest_phone}</span>}
                           {reservation.source !== 'online' && (
                             <span className="px-2 py-0.5 rounded text-xs bg-[var(--color-bgHover)]">
-                              {reservation.source === 'phone' ? 'Телефон' : 'Без записи'}
+                              {reservation.source === 'phone' ? tm.sourcePhone : tm.sourceWalkIn}
                             </span>
                           )}
                         </div>
@@ -191,9 +194,9 @@ export default function ReservationsPage() {
                           }}
                           className="px-3 py-1.5 rounded-lg text-xs bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                         >
-                          <option value="">Назначить стол</option>
+                          <option value="">{tm.assignTable}</option>
                           {availableTables.map(t => (
-                            <option key={t.id} value={t.id}>{t.name} ({t.capacity} чел.)</option>
+                            <option key={t.id} value={t.id}>{t.name} ({t.capacity} {tm.guestCountShort})</option>
                           ))}
                         </select>
                       )}
@@ -212,14 +215,14 @@ export default function ReservationsPage() {
                           onClick={() => updateStatus(reservation.id, 'cancelled')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-danger)]/20 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/30 transition-colors"
                         >
-                          Отменить
+                          {tm.cancelAction}
                         </button>
                       )}
                       <button
                         onClick={() => handleDelete(reservation.id)}
                         disabled={deletingId === reservation.id}
                         className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"
-                        aria-label="Удалить бронирование"
+                        aria-label={tm.deleteReservation}
                       >
                         <IconTrash size={14} />
                       </button>

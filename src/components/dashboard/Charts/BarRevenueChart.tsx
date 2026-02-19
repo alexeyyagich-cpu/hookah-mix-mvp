@@ -1,5 +1,9 @@
 'use client'
 
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+
 interface DayRevenue {
   date: string
   revenue: number
@@ -11,10 +15,13 @@ interface BarRevenueChartProps {
 }
 
 export function BarRevenueChart({ data }: BarRevenueChartProps) {
+  const t = useTranslation('manage')
+  const { locale } = useLocale()
+
   if (!data || data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-        Нет данных для отображения
+        {t.noChartData}
       </div>
     )
   }
@@ -37,7 +44,7 @@ export function BarRevenueChart({ data }: BarRevenueChartProps) {
             >
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
                 <div className="font-medium text-[var(--color-success)]">{day.revenue.toFixed(0)}€</div>
-                <div className="text-[var(--color-textMuted)]">Себ. {day.cost.toFixed(0)}€</div>
+                <div className="text-[var(--color-textMuted)]">{t.costShort} {day.cost.toFixed(0)}€</div>
               </div>
 
               <div className="w-full relative">
@@ -60,7 +67,7 @@ export function BarRevenueChart({ data }: BarRevenueChartProps) {
           <div key={day.date} className="flex-1 text-center">
             {(data.length <= 7 || index === 0 || index === data.length - 1) && (
               <div className="text-[10px] text-[var(--color-textMuted)]">
-                {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                {new Date(day.date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', { day: 'numeric', month: 'short' })}
               </div>
             )}
           </div>
@@ -70,11 +77,11 @@ export function BarRevenueChart({ data }: BarRevenueChartProps) {
       <div className="flex items-center justify-center gap-6 text-sm text-[var(--color-textMuted)]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-[var(--color-success)]" />
-          Выручка
+          {t.chartRevenue}
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-[var(--color-danger)]/30" />
-          Себестоимость
+          {t.chartCostPrice}
         </div>
       </div>
     </div>

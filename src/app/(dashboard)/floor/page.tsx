@@ -6,7 +6,9 @@ import { FloorPlan } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { IconSettings, IconCalendar } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 import type { FloorTable, ReservationStatus } from '@/types/database'
 
 const STATUS_COLORS: Record<ReservationStatus, string> = {
@@ -19,6 +21,7 @@ const STATUS_COLORS: Record<ReservationStatus, string> = {
 export default function FloorPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
+  const { locale } = useLocale()
   const { tables } = useFloorPlan()
   const { reservations } = useReservations()
   const [isEditMode, setIsEditMode] = useState(false)
@@ -48,7 +51,7 @@ export default function FloorPage() {
         <div>
           <h1 className="text-2xl font-bold">{tm.floorTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {stats.available} свободных из {stats.total} столов
+            {tm.floorAvailableOfTotal(stats.available, stats.total)}
           </p>
         </div>
         <button
@@ -69,19 +72,19 @@ export default function FloorPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Всего столов</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tm.totalTables}</div>
           <div className="text-2xl font-bold mt-1">{stats.total}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Свободно</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tm.freeCount}</div>
           <div className="text-2xl font-bold text-[var(--color-success)] mt-1">{stats.available}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Занято</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tm.occupiedCount}</div>
           <div className="text-2xl font-bold text-[var(--color-primary)] mt-1">{stats.occupied}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Бронь</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tm.reservedCount}</div>
           <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">{stats.reserved}</div>
         </div>
       </div>
@@ -91,18 +94,18 @@ export default function FloorPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold flex items-center gap-2">
             <IconCalendar size={18} className="text-[var(--color-primary)]" />
-            Бронирования на сегодня
+            {tm.todayReservations}
           </h2>
           <Link
             href="/floor/reservations"
             className="text-sm text-[var(--color-primary)] hover:underline"
           >
-            Все бронирования →
+            {tm.allReservations}
           </Link>
         </div>
 
         {todayReservations.length === 0 ? (
-          <p className="text-sm text-[var(--color-textMuted)]">Нет бронирований на сегодня</p>
+          <p className="text-sm text-[var(--color-textMuted)]">{tm.noTodayReservations}</p>
         ) : (
           <div className="space-y-2">
             {todayReservations.map((r) => (
@@ -113,13 +116,13 @@ export default function FloorPage() {
                 <div className="flex items-center gap-3">
                   <span className="font-mono font-semibold text-sm">{r.reservation_time.slice(0, 5)}</span>
                   <span className="text-sm">{r.guest_name}</span>
-                  <span className="text-xs text-[var(--color-textMuted)]">{r.guest_count} чел.</span>
+                  <span className="text-xs text-[var(--color-textMuted)]">{r.guest_count} {tm.guestCountShort}</span>
                 </div>
                 <span
                   className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
                   style={{ backgroundColor: STATUS_COLORS[r.status] }}
                 >
-                  {r.status === 'pending' ? 'Ожидает' : 'Подтверждён'}
+                  {r.status === 'pending' ? tm.statusPending : tm.statusConfirmed}
                 </span>
               </div>
             ))}
@@ -151,7 +154,7 @@ export default function FloorPage() {
             <div>
               <h2 className="text-xl font-bold">{selectedTable.name}</h2>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Вместимость: {selectedTable.capacity} человек
+                {tm.capacity(selectedTable.capacity)}
               </p>
             </div>
             <span
@@ -180,9 +183,9 @@ export default function FloorPage() {
 
           {selectedTable.session_start_time && (
             <div className="mb-4">
-              <p className="text-sm text-[var(--color-textMuted)]">Начало сессии</p>
+              <p className="text-sm text-[var(--color-textMuted)]">{tm.sessionStart}</p>
               <p className="font-medium">
-                {new Date(selectedTable.session_start_time).toLocaleTimeString('ru-RU', {
+                {new Date(selectedTable.session_start_time).toLocaleTimeString(LOCALE_MAP[locale] || 'ru-RU', {
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
@@ -212,11 +215,11 @@ export default function FloorPage() {
       {/* Help text */}
       {isEditMode && (
         <div className="p-4 rounded-xl bg-[var(--color-bgHover)] text-sm text-[var(--color-textMuted)]">
-          <p className="font-medium mb-1">Режим редактирования:</p>
+          <p className="font-medium mb-1">{tm.editModeTitle}</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>Перетаскивайте столы для изменения расположения</li>
-            <li>Нажмите на стол для редактирования</li>
-            <li>Используйте кнопку &quot;Добавить стол&quot; для создания новых</li>
+            <li>{tm.editModeDrag}</li>
+            <li>{tm.editModeClick}</li>
+            <li>{tm.editModeAdd}</li>
           </ul>
         </div>
       )}

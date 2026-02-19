@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -12,6 +13,7 @@ interface CheckoutModalProps {
 }
 
 export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModalProps) {
+  const t = useTranslation('market')
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -66,7 +68,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
         <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl animate-fadeInUp">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-            <h2 className="font-semibold text-lg">Подтверждение заказа</h2>
+            <h2 className="font-semibold text-lg">{t.orderConfirmation}</h2>
             {!loading && !success && (
               <button
                 onClick={onClose}
@@ -84,9 +86,9 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                 <div className="w-16 h-16 rounded-full bg-[var(--color-success)]/10 flex items-center justify-center mx-auto mb-4">
                   <IconCheck size={32} className="text-[var(--color-success)]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Заказ оформлен!</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.orderPlaced}</h3>
                 <p className="text-[var(--color-textMuted)]">
-                  Вы можете отслеживать статус в разделе "Заказы"
+                  {t.trackInOrders}
                 </p>
               </div>
             ) : (
@@ -96,13 +98,13 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                   <div className="font-medium">{cart.supplier.name}</div>
                   <div className="flex items-center gap-2 mt-2 text-sm text-[var(--color-textMuted)]">
                     <IconTruck size={16} />
-                    <span>Доставка: {cart.supplier.delivery_days_min}-{cart.supplier.delivery_days_max} дней</span>
+                    <span>{t.deliveryColon(cart.supplier.delivery_days_min, cart.supplier.delivery_days_max)}</span>
                   </div>
                 </div>
 
                 {/* Order summary */}
                 <div className="space-y-2">
-                  <h3 className="font-medium">Состав заказа</h3>
+                  <h3 className="font-medium">{t.orderContents}</h3>
                   <div className="max-h-48 overflow-y-auto space-y-2">
                     {cart.items.map(item => (
                       <div key={item.product.id} className="flex justify-between text-sm">
@@ -120,13 +122,13 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
 
                 {/* Total */}
                 <div className="flex justify-between items-center pt-4 border-t border-[var(--color-border)]">
-                  <span className="font-medium">Итого к оплате</span>
+                  <span className="font-medium">{t.totalToPay}</span>
                   <span className="text-xl font-bold">{cart.subtotal.toFixed(2)}€</span>
                 </div>
 
                 {/* Estimated delivery */}
                 <div className="text-sm text-[var(--color-textMuted)]">
-                  Ожидаемая доставка: {estimatedDelivery.toLocaleDateString('ru-RU', {
+                  {t.estimatedDeliveryLabel} {estimatedDelivery.toLocaleDateString('ru-RU', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
@@ -136,12 +138,12 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                 {/* Notes */}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Примечание к заказу (необязательно)
+                    {t.orderNoteOptional}
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Особые пожелания, время доставки и т.д."
+                    placeholder={t.orderNotePlaceholder}
                     className="input w-full h-20 resize-none"
                   />
                 </div>
@@ -157,14 +159,14 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                 disabled={loading}
                 className="btn btn-ghost flex-1"
               >
-                Отмена
+                {t.cancelBtn}
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={loading}
                 className="btn btn-primary flex-1"
               >
-                {loading ? 'Оформляем...' : 'Подтвердить заказ'}
+                {loading ? t.processingOrder : t.confirmOrder}
               </button>
             </div>
           )}

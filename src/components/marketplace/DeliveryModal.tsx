@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { MarketplaceOrderWithItems } from '@/types/database'
 import { IconClose, IconCheck, IconInventory } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface DeliveryModalProps {
   isOpen: boolean
@@ -19,6 +20,7 @@ export function DeliveryModal({
   onConfirmDelivery,
   onAddToInventory,
 }: DeliveryModalProps) {
+  const t = useTranslation('market')
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'confirm' | 'inventory' | 'success'>('confirm')
@@ -110,9 +112,9 @@ export function DeliveryModal({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
             <h2 className="font-semibold text-lg">
-              {step === 'confirm' && 'Подтверждение доставки'}
-              {step === 'inventory' && 'Добавить в инвентарь'}
-              {step === 'success' && 'Готово!'}
+              {step === 'confirm' && t.confirmDeliveryTitle}
+              {step === 'inventory' && t.addToInventory}
+              {step === 'success' && t.doneLabel}
             </h2>
             {!loading && step !== 'success' && (
               <button
@@ -131,15 +133,15 @@ export function DeliveryModal({
                 <div className="w-16 h-16 rounded-full bg-[var(--color-success)]/10 flex items-center justify-center mx-auto mb-4">
                   <IconCheck size={32} className="text-[var(--color-success)]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Доставка подтверждена!</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.deliveryConfirmed}</h3>
                 <p className="text-[var(--color-textMuted)]">
-                  Статус заказа обновлен
+                  {t.orderStatusUpdated}
                 </p>
               </div>
             ) : step === 'confirm' ? (
               <>
                 <p className="text-[var(--color-textMuted)]">
-                  Подтвердите, что вы получили заказ #{order.order_number}
+                  {t.confirmReceivedOrder(order.order_number)}
                 </p>
 
                 {/* Order items */}
@@ -150,7 +152,7 @@ export function DeliveryModal({
                         <div className="text-xs text-[var(--color-textMuted)]">{item.brand}</div>
                         <div className="font-medium">{item.flavor}</div>
                         <div className="text-sm text-[var(--color-textMuted)]">
-                          {item.quantity} × {item.package_grams}г
+                          {item.quantity} × {item.package_grams}g
                         </div>
                       </div>
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -166,7 +168,7 @@ export function DeliveryModal({
                 </div>
 
                 <p className="text-sm text-[var(--color-textMuted)]">
-                  Отметьте товары, которые вы получили и хотите добавить в инвентарь
+                  {t.markReceivedItems}
                 </p>
               </>
             ) : (
@@ -174,9 +176,9 @@ export function DeliveryModal({
                 <div className="flex items-center gap-3 p-4 rounded-lg bg-[var(--color-primary)]/10">
                   <IconInventory size={24} className="text-[var(--color-primary)]" />
                   <div>
-                    <div className="font-medium">Добавить товары в инвентарь?</div>
+                    <div className="font-medium">{t.addItemsToInventory}</div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {selectedItems.size} позиций будут добавлены
+                      {t.itemsWillBeAdded(selectedItems.size)}
                     </div>
                   </div>
                 </div>
@@ -188,7 +190,7 @@ export function DeliveryModal({
                       <div key={item.id} className="flex justify-between text-sm">
                         <span>{item.brand} {item.flavor}</span>
                         <span className="text-[var(--color-textMuted)]">
-                          +{item.quantity * item.package_grams}г
+                          +{item.quantity * item.package_grams}g
                         </span>
                       </div>
                     ))
@@ -208,14 +210,14 @@ export function DeliveryModal({
                     disabled={loading}
                     className="btn btn-ghost flex-1"
                   >
-                    Отмена
+                    {t.cancelBtn}
                   </button>
                   <button
                     onClick={handleConfirmDelivery}
                     disabled={loading}
                     className="btn btn-primary flex-1"
                   >
-                    {loading ? 'Подтверждаем...' : 'Подтвердить доставку'}
+                    {loading ? t.confirming : t.confirmDeliveryBtn}
                   </button>
                 </>
               ) : (
@@ -225,14 +227,14 @@ export function DeliveryModal({
                     disabled={loading}
                     className="btn btn-ghost flex-1"
                   >
-                    Пропустить
+                    {t.skip}
                   </button>
                   <button
                     onClick={handleAddToInventory}
                     disabled={loading}
                     className="btn btn-primary flex-1"
                   >
-                    {loading ? 'Добавляем...' : 'Добавить в инвентарь'}
+                    {loading ? t.adding : t.addToInventoryBtn}
                   </button>
                 </>
               )}

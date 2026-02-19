@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
@@ -26,6 +27,8 @@ interface QuickSessionProps {
 }
 
 export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessionProps) {
+  const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const { bowls, defaultBowl } = useBowls()
   const { inventory } = useInventory()
   const [selectedBowl, setSelectedBowl] = useState<string>('')
@@ -115,7 +118,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <IconSmoke size={22} className="text-[var(--color-primary)]" />
-            Сохранить сессию
+            {t.saveSession}
           </h2>
           <button
             onClick={onClose}
@@ -129,10 +132,10 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1">
           {/* Mix Preview */}
           <div className="space-y-3">
-            <label className="block text-sm font-medium">Микс</label>
+            <label className="block text-sm font-medium">{t.mixLabel}</label>
             {mixItems.length === 0 ? (
               <div className="p-4 rounded-xl bg-[var(--color-bgHover)] text-center text-[var(--color-textMuted)]">
-                Выберите табаки в калькуляторе
+                {t.selectTobaccosInCalc}
               </div>
             ) : (
               <div className="space-y-2">
@@ -159,10 +162,10 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                       <div className="text-right">
                         <div className="font-medium">{item.percent}%</div>
                         <div className="text-xs text-[var(--color-textMuted)]">
-                          {gramsNeeded}г
+                          {gramsNeeded}g
                           {hasInventory && invItem && (
                             <span className={invItem.quantity_grams >= gramsNeeded ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}>
-                              {' '}(на складе: {invItem.quantity_grams}г)
+                              {' '}{t.inStockLabel(invItem.quantity_grams)}
                             </span>
                           )}
                         </div>
@@ -175,7 +178,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
             {compatibilityScore && (
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-[var(--color-textMuted)]">Совместимость:</span>
+                <span className="text-[var(--color-textMuted)]">{t.compatibilityLabel}:</span>
                 <span className={`font-bold ${
                   compatibilityScore >= 80 ? 'text-[var(--color-success)]' :
                   compatibilityScore >= 60 ? 'text-[var(--color-primary)]' :
@@ -189,7 +192,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
           {/* Bowl Selection */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Чаша</label>
+            <label className="block text-sm font-medium">{t.selectBowlLabel}</label>
             <select
               value={selectedBowl}
               onChange={(e) => {
@@ -199,10 +202,10 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
               }}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
             >
-              <option value="">Без чаши</option>
+              <option value="">{t.noBowlOption}</option>
               {bowls.map(bowl => (
                 <option key={bowl.id} value={bowl.id}>
-                  {bowl.name} ({bowl.capacity_grams}г)
+                  {bowl.name} ({bowl.capacity_grams}g)
                 </option>
               ))}
             </select>
@@ -210,7 +213,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
           {/* Total Grams */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Всего грамм</label>
+            <label className="block text-sm font-medium">{t.totalGrams}</label>
             <input
               type="number"
               value={totalGrams}
@@ -229,13 +232,13 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
               onChange={(e) => setDeductInventory(e.target.checked)}
               className="w-5 h-5 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
             />
-            <span className="text-sm">Списать табак со склада</span>
+            <span className="text-sm">{t.deductFromInventory}</span>
           </label>
 
           {/* Session Timer */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium">Таймер сессии</label>
+              <label className="block text-sm font-medium">{t.sessionTimerLabel}</label>
               <button
                 type="button"
                 onClick={() => setShowTimer(!showTimer)}
@@ -246,7 +249,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                 }}
               >
                 <IconTimer size={14} />
-                {showTimer ? 'Скрыть' : 'Показать'}
+                {showTimer ? t.hideTimer : t.showTimer}
               </button>
             </div>
             {showTimer && (
@@ -258,19 +261,19 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             )}
             {!showTimer && durationMinutes > 0 && (
               <div className="text-sm text-[var(--color-textMuted)]">
-                Длительность: {durationMinutes} мин
+                {t.durationMinutes(durationMinutes)}
               </div>
             )}
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Заметки</label>
+            <label className="block text-sm font-medium">{t.notesLabel}</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none resize-none"
-              placeholder="Комментарий к сессии..."
+              placeholder={t.sessionNotePlaceholder}
               rows={2}
             />
           </div>
@@ -283,14 +286,14 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             onClick={onClose}
             className="btn btn-ghost"
           >
-            Отмена
+            {tc.cancel}
           </button>
           <button
             onClick={handleSubmit}
             disabled={!canSubmit || saving}
             className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Сохранение...' : 'Сохранить сессию'}
+            {saving ? tc.saving : t.saveSession}
           </button>
         </div>
       </div>

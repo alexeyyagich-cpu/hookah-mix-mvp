@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 import { MIX_RECIPES, MIX_CATEGORY_INFO, getMixCategories, type MixRecipe } from "@/data/mixes";
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
+  const t = useTranslation("hookah");
   const [selectedCategory, setSelectedCategory] = useState<MixRecipe["category"] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -59,10 +61,10 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
         >
           <div>
             <h2 className="text-lg font-bold" style={{ color: "var(--color-text)" }}>
-              Готовые миксы
+              {t.mixDrawerTitle}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: "var(--color-textMuted)" }}>
-              {MIX_RECIPES.length} проверенных рецептов
+              {t.mixDrawerRecipeCount(MIX_RECIPES.length)}
             </p>
           </div>
           <button
@@ -95,7 +97,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
             </svg>
             <input
               type="text"
-              placeholder="Поиск по названию или тегу..."
+              placeholder={t.mixDrawerSearchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 bg-transparent outline-none text-sm"
@@ -107,7 +109,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
                 className="text-xs px-2 py-1 rounded-lg hover:bg-[var(--color-bgAccent)] transition-colors"
                 style={{ color: "var(--color-textMuted)" }}
               >
-                Очистить
+                {t.mixDrawerClear}
               </button>
             )}
           </div>
@@ -120,7 +122,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
               onClick={() => setSelectedCategory(null)}
               className={`pill whitespace-nowrap ${!selectedCategory ? "pill-active" : ""}`}
             >
-              Все
+              {t.mixDrawerAll}
             </button>
             {categories.map(cat => (
               <button
@@ -141,7 +143,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
             {filteredMixes.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-4xl mb-3">🔍</p>
-                <p style={{ color: "var(--color-textMuted)" }}>Миксы не найдены</p>
+                <p style={{ color: "var(--color-textMuted)" }}>{t.mixDrawerNotFound}</p>
               </div>
             ) : (
               filteredMixes.map(mix => (
@@ -156,6 +158,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
 }
 
 function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
+  const t = useTranslation("hookah");
   const [isExpanded, setIsExpanded] = useState(false);
 
   const difficultyColors = {
@@ -165,9 +168,9 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
   };
 
   const difficultyLabels = {
-    easy: "Простой",
-    medium: "Средний",
-    advanced: "Сложный",
+    easy: t.mixDifficultyEasy,
+    medium: t.mixDifficultyMedium,
+    advanced: t.mixDifficultyAdvanced,
   };
 
   return (
@@ -300,7 +303,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
               color: "var(--color-bg)",
             }}
           >
-            Применить микс
+            {t.mixDrawerApply}
           </button>
         </div>
       )}

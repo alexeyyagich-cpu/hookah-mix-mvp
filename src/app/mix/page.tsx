@@ -57,17 +57,18 @@ const CATEGORIES: Category[] = [
 ];
 
 // Category labels and icons for better UX
-const CATEGORY_INFO: Record<Category, { label: string; emoji: string }> = {
-  fruit: { label: "Фрукты", emoji: "🍎" },
-  berry: { label: "Ягоды", emoji: "🫐" },
-  citrus: { label: "Цитрус", emoji: "🍋" },
-  tropical: { label: "Тропики", emoji: "🥭" },
-  mint: { label: "Свежесть", emoji: "❄️" },
-  dessert: { label: "Десерты", emoji: "🍰" },
-  soda: { label: "Напитки", emoji: "🥤" },
-  candy: { label: "Сладости", emoji: "🍬" },
-  spice: { label: "Специи", emoji: "🌶️" },
-  herbal: { label: "Травы", emoji: "🌿" },
+// Category emoji lookup (labels come from i18n)
+const CATEGORY_EMOJI: Record<Category, string> = {
+  fruit: "🍎",
+  berry: "🫐",
+  citrus: "🍋",
+  tropical: "🥭",
+  mint: "❄️",
+  dessert: "🍰",
+  soda: "🥤",
+  candy: "🍬",
+  spice: "🌶️",
+  herbal: "🌿",
 };
 
 function roundToInt(v: number) {
@@ -78,6 +79,20 @@ export default function MixPage() {
   const t = useTranslation('hookah');
   const { theme } = useTheme();
   const { user, profile } = useAuth();
+
+  // Category labels from i18n
+  const CATEGORY_LABELS: Record<Category, string> = useMemo(() => ({
+    fruit: t.categoryFruit,
+    berry: t.categoryBerry,
+    citrus: t.categoryCitrus,
+    tropical: t.categoryTropical,
+    mint: t.categoryMint,
+    dessert: t.categoryDessert,
+    soda: t.categorySoda,
+    candy: t.categoryCandy,
+    spice: t.categorySpice,
+    herbal: t.categoryHerbal,
+  }), [t]);
   const { createSession } = useSessions();
   const { saveMix, incrementUsage } = useSavedMixes();
   const { recordVisit } = useGuests();
@@ -456,7 +471,7 @@ export default function MixPage() {
               }}
             >
               <IconTarget size={16} />
-              <span className="hidden md:inline">Подбор</span>
+              <span className="hidden md:inline">{t.mixNavRecommend}</span>
             </Link>
 
             {/* Миксы dropdown */}
@@ -471,7 +486,7 @@ export default function MixPage() {
                 }}
               >
                 <IconMix size={16} />
-                <span className="hidden md:inline">Миксы</span>
+                <span className="hidden md:inline">{t.mixNavMixes}</span>
                 <span className={`transition-transform text-xs ${isMixesMenuOpen ? 'rotate-180' : ''}`}>▼</span>
               </button>
               {isMixesMenuOpen && (
@@ -490,7 +505,7 @@ export default function MixPage() {
                       style={{ color: "var(--color-text)" }}
                     >
                       <IconMix size={16} />
-                      <span>Рецепты миксов</span>
+                      <span>{t.mixMixRecipes}</span>
                     </button>
                     {user && (
                       <button
@@ -499,7 +514,7 @@ export default function MixPage() {
                         style={{ color: "var(--color-text)", borderColor: "var(--color-border)" }}
                       >
                         <IconStar size={16} className="text-[var(--color-warning)]" />
-                        <span>Мои сохранённые</span>
+                        <span>{t.mixMySaved}</span>
                       </button>
                     )}
                   </div>
@@ -518,7 +533,7 @@ export default function MixPage() {
                 }}
               >
                 <span>👥</span>
-                <span className="hidden md:inline">Гости</span>
+                <span className="hidden md:inline">{t.mixNavGuests}</span>
               </button>
             )}
 
@@ -528,7 +543,7 @@ export default function MixPage() {
               className="btn btn-neon text-sm flex items-center gap-1.5 px-2 sm:px-3"
             >
               <span>🎰</span>
-              <span className="hidden md:inline">Рандом</span>
+              <span className="hidden md:inline">{t.mixNavRandom}</span>
             </button>
 
             {/* Divider */}
@@ -538,12 +553,12 @@ export default function MixPage() {
             {user ? (
               <Link href="/dashboard" className="btn btn-primary text-sm px-2 sm:px-3">
                 <span className="sm:hidden">👤</span>
-                <span className="hidden sm:inline">Кабинет</span>
+                <span className="hidden sm:inline">{t.mixNavDashboard}</span>
               </Link>
             ) : (
               <Link href="/login" className="btn btn-primary text-sm px-2 sm:px-3">
                 <span className="sm:hidden">👤</span>
-                <span className="hidden sm:inline">Войти</span>
+                <span className="hidden sm:inline">{t.mixNavLogin}</span>
               </Link>
             )}
           </div>
@@ -582,10 +597,10 @@ export default function MixPage() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h2 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
-                    Выберите табак
+                    {t.mixSelectTobacco}
                   </h2>
                   <p className="text-xs mt-0.5" style={{ color: "var(--color-textMuted)" }}>
-                    Выберите 2-3 вкуса для микса
+                    {t.mixSelectHint}
                   </p>
                 </div>
                 <span
@@ -626,9 +641,9 @@ export default function MixPage() {
                   }}
                 >
                   <span>🎨</span>
-                  <span>Фильтр по вкусам</span>
+                  <span>{t.mixFlavorFilter}</span>
                   {selectedCategory && (
-                    <span className="text-xs opacity-80">({CATEGORY_INFO[selectedCategory].label})</span>
+                    <span className="text-xs opacity-80">({CATEGORY_LABELS[selectedCategory]})</span>
                   )}
                   <span className={`transition-transform ${showCategoryFilter ? "rotate-180" : ""}`}>▼</span>
                 </button>
@@ -640,7 +655,7 @@ export default function MixPage() {
                       onClick={() => setSelectedCategory(null)}
                       className={`pill ${selectedCategory === null ? "pill-active" : ""}`}
                     >
-                      Все вкусы
+                      {t.mixAllFlavors}
                     </button>
                     {CATEGORIES.map(cat => (
                       <button
@@ -648,8 +663,8 @@ export default function MixPage() {
                         onClick={() => setSelectedCategory(prev => prev === cat ? null : cat)}
                         className={`pill ${selectedCategory === cat ? "pill-active" : ""}`}
                       >
-                        <span className="mr-1">{CATEGORY_INFO[cat].emoji}</span>
-                        {CATEGORY_INFO[cat].label}
+                        <span className="mr-1">{CATEGORY_EMOJI[cat]}</span>
+                        {CATEGORY_LABELS[cat]}
                       </button>
                     ))}
                   </div>
@@ -781,7 +796,7 @@ export default function MixPage() {
                       className="mt-4 text-xs tracking-wide text-center"
                       style={{ color: "var(--color-textMuted)" }}
                     >
-                      Потяни кольцо для подбора микса
+                      {t.mixDragRingHint}
                     </p>
                   )}
                 </div>
@@ -959,7 +974,7 @@ export default function MixPage() {
       {/* Keyboard hint - hidden on mobile, only visible on desktop */}
       <div className="hidden lg:block fixed bottom-6 left-1/2 -translate-x-1/2 z-40 opacity-50 hover:opacity-100 transition-opacity">
         <div className="glass px-4 py-2 rounded-full text-xs flex items-center gap-3 border" style={{ borderColor: "var(--color-border)" }}>
-          <span style={{ color: "var(--color-textMuted)" }}>Тема:</span>
+          <span style={{ color: "var(--color-textMuted)" }}>{t.mixThemeLabel}</span>
           {["1", "2", "3"].map(k => (
             <kbd
               key={k}
@@ -992,15 +1007,15 @@ export default function MixPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h4 className="text-base font-semibold" style={{ color: "var(--color-text)" }}>
-                  Рекомендуемые миксы
+                  {t.mixRecommendedTitle}
                 </h4>
                 <p className="text-xs mt-0.5" style={{ color: "var(--color-textMuted)" }}>
-                  Для совместимости {targetCompatibility}%+
+                  {t.mixForCompatibility(targetCompatibility!)}
                 </p>
               </div>
               <button
                 onClick={() => setShowRecommendations(false)}
-                aria-label="Закрыть рекомендации"
+                aria-label={t.mixCloseRecommendations}
                 className="icon-btn icon-btn-sm icon-btn-ghost"
               >
                 <span aria-hidden="true">×</span>
@@ -1035,7 +1050,7 @@ export default function MixPage() {
               ))}
             </div>
             <p className="text-[10px] mt-4 text-center" style={{ color: "var(--color-textMuted)" }}>
-              Нажми на микс для применения
+              {t.mixClickToApply}
             </p>
           </div>
         </>
@@ -1108,15 +1123,15 @@ export default function MixPage() {
             <div className="sticky top-0 z-10 p-4 flex items-center justify-between border-b" style={{ background: "var(--color-bg)", borderColor: "var(--color-border)" }}>
               <div>
                 <h2 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
-                  Быстрый повтор
+                  {t.mixQuickRepeat}
                 </h2>
                 <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
-                  Выберите гостя для повтора микса
+                  {t.mixQuickRepeatHint}
                 </p>
               </div>
               <button
                 onClick={() => setIsGuestsDrawerOpen(false)}
-                aria-label="Закрыть быстрый повтор"
+                aria-label={t.mixCloseQuickRepeat}
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ background: "var(--color-bgHover)", color: "var(--color-textMuted)" }}
               >
@@ -1159,7 +1174,7 @@ export default function MixPage() {
           {/* Timer toggle button */}
           <button
             onClick={() => setIsTimerVisible(!isTimerVisible)}
-            aria-label={isTimerVisible ? "Скрыть таймер" : "Показать таймер"}
+            aria-label={isTimerVisible ? t.mixHideTimerLabel : t.mixShowTimerLabel}
             className={`h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all ${isTimerVisible ? 'animate-pulse' : ''}`}
             style={{
               background: isTimerVisible ? "var(--color-success)" : "var(--color-bgHover)",
@@ -1168,13 +1183,13 @@ export default function MixPage() {
           >
             <IconTimer size={18} />
             {sessionDuration > 0 && (
-              <span className="tabular-nums">{sessionDuration}м</span>
+              <span className="tabular-nums">{sessionDuration}m</span>
             )}
           </button>
 
           <button
             onClick={() => setIsSaveMixModalOpen(true)}
-            aria-label="Сохранить микс"
+            aria-label={t.mixSaveMixLabel}
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-primary)",
@@ -1182,11 +1197,11 @@ export default function MixPage() {
             }}
           >
             <span aria-hidden="true">💾</span>
-            <span className="hidden sm:inline">Сохранить</span>
+            <span className="hidden sm:inline">{t.mixSaveBtn}</span>
           </button>
           <button
             onClick={() => setIsQuickSessionOpen(true)}
-            aria-label="Записать сессию"
+            aria-label={t.mixRecordSession}
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-success)",
@@ -1194,7 +1209,7 @@ export default function MixPage() {
             }}
           >
             <span aria-hidden="true">📝</span>
-            <span className="hidden sm:inline">Сессия</span>
+            <span className="hidden sm:inline">{t.mixSessionBtn}</span>
           </button>
         </div>
       )}

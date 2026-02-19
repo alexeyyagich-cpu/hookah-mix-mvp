@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { IconPlus, IconMinus, IconClose, IconCocktail, IconBowl } from '@/components/Icons'
 import type { FloorTable, BarRecipeWithIngredients, KdsOrderItem } from '@/types/database'
 import type { CreateKdsOrderInput } from '@/lib/hooks/useKDS'
@@ -36,6 +37,7 @@ export function NewOrderModal({
   isBarActive,
   isHookahActive,
 }: NewOrderModalProps) {
+  const t = useTranslation('manage')
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'bar' | 'hookah'>(isBarActive ? 'bar' : 'hookah')
   const [barItems, setBarItems] = useState<BarItemEntry[]>([])
@@ -142,7 +144,7 @@ export function NewOrderModal({
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)] flex items-center justify-between">
-          <h2 className="text-xl font-bold">Новый заказ</h2>
+          <h2 className="text-xl font-bold">{t.newOrderHeader}</h2>
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
@@ -155,7 +157,7 @@ export function NewOrderModal({
           {/* Table picker */}
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-textMuted)] uppercase tracking-wide mb-3">
-              Стол
+              {t.sectionTable}
             </h3>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
               <button
@@ -166,7 +168,7 @@ export function NewOrderModal({
                     : 'border-[var(--color-border)] hover:border-[var(--color-primary)]/30'
                 }`}
               >
-                Без стола
+                {t.noTableBtn}
               </button>
               {tables.map(table => (
                 <button
@@ -204,7 +206,7 @@ export function NewOrderModal({
                 }`}
               >
                 <IconCocktail size={16} />
-                Бар
+                {t.tabBar}
               </button>
               <button
                 onClick={() => setActiveTab('hookah')}
@@ -215,7 +217,7 @@ export function NewOrderModal({
                 }`}
               >
                 <IconBowl size={16} />
-                Кальянная
+                {t.tabHookah}
               </button>
             </div>
           )}
@@ -225,7 +227,7 @@ export function NewOrderModal({
             <div className="space-y-4">
               {menuRecipes.length === 0 ? (
                 <div className="text-center py-6 text-[var(--color-textMuted)] text-sm">
-                  Нет рецептов в меню. Добавьте рецепты в разделе Бар &rarr; Рецепты.
+                  {t.noMenuRecipesLong}
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -259,7 +261,7 @@ export function NewOrderModal({
               {/* Selected bar items */}
               {barItems.length > 0 && (
                 <div className="space-y-2 pt-2 border-t border-[var(--color-border)]">
-                  <h4 className="text-xs font-semibold text-[var(--color-textMuted)] uppercase">Выбрано</h4>
+                  <h4 className="text-xs font-semibold text-[var(--color-textMuted)] uppercase">{t.selectedItems}</h4>
                   {barItems.map(entry => (
                     <div
                       key={entry.recipe.id}
@@ -300,7 +302,7 @@ export function NewOrderModal({
               <textarea
                 value={hookahDescription}
                 onChange={e => setHookahDescription(e.target.value)}
-                placeholder="Опишите микс, например: Darkside Supernova + MH Pinkman, 20г, чаша Phunnel Large"
+                placeholder={t.placeholderHookahMix}
                 rows={3}
                 className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm resize-none"
               />
@@ -310,12 +312,12 @@ export function NewOrderModal({
           {/* Notes */}
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-textMuted)] uppercase tracking-wide mb-2">
-              Заметки
+              {t.sectionNotes}
             </h3>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="Особые пожелания..."
+              placeholder={t.placeholderSpecialRequests}
               rows={2}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm resize-none"
             />
@@ -328,7 +330,7 @@ export function NewOrderModal({
             onClick={onClose}
             className="px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] transition-colors"
           >
-            Отмена
+            {t.cancelBtn}
           </button>
           <button
             onClick={handleSubmit}
@@ -339,7 +341,7 @@ export function NewOrderModal({
                 : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] cursor-not-allowed'
             }`}
           >
-            {saving ? 'Создание...' : 'Создать заказ'}
+            {saving ? t.creatingOrder : t.createOrderBtn}
           </button>
         </div>
       </div>

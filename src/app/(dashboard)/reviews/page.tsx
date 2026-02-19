@@ -3,12 +3,15 @@
 import { useState } from 'react'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 type Filter = 'all' | 'published' | 'hidden'
 
 export default function ReviewsPage() {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
   const { reviews, loading, averageRating, totalCount, togglePublished, deleteReview } = useReviews()
   const [filter, setFilter] = useState<Filter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -54,7 +57,7 @@ export default function ReviewsPage() {
                   <IconStar size={16} className="text-[var(--color-warning)]" />
                   {averageRating}
                 </span>
-                <span>{totalCount} отзывов</span>
+                <span>{tm.reviewsCountLabel(totalCount)}</span>
               </>
             )}
           </div>
@@ -64,9 +67,9 @@ export default function ReviewsPage() {
       {/* Filters */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {([
-          ['all', `Все (${totalCount})`],
-          ['published', `Опубликованные (${publishedCount})`],
-          ['hidden', `Скрытые (${hiddenCount})`],
+          ['all', tm.filterAllReviews(totalCount)],
+          ['published', tm.filterPublished(publishedCount)],
+          ['hidden', tm.filterHidden(hiddenCount)],
         ] as [Filter, string][]).map(([key, label]) => (
           <button
             key={key}
@@ -87,10 +90,10 @@ export default function ReviewsPage() {
         <div className="card p-12 text-center">
           <div className="text-4xl mb-3">💬</div>
           <h3 className="text-lg font-semibold mb-2">
-            {filter === 'all' ? 'У вас пока нет отзывов' : filter === 'published' ? 'Нет опубликованных отзывов' : 'Нет скрытых отзывов'}
+            {filter === 'all' ? tm.noReviewsYet : filter === 'published' ? tm.noPublishedReviews : tm.noHiddenReviews}
           </h3>
           <p className="text-[var(--color-textMuted)] text-sm">
-            Поделитесь ссылкой на страницу заведения с гостями.
+            {tm.sharePageHint}
           </p>
         </div>
       ) : (
@@ -123,11 +126,11 @@ export default function ReviewsPage() {
                           ))}
                         </div>
                         <span className="text-xs text-[var(--color-textMuted)]">
-                          {new Date(review.created_at).toLocaleDateString('ru-RU')}
+                          {new Date(review.created_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
                         </span>
                         {!review.is_published && (
                           <span className="px-2 py-0.5 rounded text-xs bg-[var(--color-bgHover)] text-[var(--color-textMuted)]">
-                            Скрыт
+                            {tm.hiddenBadge}
                           </span>
                         )}
                       </div>
@@ -139,13 +142,13 @@ export default function ReviewsPage() {
                         onClick={() => togglePublished(review.id, !review.is_published)}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/20 text-[var(--color-textMuted)] hover:text-[var(--color-primary)]"
                       >
-                        {review.is_published ? 'Скрыть' : 'Опубликовать'}
+                        {review.is_published ? tm.actionHide : tm.actionPublish}
                       </button>
                       <button
                         onClick={() => handleDelete(review.id)}
                         disabled={deletingId === review.id}
                         className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"
-                        aria-label="Удалить отзыв"
+                        aria-label={tm.deleteReview}
                       >
                         <IconTrash size={16} />
                       </button>

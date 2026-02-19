@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
 import { BAR_CATEGORY_LABELS, BAR_CATEGORY_EMOJI, BAR_UNIT_LABELS } from '@/data/bar-ingredients'
 
@@ -13,6 +14,7 @@ interface BarInventoryTableProps {
 }
 
 export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading }: BarInventoryTableProps) {
+  const t = useTranslation('bar')
   const [sortField, setSortField] = useState<keyof BarInventoryItem>('category')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [filter, setFilter] = useState('')
@@ -65,18 +67,18 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   }
 
   const getStockStatus = (item: BarInventoryItem) => {
-    if (item.quantity <= 0) return { color: 'danger', label: 'Нет' }
-    if (item.quantity < item.min_quantity) return { color: 'warning', label: 'Мало' }
-    return { color: 'success', label: 'Ок' }
+    if (item.quantity <= 0) return { color: 'danger', label: t.stockNone }
+    if (item.quantity < item.min_quantity) return { color: 'warning', label: t.stockLow }
+    return { color: 'success', label: t.stockOk }
   }
 
   const formatQuantity = (item: BarInventoryItem) => {
     const unit = BAR_UNIT_LABELS[item.unit_type]
     if (item.unit_type === 'ml' && item.quantity >= 1000) {
-      return `${(item.quantity / 1000).toFixed(1)}л`
+      return `${(item.quantity / 1000).toFixed(1)}l`
     }
     if (item.unit_type === 'g' && item.quantity >= 1000) {
-      return `${(item.quantity / 1000).toFixed(1)}кг`
+      return `${(item.quantity / 1000).toFixed(1)}kg`
     }
     return `${Math.round(item.quantity)}${unit}`
   }
@@ -85,7 +87,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
     return (
       <div className="card p-8 text-center">
         <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-        <p className="mt-4 text-[var(--color-textMuted)]">Загрузка склада бара...</p>
+        <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingBarInventory}</p>
       </div>
     )
   }
@@ -94,9 +96,9 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
     return (
       <div className="card p-12 text-center">
         <div className="text-4xl mb-4">🍸</div>
-        <h3 className="text-lg font-semibold mb-2">Склад бара пуст</h3>
+        <h3 className="text-lg font-semibold mb-2">{t.barInventoryEmpty}</h3>
         <p className="text-[var(--color-textMuted)]">
-          Добавьте ингредиенты для начала работы с баром
+          {t.addIngredientsToStart}
         </p>
       </div>
     )
@@ -110,7 +112,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
           type="text"
           value={filter}
           onChange={e => setFilter(e.target.value)}
-          placeholder="Поиск по названию, бренду или категории..."
+          placeholder={t.searchByNameBrandCategory}
           className="w-full px-4 py-3 pl-10 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
         />
         <svg className="absolute left-3 top-3.5 w-5 h-5 text-[var(--color-textMuted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -128,25 +130,25 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                   onClick={() => handleSort('category')}
                   className="px-4 py-3 text-left text-xs font-medium text-[var(--color-textMuted)] uppercase cursor-pointer hover:text-[var(--color-text)]"
                 >
-                  Категория {sortField === 'category' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  {t.thCategory} {sortField === 'category' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
                   onClick={() => handleSort('name')}
                   className="px-4 py-3 text-left text-xs font-medium text-[var(--color-textMuted)] uppercase cursor-pointer hover:text-[var(--color-text)]"
                 >
-                  Название {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  {t.ingredientName} {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
                   onClick={() => handleSort('quantity')}
                   className="px-4 py-3 text-right text-xs font-medium text-[var(--color-textMuted)] uppercase cursor-pointer hover:text-[var(--color-text)]"
                 >
-                  Остаток {sortField === 'quantity' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  {t.thStock} {sortField === 'quantity' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-[var(--color-textMuted)] uppercase">
-                  Статус
+                  {t.thStatus}
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-[var(--color-textMuted)] uppercase">
-                  Действия
+                  {t.thActions}
                 </th>
               </tr>
             </thead>
@@ -194,7 +196,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                         <button
                           onClick={() => setAdjustingId(item.id)}
                           className="font-mono text-sm font-medium hover:text-[var(--color-primary)] transition-colors"
-                          title="Корректировать остаток"
+                          title={t.adjustStock}
                         >
                           {formatQuantity(item)}
                         </button>
@@ -211,7 +213,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                           onClick={() => onEdit(item)}
                           className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
                         >
-                          Изм.
+                          {t.editShort}
                         </button>
                         <button
                           onClick={() => handleDelete(item.id)}
@@ -221,7 +223,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                               : 'text-[var(--color-textMuted)] hover:text-[var(--color-danger)]'
                           }`}
                         >
-                          {deleteConfirm === item.id ? 'Точно?' : 'Уд.'}
+                          {deleteConfirm === item.id ? t.deleteConfirmQ : t.deleteShort}
                         </button>
                       </div>
                     </td>

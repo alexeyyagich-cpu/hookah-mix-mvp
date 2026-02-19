@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 
 interface AuthGuardProps {
   children: React.ReactNode
@@ -12,6 +13,7 @@ interface AuthGuardProps {
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const tc = useTranslation('common')
 
   useEffect(() => {
     if (!loading && !user) {
@@ -25,7 +27,7 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
         <div className="min-h-screen flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-            <p className="text-[var(--color-textMuted)]">Загрузка...</p>
+            <p className="text-[var(--color-textMuted)]">{tc.loading}</p>
           </div>
         </div>
       )

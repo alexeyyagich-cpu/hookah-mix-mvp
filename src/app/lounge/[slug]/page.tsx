@@ -1,18 +1,18 @@
 'use client'
 
-import { use, useRef, useState } from 'react'
+import { use, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePublicLounge } from '@/lib/hooks/useLoungeProfile'
 import { usePublicReviews } from '@/lib/hooks/useReviews'
 import { usePublicReservation } from '@/lib/hooks/useReservations'
-import { LOUNGE_FEATURES } from '@/types/lounge'
 import { BrandLoader } from '@/components/BrandLoader'
 import {
-  IconSmoke,
   IconStar,
   IconTarget,
   IconCalendar,
 } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
+import type { LoungeFeature } from '@/types/lounge'
 
 // Fallback demo reviews (used when no real reviews loaded)
 const DEMO_REVIEWS = [
@@ -48,25 +48,59 @@ const DEMO_REVIEWS = [
   },
 ]
 
-const DAY_NAMES: Record<string, string> = {
-  monday: 'Пн',
-  tuesday: 'Вт',
-  wednesday: 'Ср',
-  thursday: 'Чт',
-  friday: 'Пт',
-  saturday: 'Сб',
-  sunday: 'Вс',
+// Feature icon lookup (static, no translation needed)
+const FEATURE_ICONS: Record<LoungeFeature, string> = {
+  wifi: '\u{1F4F6}',
+  parking: '\u{1F17F}\uFE0F',
+  terrace: '\u{1F33F}',
+  vip_rooms: '\u{1F451}',
+  food: '\u{1F37D}\uFE0F',
+  alcohol: '\u{1F378}',
+  live_music: '\u{1F3B5}',
+  dj: '\u{1F3A7}',
+  karaoke: '\u{1F3A4}',
+  board_games: '\u{1F3B2}',
+  playstation: '\u{1F3AE}',
+  hookah_delivery: '\u{1F697}',
+  reservations: '\u{1F4C5}',
 }
 
 export default function LoungePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
+  const t = useTranslation('hookah')
   const { lounge, mixes, loading, error } = usePublicLounge(slug)
   const { reviews: realReviews, submitReview, submitting: reviewSubmitting } = usePublicReviews(lounge?.profile_id)
+
+  const DAY_NAMES: Record<string, string> = useMemo(() => ({
+    monday: t.loungeDayMon,
+    tuesday: t.loungeDayTue,
+    wednesday: t.loungeDayWed,
+    thursday: t.loungeDayThu,
+    friday: t.loungeDayFri,
+    saturday: t.loungeDaySat,
+    sunday: t.loungeDaySun,
+  }), [t])
+
+  const FEATURE_LABELS: Record<LoungeFeature, string> = useMemo(() => ({
+    wifi: t.featureWifi,
+    parking: t.featureParking,
+    terrace: t.featureTerrace,
+    vip_rooms: t.featureVipRooms,
+    food: t.featureFood,
+    alcohol: t.featureAlcohol,
+    live_music: t.featureLiveMusic,
+    dj: t.featureDj,
+    karaoke: t.featureKaraoke,
+    board_games: t.featureBoardGames,
+    playstation: t.featurePlaystation,
+    hookah_delivery: t.featureHookahDelivery,
+    reservations: t.featureReservations,
+  }), [t])
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
-        <BrandLoader size="lg" text="Загрузка..." />
+        <BrandLoader size="lg" text={t.loungeLoading} />
       </div>
     )
   }
@@ -75,13 +109,13 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold mb-2">Заведение не найдено</h1>
+          <div className="text-6xl mb-4">{'\u{1F50D}'}</div>
+          <h1 className="text-2xl font-bold mb-2">{t.loungeNotFound}</h1>
           <p className="text-[var(--color-textMuted)] mb-6">
-            Возможно, ссылка устарела или заведение скрыто
+            {t.loungeNotFoundHint}
           </p>
           <Link href="/mix" className="btn btn-primary">
-            На главную
+            {t.loungeGoHome}
           </Link>
         </div>
       </div>
@@ -111,7 +145,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
             href={`/menu/${slug}`}
             className="btn btn-primary text-sm"
           >
-            Меню табаков
+            {t.loungeTobaccoMenu}
           </Link>
         </div>
       </header>
@@ -181,7 +215,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
                       key={feature}
                       className="px-3 py-1 rounded-full text-xs bg-[var(--color-bgHover)] text-[var(--color-textMuted)]"
                     >
-                      {LOUNGE_FEATURES[feature].icon} {LOUNGE_FEATURES[feature].label}
+                      {FEATURE_ICONS[feature]} {FEATURE_LABELS[feature]}
                     </span>
                   ))}
                 </div>
@@ -196,12 +230,12 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
           <div className="card p-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <IconTarget size={18} className="text-[var(--color-primary)]" />
-              Адрес и время работы
+              {t.loungeAddressHours}
             </h3>
 
             {lounge.address && (
               <p className="text-sm mb-4">
-                📍 {lounge.address}
+                {'\u{1F4CD}'} {lounge.address}
               </p>
             )}
 
@@ -211,7 +245,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
                   <div key={day} className="flex justify-between">
                     <span className="text-[var(--color-textMuted)]">{DAY_NAMES[day]}</span>
                     <span>
-                      {hours?.is_closed ? 'Закрыто' : `${hours?.open} — ${hours?.close}`}
+                      {hours?.is_closed ? t.loungeClosed : `${hours?.open} — ${hours?.close}`}
                     </span>
                   </div>
                 ))}
@@ -223,28 +257,28 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
           <div className="card p-5">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
               <IconCalendar size={18} className="text-[var(--color-primary)]" />
-              Контакты
+              {t.loungeContacts}
             </h3>
 
             <div className="space-y-3 text-sm">
               {lounge.phone && (
                 <a href={`tel:${lounge.phone}`} className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
-                  📞 {lounge.phone}
+                  {'\u{1F4DE}'} {lounge.phone}
                 </a>
               )}
               {lounge.instagram && (
                 <a href={`https://instagram.com/${lounge.instagram}`} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
-                  📸 @{lounge.instagram}
+                  {'\u{1F4F8}'} @{lounge.instagram}
                 </a>
               )}
               {lounge.telegram && (
                 <a href={`https://t.me/${lounge.telegram}`} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
-                  ✈️ @{lounge.telegram}
+                  {'\u2708\uFE0F'} @{lounge.telegram}
                 </a>
               )}
               {lounge.website && (
                 <a href={lounge.website} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
-                  🌐 {lounge.website.replace(/^https?:\/\//, '')}
+                  {'\u{1F310}'} {lounge.website.replace(/^https?:\/\//, '')}
                 </a>
               )}
             </div>
@@ -255,8 +289,8 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
         {lounge.show_popular_mixes && signatureMixes.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <span className="text-2xl">⭐</span>
-              Фирменные миксы
+              <span className="text-2xl">{'\u2B50'}</span>
+              {t.loungeSignatureMixes}
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {signatureMixes.map(mix => (
@@ -277,16 +311,16 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {mix.tobaccos.map((t, i) => (
+                    {mix.tobaccos.map((tb, i) => (
                       <span
                         key={i}
                         className="px-2 py-1 rounded-lg text-xs"
                         style={{
-                          backgroundColor: `${t.color}20`,
-                          borderLeft: `3px solid ${t.color}`,
+                          backgroundColor: `${tb.color}20`,
+                          borderLeft: `3px solid ${tb.color}`,
                         }}
                       >
-                        {t.flavor} {t.percent}%
+                        {tb.flavor} {tb.percent}%
                       </span>
                     ))}
                   </div>
@@ -315,17 +349,17 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
 
         {/* CTA */}
         <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30 text-center">
-          <h3 className="text-xl font-bold mb-2">Хотите попробовать?</h3>
+          <h3 className="text-xl font-bold mb-2">{t.loungeCtaTitle}</h3>
           <p className="text-[var(--color-textMuted)] mb-4">
-            Посмотрите полное меню табаков или забронируйте столик
+            {t.loungeCtaHint}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href={`/menu/${slug}`} className="btn btn-primary">
-              Меню табаков
+              {t.loungeTobaccoMenu}
             </Link>
             {lounge.phone && (
               <a href={`tel:${lounge.phone}`} className="btn btn-ghost">
-                Позвонить
+                {t.loungeCallBtn}
               </a>
             )}
           </div>
@@ -335,7 +369,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
       {/* Footer */}
       <footer className="border-t border-[var(--color-border)] py-6">
         <div className="max-w-4xl mx-auto px-4 text-center text-sm text-[var(--color-textMuted)]">
-          <p>Страница создана на платформе <Link href="/mix" className="text-[var(--color-primary)] hover:underline">Hookah Torus</Link></p>
+          <p>{t.loungeFooter} <Link href="/mix" className="text-[var(--color-primary)] hover:underline">Hookah Torus</Link></p>
         </div>
       </footer>
     </div>
@@ -355,6 +389,7 @@ function ReviewForm({
   onSubmit: (review: { author_name: string; rating: number; text?: string }) => Promise<boolean>
   submitting: boolean
 }) {
+  const t = useTranslation('hookah')
   const [name, setName] = useState('')
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
@@ -382,14 +417,14 @@ function ReviewForm({
   if (submitted) {
     return (
       <div className="card p-6 mb-8 text-center">
-        <div className="text-4xl mb-3">🎉</div>
-        <h3 className="text-lg font-bold mb-1">Спасибо за отзыв!</h3>
-        <p className="text-[var(--color-textMuted)] text-sm">Ваш отзыв будет опубликован после модерации.</p>
+        <div className="text-4xl mb-3">{'\u{1F389}'}</div>
+        <h3 className="text-lg font-bold mb-1">{t.reviewThankYou}</h3>
+        <p className="text-[var(--color-textMuted)] text-sm">{t.reviewAfterModeration}</p>
         <button
           onClick={() => setSubmitted(false)}
           className="mt-4 text-sm text-[var(--color-primary)] hover:underline"
         >
-          Оставить ещё один отзыв
+          {t.reviewLeaveAnother}
         </button>
       </div>
     )
@@ -397,22 +432,22 @@ function ReviewForm({
 
   return (
     <div className="card p-6 mb-8">
-      <h3 className="text-lg font-bold mb-4">Оставить отзыв</h3>
+      <h3 className="text-lg font-bold mb-4">{t.reviewFormTitle}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Ваше имя *</label>
+          <label className="block text-sm font-medium mb-1">{t.reviewNameLabel}</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Как вас зовут?"
+            placeholder={t.reviewNamePlaceholder}
             className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Оценка *</label>
+          <label className="block text-sm font-medium mb-1">{t.reviewRatingLabel}</label>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -424,7 +459,7 @@ function ReviewForm({
                 className="text-2xl transition-transform hover:scale-110"
               >
                 <span className={star <= (hoverRating || rating) ? 'text-[var(--color-warning)]' : 'text-[var(--color-border)]'}>
-                  ★
+                  {'\u2605'}
                 </span>
               </button>
             ))}
@@ -432,11 +467,11 @@ function ReviewForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Текст отзыва</label>
+          <label className="block text-sm font-medium mb-1">{t.reviewTextLabel}</label>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Расскажите о своём впечатлении (необязательно)"
+            placeholder={t.reviewTextPlaceholder}
             rows={3}
             className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors resize-none"
           />
@@ -447,7 +482,7 @@ function ReviewForm({
           disabled={!name.trim() || rating === 0 || submitting}
           className="btn btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Отправка...' : 'Отправить отзыв'}
+          {submitting ? t.reviewSubmitting : t.reviewSubmitBtn}
         </button>
       </form>
     </div>
@@ -459,6 +494,7 @@ function ReviewForm({
 // ============================================================================
 
 function ReservationForm({ profileId }: { profileId: string }) {
+  const t = useTranslation('hookah')
   const { submitReservation, submitting, fetchSlots, occupiedSlots } = usePublicReservation(profileId)
 
   const [name, setName] = useState('')
@@ -481,7 +517,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
   const occupiedTimes = new Set(
     occupiedSlots.filter(s => s.date === date).map(s => s.time?.slice(0, 5))
   )
-  const availableSlots = timeSlots.filter(t => !occupiedTimes.has(t))
+  const availableSlots = timeSlots.filter(ts => !occupiedTimes.has(ts))
 
   const handleDateChange = (newDate: string) => {
     setDate(newDate)
@@ -516,14 +552,14 @@ function ReservationForm({ profileId }: { profileId: string }) {
   if (submitted) {
     return (
       <div className="card p-6 mb-8 text-center">
-        <div className="text-4xl mb-3">📅</div>
-        <h3 className="text-lg font-bold mb-1">Ваша бронь отправлена!</h3>
-        <p className="text-[var(--color-textMuted)] text-sm">Ожидайте подтверждение от заведения.</p>
+        <div className="text-4xl mb-3">{'\u{1F4C5}'}</div>
+        <h3 className="text-lg font-bold mb-1">{t.reservationSent}</h3>
+        <p className="text-[var(--color-textMuted)] text-sm">{t.reservationAwaitConfirm}</p>
         <button
           onClick={() => setSubmitted(false)}
           className="mt-4 text-sm text-[var(--color-primary)] hover:underline"
         >
-          Создать ещё одну бронь
+          {t.reservationCreateAnother}
         </button>
       </div>
     )
@@ -533,12 +569,12 @@ function ReservationForm({ profileId }: { profileId: string }) {
     <div className="card p-6 mb-8">
       <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
         <IconCalendar size={20} className="text-[var(--color-primary)]" />
-        Забронировать столик
+        {t.reservationTitle}
       </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Дата *</label>
+            <label className="block text-sm font-medium mb-1">{t.reservationDateLabel}</label>
             <input
               type="date"
               value={date}
@@ -549,7 +585,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Время *</label>
+            <label className="block text-sm font-medium mb-1">{t.reservationTimeLabel}</label>
             <select
               value={time}
               onChange={(e) => setTime(e.target.value)}
@@ -557,7 +593,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
               required
               disabled={!date}
             >
-              <option value="">Выберите время</option>
+              <option value="">{t.reservationSelectTime}</option>
               {availableSlots.map(slot => (
                 <option key={slot} value={slot}>{slot}</option>
               ))}
@@ -567,18 +603,18 @@ function ReservationForm({ profileId }: { profileId: string }) {
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Ваше имя *</label>
+            <label className="block text-sm font-medium mb-1">{t.reservationNameLabel}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Как вас зовут?"
+              placeholder={t.reservationNamePlaceholder}
               className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Кол-во гостей *</label>
+            <label className="block text-sm font-medium mb-1">{t.reservationGuestCount}</label>
             <input
               type="number"
               value={guestCount}
@@ -592,22 +628,22 @@ function ReservationForm({ profileId }: { profileId: string }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Телефон</label>
+          <label className="block text-sm font-medium mb-1">{t.reservationPhoneLabel}</label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="+48 512 345 678 (необязательно)"
+            placeholder={t.reservationPhonePlaceholder}
             className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Комментарий</label>
+          <label className="block text-sm font-medium mb-1">{t.reservationCommentLabel}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Особые пожелания (необязательно)"
+            placeholder={t.reservationCommentPlaceholder}
             rows={2}
             className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors resize-none"
           />
@@ -618,7 +654,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
           disabled={!name.trim() || !date || !time || submitting}
           className="btn btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Отправка...' : 'Забронировать столик'}
+          {submitting ? t.reservationSubmitting : t.reservationSubmitBtn}
         </button>
       </form>
     </div>
@@ -630,6 +666,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
 // ============================================================================
 
 function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; author_name: string; rating: number; text: string | null }[]; reviewsCount: number }) {
+  const t = useTranslation('hookah')
   const scrollRef = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const [showLeftFade, setShowLeftFade] = useState(false)
@@ -666,10 +703,10 @@ function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; aut
     <div className="mb-8">
       <div className="text-center mb-6">
         <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-          Отзывы наших <span className="text-[var(--color-warning)]">гостей</span>
+          {t.reviewsTitle} <span className="text-[var(--color-warning)]">{t.reviewsHighlight}</span>
         </h2>
         <p className="text-[var(--color-textMuted)]">
-          Более {reviewsCount} гостей уже оценили наше заведение
+          {t.reviewsSubtitle(reviewsCount)}
         </p>
       </div>
 
@@ -723,7 +760,7 @@ function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; aut
                       key={i}
                       className={`text-sm ${i < review.rating ? 'text-[var(--color-warning)]' : 'text-[var(--color-border)]'}`}
                     >
-                      ★
+                      {'\u2605'}
                     </span>
                   ))}
                 </div>
@@ -750,7 +787,7 @@ function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; aut
                   ? 'bg-[var(--color-primary)] w-6'
                   : 'bg-[var(--color-border)] hover:bg-[var(--color-textMuted)] w-2.5'
               }`}
-              aria-label={`Перейти к отзыву ${i + 1}`}
+              aria-label={t.reviewsGoTo(i + 1)}
             />
           ))}
         </div>

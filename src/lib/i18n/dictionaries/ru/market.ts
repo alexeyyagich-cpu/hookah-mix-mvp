@@ -232,4 +232,11 @@ export const market = {
   // Supplier card
   daysDelivery: (min: number, max: number) => `${min}-${max} дней`,
   minOrderCard: (amount: number) => `Мин. заказ: ${amount}\u20AC`,
+
+  // Units
+  gramsShort: 'г',
+  perPiece: 'шт',
+  packageInfo: (qty: number, grams: number, price: number) => `${qty} × ${grams}г • ${price}€/шт`,
+  totalGrams: (grams: number) => `${grams}г`,
+  packagePriceInfo: (grams: number, price: number) => `${grams}г за ${price}€`,
 }

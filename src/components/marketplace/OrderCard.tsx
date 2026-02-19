@@ -3,21 +3,33 @@
 import Link from 'next/link'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 import { IconPackage, IconTruck, IconCheck, IconClose, IconChevronRight } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface OrderCardProps {
   order: MarketplaceOrderWithItems
 }
 
-const STATUS_CONFIG: Record<OrderStatus, { label: string; colorClass: string; bgClass: string; Icon: typeof IconPackage }> = {
-  pending: { label: 'Ожидает', colorClass: 'text-[var(--color-warning)]', bgClass: 'bg-[var(--color-warning)]/10', Icon: IconPackage },
-  confirmed: { label: 'Подтвержден', colorClass: 'text-[var(--color-primary)]', bgClass: 'bg-[var(--color-primary)]/10', Icon: IconPackage },
-  shipped: { label: 'В пути', colorClass: 'text-[var(--color-primary)]', bgClass: 'bg-[var(--color-primary)]/10', Icon: IconTruck },
-  delivered: { label: 'Доставлен', colorClass: 'text-[var(--color-success)]', bgClass: 'bg-[var(--color-success)]/10', Icon: IconCheck },
-  cancelled: { label: 'Отменен', colorClass: 'text-[var(--color-danger)]', bgClass: 'bg-[var(--color-danger)]/10', Icon: IconClose },
+const STATUS_STYLE: Record<OrderStatus, { colorClass: string; bgClass: string; Icon: typeof IconPackage }> = {
+  pending: { colorClass: 'text-[var(--color-warning)]', bgClass: 'bg-[var(--color-warning)]/10', Icon: IconPackage },
+  confirmed: { colorClass: 'text-[var(--color-primary)]', bgClass: 'bg-[var(--color-primary)]/10', Icon: IconPackage },
+  shipped: { colorClass: 'text-[var(--color-primary)]', bgClass: 'bg-[var(--color-primary)]/10', Icon: IconTruck },
+  delivered: { colorClass: 'text-[var(--color-success)]', bgClass: 'bg-[var(--color-success)]/10', Icon: IconCheck },
+  cancelled: { colorClass: 'text-[var(--color-danger)]', bgClass: 'bg-[var(--color-danger)]/10', Icon: IconClose },
 }
 
 export function OrderCard({ order }: OrderCardProps) {
-  const status = STATUS_CONFIG[order.status]
+  const t = useTranslation('market')
+
+  const STATUS_LABELS: Record<OrderStatus, string> = {
+    pending: t.statusPendingCard,
+    confirmed: t.statusConfirmedCard,
+    shipped: t.statusShippedCard,
+    delivered: t.statusDeliveredCard,
+    cancelled: t.statusCancelledCard,
+  }
+
+  const status = STATUS_STYLE[order.status]
+  const statusLabel = STATUS_LABELS[order.status]
   const StatusIcon = status.Icon
 
   const formatDate = (dateStr: string) => {
@@ -74,7 +86,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <div className="text-right">
             <div className="font-semibold">{order.total.toFixed(2)}€</div>
             <div className={`text-xs font-medium ${status.colorClass}`}>
-              {status.label}
+              {statusLabel}
             </div>
           </div>
           <IconChevronRight
@@ -87,14 +99,14 @@ export function OrderCard({ order }: OrderCardProps) {
       {/* Delivery info */}
       {order.status === 'shipped' && order.estimated_delivery_date && (
         <div className="mt-3 pt-3 border-t border-[var(--color-border)] text-sm">
-          <span className="text-[var(--color-textMuted)]">Ожидаемая доставка:</span>
+          <span className="text-[var(--color-textMuted)]">{t.expectedDeliveryColon}</span>
           <span className="ml-2 font-medium">{formatDate(order.estimated_delivery_date)}</span>
         </div>
       )}
 
       {order.is_auto_order && (
         <div className="mt-2">
-          <span className="badge badge-info text-xs">Авто-заказ</span>
+          <span className="badge badge-info text-xs">{t.autoOrder}</span>
         </div>
       )}
     </Link>

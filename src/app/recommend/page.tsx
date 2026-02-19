@@ -24,6 +24,9 @@ import {
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from '@/data/tobaccos'
 import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
 import { IconTarget } from '@/components/Icons'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 // Mix item for the builder
 interface SelectedTobacco {
@@ -32,6 +35,8 @@ interface SelectedTobacco {
 }
 
 export default function RecommendPage() {
+  const t = useTranslation('hookah')
+  const { locale } = useLocale()
   const router = useRouter()
   const { user, profile } = useAuth()
   const { inventory, loading: inventoryLoading } = useInventory()
@@ -332,10 +337,10 @@ export default function RecommendPage() {
             </Link>
             <div className="hidden sm:block">
               <h1 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>
-                Подбор микса
+                {t.recommendTitle}
               </h1>
               <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                По предпочтениям гостя
+                {t.recommendSubtitle}
               </p>
             </div>
           </div>
@@ -351,16 +356,16 @@ export default function RecommendPage() {
               }}
             >
               <span>🎨</span>
-              <span className="hidden sm:inline">Калькулятор</span>
+              <span className="hidden sm:inline">{t.recommendCalculator}</span>
             </Link>
             <ThemeSwitcher />
             {user ? (
               <Link href="/dashboard" className="btn btn-primary text-sm">
-                Кабинет
+                {t.mixNavDashboard}
               </Link>
             ) : (
               <Link href="/login" className="btn btn-primary text-sm">
-                Войти
+                {t.mixNavLogin}
               </Link>
             )}
           </div>
@@ -374,10 +379,10 @@ export default function RecommendPage() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-                  Гость
+                  {t.recommendGuestTitle}
                 </h2>
                 <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>
-                  Выберите постоянного гостя или создайте нового
+                  {t.recommendGuestHint}
                 </p>
               </div>
               <button
@@ -385,7 +390,7 @@ export default function RecommendPage() {
                 className="btn btn-primary text-sm flex items-center gap-2"
               >
                 <span>+</span>
-                <span className="hidden sm:inline">Новый гость</span>
+                <span className="hidden sm:inline">{t.recommendNewGuest}</span>
               </button>
             </div>
 
@@ -407,9 +412,9 @@ export default function RecommendPage() {
                       {selectedGuest.name}
                     </p>
                     <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                      {selectedGuest.visit_count} визитов
+                      {t.recommendVisits(selectedGuest.visit_count)}
                       {selectedGuest.last_visit_at && (
-                        <> &middot; {new Date(selectedGuest.last_visit_at).toLocaleDateString('ru-RU')}</>
+                        <> &middot; {new Date(selectedGuest.last_visit_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}</>
                       )}
                     </p>
                   </div>
@@ -419,7 +424,7 @@ export default function RecommendPage() {
                     setSelectedGuest(null)
                     resetFilters()
                   }}
-                  aria-label="Сбросить выбор гостя"
+                  aria-label={t.recommendResetGuest}
                   className="icon-btn icon-btn-sm icon-btn-ghost"
                 >
                   <span aria-hidden="true">×</span>
@@ -436,7 +441,7 @@ export default function RecommendPage() {
                   style={{ background: 'var(--color-bgAccent)' }}
                 >
                   <span className="text-sm" style={{ color: 'var(--color-text)' }}>
-                    Постоянные гости ({guests.length})
+                    {t.recommendRegularGuests(guests.length)}
                   </span>
                   <span
                     className={`text-xs transition-transform ${showGuestList ? 'rotate-180' : ''}`}
@@ -498,7 +503,7 @@ export default function RecommendPage() {
 
             {!selectedGuest && guests.length === 0 && !guestsLoading && (
               <p className="text-sm text-center py-4" style={{ color: 'var(--color-textMuted)' }}>
-                Нет сохранённых гостей. Создайте первого!
+                {t.recommendNoGuests}
               </p>
             )}
           </section>
@@ -509,10 +514,10 @@ export default function RecommendPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-                Предпочтения гостя
+                {t.recommendPreferencesTitle}
               </h2>
               <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>
-                Выберите крепость и вкусовой профиль для подбора
+                {t.recommendPreferencesHint}
               </p>
             </div>
             {(hasValidPreferences || selectedTobaccos.length > 0) && (
@@ -524,7 +529,7 @@ export default function RecommendPage() {
                   color: 'var(--color-textMuted)',
                 }}
               >
-                Сбросить
+                {t.recommendReset}
               </button>
             )}
           </div>
@@ -535,16 +540,16 @@ export default function RecommendPage() {
               className="text-sm font-medium mb-3 block"
               style={{ color: 'var(--color-textMuted)' }}
             >
-              Крепость
+              {t.recommendStrength}
             </label>
             <div className="grid grid-cols-3 gap-3">
               {getAllStrengthOptions().map((strength, index) => {
                 const info = STRENGTH_LABELS[strength]
                 const isSelected = selectedStrength === strength
                 const strengthColors = {
-                  light: { bg: '#22c55e', label: 'Мягкий дым' },
-                  medium: { bg: '#f59e0b', label: 'Баланс' },
-                  strong: { bg: '#ef4444', label: 'Насыщенный' },
+                  light: { bg: '#22c55e', label: t.recommendStrengthLight },
+                  medium: { bg: '#f59e0b', label: t.recommendStrengthMedium },
+                  strong: { bg: '#ef4444', label: t.recommendStrengthStrong },
                 }
                 const colorInfo = strengthColors[strength as keyof typeof strengthColors]
 
@@ -605,7 +610,7 @@ export default function RecommendPage() {
               className="text-sm font-medium mb-3 block"
               style={{ color: 'var(--color-textMuted)' }}
             >
-              Вкусовой профиль <span className="font-normal">(можно несколько)</span>
+              {t.recommendFlavorProfile} <span className="font-normal">{t.recommendFlavorMultiple}</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {getAllFlavorProfiles().map(profile => {
@@ -674,10 +679,10 @@ export default function RecommendPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                      Учитывать инвентарь
+                      {t.recommendInventoryToggle}
                     </p>
                     <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                      Только то, что есть в наличии
+                      {t.recommendInventoryHint}
                     </p>
                   </div>
                 </div>
@@ -689,7 +694,7 @@ export default function RecommendPage() {
                       : 'bg-[var(--color-bgAccent)] border border-[var(--color-border)]'
                   }`}
                   disabled={inventoryLoading}
-                  aria-label="Переключить учёт инвентаря"
+                  aria-label={t.recommendInventoryToggleLabel}
                 >
                   <span
                     className={`absolute top-1 left-1 w-5 h-5 rounded-full shadow-md transition-transform ${
@@ -715,17 +720,17 @@ export default function RecommendPage() {
                 <span className="text-xl">💎</span>
                 <div className="flex-1">
                   <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                    Pro: Учёт инвентаря
+                    {t.recommendProInventory}
                   </p>
                   <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                    Рекомендации с учётом наличия на складе
+                    {t.recommendProInventoryHint}
                   </p>
                 </div>
                 <Link
                   href="/settings"
                   className="btn btn-primary text-xs px-3 py-1.5"
                 >
-                  Перейти на Pro
+                  {t.recommendGoToPro}
                 </Link>
               </div>
             </div>
@@ -746,7 +751,7 @@ export default function RecommendPage() {
                 }}
               >
                 <span>💾</span>
-                <span>Сохранить предпочтения для {selectedGuest.name}</span>
+                <span>{t.recommendSavePrefs(selectedGuest.name)}</span>
               </button>
             </div>
           )}
@@ -758,10 +763,10 @@ export default function RecommendPage() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-                  Собранный микс
+                  {t.recommendBuiltMix}
                 </h2>
                 <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)' }}>
-                  Настройте пропорции слайдерами
+                  {t.recommendAdjustSliders}
                 </p>
               </div>
               <span
@@ -799,7 +804,7 @@ export default function RecommendPage() {
                       </span>
                       <button
                         onClick={() => removeFromMix(tobacco.id)}
-                        aria-label={`Удалить ${tobacco.flavor} из микса`}
+                        aria-label={t.recommendRemoveFromMix(tobacco.flavor)}
                         className="icon-btn icon-btn-sm icon-btn-ghost icon-btn-danger"
                       >
                         <span aria-hidden="true">×</span>
@@ -834,7 +839,7 @@ export default function RecommendPage() {
               <div className="mt-6 pt-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="text-center p-3 rounded-xl" style={{ background: 'var(--color-bgHover)' }}>
-                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>Совместимость</p>
+                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>{t.recommendCompatibility}</p>
                     <p
                       className="text-2xl font-bold"
                       style={{
@@ -847,13 +852,13 @@ export default function RecommendPage() {
                     </p>
                   </div>
                   <div className="text-center p-3 rounded-xl" style={{ background: 'var(--color-bgHover)' }}>
-                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>Крепость</p>
+                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>{t.recommendStrengthLabel}</p>
                     <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
                       {mixResult.finalStrength}
                     </p>
                   </div>
                   <div className="text-center p-3 rounded-xl" style={{ background: 'var(--color-bgHover)' }}>
-                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>Жар</p>
+                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>{t.recommendHeatLabel}</p>
                     <p className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
                       {mixResult.finalHeatLoad}
                     </p>
@@ -864,14 +869,14 @@ export default function RecommendPage() {
                   onClick={openInCalculator}
                   className="btn btn-primary w-full text-sm"
                 >
-                  Открыть в калькуляторе
+                  {t.recommendOpenCalc}
                 </button>
               </div>
             )}
 
             {!validation.ok && selectedTobaccos.length < 2 && (
               <p className="mt-4 text-sm text-center" style={{ color: 'var(--color-textMuted)' }}>
-                Выберите минимум 2 табака для расчёта
+                {t.recommendMinTobaccos}
               </p>
             )}
           </section>
@@ -884,7 +889,7 @@ export default function RecommendPage() {
             style={{ color: 'var(--color-textMuted)' }}
           >
             <div className="animate-spin text-2xl mb-3">⏳</div>
-            <p className="text-sm">Загрузка инвентаря...</p>
+            <p className="text-sm">{t.recommendLoadingInventory}</p>
           </div>
         )}
 
@@ -911,18 +916,18 @@ export default function RecommendPage() {
               />
             </div>
             <p className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-              Выберите предпочтения
+              {t.recommendSelectPrefs}
             </p>
             <p className="text-sm max-w-xs mx-auto mb-6">
-              Укажите крепость и хотя бы один вкусовой профиль, чтобы получить персональные рекомендации
+              {t.recommendSelectPrefsHint}
             </p>
             {/* Quick hint badges */}
             <div className="flex flex-wrap justify-center gap-2">
               <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--color-bgHover)' }}>
-                🌿 Выберите крепость выше
+                {t.recommendHintStrength}
               </span>
               <span className="text-xs px-3 py-1.5 rounded-full" style={{ background: 'var(--color-bgHover)' }}>
-                🎯 Добавьте вкусовые профили
+                {t.recommendHintProfiles}
               </span>
             </div>
           </div>
@@ -933,7 +938,7 @@ export default function RecommendPage() {
               <section className="card card-elevated p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-                    Рекомендуемые табаки
+                    {t.recommendTobaccosTitle}
                   </h3>
                   <span
                     className="text-xs px-2 py-1 rounded-lg"
@@ -942,12 +947,12 @@ export default function RecommendPage() {
                       color: 'var(--color-textMuted)',
                     }}
                   >
-                    {recommendations.tobaccos.length} найдено
+                    {t.recommendFound(recommendations.tobaccos.length)}
                   </span>
                 </div>
 
                 <p className="text-xs mb-4" style={{ color: 'var(--color-textMuted)' }}>
-                  Нажмите на табак, чтобы добавить в микс
+                  {t.recommendClickToAdd}
                 </p>
 
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -975,7 +980,7 @@ export default function RecommendPage() {
               <section className="card card-elevated p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-                    Рекомендуемые миксы
+                    {t.recommendMixesTitle}
                   </h3>
                   <span
                     className="text-xs px-2 py-1 rounded-lg"
@@ -984,7 +989,7 @@ export default function RecommendPage() {
                       color: 'var(--color-textMuted)',
                     }}
                   >
-                    {recommendations.mixes.length} найдено
+                    {t.recommendFound(recommendations.mixes.length)}
                   </span>
                 </div>
 
@@ -1010,10 +1015,10 @@ export default function RecommendPage() {
                 >
                   <div className="text-4xl mb-4">😔</div>
                   <p className="text-lg font-medium" style={{ color: 'var(--color-text)' }}>
-                    Ничего не найдено
+                    {t.recommendNoResults}
                   </p>
                   <p className="text-sm mt-1">
-                    Попробуйте изменить параметры поиска
+                    {t.recommendNoResultsHint}
                   </p>
                   <button
                     onClick={resetFilters}
@@ -1023,7 +1028,7 @@ export default function RecommendPage() {
                       color: 'var(--color-text)',
                     }}
                   >
-                    Сбросить фильтры
+                    {t.recommendResetFilters}
                   </button>
                 </div>
               )}
@@ -1058,6 +1063,7 @@ function GuestModal({
   onSave: (guest: NewGuest) => void
   initialData?: Guest
 }) {
+  const t = useTranslation('hookah')
   const [name, setName] = useState(initialData?.name || '')
   const [phone, setPhone] = useState(initialData?.phone || '')
   const [notes, setNotes] = useState(initialData?.notes || '')
@@ -1098,11 +1104,11 @@ function GuestModal({
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-            {initialData ? 'Редактировать гостя' : 'Новый гость'}
+            {initialData ? t.guestModalEditTitle : t.guestModalNewTitle}
           </h2>
           <button
             onClick={onClose}
-            aria-label="Закрыть модальное окно"
+            aria-label={t.guestModalClose}
             className="icon-btn icon-btn-sm icon-btn-ghost"
           >
             <span aria-hidden="true">×</span>
@@ -1113,13 +1119,13 @@ function GuestModal({
           {/* Name */}
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
-              Имя *
+              {t.guestModalNameLabel}
             </label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="Имя гостя"
+              placeholder={t.guestModalNamePlaceholder}
               required
               className="w-full p-3 rounded-xl border text-sm"
               style={{
@@ -1133,7 +1139,7 @@ function GuestModal({
           {/* Phone */}
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
-              Телефон
+              {t.guestModalPhoneLabel}
             </label>
             <input
               type="tel"
@@ -1152,7 +1158,7 @@ function GuestModal({
           {/* Strength Preference */}
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
-              Предпочитаемая крепость
+              {t.guestModalStrengthLabel}
             </label>
             <div className="flex flex-wrap gap-2">
               {getAllStrengthOptions().map(s => {
@@ -1181,7 +1187,7 @@ function GuestModal({
           {/* Flavor Profiles */}
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
-              Любимые вкусы
+              {t.guestModalFlavorsLabel}
             </label>
             <div className="flex flex-wrap gap-2">
               {getAllFlavorProfiles().map(fp => {
@@ -1210,12 +1216,12 @@ function GuestModal({
           {/* Notes */}
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
-              Заметки
+              {t.guestModalNotesLabel}
             </label>
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="Дополнительная информация..."
+              placeholder={t.guestModalNotesPlaceholder}
               rows={3}
               className="w-full p-3 rounded-xl border text-sm resize-none"
               style={{
@@ -1237,14 +1243,14 @@ function GuestModal({
                 color: 'var(--color-text)',
               }}
             >
-              Отмена
+              {t.guestModalCancel}
             </button>
             <button
               type="submit"
               disabled={!name.trim()}
               className="flex-1 btn btn-primary text-sm disabled:opacity-50"
             >
-              Сохранить
+              {t.guestModalSave}
             </button>
           </div>
         </form>
@@ -1265,6 +1271,7 @@ function TobaccoResultCard({
   isDisabled: boolean
   onSelect: () => void
 }) {
+  const t = useTranslation('hookah')
   const { tobacco, matchScore, inStock, stockQuantity } = result
   const categoryEmoji = CATEGORY_EMOJI[tobacco.category] || '🔸'
 
@@ -1311,7 +1318,7 @@ function TobaccoResultCard({
               className="text-xs px-1.5 py-0.5 rounded"
               style={{ background: 'var(--color-bgAccent)' }}
             >
-              Сила: {tobacco.strength}/10
+              {t.recommendStrengthBadge(tobacco.strength)}
             </span>
           </div>
         </div>
@@ -1328,14 +1335,14 @@ function TobaccoResultCard({
                   : 'color-mix(in srgb, var(--color-danger) 15%, transparent)',
               }}
             >
-              {inStock ? `${stockQuantity}г` : 'Нет в наличии'}
+              {inStock ? `${stockQuantity}${t.gramsShort}` : t.recommendOutOfStock}
             </div>
           )}
           <div
             className="text-xs font-medium"
             style={{ color: 'var(--color-primary)' }}
           >
-            {matchScore}% match
+            {t.matchPercent(matchScore)}
           </div>
         </div>
       </div>
@@ -1351,13 +1358,14 @@ function MixResultCard({
   result: RecommendedMix
   onApply: () => void
 }) {
+  const t = useTranslation('hookah')
   const { mix, matchScore, matchReasons, availability, missingTobaccos, replacements } = result
   const [isExpanded, setIsExpanded] = useState(false)
 
   const availabilityBadge = availability && {
-    full: { text: 'Всё в наличии', color: 'var(--color-success)' },
-    partial: { text: 'Частично', color: 'var(--color-warning)' },
-    none: { text: 'Нет в наличии', color: 'var(--color-danger)' },
+    full: { text: t.recommendAvailFull, color: 'var(--color-success)' },
+    partial: { text: t.recommendAvailPartial, color: 'var(--color-warning)' },
+    none: { text: t.recommendAvailNone, color: 'var(--color-danger)' },
   }[availability]
 
   return (
@@ -1417,7 +1425,7 @@ function MixResultCard({
             className="text-xs font-medium"
             style={{ color: 'var(--color-primary)' }}
           >
-            {matchScore}% match
+            {t.matchPercent(matchScore)}
           </div>
           <span
             className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -1435,7 +1443,7 @@ function MixResultCard({
             className="text-xs font-medium mb-2"
             style={{ color: 'var(--color-textMuted)' }}
           >
-            Состав:
+            {t.recommendComposition}
           </p>
           <div className="space-y-1.5">
             {mix.ingredients.map((ing, i) => (
@@ -1455,7 +1463,7 @@ function MixResultCard({
                 className="text-xs font-medium mb-2"
                 style={{ color: 'var(--color-warning)' }}
               >
-                Отсутствует:
+                {t.recommendMissing}
               </p>
               <ul className="text-xs space-y-1" style={{ color: 'var(--color-textMuted)' }}>
                 {missingTobaccos.map((t, i) => (
@@ -1469,7 +1477,7 @@ function MixResultCard({
                     className="text-xs font-medium mb-1"
                     style={{ color: 'var(--color-success)' }}
                   >
-                    Замены:
+                    {t.recommendReplacements}
                   </p>
                   <ul className="text-xs space-y-1" style={{ color: 'var(--color-textMuted)' }}>
                     {replacements.map((r, i) => (
@@ -1492,7 +1500,7 @@ function MixResultCard({
               }}
               className="btn btn-primary w-full text-sm"
             >
-              Использовать этот микс
+              {t.recommendUseMix}
             </button>
           </div>
         </div>

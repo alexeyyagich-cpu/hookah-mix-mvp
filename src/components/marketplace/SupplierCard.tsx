@@ -3,12 +3,14 @@
 import Link from 'next/link'
 import type { Supplier } from '@/types/database'
 import { IconTruck, IconChevronRight } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface SupplierCardProps {
   supplier: Supplier
 }
 
 export function SupplierCard({ supplier }: SupplierCardProps) {
+  const t = useTranslation('market')
   return (
     <Link
       href={`/marketplace/supplier/${supplier.id}`}
@@ -50,11 +52,11 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
           <div className="flex items-center gap-4 mt-3 text-sm text-[var(--color-textMuted)]">
             <div className="flex items-center gap-1.5">
               <IconTruck size={16} />
-              <span>{supplier.delivery_days_min}-{supplier.delivery_days_max} дней</span>
+              <span>{t.daysDelivery(supplier.delivery_days_min, supplier.delivery_days_max)}</span>
             </div>
             {supplier.min_order_amount > 0 && (
               <div>
-                Мин. заказ: <span className="font-medium text-[var(--color-text)]">{supplier.min_order_amount}€</span>
+                {t.minOrderCard(supplier.min_order_amount)}
               </div>
             )}
           </div>

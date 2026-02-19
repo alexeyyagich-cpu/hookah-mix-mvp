@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslation } from '@/lib/i18n'
 import { IconBowl, IconStar, IconEdit, IconTrash } from '@/components/Icons'
 import type { BowlType } from '@/types/database'
 
@@ -11,6 +12,7 @@ interface BowlCardProps {
 }
 
 export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps) {
+  const t = useTranslation('hookah')
   return (
     <div className={`card p-5 ${bowl.is_default ? 'border-[var(--color-primary)]' : ''}`}>
       <div className="flex items-start justify-between">
@@ -22,11 +24,11 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
             <h3 className="font-semibold flex items-center gap-2">
               {bowl.name}
               {bowl.is_default && (
-                <span className="badge badge-primary text-[10px]">По умолчанию</span>
+                <span className="badge badge-primary text-[10px]">{t.defaultBowl}</span>
               )}
             </h3>
             <p className="text-sm text-[var(--color-textMuted)]">
-              Вместимость: <span className="text-[var(--color-text)]">{bowl.capacity_grams}г</span>
+              {t.bowlCapacityLabel}: <span className="text-[var(--color-text)]">{bowl.capacity_grams}g</span>
             </p>
           </div>
         </div>
@@ -35,7 +37,7 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
             <button
               onClick={() => onSetDefault(bowl.id)}
               className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-warning)] transition-colors"
-              title="Сделать по умолчанию"
+              title={t.setDefault}
             >
               <IconStar size={18} />
             </button>
@@ -43,14 +45,14 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
           <button
             onClick={() => onEdit(bowl)}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
-            title="Редактировать"
+            title={t.editItem}
           >
             <IconEdit size={18} />
           </button>
           <button
             onClick={() => onDelete(bowl.id)}
             className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
-            title="Удалить"
+            title={t.deleteItem}
           >
             <IconTrash size={18} />
           </button>

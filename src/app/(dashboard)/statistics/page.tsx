@@ -23,12 +23,16 @@ import {
   IconExport,
   IconWarning,
 } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 type ViewMode = 'overview' | 'comparison'
 
 export default function StatisticsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
+  const { locale } = useLocale()
   const { settings: notificationSettings } = useNotificationSettings()
   const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
   const { statistics, loading, error, dateRange, setDateRange } = useStatistics({ lowStockThreshold })
@@ -122,7 +126,7 @@ export default function StatisticsPage() {
         <div>
           <h1 className="text-2xl font-bold">{tm.statsTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            Аналитика потребления и популярных миксов
+            {tm.statsSubtitle}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -136,7 +140,7 @@ export default function StatisticsPage() {
                   : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
               }`}
             >
-              Обзор
+              {tm.viewOverview}
             </button>
             <button
               onClick={() => setViewMode('comparison')}
@@ -146,7 +150,7 @@ export default function StatisticsPage() {
                   : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
               }`}
             >
-              Сравнение
+              {tm.viewComparison}
             </button>
           </div>
 
@@ -154,10 +158,10 @@ export default function StatisticsPage() {
           {viewMode === 'overview' && (
             <div className="flex rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] p-1">
               {[
-                { value: '7d', label: '7 дней' },
-                { value: '30d', label: '30 дней' },
-                { value: '90d', label: '90 дней' },
-                { value: 'all', label: 'Все' },
+                { value: '7d', label: tm.period7d },
+                { value: '30d', label: tm.period30d },
+                { value: '90d', label: tm.period90d },
+                { value: 'all', label: tm.periodAll },
               ].map((option) => (
                 <button
                   key={option.value}
@@ -182,10 +186,10 @@ export default function StatisticsPage() {
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              title={canExport ? 'Экспорт данных' : 'Доступно на Pro'}
+              title={canExport ? tm.exportTooltip : tm.exportProOnly}
             >
               <IconExport size={18} />
-              Экспорт {!canExport && <IconLock size={14} />}
+              {tm.exportLabel} {!canExport && <IconLock size={14} />}
             </button>
 
             {exportMenuOpen && canExport && (
@@ -218,13 +222,13 @@ export default function StatisticsPage() {
               <IconTrendUp size={22} />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Расширенная аналитика</h3>
+              <h3 className="font-semibold">{tm.advancedAnalytics}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                На Pro тарифе: статистика за все время, экспорт в CSV/PDF, детальные отчеты
+                {tm.advancedAnalyticsDesc}
               </p>
             </div>
             <a href="/pricing" className="btn btn-primary">
-              Обновить
+              {tm.upgrade}
             </a>
           </div>
         </div>
@@ -248,7 +252,7 @@ export default function StatisticsPage() {
           {/* Preset Selector */}
           <div className="card p-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm text-[var(--color-textMuted)]">Сравнить:</span>
+              <span className="text-sm text-[var(--color-textMuted)]">{tm.compare}</span>
               {presets.map((preset, index) => (
                 <button
                   key={index}
@@ -267,25 +271,25 @@ export default function StatisticsPage() {
               ))}
             </div>
             <div className="mt-3 text-xs text-[var(--color-textMuted)]">
-              Период A: {periodsConfig.periodA.start.toLocaleDateString('ru-RU')} — {periodsConfig.periodA.end.toLocaleDateString('ru-RU')}
+              {tm.periodALabel}: {periodsConfig.periodA.start.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')} — {periodsConfig.periodA.end.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
               {' | '}
-              Период B: {periodsConfig.periodB.start.toLocaleDateString('ru-RU')} — {periodsConfig.periodB.end.toLocaleDateString('ru-RU')}
+              {tm.periodBLabel}: {periodsConfig.periodB.start.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')} — {periodsConfig.periodB.end.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
             </div>
           </div>
 
           {comparisonLoading ? (
             <div className="card p-12 text-center">
               <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-              <p className="mt-4 text-[var(--color-textMuted)]">Загрузка сравнения...</p>
+              <p className="mt-4 text-[var(--color-textMuted)]">{tm.loadingComparison}</p>
             </div>
           ) : !periodA || !periodB || !comparison ? (
             <div className="card p-12 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
                 <IconChart size={32} className="text-[var(--color-textMuted)]" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Недостаточно данных</h3>
+              <h3 className="text-lg font-semibold mb-2">{tm.insufficientData}</h3>
               <p className="text-[var(--color-textMuted)]">
-                Нужны данные за оба периода для сравнения
+                {tm.insufficientDataDesc}
               </p>
             </div>
           ) : (
@@ -294,28 +298,28 @@ export default function StatisticsPage() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <ComparisonCard
                   icon={<IconSmoke size={18} />}
-                  label="Сессий"
+                  label={tm.compSessions}
                   periodAValue={periodA.totalSessions}
                   periodBValue={periodB.totalSessions}
                   change={comparison.sessionsChange}
                 />
                 <ComparisonCard
                   icon={<IconChart size={18} />}
-                  label="Расход (г)"
+                  label={tm.compConsumption}
                   periodAValue={periodA.totalGramsUsed}
                   periodBValue={periodB.totalGramsUsed}
                   change={comparison.gramsChange}
                 />
                 <ComparisonCard
                   icon={<IconScale size={18} />}
-                  label="Средний расход (г)"
+                  label={tm.compAvgConsumption}
                   periodAValue={periodA.averageSessionGrams}
                   periodBValue={periodB.averageSessionGrams}
                   change={comparison.avgGramsChange}
                 />
                 <ComparisonCard
                   icon={<IconTarget size={18} />}
-                  label="Совместимость"
+                  label={tm.compCompatibility}
                   periodAValue={`${periodA.averageCompatibilityScore}%`}
                   periodBValue={`${periodB.averageCompatibilityScore}%`}
                   change={comparison.compatibilityChange}
@@ -323,7 +327,7 @@ export default function StatisticsPage() {
                 />
                 <ComparisonCard
                   icon={<IconStar size={18} />}
-                  label="Рейтинг"
+                  label={tm.compRating}
                   periodAValue={periodA.averageRating}
                   periodBValue={periodB.averageRating}
                   change={comparison.ratingChange}
@@ -333,14 +337,14 @@ export default function StatisticsPage() {
 
               {/* Summary */}
               <div className="card p-6">
-                <h3 className="text-lg font-semibold mb-4">Итог</h3>
+                <h3 className="text-lg font-semibold mb-4">{tm.summaryTitle}</h3>
                 <div className="space-y-2 text-sm">
                   {comparison.sessionsChange !== 0 && (
                     <p>
                       <span className={comparison.sessionsChange > 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}>
                         {comparison.sessionsChange > 0 ? '↑' : '↓'} {Math.abs(comparison.sessionsChange)}%
                       </span>
-                      {' '}количество сессий
+                      {' '}{tm.summarySessionsCount}
                     </p>
                   )}
                   {comparison.gramsChange !== 0 && (
@@ -348,7 +352,7 @@ export default function StatisticsPage() {
                       <span className={comparison.gramsChange > 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}>
                         {comparison.gramsChange > 0 ? '↑' : '↓'} {Math.abs(comparison.gramsChange)}%
                       </span>
-                      {' '}общий расход табака
+                      {' '}{tm.summaryTotalConsumption}
                     </p>
                   )}
                   {comparison.compatibilityChange !== 0 && (
@@ -356,7 +360,7 @@ export default function StatisticsPage() {
                       <span className={comparison.compatibilityChange > 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-warning)]'}>
                         {comparison.compatibilityChange > 0 ? '+' : ''}{comparison.compatibilityChange}%
                       </span>
-                      {' '}средняя совместимость миксов
+                      {' '}{tm.summaryAvgCompatibility}
                     </p>
                   )}
                   {comparison.ratingChange !== 0 && (
@@ -364,11 +368,11 @@ export default function StatisticsPage() {
                       <span className={comparison.ratingChange > 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-warning)]'}>
                         {comparison.ratingChange > 0 ? '+' : ''}{comparison.ratingChange}
                       </span>
-                      {' '}средняя оценка сессий
+                      {' '}{tm.summaryAvgRating}
                     </p>
                   )}
                   {comparison.sessionsChange === 0 && comparison.gramsChange === 0 && comparison.compatibilityChange === 0 && comparison.ratingChange === 0 && (
-                    <p className="text-[var(--color-textMuted)]">Показатели за оба периода одинаковы</p>
+                    <p className="text-[var(--color-textMuted)]">{tm.summaryNoChanges}</p>
                   )}
                 </div>
               </div>
@@ -381,16 +385,16 @@ export default function StatisticsPage() {
       {viewMode === 'overview' && loading ? (
         <div className="card p-12 text-center">
           <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 text-[var(--color-textMuted)]">Загрузка статистики...</p>
+          <p className="mt-4 text-[var(--color-textMuted)]">{tm.loadingStats}</p>
         </div>
       ) : viewMode === 'overview' && !statistics ? (
         <div className="card p-12 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
             <IconChart size={32} className="text-[var(--color-textMuted)]" />
           </div>
-          <h3 className="text-lg font-semibold mb-2">Нет данных</h3>
+          <h3 className="text-lg font-semibold mb-2">{tm.noData}</h3>
           <p className="text-[var(--color-textMuted)]">
-            Создайте несколько сессий для появления статистики
+            {tm.createSessionsHint}
           </p>
         </div>
       ) : viewMode === 'overview' && statistics ? (
@@ -399,34 +403,34 @@ export default function StatisticsPage() {
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <StatsCard
               icon={<IconSmoke size={20} />}
-              label="Сессий"
+              label={tm.labelSessions}
               value={statistics.totalSessions}
               color="primary"
             />
             <StatsCard
               icon={<IconChart size={20} />}
-              label="Расход"
-              value={`${statistics.totalGramsUsed}г`}
+              label={tm.labelConsumption}
+              value={`${statistics.totalGramsUsed}${tc.grams}`}
               color="success"
             />
             <StatsCard
               icon={<IconScale size={20} />}
-              label="Средний расход"
-              value={`${statistics.averageSessionGrams}г`}
-              subtext="на сессию"
+              label={tm.labelAvgConsumption}
+              value={`${statistics.averageSessionGrams}${tc.grams}`}
+              subtext={tm.subtextPerSession}
             />
             <StatsCard
               icon={<IconTarget size={20} />}
-              label="Совместимость"
+              label={tm.labelCompatibility}
               value={`${statistics.averageCompatibilityScore}%`}
-              subtext="в среднем"
+              subtext={tm.subtextAverage}
               color="primary"
             />
             <StatsCard
               icon={<IconStar size={20} />}
-              label="Рейтинг"
+              label={tm.labelRating}
               value={`${statistics.averageRating}/5`}
-              subtext="средняя оценка"
+              subtext={tm.subtextAvgRating}
               color="warning"
             />
           </div>
@@ -435,13 +439,13 @@ export default function StatisticsPage() {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Consumption Over Time */}
             <div className="card p-5">
-              <h2 className="text-lg font-semibold mb-6">Расход по дням</h2>
+              <h2 className="text-lg font-semibold mb-6">{tm.chartConsumptionByDay}</h2>
               <ConsumptionChart data={statistics.dailyConsumption} />
             </div>
 
             {/* Brand Distribution */}
             <div className="card p-5">
-              <h2 className="text-lg font-semibold mb-6">Распределение по брендам</h2>
+              <h2 className="text-lg font-semibold mb-6">{tm.chartBrandDistribution}</h2>
               <BrandPieChart data={statistics.consumptionByBrand} />
             </div>
 
@@ -453,10 +457,10 @@ export default function StatisticsPage() {
 
             {/* Top Mixes */}
             <div className="card p-5">
-              <h2 className="text-lg font-semibold mb-6">Популярные миксы</h2>
+              <h2 className="text-lg font-semibold mb-6">{tm.chartPopularMixes}</h2>
               {statistics.topMixes.length === 0 ? (
                 <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-                  Нет данных
+                  {tm.noData}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -491,7 +495,7 @@ export default function StatisticsPage() {
             <div className="card p-5">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <IconWarning size={20} className="text-[var(--color-warning)]" />
-                Заканчивающиеся табаки
+                {tm.lowStockTitle}
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {statistics.lowStockItems.map((item) => (
@@ -508,7 +512,7 @@ export default function StatisticsPage() {
                         ? 'text-[var(--color-danger)]'
                         : 'text-[var(--color-warning)]'
                     }`}>
-                      {item.quantity_grams <= 0 ? 'Закончился' : `${item.quantity_grams}г`}
+                      {item.quantity_grams <= 0 ? tm.outOfStock : `${item.quantity_grams}${tc.grams}`}
                     </div>
                   </div>
                 ))}

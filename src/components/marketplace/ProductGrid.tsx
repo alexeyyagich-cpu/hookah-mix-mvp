@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import type { SupplierProduct, Supplier } from '@/types/database'
 import { ProductCard } from './ProductCard'
 import { IconSearch } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface ProductGridProps {
   products: SupplierProduct[]
@@ -24,6 +25,7 @@ export function ProductGrid({
   canAddToCart,
   loading,
 }: ProductGridProps) {
+  const t = useTranslation('market')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedBrand, setSelectedBrand] = useState<string>('all')
   const [showInStockOnly, setShowInStockOnly] = useState(true)
@@ -77,7 +79,7 @@ export function ProductGrid({
           <IconSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-textMuted)]" />
           <input
             type="text"
-            placeholder="Поиск по бренду или вкусу..."
+            placeholder={t.searchByBrandOrFlavor}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input pl-10 w-full"
@@ -90,7 +92,7 @@ export function ProductGrid({
           onChange={(e) => setSelectedBrand(e.target.value)}
           className="input w-full sm:w-48"
         >
-          <option value="all">Все бренды</option>
+          <option value="all">{t.allBrands}</option>
           {brands.map(brand => (
             <option key={brand} value={brand}>{brand}</option>
           ))}
@@ -104,7 +106,7 @@ export function ProductGrid({
             onChange={(e) => setShowInStockOnly(e.target.checked)}
             className="w-4 h-4 rounded border-[var(--color-border)]"
           />
-          <span className="text-sm">Только в наличии</span>
+          <span className="text-sm">{t.inStockOnly}</span>
         </label>
       </div>
 
@@ -112,14 +114,14 @@ export function ProductGrid({
       {!canAdd && (
         <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
           <p className="text-sm">
-            У вас в корзине товары другого поставщика.
+            {t.otherSupplierWarning}
             <button
               onClick={() => {/* Clear cart handled in parent */}}
               className="ml-2 text-[var(--color-primary)] underline"
             >
-              Очистить корзину
+              {t.clearCartToAdd}
             </button>
-            , чтобы добавить товары этого поставщика.
+            {t.toAddFromThisSupplier}
           </p>
         </div>
       )}
@@ -128,8 +130,8 @@ export function ProductGrid({
       {filteredProducts.length === 0 ? (
         <div className="card p-8 text-center text-[var(--color-textMuted)]">
           {products.length === 0
-            ? 'У поставщика пока нет товаров'
-            : 'Ничего не найдено по вашему запросу'
+            ? t.noProductsYet
+            : t.nothingFoundForQuery
           }
         </div>
       ) : (
@@ -149,7 +151,7 @@ export function ProductGrid({
 
       {/* Results count */}
       <div className="text-sm text-[var(--color-textMuted)]">
-        Показано {filteredProducts.length} из {products.length} товаров
+        {t.showingOf(filteredProducts.length, products.length)}
       </div>
     </div>
   )

@@ -8,11 +8,14 @@ import { SessionCard } from '@/components/dashboard/SessionCard'
 import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus } from '@/components/Icons'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export default function SessionsPage() {
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
+  const { locale } = useLocale()
   const { sessions, loading, error, updateSession, deleteSession } = useSessions()
   const { isFreeTier } = useSubscription()
 
@@ -38,7 +41,7 @@ export default function SessionsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Удалить эту сессию?')) {
+    if (confirm(t.deleteSessionConfirm)) {
       await deleteSession(id)
     }
   }
@@ -64,13 +67,13 @@ export default function SessionsPage() {
         <div>
           <h1 className="text-2xl font-bold">{t.sessionHistory}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {sessions.length} сессий
-            {isFreeTier && ' за последние 30 дней'}
+            {t.sessionsSubtitle(sessions.length)}
+            {isFreeTier && ` ${t.sessionsFreeTierNotice}`}
           </p>
         </div>
         <Link href="/mix" className="btn btn-primary flex items-center gap-2">
           <IconPlus size={18} />
-          Создать сессию
+          {t.createSession}
         </Link>
       </div>
 
@@ -82,14 +85,13 @@ export default function SessionsPage() {
               <IconCalendar size={20} />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Ограниченная история</h3>
+              <h3 className="font-semibold">{t.limitedHistory}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                На бесплатном тарифе доступна история только за последние 30 дней.
-                Обновите подписку для полного доступа.
+                {t.limitedHistoryDesc}
               </p>
             </div>
             <a href="/pricing" className="btn btn-primary">
-              Обновить
+              {tc.upgrade}
             </a>
           </div>
         </div>
@@ -101,7 +103,7 @@ export default function SessionsPage() {
           type="text"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          placeholder="Поиск по табакам..."
+          placeholder={t.searchTobaccos}
           className="w-full px-4 py-3 pl-10 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
         />
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-textMuted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,7 +127,7 @@ export default function SessionsPage() {
       {loading ? (
         <div className="card p-12 text-center">
           <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4 text-[var(--color-textMuted)]">Загрузка сессий...</p>
+          <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingSessions}</p>
         </div>
       ) : filteredSessions.length === 0 ? (
         <div className="card p-12 text-center">
@@ -137,13 +139,13 @@ export default function SessionsPage() {
           </h3>
           <p className="text-[var(--color-textMuted)] mb-4">
             {filter
-              ? 'Попробуйте изменить поисковый запрос'
-              : 'Создайте первую забивку в калькуляторе миксов'
+              ? t.tryDifferentSearch
+              : t.startFirstSession
             }
           </p>
           {!filter && (
             <Link href="/mix" className="btn btn-primary">
-              Создать микс
+              {t.createMix}
             </Link>
           )}
         </div>
@@ -166,7 +168,7 @@ export default function SessionsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
-              <h2 className="text-xl font-bold">Детали сессии</h2>
+              <h2 className="text-xl font-bold">{t.sessionDetails}</h2>
               <button
                 onClick={() => setSelectedSession(null)}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
@@ -179,7 +181,7 @@ export default function SessionsPage() {
               {/* Date & Bowl */}
               <div className="flex items-center justify-between">
                 <div className="text-[var(--color-textMuted)]">
-                  {new Date(selectedSession.session_date).toLocaleDateString('ru-RU', {
+                  {new Date(selectedSession.session_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long',
@@ -198,7 +200,7 @@ export default function SessionsPage() {
 
               {/* Mix Items */}
               <div className="space-y-3">
-                <h3 className="font-semibold">Состав микса</h3>
+                <h3 className="font-semibold">{t.mixComposition}</h3>
                 {selectedSession.session_items?.map((item, index) => (
                   <div
                     key={index}
@@ -210,7 +212,7 @@ export default function SessionsPage() {
                     </div>
                     <div className="text-right">
                       <div className="font-medium">{item.percentage}%</div>
-                      <div className="text-sm text-[var(--color-textMuted)]">{item.grams_used}г</div>
+                      <div className="text-sm text-[var(--color-textMuted)]">{item.grams_used}{tc.grams}</div>
                     </div>
                   </div>
                 ))}
@@ -219,8 +221,8 @@ export default function SessionsPage() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-3 rounded-xl bg-[var(--color-bgHover)]">
-                  <div className="text-2xl font-bold">{selectedSession.total_grams}г</div>
-                  <div className="text-xs text-[var(--color-textMuted)]">Всего</div>
+                  <div className="text-2xl font-bold">{selectedSession.total_grams}{tc.grams}</div>
+                  <div className="text-xs text-[var(--color-textMuted)]">{t.totalLabel}</div>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-[var(--color-bgHover)]">
                   <div className={`text-2xl font-bold ${
@@ -230,13 +232,13 @@ export default function SessionsPage() {
                   }`}>
                     {selectedSession.compatibility_score || '—'}%
                   </div>
-                  <div className="text-xs text-[var(--color-textMuted)]">Совместимость</div>
+                  <div className="text-xs text-[var(--color-textMuted)]">{t.compatibilityLabel}</div>
                 </div>
                 <div className="text-center p-3 rounded-xl bg-[var(--color-bgHover)]">
                   <div className="text-2xl font-bold text-[var(--color-primary)]">
                     {selectedSession.rating ? '★'.repeat(selectedSession.rating) : '—'}
                   </div>
-                  <div className="text-xs text-[var(--color-textMuted)]">Оценка</div>
+                  <div className="text-xs text-[var(--color-textMuted)]">{t.ratingLabel}</div>
                 </div>
               </div>
 

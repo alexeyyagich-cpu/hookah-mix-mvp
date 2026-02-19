@@ -77,9 +77,9 @@ export default function KdsPage() {
       {isCombined && (
         <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1 w-fit">
           {([
-            { key: 'all' as TypeFilter, label: 'Все' },
-            { key: 'bar' as TypeFilter, label: 'Бар' },
-            { key: 'hookah' as TypeFilter, label: 'Кальянная' },
+            { key: 'all' as TypeFilter, label: tm.filterAllOrders },
+            { key: 'bar' as TypeFilter, label: tm.filterBar },
+            { key: 'hookah' as TypeFilter, label: tm.filterHookah },
           ]).map(({ key, label }) => (
             <button
               key={key}
@@ -151,7 +151,7 @@ export default function KdsPage() {
                   ))}
                   {col.orders.length === 0 && (
                     <div className="text-center py-8 text-sm text-[var(--color-textMuted)] rounded-xl border border-dashed border-[var(--color-border)]">
-                      Пусто
+                      {tm.emptyColumn}
                     </div>
                   )}
                 </div>
@@ -201,7 +201,7 @@ export default function KdsPage() {
               ))}
               {columns.find(c => c.key === mobileColumn)?.orders.length === 0 && (
                 <div className="text-center py-8 text-sm text-[var(--color-textMuted)] card">
-                  Нет заказов
+                  {tm.noOrdersInColumn}
                 </div>
               )}
             </div>

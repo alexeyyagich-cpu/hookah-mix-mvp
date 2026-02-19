@@ -2,6 +2,7 @@
 
 import type { OrderStatus } from '@/types/database'
 import { IconPackage, IconCheck, IconTruck, IconClose } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface OrderTimelineProps {
   status: OrderStatus
@@ -10,11 +11,11 @@ interface OrderTimelineProps {
   actualDeliveryDate?: string | null
 }
 
-const STATUSES: { key: OrderStatus; label: string; Icon: typeof IconPackage }[] = [
-  { key: 'pending', label: 'Оформлен', Icon: IconPackage },
-  { key: 'confirmed', label: 'Подтвержден', Icon: IconCheck },
-  { key: 'shipped', label: 'Отправлен', Icon: IconTruck },
-  { key: 'delivered', label: 'Доставлен', Icon: IconCheck },
+const STATUS_ICONS: { key: OrderStatus; Icon: typeof IconPackage }[] = [
+  { key: 'pending', Icon: IconPackage },
+  { key: 'confirmed', Icon: IconCheck },
+  { key: 'shipped', Icon: IconTruck },
+  { key: 'delivered', Icon: IconCheck },
 ]
 
 export function OrderTimeline({
@@ -23,6 +24,15 @@ export function OrderTimeline({
   estimatedDeliveryDate,
   actualDeliveryDate,
 }: OrderTimelineProps) {
+  const t = useTranslation('market')
+
+  const TIMELINE_LABELS: Record<string, string> = {
+    pending: t.timelineOrdered,
+    confirmed: t.timelineConfirmed,
+    shipped: t.timelineShipped,
+    delivered: t.timelineDelivered,
+  }
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('ru-RU', {
@@ -35,7 +45,7 @@ export function OrderTimeline({
 
   const getStatusIndex = (s: OrderStatus) => {
     if (s === 'cancelled') return -1
-    return STATUSES.findIndex(item => item.key === s)
+    return STATUS_ICONS.findIndex(item => item.key === s)
   }
 
   const currentIndex = getStatusIndex(status)
@@ -48,7 +58,7 @@ export function OrderTimeline({
             <IconClose size={24} className="text-[var(--color-danger)]" />
           </div>
           <div>
-            <div className="font-semibold text-[var(--color-danger)]">Заказ отменен</div>
+            <div className="font-semibold text-[var(--color-danger)]">{t.orderCancelled}</div>
             <div className="text-sm text-[var(--color-textMuted)]">
               {formatDate(createdAt)}
             </div>
@@ -61,7 +71,7 @@ export function OrderTimeline({
   return (
     <div className="card p-6">
       <div className="relative">
-        {STATUSES.map((item, index) => {
+        {STATUS_ICONS.map((item, index) => {
           const isCompleted = index <= currentIndex
           const isCurrent = index === currentIndex
           const Icon = item.Icon
@@ -79,7 +89,7 @@ export function OrderTimeline({
                 >
                   <Icon size={20} />
                 </div>
-                {index < STATUSES.length - 1 && (
+                {index < STATUS_ICONS.length - 1 && (
                   <div
                     className={`w-0.5 h-12 ${
                       index < currentIndex
@@ -91,11 +101,11 @@ export function OrderTimeline({
               </div>
 
               {/* Content */}
-              <div className={`pb-8 ${index === STATUSES.length - 1 ? 'pb-0' : ''}`}>
+              <div className={`pb-8 ${index === STATUS_ICONS.length - 1 ? 'pb-0' : ''}`}>
                 <div className={`font-medium ${
                   isCompleted ? 'text-[var(--color-text)]' : 'text-[var(--color-textMuted)]'
                 }`}>
-                  {item.label}
+                  {TIMELINE_LABELS[item.key]}
                 </div>
 
                 {/* Show date for completed or current status */}
@@ -109,7 +119,7 @@ export function OrderTimeline({
                 {/* Show estimated delivery for shipped */}
                 {item.key === 'delivered' && !isCompleted && estimatedDeliveryDate && (
                   <div className="text-sm text-[var(--color-textMuted)] mt-0.5">
-                    Ожидается: {formatDate(estimatedDeliveryDate)}
+                    {t.expectedLabel} {formatDate(estimatedDeliveryDate)}
                   </div>
                 )}
               </div>

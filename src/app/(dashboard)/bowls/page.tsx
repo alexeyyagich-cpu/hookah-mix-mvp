@@ -92,7 +92,7 @@ export default function BowlsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Удалить эту чашу?')) {
+    if (confirm(t.deleteBowlConfirm)) {
       await deleteBowl(id)
     }
   }
@@ -118,7 +118,7 @@ export default function BowlsPage() {
         <div>
           <h1 className="text-2xl font-bold">{t.bowlsTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            Управляйте чашами для точного расчета граммовки
+            {t.bowlsSubtitle}
           </p>
         </div>
         <button
@@ -136,14 +136,13 @@ export default function BowlsPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔒</span>
             <div className="flex-1">
-              <h3 className="font-semibold">Достигнут лимит</h3>
+              <h3 className="font-semibold">{t.limitReached}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Бесплатный тариф позволяет добавить {bowlsLimit} чашу.
-                Обновите подписку для добавления большего количества.
+                {t.bowlsFreeTierLimit(bowlsLimit!)}
               </p>
             </div>
             <a href="/pricing" className="btn btn-primary">
-              Обновить
+              {tc.upgrade}
             </a>
           </div>
         </div>
@@ -170,7 +169,7 @@ export default function BowlsPage() {
           <div className="text-5xl mb-4">🥣</div>
           <h3 className="text-lg font-semibold mb-2">{t.noBowls}</h3>
           <p className="text-[var(--color-textMuted)] mb-4">
-            Добавьте первую чашу для точного расчета граммовки при создании сессий
+            {t.noBowlsDesc}
           </p>
           <button onClick={() => openModal()} className="btn btn-primary">
             + {t.addBowl}
@@ -211,7 +210,7 @@ export default function BowlsPage() {
                 className="p-4 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="font-medium">{preset.name}</div>
-                <div className="text-sm text-[var(--color-textMuted)]">{preset.capacity}г</div>
+                <div className="text-sm text-[var(--color-textMuted)]">{preset.capacity}{tc.grams}</div>
               </button>
             ))}
           </div>
@@ -224,7 +223,7 @@ export default function BowlsPage() {
           <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 className="text-xl font-bold">
-                {editingBowl ? 'Редактировать чашу' : t.addBowl}
+                {editingBowl ? t.editBowl : t.addBowl}
               </h2>
               <button
                 onClick={closeModal}
@@ -242,7 +241,7 @@ export default function BowlsPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                  placeholder="Phunnel средний"
+                  placeholder={t.bowlNamePlaceholder}
                   required
                 />
               </div>

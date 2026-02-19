@@ -2,12 +2,26 @@
 
 import { useState, useMemo } from 'react'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
-import { COCKTAIL_METHOD_LABELS, COCKTAIL_METHOD_EMOJI, GLASS_LABELS, DIFFICULTY_LABELS } from '@/data/bar-recipes'
+import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
 import { useTranslation } from '@/lib/i18n'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
+
+  const METHOD_LABELS: Record<string, string> = {
+    build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
+    blend: tb.methodBlend, layer: tb.methodLayer, muddle: tb.methodMuddle,
+  }
+  const GLASS_LABELS: Record<string, string> = {
+    highball: tb.glassHighball, rocks: tb.glassRocks, coupe: tb.glassCoupe,
+    flute: tb.glassFlute, martini: tb.glassMartini, collins: tb.glassCollins,
+    hurricane: tb.glassHurricane, shot: tb.glassShot, wine: tb.glassWine,
+    beer: tb.glassBeer, copper_mug: tb.glassCopperMug, tiki: tb.glassTiki,
+    other: tb.glassOther,
+  }
+  const DIFFICULTY_LABELS: Record<number, string> = { 1: tb.easy, 2: tb.medium, 3: tb.hard }
+
   const {
     recipes,
     loading,
@@ -73,8 +87,8 @@ export default function BarMenuPage() {
         <div>
           <h1 className="text-2xl font-bold">{tb.menuTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {menuRecipes.length} позиций в меню
-            {avgPrice !== null && ` · средняя цена ${avgPrice.toFixed(0)}€`}
+            {tb.menuItemsInMenu(menuRecipes.length)}
+            {avgPrice !== null && ` · ${tb.avgPriceLabel(avgPrice.toFixed(0))}`}
           </p>
         </div>
         <select
@@ -82,25 +96,25 @@ export default function BarMenuPage() {
           onChange={e => setGroupBy(e.target.value as 'method' | 'none')}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >
-          <option value="method">По методу</option>
-          <option value="none">Без группировки</option>
+          <option value="method">{tb.byMethod}</option>
+          <option value="none">{tb.noGrouping}</option>
         </select>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">В меню</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.onMenu}</div>
           <div className="text-2xl font-bold mt-1">{menuRecipes.length}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Средняя цена</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.avgPriceCard}</div>
           <div className="text-2xl font-bold mt-1">
             {avgPrice !== null ? `${avgPrice.toFixed(0)}€` : '—'}
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Средняя маржа</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.avgMargin}</div>
           <div className={`text-2xl font-bold mt-1 ${
             avgMargin !== null
               ? avgMargin >= 60 ? 'text-[var(--color-success)]' : avgMargin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
@@ -110,7 +124,7 @@ export default function BarMenuPage() {
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Потенциал выручки</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{tb.revenuePotential}</div>
           <div className="text-2xl font-bold mt-1">
             {totalRevenuePotential > 0 ? `${totalRevenuePotential.toFixed(0)}€` : '—'}
           </div>
@@ -127,7 +141,7 @@ export default function BarMenuPage() {
           <div className="text-4xl mb-3">📋</div>
           <h3 className="text-lg font-semibold mb-2">{tb.menuEmpty}</h3>
           <p className="text-[var(--color-textMuted)] max-w-md mx-auto">
-            Перейдите в раздел &laquo;Рецепты&raquo; и добавьте коктейли в меню, нажав кнопку &laquo;Добавить в меню&raquo;.
+            {tb.menuEmptyGoToRecipes}
           </p>
         </div>
       ) : (
@@ -138,8 +152,8 @@ export default function BarMenuPage() {
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   {method !== 'other' && COCKTAIL_METHOD_EMOJI[method as keyof typeof COCKTAIL_METHOD_EMOJI]}
                   {method !== 'other'
-                    ? COCKTAIL_METHOD_LABELS[method as keyof typeof COCKTAIL_METHOD_LABELS]
-                    : 'Другие'
+                    ? METHOD_LABELS[method as keyof typeof METHOD_LABELS]
+                    : tb.others
                   }
                   <span className="text-sm font-normal text-[var(--color-textMuted)]">
                     ({items.length})
@@ -151,12 +165,12 @@ export default function BarMenuPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[var(--color-border)]">
-                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Название</th>
-                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase hidden sm:table-cell">Состав</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Себестоимость</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Цена</th>
-                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">Маржа</th>
-                      <th className="text-center px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase w-20">Убрать</th>
+                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thName}</th>
+                      <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase hidden sm:table-cell">{tb.thComposition}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thCostPrice}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thPrice}</th>
+                      <th className="text-right px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thMargin}</th>
+                      <th className="text-center px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase w-20">{tb.thRemove}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -218,9 +232,9 @@ export default function BarMenuPage() {
                                   setPriceValue(recipe.menu_price?.toString() || '')
                                 }}
                                 className="font-mono text-sm font-semibold hover:text-[var(--color-primary)] transition-colors"
-                                title="Нажмите для редактирования"
+                                title={tb.clickToEdit}
                               >
-                                {recipe.menu_price ? `${recipe.menu_price.toFixed(2)}€` : 'Задать'}
+                                {recipe.menu_price ? `${recipe.menu_price.toFixed(2)}€` : tb.setPrice}
                               </button>
                             )}
                           </td>
@@ -233,7 +247,7 @@ export default function BarMenuPage() {
                             <button
                               onClick={() => toggleOnMenu(recipe.id)}
                               className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
-                              title="Убрать из меню"
+                              title={tb.removeFromMenuTitle}
                             >
                               <svg className="w-4 h-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

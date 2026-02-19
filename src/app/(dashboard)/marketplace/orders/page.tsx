@@ -5,19 +5,21 @@ import Link from 'next/link'
 import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
 import { OrderCard } from '@/components/marketplace/OrderCard'
 import { IconChevronLeft, IconPackage, IconShop } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import type { OrderStatus } from '@/types/database'
 
-const STATUS_TABS: { key: OrderStatus | 'all'; label: string }[] = [
-  { key: 'all', label: 'Все' },
-  { key: 'pending', label: 'Ожидают' },
-  { key: 'confirmed', label: 'Подтверждены' },
-  { key: 'shipped', label: 'В пути' },
-  { key: 'delivered', label: 'Доставлены' },
-]
-
 export default function OrdersPage() {
+  const tmk = useTranslation('market')
   const { orders, loading, error } = useMarketplaceOrders()
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
+
+  const STATUS_TABS: { key: OrderStatus | 'all'; label: string }[] = [
+    { key: 'all', label: tmk.statusAll },
+    { key: 'pending', label: tmk.statusPendingPlural },
+    { key: 'confirmed', label: tmk.statusConfirmedPlural },
+    { key: 'shipped', label: tmk.statusShippedLabel },
+    { key: 'delivered', label: tmk.statusDeliveredPlural },
+  ]
 
   const filteredOrders = statusFilter === 'all'
     ? orders
@@ -36,7 +38,7 @@ export default function OrdersPage() {
         className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
       >
         <IconChevronLeft size={20} />
-        Назад к маркетплейсу
+        {tmk.backToMarketplace}
       </Link>
 
       {/* Header */}
@@ -44,16 +46,16 @@ export default function OrdersPage() {
         <div className="flex items-center gap-3">
           <IconPackage size={28} className="text-[var(--color-primary)]" />
           <div>
-            <h1 className="text-2xl font-bold">Мои заказы</h1>
+            <h1 className="text-2xl font-bold">{tmk.myOrders}</h1>
             <p className="text-[var(--color-textMuted)]">
-              {orders.length} заказов
+              {tmk.ordersCount(orders.length)}
             </p>
           </div>
         </div>
 
         <Link href="/marketplace" className="btn btn-primary flex items-center gap-2">
           <IconShop size={18} />
-          Новый заказ
+          {tmk.newOrder}
         </Link>
       </div>
 
@@ -112,17 +114,17 @@ export default function OrdersPage() {
         <div className="card p-8 text-center">
           <IconPackage size={48} className="text-[var(--color-textMuted)] mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">
-            {statusFilter === 'all' ? 'Нет заказов' : 'Нет заказов с таким статусом'}
+            {statusFilter === 'all' ? tmk.noOrders : tmk.noOrdersWithStatus}
           </h2>
           <p className="text-[var(--color-textMuted)] mb-6">
             {statusFilter === 'all'
-              ? 'Оформите первый заказ у поставщиков'
-              : 'Попробуйте выбрать другой фильтр'
+              ? tmk.placeFirstOrder
+              : tmk.tryDifferentFilter
             }
           </p>
           {statusFilter === 'all' && (
             <Link href="/marketplace" className="btn btn-primary">
-              Перейти к поставщикам
+              {tmk.goToSuppliers}
             </Link>
           )}
         </div>

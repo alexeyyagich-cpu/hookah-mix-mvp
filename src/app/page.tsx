@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 import {
   IconSmoke,
   IconStar,
@@ -11,77 +12,78 @@ import {
   IconInventory,
 } from '@/components/Icons'
 
-const features = [
-  {
-    icon: IconInventory,
-    title: 'Учёт инвентаря',
-    description: 'Отслеживайте остатки табака в реальном времени. Уведомления о низком остатке и прогноз расхода.',
-  },
-  {
-    icon: IconSmoke,
-    title: 'Калькулятор миксов',
-    description: 'Создавайте идеальные миксы с AI-рекомендациями. Сохраняйте любимые рецепты.',
-  },
-  {
-    icon: IconTrendUp,
-    title: 'Аналитика',
-    description: 'Детальная статистика: популярные вкусы, расход по брендам, сравнение периодов.',
-  },
-  {
-    icon: IconCalendar,
-    title: 'История сессий',
-    description: 'Полная история всех кальянов. Оценки, заметки, повторение лучших миксов.',
-  },
-  {
-    icon: IconStar,
-    title: 'Гостевая база',
-    description: 'Запоминайте предпочтения гостей. Персонализированный сервис без лишних вопросов.',
-  },
-  {
-    icon: IconTarget,
-    title: 'Публичное меню',
-    description: 'QR-код для гостей с вашим меню табаков и фирменными миксами.',
-  },
-]
-
-const benefits = [
-  {
-    stat: '-30%',
-    label: 'расхода табака',
-    description: 'Точный учёт исключает потери и перерасход',
-  },
-  {
-    stat: '2x',
-    label: 'быстрее обслуживание',
-    description: 'Готовые миксы и история предпочтений гостей',
-  },
-  {
-    stat: '100%',
-    label: 'контроль склада',
-    description: 'Всегда знаете что заканчивается и когда заказывать',
-  },
-]
-
-const howItWorks = [
-  {
-    step: '1',
-    title: 'Зарегистрируйтесь',
-    description: 'Создайте аккаунт за 30 секунд. Добавьте название заведения и начните работу.',
-  },
-  {
-    step: '2',
-    title: 'Добавьте табаки',
-    description: 'Внесите инвентарь вручную или отсканируйте штрих-код. Укажите остатки и цены закупки.',
-  },
-  {
-    step: '3',
-    title: 'Работайте эффективнее',
-    description: 'Создавайте миксы, ведите сессии, следите за статистикой. Система сама считает расход и напомнит о заказе.',
-  },
-]
-
 export default function LandingPage() {
   const { user } = useAuth()
+  const t = useTranslation('auth')
+
+  const features = [
+    {
+      icon: IconInventory,
+      title: t.feature1Title,
+      description: t.feature1Desc,
+    },
+    {
+      icon: IconSmoke,
+      title: t.feature2Title,
+      description: t.feature2Desc,
+    },
+    {
+      icon: IconTrendUp,
+      title: t.feature3Title,
+      description: t.feature3Desc,
+    },
+    {
+      icon: IconCalendar,
+      title: t.feature4Title,
+      description: t.feature4Desc,
+    },
+    {
+      icon: IconStar,
+      title: t.feature5Title,
+      description: t.feature5Desc,
+    },
+    {
+      icon: IconTarget,
+      title: t.feature6Title,
+      description: t.feature6Desc,
+    },
+  ]
+
+  const benefits = [
+    {
+      stat: t.benefit1Stat,
+      label: t.benefit1Label,
+      description: t.benefit1Desc,
+    },
+    {
+      stat: t.benefit2Stat,
+      label: t.benefit2Label,
+      description: t.benefit2Desc,
+    },
+    {
+      stat: t.benefit3Stat,
+      label: t.benefit3Label,
+      description: t.benefit3Desc,
+    },
+  ]
+
+  const howItWorks = [
+    {
+      step: '1',
+      title: t.step1Title,
+      description: t.step1Desc,
+    },
+    {
+      step: '2',
+      title: t.step2Title,
+      description: t.step2Desc,
+    },
+    {
+      step: '3',
+      title: t.step3Title,
+      description: t.step3Desc,
+    },
+  ]
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
@@ -99,31 +101,31 @@ export default function LandingPage() {
 
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-              Возможности
+              {t.navFeatures}
             </Link>
             <Link href="#benefits" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-              Преимущества
+              {t.navBenefits}
             </Link>
             <Link href="/pricing" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-              Тарифы
+              {t.navPricing}
             </Link>
             <Link href="/mix" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-              Калькулятор
+              {t.navCalculator}
             </Link>
           </nav>
 
           <div className="flex items-center gap-2">
             {user ? (
               <Link href="/dashboard" className="btn btn-primary text-sm px-3 py-2 whitespace-nowrap">
-                Личный кабинет
+                {t.dashboard}
               </Link>
             ) : (
               <>
                 <Link href="/login" className="btn btn-secondary text-sm px-3 py-2 whitespace-nowrap">
-                  Войти
+                  {t.signIn}
                 </Link>
                 <Link href="/register" className="btn btn-primary text-sm px-3 py-2 whitespace-nowrap">
-                  Начать бесплатно
+                  {t.startFree}
                 </Link>
               </>
             )}
@@ -138,29 +140,29 @@ export default function LandingPage() {
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-sm font-medium mb-6">
               <span className="w-2 h-2 rounded-full bg-[var(--color-success)] animate-pulse" />
-              Бесплатный старт — без карты
+              {t.heroBadge}
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Управляйте кальянной
-              <span className="text-[var(--color-primary)]"> как профи</span>
+              {t.heroTitle1}
+              <span className="text-[var(--color-primary)]">{t.heroTitle2}</span>
             </h1>
 
             <p className="text-xl text-[var(--color-textMuted)] mb-8 max-w-2xl mx-auto">
-              Учёт табака, создание миксов с AI, аналитика и гостевая база — всё в одном приложении для вашего заведения
+              {t.heroSubtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register" className="btn btn-primary btn-lg text-lg px-8">
-                Попробовать бесплатно
+                {t.heroCta}
               </Link>
               <Link href="/mix" className="btn btn-secondary btn-lg text-lg px-8">
-                Открыть калькулятор
+                {t.heroCtaCalculator}
               </Link>
             </div>
 
             <p className="mt-6 text-sm text-[var(--color-textMuted)]">
-              Бесплатный старт за 2 минуты
+              {t.heroNote}
             </p>
           </div>
         </div>
@@ -204,10 +206,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Всё что нужно для <span className="text-[var(--color-primary)]">эффективной работы</span>
+              {t.featuresTitle1}<span className="text-[var(--color-primary)]">{t.featuresTitle2}</span>
             </h2>
             <p className="text-xl text-[var(--color-textMuted)] max-w-2xl mx-auto">
-              Инструменты, которые экономят время и увеличивают прибыль
+              {t.featuresSubtitle}
             </p>
           </div>
 
@@ -233,10 +235,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Что вы получите
+              {t.benefitsTitle}
             </h2>
             <p className="text-xl text-[var(--color-textMuted)]">
-              Конкретные преимущества для вашего бизнеса
+              {t.benefitsSubtitle}
             </p>
           </div>
 
@@ -259,7 +261,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Как это <span className="text-[var(--color-warning)]">работает</span>
+              {t.howTitle1}<span className="text-[var(--color-warning)]">{t.howTitle2}</span>
             </h2>
           </div>
 
@@ -281,30 +283,30 @@ export default function LandingPage() {
       <section className="py-20 px-4 bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-warning)]/10">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Готовы начать?
+            {t.ctaTitle}
           </h2>
           <p className="text-xl text-[var(--color-textMuted)] mb-8">
-            Бесплатный тариф — навсегда. Без скрытых платежей и обязательств.
+            {t.ctaSubtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register" className="btn btn-primary btn-lg text-lg px-8">
-              Создать аккаунт
+              {t.ctaButton}
             </Link>
             <Link href="/pricing" className="btn btn-secondary btn-lg text-lg px-8">
-              Сравнить тарифы
+              {t.ctaComparePlans}
             </Link>
           </div>
 
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-[var(--color-textMuted)]">
             <span className="flex items-center gap-2">
-              <span className="text-[var(--color-success)]">✓</span> Бесплатный старт
+              <span className="text-[var(--color-success)]">✓</span> {t.ctaFreeStart}
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-[var(--color-success)]">✓</span> Без карты
+              <span className="text-[var(--color-success)]">✓</span> {t.ctaNoCard}
             </span>
             <span className="flex items-center gap-2">
-              <span className="text-[var(--color-success)]">✓</span> Отмена в любой момент
+              <span className="text-[var(--color-success)]">✓</span> {t.ctaCancelAnytime}
             </span>
           </div>
         </div>
@@ -324,31 +326,31 @@ export default function LandingPage() {
                 <span className="font-bold">Hookah Torus</span>
               </div>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Платформа для управления кальянным бизнесом
+                {t.footerDescription}
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Продукт</h4>
+              <h4 className="font-semibold mb-4">{t.footerProduct}</h4>
               <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
-                <li><Link href="/mix" className="hover:text-[var(--color-text)]">Калькулятор миксов</Link></li>
-                <li><Link href="/recommend" className="hover:text-[var(--color-text)]">AI Рекомендации</Link></li>
-                <li><Link href="/pricing" className="hover:text-[var(--color-text)]">Тарифы</Link></li>
+                <li><Link href="/mix" className="hover:text-[var(--color-text)]">{t.footerMixCalculator}</Link></li>
+                <li><Link href="/recommend" className="hover:text-[var(--color-text)]">{t.footerAiRecommendations}</Link></li>
+                <li><Link href="/pricing" className="hover:text-[var(--color-text)]">{t.footerPricing}</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Правовая информация</h4>
+              <h4 className="font-semibold mb-4">{t.footerLegal}</h4>
               <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
-                <li><Link href="/legal/terms" className="hover:text-[var(--color-text)]">Условия использования</Link></li>
-                <li><Link href="/legal/privacy" className="hover:text-[var(--color-text)]">Политика конфиденциальности</Link></li>
+                <li><Link href="/legal/terms" className="hover:text-[var(--color-text)]">{t.footerTerms}</Link></li>
+                <li><Link href="/legal/privacy" className="hover:text-[var(--color-text)]">{t.footerPrivacy}</Link></li>
               </ul>
             </div>
           </div>
 
           <div className="pt-8 border-t border-[var(--color-border)] text-center">
             <p className="text-sm text-[var(--color-textMuted)]">
-              &copy; {new Date().getFullYear()} Hookah Torus. Все права защищены.
+              {t.footerCopyright(new Date().getFullYear())}
             </p>
           </div>
         </div>

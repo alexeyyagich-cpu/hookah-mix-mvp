@@ -30,13 +30,12 @@ export default function MarketplacePage() {
           <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center mx-auto mb-4">
             <IconLock size={32} className="text-[var(--color-primary)]" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Доступно на Pro</h2>
+          <h2 className="text-xl font-semibold mb-2">{tmk.availableOnPro}</h2>
           <p className="text-[var(--color-textMuted)] mb-6 max-w-md mx-auto">
-            Маркетплейс позволяет заказывать табак напрямую у поставщиков,
-            отслеживать доставки и автоматически пополнять запасы.
+            {tmk.marketplaceProDesc}
           </p>
           <Link href="/pricing" className="btn btn-primary">
-            Обновить до Pro
+            {tmk.upgradeToPro}
           </Link>
         </div>
       </div>
@@ -52,7 +51,7 @@ export default function MarketplacePage() {
           <div>
             <h1 className="text-2xl font-bold">{tmk.title}</h1>
             <p className="text-[var(--color-textMuted)]">
-              Заказывайте табак у проверенных поставщиков
+              {tmk.orderFromSuppliers}
             </p>
           </div>
         </div>
@@ -107,7 +106,7 @@ export default function MarketplacePage() {
         </div>
       ) : suppliers.length === 0 ? (
         <div className="card p-8 text-center text-[var(--color-textMuted)]">
-          Нет доступных поставщиков
+          {tmk.noSuppliersAvailable}
         </div>
       ) : (
         <div className="flex flex-col gap-4 isolate">

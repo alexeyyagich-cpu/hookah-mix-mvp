@@ -13,43 +13,27 @@ import { TOBACCOS, getBrandNames, getFlavorsByBrand } from '@/data/tobaccos'
 import { getBowlBrands, getBowlsByBrand } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
 
-const STEP_INFO: Record<OnboardingStep, { title: string; description: string }> = {
-  welcome: {
-    title: 'Добро пожаловать в Hookah Torus',
-    description: 'Платформа для управления заведением',
-  },
-  business_type: {
-    title: 'Тип заведения',
-    description: 'Выберите, что подходит вам',
-  },
-  business: {
-    title: 'О вашем заведении',
-    description: 'Расскажите немного о себе',
-  },
-  setup: {
-    title: 'Быстрая настройка',
-    description: 'Добавьте первые позиции',
-  },
-  complete: {
-    title: 'Готово!',
-    description: 'Вы готовы к работе',
-  },
-  // Legacy steps (for type completeness)
-  bowl: { title: '', description: '' },
-  tobacco: { title: '', description: '' },
-}
-
-const BUSINESS_TYPES: { type: BusinessType; icon: string; title: string; description: string; badge?: string }[] = [
-  { type: 'hookah', icon: '🔥', title: 'Кальянная', description: 'Табак, миксы, сессии' },
-  { type: 'bar', icon: '🍸', title: 'Бар', description: 'Коктейли, склад, меню' },
-  { type: 'hookah_bar', icon: '🔥🍸', title: 'Кальянная + Бар', description: 'Всё в одном' },
-  { type: 'restaurant', icon: '🍽️', title: 'Ресторан / Кафе', description: 'Бар + кухня', badge: 'скоро' },
-]
-
 export default function OnboardingPage() {
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
   const router = useRouter()
+
+  const STEP_INFO: Record<OnboardingStep, { title: string; description: string }> = {
+    welcome: { title: t.welcomeTitle, description: t.welcomeDesc },
+    business_type: { title: t.businessTypeTitle, description: t.businessTypeDesc },
+    business: { title: t.businessInfoTitle, description: t.businessInfoDesc },
+    setup: { title: t.setupTitle, description: t.setupDesc },
+    complete: { title: t.completeTitle, description: t.completeDesc },
+    bowl: { title: '', description: '' },
+    tobacco: { title: '', description: '' },
+  }
+
+  const BUSINESS_TYPES: { type: BusinessType; icon: string; title: string; description: string; badge?: string }[] = [
+    { type: 'hookah', icon: '🔥', title: t.businessTypeHookah, description: t.businessTypeHookahDesc },
+    { type: 'bar', icon: '🍸', title: t.businessTypeBar, description: t.businessTypeBarDesc },
+    { type: 'hookah_bar', icon: '🔥🍸', title: t.businessTypeHookahBar, description: t.businessTypeHookahBarDesc },
+    { type: 'restaurant', icon: '🍽️', title: t.businessTypeRestaurant, description: t.businessTypeRestaurantDesc, badge: tc.soon },
+  ]
   const { state, loading, currentStepIndex, totalSteps, progress, nextStep, prevStep, skipOnboarding, finishOnboarding, setBusinessType } = useOnboarding()
   const { user, profile, refreshProfile } = useAuth()
   const { addBowl } = useBowls()
@@ -178,21 +162,21 @@ export default function OnboardingPage() {
   const capabilities: { icon: string; text: string }[] = []
   if (needsHookah) {
     capabilities.push(
-      { icon: '📊', text: 'Учёт табака и инвентаря' },
-      { icon: '🧮', text: 'Калькулятор миксов' },
-      { icon: '📝', text: 'Сессии и история' },
+      { icon: '📊', text: t.capTobaccoInventory },
+      { icon: '🧮', text: t.capMixCalculator },
+      { icon: '📝', text: t.capSessions },
     )
   }
   if (needsBar) {
     capabilities.push(
-      { icon: '🍸', text: 'Управление баром' },
-      { icon: '📋', text: 'Рецепты и меню' },
-      { icon: '💰', text: 'Продажи и аналитика' },
+      { icon: '🍸', text: t.capBarManagement },
+      { icon: '📋', text: t.capRecipes },
+      { icon: '💰', text: t.capSales },
     )
   }
   capabilities.push(
-    { icon: '🗺️', text: 'План зала и бронирования' },
-    { icon: '👥', text: 'Команда и управление' },
+    { icon: '🗺️', text: t.capFloorPlan },
+    { icon: '👥', text: t.capTeam },
   )
 
   return (
@@ -202,7 +186,7 @@ export default function OnboardingPage() {
         <div className="w-full max-w-lg mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-[var(--color-textMuted)]">
-              Шаг {currentStepIndex + 1} из {totalSteps}
+              {t.stepOf(currentStepIndex + 1, totalSteps)}
             </span>
             <button
               onClick={skipOnboarding}
@@ -235,22 +219,22 @@ export default function OnboardingPage() {
               <div className="grid grid-cols-3 gap-3 text-center">
                 <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
                   <div className="text-2xl mb-2">📊</div>
-                  <div className="text-xs text-[var(--color-textMuted)]">Учёт инвентаря</div>
+                  <div className="text-xs text-[var(--color-textMuted)]">{t.welcomeInventory}</div>
                 </div>
                 <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
                   <div className="text-2xl mb-2">🗺️</div>
-                  <div className="text-xs text-[var(--color-textMuted)]">План зала</div>
+                  <div className="text-xs text-[var(--color-textMuted)]">{t.welcomeFloorPlan}</div>
                 </div>
                 <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
                   <div className="text-2xl mb-2">📈</div>
-                  <div className="text-xs text-[var(--color-textMuted)]">Аналитика</div>
+                  <div className="text-xs text-[var(--color-textMuted)]">{t.welcomeAnalytics}</div>
                 </div>
               </div>
               <button
                 onClick={nextStep}
                 className="btn btn-primary w-full py-3"
               >
-                Начать настройку
+                {t.startSetup}
               </button>
             </div>
           )}
@@ -303,7 +287,7 @@ export default function OnboardingPage() {
           {state.currentStep === 'business' && (
             <div className="space-y-4 text-left">
               <div>
-                <label className="block text-sm font-medium mb-2">Название заведения</label>
+                <label className="block text-sm font-medium mb-2">{t.businessNameLabel}</label>
                 <input
                   type="text"
                   value={businessName}
@@ -313,7 +297,7 @@ export default function OnboardingPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Ваше имя</label>
+                <label className="block text-sm font-medium mb-2">{t.ownerNameLabel}</label>
                 <input
                   type="text"
                   value={ownerName}
@@ -351,7 +335,7 @@ export default function OnboardingPage() {
                         : 'text-[var(--color-textMuted)]'
                     }`}
                   >
-                    🔥 Кальянная
+                    🔥 {t.hookahTab}
                   </button>
                   <button
                     onClick={() => setSetupTab('bar')}
@@ -361,7 +345,7 @@ export default function OnboardingPage() {
                         : 'text-[var(--color-textMuted)]'
                     }`}
                   >
-                    🍸 Бар
+                    🍸 {t.barTab}
                   </button>
                 </div>
               )}
@@ -371,12 +355,12 @@ export default function OnboardingPage() {
                 <div className="space-y-4">
                   {/* Bowl section */}
                   <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-                    <p className="text-sm font-medium mb-1">Добавьте чашу</p>
-                    <p className="text-xs text-[var(--color-textMuted)]">Для точного расчёта граммовки</p>
+                    <p className="text-sm font-medium mb-1">{t.addBowlPrompt}</p>
+                    <p className="text-xs text-[var(--color-textMuted)]">{t.addBowlPromptDesc}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Бренд</label>
+                    <label className="block text-sm font-medium mb-2">{t.brand}</label>
                     <select
                       value={bowlBrand}
                       onChange={(e) => { setBowlBrand(e.target.value); setBowlModel(''); setIsCustomBowl(false); }}
@@ -386,14 +370,14 @@ export default function OnboardingPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Модель</label>
+                    <label className="block text-sm font-medium mb-2">{t.modelLabel}</label>
                     {isCustomBowl ? (
                       <div className="flex gap-2">
                         <input
                           type="text"
                           value={bowlModel}
                           onChange={(e) => setBowlModel(e.target.value)}
-                          placeholder="Введите название чаши"
+                          placeholder={t.enterBowlName}
                           className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                         />
                         <button
@@ -417,16 +401,16 @@ export default function OnboardingPage() {
                         }}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                       >
-                        <option value="">Выберите модель...</option>
+                        <option value="">{t.selectModel}</option>
                         {getBowlsByBrand(bowlBrand).map(b => (
-                          <option key={b.id} value={b.name}>{b.name} ({b.capacity}г)</option>
+                          <option key={b.id} value={b.name}>{b.name} ({b.capacity}{tc.grams})</option>
                         ))}
-                        <option value="__custom__">Другая...</option>
+                        <option value="__custom__">{t.otherOption}</option>
                       </select>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Вместимость (грамм)</label>
+                    <label className="block text-sm font-medium mb-2">{t.capacityGramsLabel}</label>
                     <input
                       type="number"
                       value={bowlCapacity}
@@ -451,12 +435,12 @@ export default function OnboardingPage() {
 
                   {/* Tobacco section */}
                   <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-                    <p className="text-sm font-medium mb-1">Добавьте табак</p>
-                    <p className="text-xs text-[var(--color-textMuted)]">Остальные добавите позже</p>
+                    <p className="text-sm font-medium mb-1">{t.addTobaccoPrompt}</p>
+                    <p className="text-xs text-[var(--color-textMuted)]">{t.addTobaccoPromptDesc}</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">Бренд</label>
+                    <label className="block text-sm font-medium mb-2">{t.brand}</label>
                     <select
                       value={tobaccoBrand}
                       onChange={(e) => { setTobaccoBrand(e.target.value); setTobaccoFlavor(''); setIsCustomFlavor(false); }}
@@ -466,14 +450,14 @@ export default function OnboardingPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Вкус</label>
+                    <label className="block text-sm font-medium mb-2">{t.flavor}</label>
                     {isCustomFlavor ? (
                       <div className="flex gap-2">
                         <input
                           type="text"
                           value={tobaccoFlavor}
                           onChange={(e) => setTobaccoFlavor(e.target.value)}
-                          placeholder="Введите название вкуса"
+                          placeholder={t.enterFlavorName}
                           className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                         />
                         <button
@@ -493,14 +477,14 @@ export default function OnboardingPage() {
                         }}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                       >
-                        <option value="">Выберите вкус...</option>
+                        <option value="">{t.selectFlavorPrompt}</option>
                         {getFlavorsByBrand(tobaccoBrand).map(f => <option key={f} value={f}>{f}</option>)}
-                        <option value="__custom__">Другой...</option>
+                        <option value="__custom__">{t.otherFlavorOption}</option>
                       </select>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Количество (грамм)</label>
+                    <label className="block text-sm font-medium mb-2">{t.quantityGramsLabel}</label>
                     <input
                       type="number"
                       value={tobaccoQuantity}
@@ -526,14 +510,14 @@ export default function OnboardingPage() {
               {((needsBar && !needsHookah) || (needsBar && needsHookah && setupTab === 'bar')) && (
                 <div className="space-y-4">
                   <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-                    <p className="text-sm font-medium mb-1">Склад бара</p>
+                    <p className="text-sm font-medium mb-1">{t.barStockTitle}</p>
                     <p className="text-xs text-[var(--color-textMuted)]">
-                      Добавьте ингредиенты после настройки в разделе Склад
+                      {t.barStockDesc}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    {['Водка', 'Джин', 'Ром белый', 'Виски', 'Текила', 'Тоник'].map(name => (
+                    {[t.barStockVodka, t.barStockGin, t.barStockWhiteRum, t.barStockWhiskey, t.barStockTequila, t.barStockTonic].map(name => (
                       <div
                         key={name}
                         className="p-3 rounded-xl bg-[var(--color-bgHover)] flex items-center gap-2"
@@ -545,13 +529,13 @@ export default function OnboardingPage() {
                   </div>
 
                   <p className="text-xs text-[var(--color-textMuted)] text-center">
-                    Всё это можно настроить в разделе &quot;Склад&quot; после завершения
+                    {t.barStockNote}
                   </p>
 
                   {selectedType === 'restaurant' && (
                     <div className="p-3 rounded-xl bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/20">
                       <p className="text-sm text-[var(--color-warning)]">
-                        Модуль кухни скоро будет доступен. Пока вы можете пользоваться баром.
+                        {t.kitchenSoon}
                       </p>
                     </div>
                   )}
@@ -581,9 +565,9 @@ export default function OnboardingPage() {
               </div>
 
               <div className="text-center space-y-2">
-                <p className="text-lg font-medium">Всё готово!</p>
+                <p className="text-lg font-medium">{t.allReady}</p>
                 <p className="text-[var(--color-textMuted)]">
-                  Ваше заведение настроено. Теперь вы можете:
+                  {t.allReadyDesc}
                 </p>
               </div>
 
@@ -600,7 +584,7 @@ export default function OnboardingPage() {
                 onClick={handleFinish}
                 className="btn btn-primary w-full py-3"
               >
-                Перейти в кабинет
+                {t.goToDashboard}
               </button>
             </div>
           )}

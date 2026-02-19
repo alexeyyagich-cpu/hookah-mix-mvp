@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { IconTimer } from '@/components/Icons'
 
 interface SessionTimerProps {
@@ -16,6 +17,7 @@ export function SessionTimer({
   autoStart = false,
   compact = false,
 }: SessionTimerProps) {
+  const t = useTranslation('hookah')
   const [seconds, setSeconds] = useState(0)
   const [isRunning, setIsRunning] = useState(autoStart)
   const [notificationSent, setNotificationSent] = useState(false)
@@ -35,7 +37,7 @@ export function SessionTimer({
   const sendNotification = useCallback(() => {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('Hookah Torus', {
-        body: `Сессия идёт уже ${notificationMinutes} минут!`,
+        body: t.sessionNotification(notificationMinutes),
         icon: '/icons/icon-192x192.png',
         tag: 'session-timer',
       })
@@ -159,10 +161,10 @@ export function SessionTimer({
           </div>
           <div>
             <h3 className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>
-              Таймер сессии
+              {t.sessionTimerTitle}
             </h3>
             <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-              {isRunning ? 'Идёт' : seconds > 0 ? 'Пауза' : 'Готов'}
+              {isRunning ? t.timerRunning : seconds > 0 ? t.timerPaused : t.timerReady}
             </p>
           </div>
         </div>
@@ -172,7 +174,7 @@ export function SessionTimer({
             className="px-2 py-1 rounded-lg text-xs font-bold"
             style={{ background: 'var(--color-danger)', color: 'white' }}
           >
-            {minutes - notificationMinutes}+ мин
+            {t.overtimeMin(minutes - notificationMinutes)}
           </span>
         )}
       </div>
@@ -192,7 +194,7 @@ export function SessionTimer({
         </div>
         {notificationMinutes && (
           <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
-            Оповещение через {Math.max(0, notificationMinutes - minutes)} мин
+            {t.notificationIn(Math.max(0, notificationMinutes - minutes))}
           </p>
         )}
       </div>
@@ -207,7 +209,7 @@ export function SessionTimer({
               color: 'white',
             }}
           >
-            {seconds > 0 ? 'Продолжить' : 'Старт'}
+            {seconds > 0 ? t.timerResume : t.timerStart}
           </button>
         ) : (
           <button
@@ -218,7 +220,7 @@ export function SessionTimer({
               color: 'white',
             }}
           >
-            Пауза
+            {t.timerPause}
           </button>
         )}
 
@@ -232,7 +234,7 @@ export function SessionTimer({
                 color: 'var(--color-bg)',
               }}
             >
-              Стоп
+              {t.timerStop}
             </button>
             <button
               onClick={handleReset}
@@ -241,7 +243,7 @@ export function SessionTimer({
                 background: 'var(--color-bgHover)',
                 color: 'var(--color-textMuted)',
               }}
-              title="Сбросить"
+              title={t.timerReset}
             >
               ↺
             </button>

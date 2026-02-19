@@ -17,6 +17,7 @@ import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 
 export default function InventoryPage() {
   const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const {
     inventory,
     loading,
@@ -104,7 +105,7 @@ export default function InventoryPage() {
 
   const handleAdjust = async (id: string, amount: number) => {
     const type = amount > 0 ? 'purchase' : 'adjustment'
-    await adjustQuantity(id, amount, type, amount > 0 ? 'Поступление' : 'Корректировка')
+    await adjustQuantity(id, amount, type, amount > 0 ? t.adjustPurchase : t.adjustCorrection)
   }
 
   const totalValue = inventory.reduce((sum, item) => {
@@ -144,9 +145,7 @@ export default function InventoryPage() {
         <div>
           <h1 className="text-2xl font-bold">{t.inventoryTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {inventory.length} позиций
-            {isFreeTier && ` из ${itemsLimit}`}
-            {' '}• {totalGrams.toFixed(0)}г на складе
+            {t.inventorySubtitle(inventory.length, isFreeTier ? itemsLimit : null, totalGrams.toFixed(0))}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -156,7 +155,7 @@ export default function InventoryPage() {
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport || inventory.length === 0}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              title={canExport ? 'Экспорт инвентаря' : 'Доступно на Pro'}
+              title={canExport ? t.exportInventory : t.availableOnPro}
             >
               <IconExport size={18} />
               {!canExport && <IconLock size={14} />}
@@ -169,14 +168,14 @@ export default function InventoryPage() {
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
                   <IconChart size={16} />
-                  Экспорт CSV
+                  {t.exportCSV}
                 </button>
                 <button
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
                   <IconExport size={16} />
-                  Экспорт PDF
+                  {t.exportPDF}
                 </button>
               </div>
             )}
@@ -215,11 +214,11 @@ export default function InventoryPage() {
           <div className="text-2xl font-bold mt-1">{inventory.length}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">На складе</div>
-          <div className="text-2xl font-bold mt-1">{totalGrams.toFixed(0)}г</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.inWarehouse}</div>
+          <div className="text-2xl font-bold mt-1">{totalGrams.toFixed(0)}{tc.grams}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Заканчиваются</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.runningLow}</div>
           <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">
             {inventory.filter(i => i.quantity_grams < lowStockThreshold && i.quantity_grams > 0).length}
           </div>
@@ -238,14 +237,13 @@ export default function InventoryPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔒</span>
             <div className="flex-1">
-              <h3 className="font-semibold">Достигнут лимит</h3>
+              <h3 className="font-semibold">{t.limitReached}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Бесплатный тариф позволяет добавить до {itemsLimit} позиций.
-                Обновите подписку для безлимитного инвентаря.
+                {t.freeTierLimit(itemsLimit!)}
               </p>
             </div>
             <a href="/pricing" className="btn btn-primary">
-              Обновить
+              {tc.upgrade}
             </a>
           </div>
         </div>
@@ -275,7 +273,7 @@ export default function InventoryPage() {
       {/* Delete Confirmation Toast */}
       {deleteConfirm && (
         <div className="fixed bottom-4 right-4 z-50 p-4 rounded-xl bg-[var(--color-danger)] text-white shadow-lg animate-fadeInUp">
-          Нажмите еще раз для подтверждения удаления
+          {t.deleteConfirmToast}
         </div>
       )}
 

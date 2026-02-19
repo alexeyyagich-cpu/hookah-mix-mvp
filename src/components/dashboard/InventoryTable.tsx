@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
 import type { ForecastResult } from '@/lib/utils/forecast'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
@@ -19,6 +20,7 @@ interface InventoryTableProps {
 }
 
 export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, onEdit, onDelete, onAdjust, loading }: InventoryTableProps) {
+  const t = useTranslation('hookah')
   const [sortField, setSortField] = useState<keyof TobaccoInventory>('brand')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [filter, setFilter] = useState('')
@@ -60,16 +62,16 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
   }
 
   const getStockStatus = (quantity: number) => {
-    if (quantity <= 0) return { color: 'danger', label: 'Нет в наличии' }
-    if (quantity < lowStockThreshold) return { color: 'warning', label: 'Мало' }
-    return { color: 'success', label: 'В наличии' }
+    if (quantity <= 0) return { color: 'danger', label: t.statusOutOfStock }
+    if (quantity < lowStockThreshold) return { color: 'warning', label: t.statusLow }
+    return { color: 'success', label: t.statusInStock }
   }
 
   if (loading) {
     return (
       <div className="card p-8 text-center">
         <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-        <p className="mt-4 text-[var(--color-textMuted)]">Загрузка инвентаря...</p>
+        <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingInventory}</p>
       </div>
     )
   }
@@ -82,7 +84,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
           type="text"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          placeholder="Поиск по бренду или вкусу..."
+          placeholder={t.searchPlaceholder}
           className="w-full px-4 py-3 pl-10 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
         />
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-textMuted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,30 +102,30 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                   onClick={() => handleSort('brand')}
                   className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
                 >
-                  Бренд {sortField === 'brand' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  {t.brandColumn} {sortField === 'brand' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
                   onClick={() => handleSort('flavor')}
                   className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
                 >
-                  Вкус {sortField === 'flavor' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  {t.flavorColumn} {sortField === 'flavor' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
                   onClick={() => handleSort('quantity_grams')}
                   className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
                 >
-                  Остаток {sortField === 'quantity_grams' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  {t.remainingColumn} {sortField === 'quantity_grams' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)]">
-                  Статус
+                  {t.statusColumn}
                 </th>
                 {forecasts && (
                   <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)]">
-                    Прогноз
+                    {t.forecastColumn}
                   </th>
                 )}
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)]">
-                  Действия
+                  {t.actionsColumn}
                 </th>
               </tr>
             </thead>
@@ -131,7 +133,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
               {sortedInventory.length === 0 ? (
                 <tr>
                   <td colSpan={forecasts ? 6 : 5} className="px-4 py-12 text-center text-[var(--color-textMuted)]">
-                    {filter ? 'Ничего не найдено' : 'Инвентарь пуст. Добавьте первый табак!'}
+                    {filter ? t.noResults : t.emptyInventory}
                   </td>
                 </tr>
               ) : (
@@ -175,7 +177,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                             onClick={() => setAdjustingId(item.id)}
                             className="font-mono hover:text-[var(--color-primary)] transition-colors"
                           >
-                            {item.quantity_grams.toFixed(0)}г
+                            {item.quantity_grams.toFixed(0)}g
                           </button>
                         )}
                       </td>
@@ -198,7 +200,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                               <span
                                 className="font-medium text-sm"
                                 style={{ color: colorVar }}
-                                title={forecast.confidence !== 'low' ? `Уверенность: ${forecast.confidence === 'high' ? 'высокая' : 'средняя'}` : 'Мало данных'}
+                                title={forecast.confidence !== 'low' ? t.confidenceLabel(forecast.confidence) : t.confidenceLow}
                               >
                                 {formatForecastDays(forecast.daysUntilEmpty)}
                               </span>
@@ -213,7 +215,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                             <Link
                               href="/marketplace"
                               className="p-2 rounded-lg hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors"
-                              title="Заказать"
+                              title={t.orderAction}
                             >
                               <IconShop size={16} />
                             </Link>
@@ -221,14 +223,14 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                           <button
                             onClick={() => onEdit(item)}
                             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
-                            title="Редактировать"
+                            title={t.editItem}
                           >
                             ✏️
                           </button>
                           <button
                             onClick={() => onDelete(item.id)}
                             className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
-                            title="Удалить"
+                            title={t.deleteItem}
                           >
                             🗑️
                           </button>

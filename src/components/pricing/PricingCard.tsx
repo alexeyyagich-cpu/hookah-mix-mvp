@@ -107,7 +107,7 @@ export function PricingCard({
         {isLoading ? (
           <>
             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            Загрузка...
+            {tc.loading}
           </>
         ) : (
           buttonText

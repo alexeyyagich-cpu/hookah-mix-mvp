@@ -9,9 +9,11 @@ import { useCart } from '@/lib/hooks/useCart'
 import { ProductGrid } from '@/components/marketplace/ProductGrid'
 import { CartDrawer } from '@/components/marketplace/CartDrawer'
 import { IconChevronLeft, IconCart, IconTruck } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 import type { Supplier, SupplierProduct } from '@/types/database'
 
 export default function SupplierPage() {
+  const t = useTranslation('market')
   const params = useParams()
   const supplierId = params.id as string
 
@@ -53,13 +55,13 @@ export default function SupplierPage() {
           className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
         >
           <IconChevronLeft size={20} />
-          Назад к маркетплейсу
+          {t.backToMarketplace}
         </Link>
 
         <div className="card p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">Поставщик не найден</h2>
+          <h2 className="text-xl font-semibold mb-2">{t.supplierNotFound}</h2>
           <p className="text-[var(--color-textMuted)]">
-            Возможно, он был удален или деактивирован
+            {t.supplierMaybeDeleted}
           </p>
         </div>
       </div>
@@ -74,7 +76,7 @@ export default function SupplierPage() {
         className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
       >
         <IconChevronLeft size={20} />
-        Назад к маркетплейсу
+        {t.backToMarketplace}
       </Link>
 
       {/* Supplier header */}
@@ -107,11 +109,11 @@ export default function SupplierPage() {
                 <div className="flex items-center gap-4 mt-2 text-sm text-[var(--color-textMuted)]">
                   <div className="flex items-center gap-1.5">
                     <IconTruck size={16} />
-                    <span>{supplier.delivery_days_min}-{supplier.delivery_days_max} дней</span>
+                    <span>{t.daysDelivery(supplier.delivery_days_min, supplier.delivery_days_max)}</span>
                   </div>
                   {supplier.min_order_amount > 0 && (
                     <div>
-                      Мин. заказ: <span className="font-medium text-[var(--color-text)]">{supplier.min_order_amount}€</span>
+                      {t.minOrderLabel(supplier.min_order_amount)}
                     </div>
                   )}
                 </div>
@@ -124,7 +126,7 @@ export default function SupplierPage() {
               className="btn btn-primary flex items-center gap-2"
             >
               <IconCart size={18} />
-              Корзина
+              {t.cartLabel}
               {cartItemCount > 0 && (
                 <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-sm">
                   {cartItemCount}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode'
 import { findTobaccoByBarcode, TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 import { IconClose, IconScan } from '@/components/Icons'
@@ -12,6 +13,7 @@ interface BarcodeScannerProps {
 }
 
 export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScannerProps) {
+  const t = useTranslation('hookah')
   const [error, setError] = useState<string | null>(null)
   const [scanning, setScanning] = useState(false)
   const [lastScanned, setLastScanned] = useState<string | null>(null)
@@ -70,9 +72,9 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
         console.error('Scanner error:', err)
         if (mounted) {
           if (err instanceof Error && err.message.includes('Permission')) {
-            setError('Нет доступа к камере. Разрешите доступ в настройках браузера.')
+            setError(t.cameraNoAccess)
           } else {
-            setError('Не удалось запустить сканер. Попробуйте ввести код вручную.')
+            setError(t.scannerError)
           }
         }
       }
@@ -100,7 +102,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
     <div className="fixed inset-0 z-50 bg-black/90 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-4 text-white">
-        <h2 className="text-lg font-semibold">Сканировать штрих-код</h2>
+        <h2 className="text-lg font-semibold">{t.scanBarcode}</h2>
         <button
           onClick={handleClose}
           className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
@@ -119,7 +121,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
                 onClick={onManualEntry}
                 className="btn btn-primary"
               >
-                Ввести вручную
+                {t.enterManually}
               </button>
             </div>
           ) : (
@@ -143,7 +145,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
               {notFound && (
                 <div className="absolute inset-x-0 bottom-4 text-center">
                   <span className="px-4 py-2 rounded-full bg-[var(--color-warning)] text-white text-sm">
-                    Штрих-код не найден в базе
+                    {t.barcodeNotFound}
                   </span>
                 </div>
               )}
@@ -155,13 +157,13 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
       {/* Footer */}
       <div className="p-4 space-y-3">
         <p className="text-center text-white/70 text-sm">
-          Наведите камеру на штрих-код упаковки табака
+          {t.scanInstruction}
         </p>
         <button
           onClick={onManualEntry}
           className="w-full btn btn-ghost text-white border-white/30"
         >
-          Ввести вручную
+          {t.enterManually}
         </button>
       </div>
 
@@ -186,6 +188,7 @@ interface ScanButtonProps {
 }
 
 export function ScanButton({ onScanResult, onManualAdd }: ScanButtonProps) {
+  const t = useTranslation('hookah')
   const [showScanner, setShowScanner] = useState(false)
 
   return (
@@ -193,10 +196,10 @@ export function ScanButton({ onScanResult, onManualAdd }: ScanButtonProps) {
       <button
         onClick={() => setShowScanner(true)}
         className="btn btn-ghost flex items-center gap-2"
-        title="Сканировать штрих-код"
+        title={t.scanBarcode}
       >
         <IconScan size={18} />
-        <span className="hidden sm:inline">Сканировать</span>
+        <span className="hidden sm:inline">{t.scanButton}</span>
       </button>
 
       {showScanner && (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem, BarIngredientCategory, BarUnitType } from '@/types/database'
 import { BAR_INGREDIENT_PRESETS, BAR_CATEGORY_LABELS, BAR_CATEGORY_EMOJI, BAR_UNIT_LABELS } from '@/data/bar-ingredients'
 
@@ -17,6 +18,7 @@ const CATEGORIES: BarIngredientCategory[] = [
 ]
 
 export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, canAddMore }: AddBarIngredientModalProps) {
+  const t = useTranslation('bar')
   const [mode, setMode] = useState<'catalog' | 'custom'>('catalog')
   const [catalogFilter, setCatalogFilter] = useState('')
   const [catalogCategory, setCatalogCategory] = useState<BarIngredientCategory | 'all'>('all')
@@ -108,7 +110,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">
-              {editingItem ? 'Редактировать' : 'Добавить ингредиент'}
+              {editingItem ? t.editLabel : t.addIngredientLabel}
             </h2>
             <button
               onClick={onClose}
@@ -131,7 +133,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
                 }`}
               >
-                Из каталога
+                {t.fromCatalogTab}
               </button>
               <button
                 onClick={() => setMode('custom')}
@@ -141,7 +143,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
                 }`}
               >
-                Свой ингредиент
+                {t.customIngredient}
               </button>
             </div>
           )}
@@ -154,7 +156,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 type="text"
                 value={catalogFilter}
                 onChange={e => setCatalogFilter(e.target.value)}
-                placeholder="Поиск ингредиента..."
+                placeholder={t.searchIngredientPlaceholder}
                 className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               />
 
@@ -168,7 +170,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                       : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
                   }`}
                 >
-                  Все
+                  {t.all}
                 </button>
                 {CATEGORIES.map(cat => (
                   <button
@@ -207,7 +209,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 ))}
                 {filteredPresets.length === 0 && (
                   <p className="text-sm text-[var(--color-textMuted)] text-center py-4">
-                    Ничего не найдено
+                    {t.nothingFound}
                   </p>
                 )}
               </div>
@@ -215,20 +217,20 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium">Название *</label>
+                <label className="block text-sm font-medium">{t.nameRequiredLabel}</label>
                 <input
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   required
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                  placeholder="Абсолют Водка"
+                  placeholder={t.namePlaceholderVodka}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Бренд</label>
+                  <label className="block text-sm font-medium">{t.brandLabel}</label>
                   <input
                     type="text"
                     value={brand}
@@ -239,7 +241,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Категория</label>
+                  <label className="block text-sm font-medium">{t.categoryLabel}</label>
                   <select
                     value={category}
                     onChange={e => setCategory(e.target.value as BarIngredientCategory)}
@@ -256,20 +258,20 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Единица</label>
+                  <label className="block text-sm font-medium">{t.unitLabelField}</label>
                   <select
                     value={unitType}
                     onChange={e => setUnitType(e.target.value as BarUnitType)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                   >
-                    <option value="ml">мл</option>
-                    <option value="g">г</option>
-                    <option value="pcs">шт</option>
+                    <option value="ml">{t.mlUnit}</option>
+                    <option value="g">{t.gUnit}</option>
+                    <option value="pcs">{t.pcsUnitShort}</option>
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Остаток</label>
+                  <label className="block text-sm font-medium">{t.stockLeft}</label>
                   <input
                     type="number"
                     step="any"
@@ -281,7 +283,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Мин. остаток</label>
+                  <label className="block text-sm font-medium">{t.minStock}</label>
                   <input
                     type="number"
                     step="any"
@@ -295,7 +297,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Цена закупки (EUR)</label>
+                  <label className="block text-sm font-medium">{t.purchasePriceEur}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -307,7 +309,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Объём упаковки ({BAR_UNIT_LABELS[unitType]})</label>
+                  <label className="block text-sm font-medium">{t.packageVolume(BAR_UNIT_LABELS[unitType])}</label>
                   <input
                     type="number"
                     step="any"
@@ -320,13 +322,13 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium">Заметки</label>
+                <label className="block text-sm font-medium">{t.notesLabel}</label>
                 <input
                   type="text"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                  placeholder="Поставщик, срок годности..."
+                  placeholder={t.notesPlaceholder}
                 />
               </div>
 
@@ -337,7 +339,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     onClick={() => setMode('catalog')}
                     className="btn btn-ghost"
                   >
-                    Назад
+                    {t.back}
                   </button>
                 )}
                 <button
@@ -345,7 +347,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   disabled={saving || !name.trim() || (!editingItem && !canAddMore)}
                   className="btn btn-primary flex-1 disabled:opacity-50"
                 >
-                  {saving ? 'Сохранение...' : editingItem ? 'Сохранить' : 'Добавить'}
+                  {saving ? t.saving : editingItem ? t.save : t.addBtnFinal}
                 </button>
               </div>
             </form>

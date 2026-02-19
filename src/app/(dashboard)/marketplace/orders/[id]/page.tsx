@@ -14,17 +14,22 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 
-const STATUS_ACTIONS: Partial<Record<OrderStatus, { next: OrderStatus; label: string }>> = {
-  pending: { next: 'confirmed', label: 'Подтвердить заказ' },
-  confirmed: { next: 'shipped', label: 'Отметить отправленным' },
-  shipped: { next: 'delivered', label: 'Подтвердить доставку' },
-}
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export default function OrderDetailPage() {
+  const t = useTranslation('market')
+  const { locale } = useLocale()
   const params = useParams()
   const orderId = params.id as string
+
+  const STATUS_ACTIONS: Partial<Record<OrderStatus, { next: OrderStatus; label: string }>> = {
+    pending: { next: 'confirmed', label: t.confirmOrderAction },
+    confirmed: { next: 'shipped', label: t.markShipped },
+    shipped: { next: 'delivered', label: t.confirmDelivery },
+  }
 
   const { orders, loading, error, updateOrderStatus, getOrder } = useMarketplaceOrders()
   const { addTobacco, adjustQuantity, inventory } = useInventory()
@@ -77,7 +82,7 @@ export default function OrderDetailPage() {
 
       if (existingItem) {
         // Add to existing
-        await adjustQuantity(existingItem.id, totalGrams, 'purchase', `Поставка: заказ ${order?.order_number}`)
+        await adjustQuantity(existingItem.id, totalGrams, 'purchase', t.supplyNote(order?.order_number || ''))
       } else {
         // Create new inventory item
         await addTobacco({
@@ -89,7 +94,7 @@ export default function OrderDetailPage() {
           package_grams: item.package_grams,
           purchase_date: new Date().toISOString().slice(0, 10),
           expiry_date: null,
-          notes: `Добавлено из заказа ${order?.order_number}`,
+          notes: t.addedFromOrder(order?.order_number || ''),
         })
       }
     }
@@ -97,7 +102,7 @@ export default function OrderDetailPage() {
   }
 
   const handleCancelOrder = async () => {
-    if (!order || !confirm('Вы уверены, что хотите отменить заказ?')) return
+    if (!order || !confirm(t.cancelConfirmMsg)) return
 
     setUpdating(true)
     await updateOrderStatus(order.id, 'cancelled')
@@ -105,7 +110,7 @@ export default function OrderDetailPage() {
   }
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('ru-RU', {
+    return new Date(dateStr).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -134,13 +139,13 @@ export default function OrderDetailPage() {
           className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
         >
           <IconChevronLeft size={20} />
-          Назад к заказам
+          {t.backToOrders}
         </Link>
 
         <div className="card p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">Заказ не найден</h2>
+          <h2 className="text-xl font-semibold mb-2">{t.orderNotFound}</h2>
           <p className="text-[var(--color-textMuted)]">
-            Возможно, он был удален
+            {t.orderMaybeDeleted}
           </p>
         </div>
       </div>
@@ -157,7 +162,7 @@ export default function OrderDetailPage() {
         className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
       >
         <IconChevronLeft size={20} />
-        Назад к заказам
+        {t.backToOrders}
       </Link>
 
       {/* Header */}
@@ -167,7 +172,7 @@ export default function OrderDetailPage() {
             <IconPackage size={28} className="text-[var(--color-primary)]" />
             <h1 className="text-2xl font-bold">#{order.order_number}</h1>
             {order.is_auto_order && (
-              <span className="badge badge-info">Авто-заказ</span>
+              <span className="badge badge-info">{t.autoOrder}</span>
             )}
           </div>
           <p className="text-[var(--color-textMuted)] mt-1">
@@ -185,7 +190,7 @@ export default function OrderDetailPage() {
                 className="btn btn-ghost text-[var(--color-danger)]"
               >
                 <IconClose size={18} />
-                Отменить
+                {t.cancelOrder}
               </button>
               {statusAction && (
                 <button
@@ -193,7 +198,7 @@ export default function OrderDetailPage() {
                   disabled={updating}
                   className="btn btn-primary"
                 >
-                  {updating ? 'Обновляем...' : statusAction.label}
+                  {updating ? t.updating : statusAction.label}
                 </button>
               )}
             </>
@@ -214,7 +219,7 @@ export default function OrderDetailPage() {
 
           {/* Order items */}
           <div className="card p-6">
-            <h2 className="font-semibold text-lg mb-4">Состав заказа</h2>
+            <h2 className="font-semibold text-lg mb-4">{t.orderComposition}</h2>
             <div className="space-y-4">
               {order.order_items.map(item => (
                 <div key={item.id} className="flex justify-between items-center pb-4 border-b border-[var(--color-border)] last:border-0 last:pb-0">
@@ -224,13 +229,13 @@ export default function OrderDetailPage() {
                     </div>
                     <div className="font-medium">{item.flavor}</div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {item.quantity} × {item.package_grams}г • {item.unit_price}€/шт
+                      {t.packageInfo(item.quantity, item.package_grams, item.unit_price)}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-semibold">{item.total_price.toFixed(2)}€</div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {item.quantity * item.package_grams}г
+                      {t.totalGrams(item.quantity * item.package_grams)}
                     </div>
                   </div>
                 </div>
@@ -241,7 +246,7 @@ export default function OrderDetailPage() {
           {/* Notes */}
           {order.notes && (
             <div className="card p-6">
-              <h2 className="font-semibold text-lg mb-2">Примечание</h2>
+              <h2 className="font-semibold text-lg mb-2">{t.noteLabel}</h2>
               <p className="text-[var(--color-textMuted)]">{order.notes}</p>
             </div>
           )}
@@ -251,7 +256,7 @@ export default function OrderDetailPage() {
         <div className="space-y-4">
           {/* Supplier */}
           <div className="card p-4">
-            <h3 className="text-sm text-[var(--color-textMuted)] mb-2">Поставщик</h3>
+            <h3 className="text-sm text-[var(--color-textMuted)] mb-2">{t.supplierLabel}</h3>
             <div className="font-medium">{order.supplier.name}</div>
             {order.supplier.contact_email && (
               <a
@@ -270,17 +275,17 @@ export default function OrderDetailPage() {
 
           {/* Order summary */}
           <div className="card p-4 space-y-2">
-            <h3 className="text-sm text-[var(--color-textMuted)] mb-2">Сумма заказа</h3>
+            <h3 className="text-sm text-[var(--color-textMuted)] mb-2">{t.orderSumLabel}</h3>
             <div className="flex justify-between text-sm">
-              <span>Подытог</span>
+              <span>{t.subtotalLabel}</span>
               <span>{order.subtotal.toFixed(2)}€</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Доставка</span>
-              <span>{order.shipping_cost > 0 ? `${order.shipping_cost.toFixed(2)}€` : 'Бесплатно'}</span>
+              <span>{t.shippingLabel}</span>
+              <span>{order.shipping_cost > 0 ? `${order.shipping_cost.toFixed(2)}€` : t.freeShipping}</span>
             </div>
             <div className="flex justify-between font-semibold pt-2 border-t border-[var(--color-border)]">
-              <span>Итого</span>
+              <span>{t.totalLabel}</span>
               <span>{order.total.toFixed(2)}€</span>
             </div>
           </div>
@@ -290,10 +295,10 @@ export default function OrderDetailPage() {
             <div className="card p-4">
               <div className="flex items-center gap-2 text-sm">
                 <IconTruck size={18} className="text-[var(--color-primary)]" />
-                <span>Ожидаемая доставка</span>
+                <span>{t.expectedDelivery}</span>
               </div>
               <div className="font-medium mt-1">
-                {new Date(order.estimated_delivery_date).toLocaleDateString('ru-RU', {
+                {new Date(order.estimated_delivery_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',
@@ -306,10 +311,10 @@ export default function OrderDetailPage() {
             <div className="card p-4 bg-[var(--color-success)]/10 border-[var(--color-success)]/30">
               <div className="flex items-center gap-2 text-sm text-[var(--color-success)]">
                 <IconCheck size={18} />
-                <span>Доставлен</span>
+                <span>{t.deliveredLabel}</span>
               </div>
               <div className="font-medium mt-1">
-                {new Date(order.actual_delivery_date).toLocaleDateString('ru-RU', {
+                {new Date(order.actual_delivery_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric',

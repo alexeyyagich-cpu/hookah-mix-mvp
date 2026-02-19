@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { TobaccoInventory, SupplierProduct, Supplier } from '@/types/database'
 import { IconClose, IconRefresh, IconCheck } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 interface AutoReorderModalProps {
   isOpen: boolean
@@ -25,6 +26,7 @@ export function AutoReorderModal({
   products,
   onSave,
 }: AutoReorderModalProps) {
+  const t = useTranslation('market')
   const [selectedProductId, setSelectedProductId] = useState('')
   const [threshold, setThreshold] = useState(50)
   const [quantity, setQuantity] = useState(3)
@@ -97,7 +99,7 @@ export function AutoReorderModal({
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
             <h2 className="font-semibold text-lg flex items-center gap-2">
               <IconRefresh size={20} className="text-[var(--color-primary)]" />
-              Авто-заказ
+              {t.autoReorderModalTitle}
             </h2>
             {!loading && !success && (
               <button
@@ -116,9 +118,9 @@ export function AutoReorderModal({
                 <div className="w-16 h-16 rounded-full bg-[var(--color-success)]/10 flex items-center justify-center mx-auto mb-4">
                   <IconCheck size={32} className="text-[var(--color-success)]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Правило создано!</h3>
+                <h3 className="text-xl font-semibold mb-2">{t.ruleCreated}</h3>
                 <p className="text-[var(--color-textMuted)]">
-                  Заказ будет автоматически создан при достижении порога
+                  {t.willAutoOrderAtThreshold}
                 </p>
               </div>
             ) : (
@@ -128,19 +130,19 @@ export function AutoReorderModal({
                   <div className="text-xs text-[var(--color-textMuted)]">{tobacco.brand}</div>
                   <div className="font-medium">{tobacco.flavor}</div>
                   <div className="text-sm text-[var(--color-textMuted)] mt-1">
-                    Текущий остаток: {tobacco.quantity_grams.toFixed(0)}г
+                    {t.currentStock(tobacco.quantity_grams.toFixed(0))}
                   </div>
                 </div>
 
                 {/* Product selection */}
                 {matchingProducts.length === 0 ? (
                   <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5 text-sm">
-                    Не найдено товаров от поставщиков, соответствующих этому табаку.
+                    {t.noMatchingProducts}
                   </div>
                 ) : (
                   <div>
                     <label className="block text-sm font-medium mb-1">
-                      Товар для заказа
+                      {t.productToOrder}
                     </label>
                     <select
                       value={selectedProductId}
@@ -151,7 +153,7 @@ export function AutoReorderModal({
                         const supplier = suppliers.find(s => s.id === product.supplier_id)
                         return (
                           <option key={product.id} value={product.id}>
-                            {supplier?.name} - {product.package_grams}г за {product.price}€
+                            {supplier?.name} - {product.package_grams}g / {product.price}€
                           </option>
                         )
                       })}
@@ -162,7 +164,7 @@ export function AutoReorderModal({
                 {/* Threshold */}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Порог заказа (граммы)
+                    {t.thresholdGrams}
                   </label>
                   <input
                     type="number"
@@ -173,14 +175,14 @@ export function AutoReorderModal({
                     step="10"
                   />
                   <p className="text-xs text-[var(--color-textMuted)] mt-1">
-                    Заказ будет создан, когда остаток опустится ниже {threshold}г
+                    {t.willOrderWhenBelow(threshold)}
                   </p>
                 </div>
 
                 {/* Quantity */}
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Количество к заказу
+                    {t.quantityToOrder}
                   </label>
                   <input
                     type="number"
@@ -191,7 +193,7 @@ export function AutoReorderModal({
                   />
                   {selectedProduct && (
                     <p className="text-xs text-[var(--color-textMuted)] mt-1">
-                      {quantity} × {selectedProduct.package_grams}г = {quantity * selectedProduct.package_grams}г
+                      {quantity} × {selectedProduct.package_grams}g = {quantity * selectedProduct.package_grams}g
                       ({(quantity * selectedProduct.price).toFixed(2)}€)
                     </p>
                   )}
@@ -200,9 +202,9 @@ export function AutoReorderModal({
                 {/* Supplier info */}
                 {selectedSupplier && (
                   <div className="text-sm text-[var(--color-textMuted)]">
-                    Поставщик: {selectedSupplier.name}
+                    {t.supplierColon(selectedSupplier.name)}
                     <br />
-                    Доставка: {selectedSupplier.delivery_days_min}-{selectedSupplier.delivery_days_max} дней
+                    {t.deliveryColonDays(selectedSupplier.delivery_days_min, selectedSupplier.delivery_days_max)}
                   </div>
                 )}
               </>
@@ -217,14 +219,14 @@ export function AutoReorderModal({
                 disabled={loading}
                 className="btn btn-ghost flex-1"
               >
-                Отмена
+                {t.cancelBtn}
               </button>
               <button
                 onClick={handleSave}
                 disabled={loading || matchingProducts.length === 0 || !selectedProductId}
                 className="btn btn-primary flex-1"
               >
-                {loading ? 'Сохраняем...' : 'Создать правило'}
+                {loading ? t.savingRule : t.createRule}
               </button>
             </div>
           )}

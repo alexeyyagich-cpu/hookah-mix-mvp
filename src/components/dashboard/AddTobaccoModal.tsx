@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
@@ -15,6 +16,8 @@ interface AddTobaccoModalProps {
 }
 
 export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMore, scannedTobacco }: AddTobaccoModalProps) {
+  const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const [selectedTobacco, setSelectedTobacco] = useState<string>('')
   const [brand, setBrand] = useState('')
   const [flavor, setFlavor] = useState('')
@@ -53,7 +56,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
       setPackageGrams(scannedTobacco.packageGrams.toString())
       setPackageCount('1')
       setPurchasePrice('')
-      setNotes('Добавлено сканированием')
+      setNotes(t.addedByScanning)
       setShowCatalog(false)
     } else {
       resetForm()
@@ -118,7 +121,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
         {/* Header */}
         <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
           <h2 className="text-xl font-bold">
-            {isEditing ? 'Редактировать табак' : 'Добавить табак'}
+            {isEditing ? t.editTobaccoTitle : t.addTobaccoTitle}
           </h2>
           <button
             onClick={onClose}
@@ -133,12 +136,12 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
           {!canAddMore && !isEditing ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-4">🔒</div>
-              <h3 className="text-lg font-semibold mb-2">Достигнут лимит</h3>
+              <h3 className="text-lg font-semibold mb-2">{t.limitReachedTitle}</h3>
               <p className="text-[var(--color-textMuted)] mb-4">
-                Обновите подписку до Pro для добавления неограниченного количества табаков
+                {t.upgradeForUnlimited}
               </p>
               <a href="/pricing" className="btn btn-primary">
-                Обновить подписку
+                {t.upgradeSubscription}
               </a>
             </div>
           ) : (
@@ -147,12 +150,12 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
               {showCatalog && !isEditing && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Выберите из каталога</label>
+                    <label className="block text-sm font-medium mb-2">{t.selectFromCatalog}</label>
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Поиск по бренду или вкусу..."
+                      placeholder={t.searchPlaceholder}
                       className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                     />
                   </div>
@@ -183,7 +186,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       onClick={() => setShowCatalog(false)}
                       className="text-sm text-[var(--color-primary)] hover:underline"
                     >
-                      Или добавить вручную →
+                      {t.addManually}
                     </button>
                   </div>
                 </div>
@@ -198,35 +201,35 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       onClick={() => setShowCatalog(true)}
                       className="text-sm text-[var(--color-primary)] hover:underline mb-4"
                     >
-                      ← Выбрать из каталога
+                      {t.backToCatalog}
                     </button>
                   )}
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium">Бренд *</label>
+                      <label className="block text-sm font-medium">{t.brandRequired}</label>
                       <select
                         value={brand}
                         onChange={(e) => setBrand(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                         required
                       >
-                        <option value="">Выберите бренд</option>
+                        <option value="">{t.selectBrandOption}</option>
                         {brands.map((b) => (
                           <option key={b} value={b}>{b}</option>
                         ))}
-                        <option value="other">Другой...</option>
+                        <option value="other">{t.otherBrand}</option>
                       </select>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium">Вкус *</label>
+                      <label className="block text-sm font-medium">{t.flavorRequired}</label>
                       <input
                         type="text"
                         value={flavor}
                         onChange={(e) => setFlavor(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                        placeholder="Название вкуса"
+                        placeholder={t.flavorPlaceholder}
                         required
                       />
                     </div>
@@ -234,21 +237,21 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium">Размер упаковки</label>
+                      <label className="block text-sm font-medium">{t.packageSize}</label>
                       <select
                         value={packageGrams}
                         onChange={(e) => setPackageGrams(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                       >
-                        <option value="25">25г</option>
-                        <option value="100">100г</option>
-                        <option value="200">200г</option>
-                        <option value="250">250г</option>
+                        <option value="25">25g</option>
+                        <option value="100">100g</option>
+                        <option value="200">200g</option>
+                        <option value="250">250g</option>
                       </select>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium">Количество упаковок *</label>
+                      <label className="block text-sm font-medium">{t.packageCount}</label>
                       <input
                         type="number"
                         value={packageCount}
@@ -260,34 +263,34 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                         required
                       />
                       <p className="text-xs text-[var(--color-textMuted)]">
-                        = {((parseFloat(packageCount) || 0) * (parseFloat(packageGrams) || 100)).toFixed(0)}г всего
+                        {t.totalGramsLabel(((parseFloat(packageCount) || 0) * (parseFloat(packageGrams) || 100)).toFixed(0))}
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium">Цена закупки за упаковку</label>
+                    <label className="block text-sm font-medium">{t.purchasePricePerPackage}</label>
                     <input
                       type="number"
                       value={purchasePrice}
                       onChange={(e) => setPurchasePrice(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                      placeholder="Цена за упаковку"
+                      placeholder={t.purchasePricePlaceholder}
                       min="0"
                       step="0.01"
                     />
                     <p className="text-xs text-[var(--color-textMuted)]">
-                      Укажите цену за {packageGrams}г упаковку для расчёта себестоимости миксов
+                      {t.purchasePriceHint(packageGrams)}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium">Заметки</label>
+                    <label className="block text-sm font-medium">{t.notesLabel}</label>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none resize-none"
-                      placeholder="Дополнительная информация..."
+                      placeholder={t.notesPlaceholder}
                       rows={3}
                     />
                   </div>
@@ -305,14 +308,14 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
               onClick={onClose}
               className="btn btn-ghost"
             >
-              Отмена
+              {tc.cancel}
             </button>
             <button
               onClick={handleSubmit}
               disabled={!brand || !flavor || !packageCount || saving}
               className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {saving ? 'Сохранение...' : isEditing ? 'Сохранить' : 'Добавить'}
+              {saving ? tc.saving : isEditing ? t.mixSaveButton : tc.add}
             </button>
           </div>
         )}

@@ -231,7 +231,33 @@ export const bar: typeof BarType = {
   someIngredientsOutOfStock: 'Einige Zutaten sind nicht auf Lager',
 
   // Quick sell panel
-  addRecipesToMenuForQuickSell: 'F\u00fcgen Sie Rezepte zum Men\u00fc f\u00fcr den Schnellverkauf hinzu',
+  addRecipesToMenuForQuickSell: 'Fügen Sie Rezepte zum Menü für den Schnellverkauf hinzu',
   quickSellTitle: 'Schnellverkauf',
   sold: 'Verkauft!',
+
+  // Units
+  litersShort: 'L',
+
+  // Method labels
+  methodBuild: 'Build',
+  methodStir: 'Rühren',
+  methodShake: 'Schütteln',
+  methodBlend: 'Mixen',
+  methodLayer: 'Schichten',
+  methodMuddle: 'Stoßen',
+
+  // Glass labels
+  glassHighball: 'Highball',
+  glassRocks: 'Rocks',
+  glassCoupe: 'Coupe',
+  glassFlute: 'Flöte',
+  glassMartini: 'Martini',
+  glassCollins: 'Collins',
+  glassHurricane: 'Hurricane',
+  glassShot: 'Shot',
+  glassWine: 'Weinglas',
+  glassBeer: 'Bierglas',
+  glassCopperMug: 'Kupferbecher',
+  glassTiki: 'Tiki',
+  glassOther: 'Anderes',
 } as const

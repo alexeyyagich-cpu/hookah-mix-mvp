@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from '@/lib/i18n'
+
 interface BrandData {
   brand: string
   grams: number
@@ -21,10 +23,12 @@ const COLORS = [
 ]
 
 export function BrandPieChart({ data }: BrandPieChartProps) {
+  const t = useTranslation('manage')
+
   if (!data || data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-        Нет данных для отображения
+        {t.noChartData}
       </div>
     )
   }
@@ -90,7 +94,7 @@ export function BrandPieChart({ data }: BrandPieChartProps) {
             textAnchor="middle"
             className="fill-[var(--color-text)] text-[8px] font-bold"
           >
-            {total.toFixed(0)}г
+            {total.toFixed(0)}g
           </text>
           <text
             x="50"
@@ -98,7 +102,7 @@ export function BrandPieChart({ data }: BrandPieChartProps) {
             textAnchor="middle"
             className="fill-[var(--color-textMuted)] text-[5px]"
           >
-            всего
+            {t.chartTotal}
           </text>
         </svg>
       </div>

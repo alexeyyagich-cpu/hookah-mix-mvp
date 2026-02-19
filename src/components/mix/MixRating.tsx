@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { IconStar } from '@/components/Icons'
 
 interface MixRatingProps {
@@ -58,7 +59,9 @@ interface MixNotesProps {
   placeholder?: string
 }
 
-export function MixNotes({ notes, onSave, placeholder = 'Добавить заметку...' }: MixNotesProps) {
+export function MixNotes({ notes, onSave, placeholder }: MixNotesProps) {
+  const t = useTranslation('hookah')
+  const resolvedPlaceholder = placeholder ?? t.mixNotePlaceholder
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState(notes || '')
 
@@ -84,7 +87,7 @@ export function MixNotes({ notes, onSave, placeholder = 'Добавить зам
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           rows={3}
           className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none resize-none"
           autoFocus
@@ -95,7 +98,7 @@ export function MixNotes({ notes, onSave, placeholder = 'Добавить зам
             onClick={handleSave}
             className="px-3 py-1 text-xs rounded-lg bg-[var(--color-primary)] text-white hover:opacity-90"
           >
-            Сохранить
+            {t.mixNoteSave}
           </button>
           <button
             type="button"
@@ -105,10 +108,10 @@ export function MixNotes({ notes, onSave, placeholder = 'Добавить зам
             }}
             className="px-3 py-1 text-xs rounded-lg text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]"
           >
-            Отмена
+            {t.mixNoteCancel}
           </button>
           <span className="text-xs text-[var(--color-textMuted)] ml-auto">
-            ⌘+Enter для сохранения
+            {t.mixNoteShortcut}
           </span>
         </div>
       </div>
@@ -121,7 +124,7 @@ export function MixNotes({ notes, onSave, placeholder = 'Добавить зам
       onClick={() => setIsEditing(true)}
       className="w-full text-left text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors py-1"
     >
-      {notes || placeholder}
+      {notes || resolvedPlaceholder}
     </button>
   )
 }

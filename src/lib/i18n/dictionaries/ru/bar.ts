@@ -239,4 +239,30 @@ export const bar = {
   addRecipesToMenuForQuickSell: 'Добавьте рецепты в меню для быстрой продажи',
   quickSellTitle: 'Быстрая продажа',
   sold: 'Продано!',
+
+  // Units
+  litersShort: 'л',
+
+  // Method labels
+  methodBuild: 'Билд',
+  methodStir: 'Стир',
+  methodShake: 'Шейк',
+  methodBlend: 'Блендер',
+  methodLayer: 'Лейер',
+  methodMuddle: 'Мадл',
+
+  // Glass labels
+  glassHighball: 'Хайбол',
+  glassRocks: 'Рокс',
+  glassCoupe: 'Купе',
+  glassFlute: 'Флют',
+  glassMartini: 'Мартини',
+  glassCollins: 'Коллинз',
+  glassHurricane: 'Харрикейн',
+  glassShot: 'Шот',
+  glassWine: 'Бокал для вина',
+  glassBeer: 'Пивной бокал',
+  glassCopperMug: 'Медная кружка',
+  glassTiki: 'Тики',
+  glassOther: 'Другой',
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslation } from '@/lib/i18n'
 import type { RecipeCost } from '@/types/database'
 
 interface CostCalculatorProps {
@@ -7,13 +8,14 @@ interface CostCalculatorProps {
 }
 
 export function CostCalculator({ cost }: CostCalculatorProps) {
+  const t = useTranslation('bar')
   const marginColor = cost.margin !== null
     ? cost.margin >= 60 ? 'success' : cost.margin >= 40 ? 'warning' : 'danger'
     : 'textMuted'
 
   return (
     <div className="card p-5 space-y-4">
-      <h3 className="font-semibold">Калькулятор себестоимости</h3>
+      <h3 className="font-semibold">{t.costCalculatorTitle}</h3>
 
       {/* Ingredients breakdown */}
       <div className="space-y-2">
@@ -38,20 +40,20 @@ export function CostCalculator({ cost }: CostCalculatorProps) {
       {/* Totals */}
       <div className="pt-3 border-t border-[var(--color-border)] space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Себестоимость</span>
+          <span className="text-sm font-medium">{t.costTotal}</span>
           <span className="font-mono font-semibold">
             {cost.total_cost > 0 ? `${cost.total_cost.toFixed(2)}€` : '—'}
           </span>
         </div>
         {cost.menu_price !== null && (
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Цена продажи</span>
+            <span className="text-sm font-medium">{t.sellingPrice}</span>
             <span className="font-mono font-semibold">{cost.menu_price.toFixed(2)}€</span>
           </div>
         )}
         {cost.margin !== null && (
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Маржинальность</span>
+            <span className="text-sm font-medium">{t.marginality}</span>
             <span className={`font-mono font-bold text-[var(--color-${marginColor})]`}>
               {cost.margin.toFixed(1)}%
             </span>
@@ -59,7 +61,7 @@ export function CostCalculator({ cost }: CostCalculatorProps) {
         )}
         {cost.menu_price !== null && cost.total_cost > 0 && (
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Прибыль с порции</span>
+            <span className="text-sm font-medium">{t.profitPerServing}</span>
             <span className="font-mono font-semibold text-[var(--color-success)]">
               {(cost.menu_price - cost.total_cost).toFixed(2)}€
             </span>
@@ -70,7 +72,7 @@ export function CostCalculator({ cost }: CostCalculatorProps) {
       {/* Stock status */}
       {!cost.all_in_stock && (
         <div className="p-3 rounded-xl bg-[var(--color-warning)]/10 text-sm text-[var(--color-warning)]">
-          Некоторых ингредиентов нет на складе
+          {t.someIngredientsOutOfStock}
         </div>
       )}
     </div>

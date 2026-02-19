@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 interface SaveMixModalProps {
   isOpen: boolean
@@ -10,6 +11,7 @@ interface SaveMixModalProps {
 }
 
 export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: SaveMixModalProps) {
+  const t = useTranslation('hookah')
   const [name, setName] = useState(defaultName)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -26,7 +28,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
     e.preventDefault()
 
     if (!name.trim()) {
-      setError('Введите название микса')
+      setError(t.mixSaveNameRequired)
       return
     }
 
@@ -37,7 +39,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
       await onSave(name.trim())
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка сохранения')
+      setError(err instanceof Error ? err.message : t.mixSaveError)
     }
 
     setSaving(false)
@@ -65,11 +67,11 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              Сохранить микс
+              {t.mixSaveTitle}
             </h2>
             <button
               onClick={onClose}
-              aria-label="Закрыть модальное окно"
+              aria-label={t.mixSaveClose}
               className="icon-btn icon-btn-sm icon-btn-ghost"
             >
               <span aria-hidden="true">×</span>
@@ -80,13 +82,13 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="block text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                  Название микса
+                  {t.mixSaveNameLabel}
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Например: Летний вечер"
+                  placeholder={t.mixSaveNamePlaceholder}
                   autoFocus
                   className="w-full px-4 py-3 rounded-xl transition-colors"
                   style={{
@@ -119,7 +121,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
                     color: 'var(--color-text)',
                   }}
                 >
-                  Отмена
+                  {t.mixSaveCancel}
                 </button>
                 <button
                   type="submit"
@@ -130,7 +132,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
                     color: 'var(--color-bg)',
                   }}
                 >
-                  {saving ? 'Сохранение...' : 'Сохранить'}
+                  {saving ? t.mixSaving : t.mixSaveButton}
                 </button>
               </div>
             </div>

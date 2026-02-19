@@ -1,6 +1,7 @@
 'use client'
 
 import type { CostCategory } from '@/lib/hooks/usePnL'
+import { useTranslation } from '@/lib/i18n'
 
 interface CostBreakdownChartProps {
   data: CostCategory[]
@@ -19,21 +20,6 @@ const COLORS = [
   '#14B8A6', // teal
 ]
 
-const CATEGORY_LABELS: Record<string, string> = {
-  spirit: 'Крепкий алкоголь',
-  liqueur: 'Ликёры',
-  syrup: 'Сиропы',
-  mixer: 'Миксеры',
-  juice: 'Соки',
-  garnish: 'Гарниш',
-  bitter: 'Биттеры',
-  cocktails: 'Коктейли',
-  // Tobacco brands are used as-is
-}
-
-function getCategoryLabel(category: string): string {
-  return CATEGORY_LABELS[category] || category
-}
 
 function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
   const radians = ((angle - 90) * Math.PI) / 180
@@ -56,10 +42,27 @@ function createArcPath(startAngle: number, endAngle: number, radius: number) {
 }
 
 export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
+  const t = useTranslation('manage')
+
+  const categoryLabels: Record<string, string> = {
+    spirit: t.categorySpirit,
+    liqueur: t.categoryLiqueur,
+    syrup: t.categorySyrup,
+    mixer: t.categoryMixer,
+    juice: t.categoryJuice,
+    garnish: t.categoryGarnish,
+    bitter: t.categoryBitter,
+    cocktails: t.categoryCocktails,
+  }
+
+  function getCategoryLabel(category: string): string {
+    return categoryLabels[category] || category
+  }
+
   if (!data || data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-        Нет данных для отображения
+        {t.noChartData}
       </div>
     )
   }
@@ -111,7 +114,7 @@ export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
             textAnchor="middle"
             className="fill-[var(--color-textMuted)] text-[5px]"
           >
-            расходы
+            {t.chartExpenses}
           </text>
         </svg>
       </div>

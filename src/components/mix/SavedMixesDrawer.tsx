@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
 import { IconStar, IconMix, IconTrash } from '@/components/Icons'
 import { MixRating, MixNotes } from './MixRating'
@@ -16,6 +17,7 @@ type SortOption = 'recent' | 'popular' | 'favorite' | 'rating'
 type FilterOption = 'all' | 'favorites'
 
 export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDrawerProps) {
+  const t = useTranslation('hookah')
   const { savedMixes, loading, deleteMix, toggleFavorite, incrementUsage, updateMix } = useSavedMixes()
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [filterBy, setFilterBy] = useState<FilterOption>('all')
@@ -88,15 +90,15 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
         >
           <div>
             <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              Мои миксы
+              {t.mixMyMixes}
             </h2>
             <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-              {savedMixes.length} сохранённых
+              {t.mixSavedCount(savedMixes.length)}
             </p>
           </div>
           <button
             onClick={onClose}
-            aria-label="Закрыть панель сохранённых миксов"
+            aria-label={t.mixCloseDrawer}
             className="icon-btn icon-btn-sm icon-btn-ghost"
           >
             <span aria-hidden="true">×</span>
@@ -108,8 +110,8 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
           {/* Filter tabs */}
           <div className="flex gap-2">
             {[
-              { value: 'all' as FilterOption, label: 'Все' },
-              { value: 'favorites' as FilterOption, label: 'Избранные' },
+              { value: 'all' as FilterOption, label: t.mixFilterAll },
+              { value: 'favorites' as FilterOption, label: t.mixFilterFavorites },
             ].map(option => (
               <button
                 key={option.value}
@@ -129,7 +131,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
           {/* Sort dropdown */}
           <div className="flex items-center gap-2">
             <span className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-              Сортировка:
+              {t.mixSortLabel}
             </span>
             <select
               value={sortBy}
@@ -141,10 +143,10 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                 color: 'var(--color-text)',
               }}
             >
-              <option value="recent">По дате</option>
-              <option value="popular">По популярности</option>
-              <option value="rating">По рейтингу</option>
-              <option value="favorite">Избранные первыми</option>
+              <option value="recent">{t.mixSortRecent}</option>
+              <option value="popular">{t.mixSortPopular}</option>
+              <option value="rating">{t.mixSortRating}</option>
+              <option value="favorite">{t.mixSortFavorite}</option>
             </select>
           </div>
         </div>
@@ -160,11 +162,11 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
                 <IconMix size={32} />
               </div>
-              <p className="font-medium">Нет сохранённых миксов</p>
+              <p className="font-medium">{t.mixNoSaved}</p>
               <p className="text-sm mt-2">
                 {filterBy === 'favorites'
-                  ? 'Добавьте миксы в избранное'
-                  : 'Сохраните свой первый микс!'}
+                  ? t.mixAddToFavoritesHint
+                  : t.mixSaveFirstHint}
               </p>
             </div>
           ) : (
@@ -186,7 +188,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                         )}
                       </div>
                       <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
-                        Использован {mix.usage_count}× • {new Date(mix.created_at).toLocaleDateString('ru-RU')}
+                        {t.mixUsageCount(mix.usage_count, new Date(mix.created_at).toLocaleDateString())}
                       </p>
                       {/* Rating */}
                       <div className="mt-2">
@@ -239,7 +241,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                     <MixNotes
                       notes={mix.notes}
                       onSave={(notes) => updateMix(mix.id, { notes: notes || null })}
-                      placeholder="Добавить заметку..."
+                      placeholder={t.mixAddNote}
                     />
                   </div>
 
@@ -253,7 +255,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                         color: 'var(--color-bg)',
                       }}
                     >
-                      Загрузить
+                      {t.mixLoad}
                     </button>
                     <button
                       onClick={() => toggleFavorite(mix.id)}
@@ -262,7 +264,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                         background: 'var(--color-bgCard)',
                         border: '1px solid var(--color-border)',
                       }}
-                      title={mix.is_favorite ? 'Убрать из избранного' : 'В избранное'}
+                      title={mix.is_favorite ? t.mixRemoveFavorite : t.mixAddFavorite}
                     >
                       <IconStar size={16} className={mix.is_favorite ? 'text-[var(--color-warning)]' : 'text-[var(--color-textMuted)]'} />
                     </button>
@@ -276,7 +278,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                         border: '1px solid var(--color-border)',
                         color: deleteConfirm === mix.id ? 'white' : 'var(--color-textMuted)',
                       }}
-                      title="Удалить"
+                      title={t.mixDelete}
                     >
                       <IconTrash size={16} />
                     </button>

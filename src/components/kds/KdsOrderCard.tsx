@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { IconTimer, IconCocktail, IconBowl, IconClose } from '@/components/Icons'
 import type { KdsOrder, KdsOrderStatus } from '@/types/database'
 
@@ -16,11 +17,7 @@ const NEXT_STATUS: Record<string, KdsOrderStatus> = {
   ready: 'served',
 }
 
-const ACTION_LABELS: Record<string, string> = {
-  new: 'Взять',
-  preparing: 'Готово',
-  ready: 'Подано',
-}
+// ACTION_LABELS moved into component to access translations
 
 const BORDER_COLORS: Record<string, string> = {
   new: 'border-[var(--color-warning)]',
@@ -37,7 +34,7 @@ const ACTION_STYLES: Record<string, string> = {
 function formatElapsed(ms: number): string {
   const totalMinutes = Math.floor(ms / 60000)
   const seconds = Math.floor((ms % 60000) / 1000)
-  if (totalMinutes < 1) return `${seconds}с`
+  if (totalMinutes < 1) return `${seconds}s`
   return `${totalMinutes}:${seconds.toString().padStart(2, '0')}`
 }
 
@@ -49,6 +46,14 @@ function getTimerColor(ms: number): string {
 }
 
 export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
+  const t = useTranslation('manage')
+
+  const ACTION_LABELS: Record<string, string> = {
+    new: t.actionTake,
+    preparing: t.actionReady,
+    ready: t.actionServed,
+  }
+
   const [elapsed, setElapsed] = useState(Date.now() - new Date(order.created_at).getTime())
   const [acting, setActing] = useState(false)
 
@@ -88,7 +93,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <div className="font-semibold truncate">
-            {order.table_name || 'Без стола'}
+            {order.table_name || t.noTableLabel}
           </div>
           {order.guest_name && (
             <div className="text-xs text-[var(--color-textMuted)] truncate">
@@ -106,7 +111,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
               onClick={handleCancel}
               disabled={acting}
               className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
-              title="Отменить"
+              title={t.cancelTooltip}
             >
               <IconClose size={14} />
             </button>
@@ -122,7 +127,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
             : 'bg-orange-500/10 text-orange-400'
         }`}>
           {isBar ? <IconCocktail size={12} /> : <IconBowl size={12} />}
-          {isBar ? 'Бар' : 'Кальянная'}
+          {isBar ? t.typeLabelBar : t.typeLabelHookah}
         </span>
       </div>
 

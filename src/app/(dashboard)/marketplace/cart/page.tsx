@@ -8,8 +8,11 @@ import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
 import { CartSummary } from '@/components/marketplace/CartSummary'
 import { CheckoutModal } from '@/components/marketplace/CheckoutModal'
 import { IconChevronLeft, IconCart, IconPlus, IconMinus, IconTrash } from '@/components/Icons'
+import { useTranslation } from '@/lib/i18n'
 
 export default function CartPage() {
+  const tmk = useTranslation('market')
+  const tc = useTranslation('common')
   const router = useRouter()
   const { cart, updateQuantity, removeFromCart, clearCart } = useCart()
   const { createOrder } = useMarketplaceOrders()
@@ -35,17 +38,17 @@ export default function CartPage() {
           className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
         >
           <IconChevronLeft size={20} />
-          Назад к маркетплейсу
+          {tmk.backToMarketplace}
         </Link>
 
         <div className="card p-8 text-center">
           <IconCart size={48} className="text-[var(--color-textMuted)] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Корзина пуста</h2>
+          <h2 className="text-xl font-semibold mb-2">{tmk.cartEmptyTitle}</h2>
           <p className="text-[var(--color-textMuted)] mb-6">
-            Добавьте товары от поставщиков для оформления заказа
+            {tmk.addItemsForOrder}
           </p>
           <Link href="/marketplace" className="btn btn-primary">
-            Перейти к поставщикам
+            {tmk.goToSuppliers}
           </Link>
         </div>
       </div>
@@ -60,13 +63,13 @@ export default function CartPage() {
         className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
       >
         <IconChevronLeft size={20} />
-        Назад к {cart.supplier.name}
+        {tmk.backTo(cart.supplier.name)}
       </Link>
 
       {/* Header */}
       <div className="flex items-center gap-3">
         <IconCart size={28} className="text-[var(--color-primary)]" />
-        <h1 className="text-2xl font-bold">Корзина</h1>
+        <h1 className="text-2xl font-bold">{tmk.cartPageTitle}</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -74,7 +77,7 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           {/* Supplier info */}
           <div className="card p-4 bg-[var(--color-bgHover)]">
-            <div className="text-sm text-[var(--color-textMuted)]">Поставщик</div>
+            <div className="text-sm text-[var(--color-textMuted)]">{tmk.supplierFieldLabel}</div>
             <div className="font-medium">{cart.supplier.name}</div>
           </div>
 
@@ -89,7 +92,7 @@ export default function CartPage() {
                   </div>
                   <div className="font-semibold text-lg">{item.product.flavor}</div>
                   <div className="text-sm text-[var(--color-textMuted)]">
-                    {item.product.package_grams}г • {item.product.price}€/шт
+                    {item.product.package_grams}{tc.grams} • {item.product.price}€/{tc.pieces}
                   </div>
                   {item.product.sku && (
                     <div className="text-xs text-[var(--color-textMuted)] mt-1">
@@ -100,10 +103,10 @@ export default function CartPage() {
 
                 {/* Quantity controls */}
                 <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-2" role="group" aria-label="Изменить количество">
+                  <div className="flex items-center gap-2" role="group" aria-label={tmk.changeQuantity}>
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                      aria-label="Уменьшить количество"
+                      aria-label={tmk.decreaseQuantity}
                       className="icon-btn icon-btn-sm"
                     >
                       <IconMinus size={18} aria-hidden="true" />
@@ -111,7 +114,7 @@ export default function CartPage() {
                     <span className="w-10 text-center font-medium" aria-live="polite">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                      aria-label="Увеличить количество"
+                      aria-label={tmk.increaseQuantity}
                       className="icon-btn icon-btn-sm"
                     >
                       <IconPlus size={18} aria-hidden="true" />
@@ -124,11 +127,11 @@ export default function CartPage() {
 
                   <button
                     onClick={() => removeFromCart(item.product.id)}
-                    aria-label={`Удалить ${item.product.flavor} из корзины`}
+                    aria-label={tmk.removeItemFrom(item.product.flavor)}
                     className="text-sm text-[var(--color-danger)] hover:underline flex items-center gap-1"
                   >
                     <IconTrash size={14} aria-hidden="true" />
-                    Удалить
+                    {tmk.removeItem}
                   </button>
                 </div>
               </div>
@@ -140,7 +143,7 @@ export default function CartPage() {
             onClick={clearCart}
             className="btn btn-ghost text-[var(--color-danger)]"
           >
-            Очистить корзину
+            {tmk.clearCartLabel}
           </button>
         </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "@/lib/i18n";
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from "@/data/tobaccos";
 
 type Props = {
@@ -30,6 +31,7 @@ function Reel({
   isSpinning: boolean;
   stopDelay: number;
 }) {
+  const t = useTranslation("hookah");
   const [displayItems, setDisplayItems] = useState<Tobacco[]>([]);
   const [offset, setOffset] = useState(0);
   const animationRef = useRef<number | null>(null);
@@ -183,7 +185,7 @@ function Reel({
           // Idle state - show placeholder
           <div className="flex flex-col items-center justify-center text-gray-500">
             <span className="text-4xl mb-2">❓</span>
-            <span className="text-xs">Крутани!</span>
+            <span className="text-xs">{t.mixSlotIdle}</span>
           </div>
         )}
       </div>
@@ -211,6 +213,7 @@ function Reel({
 }
 
 export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
+  const t = useTranslation("hookah");
   const [isSpinning, setIsSpinning] = useState(false);
   const [reelItems, setReelItems] = useState<Tobacco[][]>([[], [], []]);
   const [results, setResults] = useState<(Tobacco | null)[]>([null, null, null]);
@@ -291,10 +294,10 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 flex items-center justify-center gap-3">
               <span className="text-3xl animate-bounce">🎰</span>
-              Слот-машина миксов
+              {t.mixSlotTitle}
               <span className="text-3xl animate-bounce" style={{ animationDelay: "0.1s" }}>🎰</span>
             </h2>
-            <p className="text-sm text-gray-400 mt-2">Крутани барабаны и получи случайный микс!</p>
+            <p className="text-sm text-gray-400 mt-2">{t.mixSlotSubtitle}</p>
           </div>
 
           {/* Slot Reels */}
@@ -316,7 +319,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/50">
                 <span className="text-2xl">🎉</span>
                 <span className="text-lg font-bold text-green-400">
-                  Твой микс готов!
+                  {t.mixSlotReady}
                 </span>
                 <span className="text-2xl">🎉</span>
               </div>
@@ -341,11 +344,11 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
                 {isSpinning ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="animate-spin">🎲</span>
-                    Крутится...
+                    {t.mixSlotSpinning}
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    🎲 Крутануть! 🎲
+                    🎲 {t.mixSlotSpin} 🎲
                   </span>
                 )}
               </button>
@@ -355,13 +358,13 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
                   onClick={handleConfirm}
                   className="w-full py-4 rounded-2xl font-bold text-lg bg-green-500 text-white hover:bg-green-600 active:scale-95 transition-all"
                 >
-                  ✅ Применить микс
+                  ✅ {t.mixSlotApply}
                 </button>
                 <button
                   onClick={spin}
                   className="w-full py-3 rounded-xl font-medium text-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
                 >
-                  🔄 Крутануть ещё раз
+                  🔄 {t.mixSlotSpinAgain}
                 </button>
               </>
             )}
@@ -371,7 +374,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
                 onClick={onClose}
                 className="text-sm text-gray-500 hover:text-gray-300 transition-colors mt-2"
               >
-                Отмена
+                {t.mixSlotCancel}
               </button>
             )}
           </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, RecipeCost } from '@/types/database'
 
 interface QuickSellPanelProps {
@@ -10,6 +11,7 @@ interface QuickSellPanelProps {
 }
 
 export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPanelProps) {
+  const t = useTranslation('bar')
   const [sellingId, setSellingId] = useState<string | null>(null)
   const [soldId, setSoldId] = useState<string | null>(null)
 
@@ -30,7 +32,7 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
     return (
       <div className="card p-6 text-center">
         <p className="text-sm text-[var(--color-textMuted)]">
-          Добавьте рецепты в меню для быстрой продажи
+          {t.addRecipesToMenuForQuickSell}
         </p>
       </div>
     )
@@ -39,7 +41,7 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
   return (
     <div className="space-y-3">
       <h3 className="font-semibold text-sm text-[var(--color-textMuted)] uppercase tracking-wide">
-        Быстрая продажа
+        {t.quickSellTitle}
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {menuRecipes.map(recipe => {
@@ -76,7 +78,7 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
               </div>
               {justSold && (
                 <div className="text-xs text-[var(--color-success)] font-medium mt-1">
-                  Продано!
+                  {t.sold}
                 </div>
               )}
             </button>

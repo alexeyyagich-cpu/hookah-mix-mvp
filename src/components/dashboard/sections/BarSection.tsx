@@ -13,8 +13,13 @@ import {
   IconCocktail,
 } from '@/components/Icons'
 import Link from 'next/link'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export function BarSection() {
+  const t = useTranslation('manage')
+  const { locale } = useLocale()
   const { sales, loading, getAnalytics } = useBarSales()
   const { inventory } = useBarInventory()
 
@@ -33,28 +38,28 @@ export function BarSection() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           icon={<IconCoin size={20} />}
-          label="Выручка"
+          label={t.barRevenueLabelShort}
           value={`${analytics.totalRevenue.toFixed(0)}€`}
           color="success"
         />
         <StatsCard
           icon={<IconTrendUp size={20} />}
-          label="Прибыль"
+          label={t.barProfitLabel}
           value={`${analytics.totalProfit.toFixed(0)}€`}
           color="primary"
         />
         <StatsCard
           icon={<IconCart size={20} />}
-          label="Продажи"
+          label={t.barSalesLabel}
           value={analytics.totalSales}
-          subtext="порций продано"
+          subtext={t.subtextPortionsSold}
           color="warning"
         />
         <StatsCard
           icon={<IconPercent size={20} />}
-          label="Маржа"
+          label={t.barMarginLabel}
           value={analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(0)}%` : '—'}
-          subtext="в среднем"
+          subtext={t.subtextAverage}
           color="primary"
         />
       </div>
@@ -67,17 +72,17 @@ export function BarSection() {
               <IconWarning size={20} />
             </div>
             <div>
-              <h3 className="font-semibold">Внимание к бар-инвентарю</h3>
+              <h3 className="font-semibold">{t.barInventoryAlert}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {outOfStockItems.length > 0 && (
-                  <span className="text-[var(--color-danger)]">{outOfStockItems.length} позиций закончились. </span>
+                  <span className="text-[var(--color-danger)]">{t.itemsOutOfStock(outOfStockItems.length)}</span>
                 )}
                 {lowStockItems.length > 0 && (
-                  <span className="text-[var(--color-warning)]">{lowStockItems.length} позиций на исходе.</span>
+                  <span className="text-[var(--color-warning)]">{t.itemsLowStock(lowStockItems.length)}</span>
                 )}
               </p>
               <Link href="/bar/inventory" className="text-sm text-[var(--color-primary)] hover:underline mt-2 inline-block">
-                Проверить бар-инвентарь →
+                {t.checkBarInventory}
               </Link>
             </div>
           </div>
@@ -88,9 +93,9 @@ export function BarSection() {
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Выручка</h2>
+            <h2 className="text-lg font-semibold">{t.barRevenueTitle}</h2>
             <Link href="/bar/sales" className="text-sm text-[var(--color-primary)] hover:underline">
-              Все продажи →
+              {t.allSalesLink}
             </Link>
           </div>
           {loading ? (
@@ -104,9 +109,9 @@ export function BarSection() {
 
         <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Топ коктейли</h2>
+            <h2 className="text-lg font-semibold">{t.topCocktails}</h2>
             <Link href="/bar/recipes" className="text-sm text-[var(--color-primary)] hover:underline">
-              Все рецепты →
+              {t.allRecipes}
             </Link>
           </div>
           {analytics.topCocktails.length === 0 ? (
@@ -114,8 +119,8 @@ export function BarSection() {
               <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
                 <IconCocktail size={24} />
               </div>
-              <p>Пока нет продаж</p>
-              <p className="text-sm mt-2">Зафиксируйте первую продажу в разделе бара</p>
+              <p>{t.noSalesYet}</p>
+              <p className="text-sm mt-2">{t.recordFirstSale}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -131,7 +136,7 @@ export function BarSection() {
                     <span className="font-medium">{cocktail.name}</span>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-medium">{cocktail.count} шт</div>
+                    <div className="text-sm font-medium">{cocktail.count} {t.pcsShort}</div>
                     <div className="text-xs text-[var(--color-textMuted)]">{cocktail.revenue.toFixed(0)}€</div>
                   </div>
                 </div>
@@ -144,9 +149,9 @@ export function BarSection() {
       {/* Recent Sales */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">Последние продажи</h2>
+          <h2 className="text-lg font-semibold">{t.recentSales}</h2>
           <Link href="/bar/sales" className="text-sm text-[var(--color-primary)] hover:underline">
-            Все продажи →
+            {t.allSalesLink}
           </Link>
         </div>
         {recentSales.length === 0 ? (
@@ -154,8 +159,8 @@ export function BarSection() {
             <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
               <IconCocktail size={24} />
             </div>
-            <p>Пока нет продаж</p>
-            <p className="text-sm mt-2">Зафиксируйте первую продажу в разделе бара</p>
+            <p>{t.noSalesYet}</p>
+            <p className="text-sm mt-2">{t.recordFirstSale}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -173,7 +178,7 @@ export function BarSection() {
                       {sale.recipe_name} {sale.quantity > 1 ? `×${sale.quantity}` : ''}
                     </div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {new Date(sale.sold_at).toLocaleDateString('ru-RU', {
+                      {new Date(sale.sold_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
                         day: 'numeric',
                         month: 'short',
                         hour: '2-digit',
@@ -187,7 +192,7 @@ export function BarSection() {
                     {sale.total_revenue.toFixed(0)}€
                   </div>
                   <div className="text-xs text-[var(--color-textMuted)]">
-                    Себ. {sale.total_cost.toFixed(0)}€
+                    {t.costShort} {sale.total_cost.toFixed(0)}€
                   </div>
                 </div>
               </div>

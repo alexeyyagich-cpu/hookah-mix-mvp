@@ -4,12 +4,15 @@ import { useState } from 'react'
 import { useTeam } from '@/lib/hooks/useTeam'
 import { useRole } from '@/lib/hooks/useRole'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import { useRouter } from 'next/navigation'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export default function TeamPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
+  const { locale } = useLocale()
   const router = useRouter()
   const { isOwner } = useRole()
   const { staff, invitations, loading, error, inviteStaff, removeStaff, cancelInvitation, resendInvitation } = useTeam()
@@ -39,14 +42,14 @@ export default function TeamPage() {
       setInviteEmail('')
       setShowInviteModal(false)
     } else {
-      setInviteError(result.error || 'Ошибка отправки приглашения')
+      setInviteError(result.error || tm.inviteError)
     }
 
     setInviting(false)
   }
 
   const handleRemoveStaff = async (staffId: string, name: string) => {
-    if (!confirm(`Удалить ${name} из команды?`)) return
+    if (!confirm(tm.confirmRemoveStaff(name))) return
 
     setActionLoading(staffId)
     await removeStaff(staffId)
@@ -54,7 +57,7 @@ export default function TeamPage() {
   }
 
   const handleCancelInvitation = async (invitationId: string) => {
-    if (!confirm('Отменить приглашение?')) return
+    if (!confirm(tm.confirmCancelInvitation)) return
 
     setActionLoading(invitationId)
     await cancelInvitation(invitationId)
@@ -68,7 +71,7 @@ export default function TeamPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
+    return new Date(dateString).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -119,7 +122,7 @@ export default function TeamPage() {
       {/* Staff List */}
       <div className="card">
         <div className="p-4 border-b border-[var(--color-border)]">
-          <h2 className="font-semibold">Кальянщики ({staff.length})</h2>
+          <h2 className="font-semibold">{tm.staffTitle(staff.length)}</h2>
         </div>
 
         {staff.length === 0 ? (
@@ -131,7 +134,7 @@ export default function TeamPage() {
               {tm.noTeamMembers}
             </p>
             <p className="text-sm text-[var(--color-textMuted)]">
-              Пригласите кальянщиков для совместной работы
+              {tm.inviteStaffHint}
             </p>
           </div>
         ) : (
@@ -143,20 +146,20 @@ export default function TeamPage() {
                     {(member.owner_name || 'S')[0].toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-medium">{member.owner_name || 'Кальянщик'}</div>
+                    <div className="font-medium">{member.owner_name || tm.defaultStaffName}</div>
                     {member.phone && (
                       <div className="text-sm text-[var(--color-textMuted)]">{member.phone}</div>
                     )}
                     <div className="text-xs text-[var(--color-textMuted)]">
-                      В команде с {formatDate(member.created_at)}
+                      {tm.memberSince(formatDate(member.created_at))}
                     </div>
                   </div>
                 </div>
                 <button
-                  onClick={() => handleRemoveStaff(member.id, member.owner_name || 'сотрудника')}
+                  onClick={() => handleRemoveStaff(member.id, member.owner_name || tm.removeStaffFallback)}
                   disabled={actionLoading === member.id}
                   className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
-                  title="Удалить из команды"
+                  title={tm.removeFromTeamTooltip}
                 >
                   {actionLoading === member.id ? (
                     <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -174,7 +177,7 @@ export default function TeamPage() {
       {invitations.length > 0 && (
         <div className="card">
           <div className="p-4 border-b border-[var(--color-border)]">
-            <h2 className="font-semibold">Ожидающие приглашения ({invitations.length})</h2>
+            <h2 className="font-semibold">{tm.pendingInvitations(invitations.length)}</h2>
           </div>
 
           <div className="divide-y divide-[var(--color-border)]">
@@ -190,10 +193,10 @@ export default function TeamPage() {
                     <div>
                       <div className="font-medium">{invitation.email}</div>
                       <div className="text-sm text-[var(--color-textMuted)]">
-                        Отправлено {formatDate(invitation.created_at)}
+                        {tm.inviteSentAt(formatDate(invitation.created_at))}
                       </div>
                       <div className={`text-xs ${daysLeft <= 2 ? 'text-[var(--color-warning)]' : 'text-[var(--color-textMuted)]'}`}>
-                        Истекает через {daysLeft} дн.
+                        {tm.expiresInDays(daysLeft)}
                       </div>
                     </div>
                   </div>
@@ -202,7 +205,7 @@ export default function TeamPage() {
                       onClick={() => handleResendInvitation(invitation.id)}
                       disabled={actionLoading === `resend-${invitation.id}`}
                       className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors disabled:opacity-50"
-                      title="Отправить повторно"
+                      title={tm.resendTooltip}
                     >
                       {actionLoading === `resend-${invitation.id}` ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -214,7 +217,7 @@ export default function TeamPage() {
                       onClick={() => handleCancelInvitation(invitation.id)}
                       disabled={actionLoading === invitation.id}
                       className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
-                      title="Отменить приглашение"
+                      title={tm.cancelInvitationTooltip}
                     >
                       {actionLoading === invitation.id ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -232,27 +235,27 @@ export default function TeamPage() {
 
       {/* Info Card */}
       <div className="card p-5 bg-[var(--color-primary)]/5 border-[var(--color-primary)]/20">
-        <h3 className="font-semibold mb-2">Что могут кальянщики?</h3>
+        <h3 className="font-semibold mb-2">{tm.staffPermissionsTitle}</h3>
         <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
           <li className="flex items-center gap-2">
             <span className="text-[var(--color-success)]">✓</span>
-            Просматривать инвентарь и чаши
+            {tm.staffCanViewInventory}
           </li>
           <li className="flex items-center gap-2">
             <span className="text-[var(--color-success)]">✓</span>
-            Создавать сессии и работать с гостями
+            {tm.staffCanCreateSessions}
           </li>
           <li className="flex items-center gap-2">
             <span className="text-[var(--color-success)]">✓</span>
-            Использовать калькулятор миксов
+            {tm.staffCanUseMixer}
           </li>
           <li className="flex items-center gap-2">
             <span className="text-[var(--color-danger)]">✗</span>
-            Редактировать инвентарь и настройки
+            {tm.staffCannotEditInventory}
           </li>
           <li className="flex items-center gap-2">
             <span className="text-[var(--color-danger)]">✗</span>
-            Просматривать статистику и маркетплейс
+            {tm.staffCannotViewStats}
           </li>
         </ul>
       </div>
@@ -266,7 +269,7 @@ export default function TeamPage() {
             <form onSubmit={handleInvite} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Email сотрудника
+                  {tm.staffEmailLabel}
                 </label>
                 <input
                   type="email"
@@ -283,7 +286,7 @@ export default function TeamPage() {
               </div>
 
               <p className="text-sm text-[var(--color-textMuted)]">
-                Сотрудник получит ссылку для регистрации. Приглашение действительно 7 дней.
+                {tm.inviteLinkHint}
               </p>
 
               <div className="flex gap-3">
@@ -303,7 +306,7 @@ export default function TeamPage() {
                   disabled={inviting || !inviteEmail.trim()}
                   className="btn btn-primary flex-1 disabled:opacity-50"
                 >
-                  {inviting ? 'Отправка...' : 'Отправить'}
+                  {inviting ? tm.sending : tm.send}
                 </button>
               </div>
             </form>

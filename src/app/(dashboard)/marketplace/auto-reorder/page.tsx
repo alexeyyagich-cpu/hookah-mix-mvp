@@ -17,9 +17,14 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
 
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+
 export default function AutoReorderPage() {
+  const t = useTranslation('market')
+  const { locale } = useLocale()
   const { rules, loading, error, createRule, deleteRule, toggleRule } = useAutoReorder()
   const { inventory } = useInventory()
   const { suppliers } = useSuppliers()
@@ -82,20 +87,19 @@ export default function AutoReorderPage() {
           className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
         >
           <IconChevronLeft size={20} />
-          Назад к маркетплейсу
+          {t.backToMarketplace}
         </Link>
 
         <div className="card p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center mx-auto mb-4">
             <IconLock size={32} className="text-[var(--color-primary)]" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Доступно на Enterprise</h2>
+          <h2 className="text-xl font-semibold mb-2">{t.availableOnEnterprise}</h2>
           <p className="text-[var(--color-textMuted)] mb-6 max-w-md mx-auto">
-            Авто-заказ автоматически создает заказы у поставщиков,
-            когда остаток табака опускается ниже установленного порога.
+            {t.autoReorderPaywallDesc}
           </p>
           <Link href="/pricing" className="btn btn-primary">
-            Обновить до Enterprise
+            {t.upgradeToEnterprise}
           </Link>
         </div>
       </div>
@@ -110,7 +114,7 @@ export default function AutoReorderPage() {
         className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
       >
         <IconChevronLeft size={20} />
-        Назад к маркетплейсу
+        {t.backToMarketplace}
       </Link>
 
       {/* Header */}
@@ -118,9 +122,9 @@ export default function AutoReorderPage() {
         <div className="flex items-center gap-3">
           <IconRefresh size={28} className="text-[var(--color-primary)]" />
           <div>
-            <h1 className="text-2xl font-bold">Авто-заказ</h1>
+            <h1 className="text-2xl font-bold">{t.autoReorderTitle}</h1>
             <p className="text-[var(--color-textMuted)]">
-              Автоматическое пополнение при низком остатке
+              {t.autoReorderSubtitle}
             </p>
           </div>
         </div>
@@ -135,7 +139,7 @@ export default function AutoReorderPage() {
 
       {/* Active rules */}
       <div className="space-y-4">
-        <h2 className="font-semibold text-lg">Активные правила ({rules.length})</h2>
+        <h2 className="font-semibold text-lg">{t.activeRules(rules.length)}</h2>
 
         {loading ? (
           <div className="space-y-4">
@@ -153,7 +157,7 @@ export default function AutoReorderPage() {
           </div>
         ) : rules.length === 0 ? (
           <div className="card p-8 text-center text-[var(--color-textMuted)]">
-            Нет активных правил авто-заказа
+            {t.noActiveRules}
           </div>
         ) : (
           <div className="space-y-4">
@@ -182,11 +186,11 @@ export default function AutoReorderPage() {
                           {tobacco.brand} {tobacco.flavor}
                         </div>
                         <div className="text-sm text-[var(--color-textMuted)]">
-                          Порог: {rule.threshold_grams}г • Заказ: {rule.reorder_quantity} шт.
+                          {t.thresholdLabel(rule.threshold_grams)} • {t.orderQtyLabel(rule.reorder_quantity)}
                         </div>
                         {supplier && product && (
                           <div className="text-xs text-[var(--color-textMuted)] mt-1">
-                            {supplier.name} • {product.package_grams}г за {product.price}€
+                            {supplier.name} • {t.packagePriceInfo(product.package_grams, product.price)}
                           </div>
                         )}
                       </div>
@@ -195,13 +199,13 @@ export default function AutoReorderPage() {
                     <div className="flex items-center gap-4">
                       {/* Current stock */}
                       <div className="text-right">
-                        <div className="text-sm text-[var(--color-textMuted)]">Остаток</div>
+                        <div className="text-sm text-[var(--color-textMuted)]">{t.stockLabel}</div>
                         <div className={`font-semibold ${
                           tobacco.quantity_grams <= rule.threshold_grams
                             ? 'text-[var(--color-danger)]'
                             : ''
                         }`}>
-                          {tobacco.quantity_grams.toFixed(0)}г
+                          {t.totalGrams(parseInt(tobacco.quantity_grams.toFixed(0)))}
                         </div>
                       </div>
 
@@ -222,13 +226,13 @@ export default function AutoReorderPage() {
                   {/* Triggered indicator */}
                   {tobacco.quantity_grams <= rule.threshold_grams && rule.is_enabled && (
                     <div className="mt-3 pt-3 border-t border-[var(--color-border)] text-sm text-[var(--color-warning)]">
-                      Остаток ниже порога — заказ будет создан автоматически
+                      {t.belowThresholdWarning}
                     </div>
                   )}
 
                   {rule.last_triggered_at && (
                     <div className="mt-2 text-xs text-[var(--color-textMuted)]">
-                      Последний заказ: {new Date(rule.last_triggered_at).toLocaleDateString('ru-RU')}
+                      {t.lastOrder} {new Date(rule.last_triggered_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
                     </div>
                   )}
                 </div>
@@ -241,7 +245,7 @@ export default function AutoReorderPage() {
       {/* Add new rule */}
       {inventoryWithoutRules.length > 0 && (
         <div className="space-y-4">
-          <h2 className="font-semibold text-lg">Добавить правило</h2>
+          <h2 className="font-semibold text-lg">{t.addRule}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {inventoryWithoutRules.map(tobacco => (
               <button
@@ -254,7 +258,7 @@ export default function AutoReorderPage() {
                     <div className="text-xs text-[var(--color-textMuted)]">{tobacco.brand}</div>
                     <div className="font-medium">{tobacco.flavor}</div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {tobacco.quantity_grams.toFixed(0)}г
+                      {t.totalGrams(parseInt(tobacco.quantity_grams.toFixed(0)))}
                     </div>
                   </div>
                   <IconPlus
@@ -271,7 +275,7 @@ export default function AutoReorderPage() {
       {/* Delete confirmation toast */}
       {deleteConfirm && (
         <div className="fixed bottom-4 right-4 z-50 p-4 rounded-xl bg-[var(--color-danger)] text-white shadow-lg animate-fadeInUp">
-          Нажмите еще раз для подтверждения удаления
+          {t.clickAgainToConfirmDelete}
         </div>
       )}
 

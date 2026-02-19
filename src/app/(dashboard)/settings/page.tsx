@@ -699,7 +699,7 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* POS Касса (ready2order) */}
+      {/* POS (ready2order) */}
       <div className="card p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#00b341] flex items-center justify-center">

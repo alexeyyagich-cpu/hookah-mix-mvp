@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { SessionWithItems } from '@/types/database'
 
 interface SessionCardProps {
@@ -10,8 +11,10 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, onView, onDelete, onRate }: SessionCardProps) {
+  const t = useTranslation('hookah')
+  const { locale } = useLocale()
   const date = new Date(session.session_date)
-  const formattedDate = date.toLocaleDateString('ru-RU', {
+  const formattedDate = date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -54,7 +57,7 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
               <span className="text-[var(--color-textMuted)]">{item.flavor}</span>
             </div>
             <div className="text-[var(--color-textMuted)]">
-              {item.grams_used}г ({item.percentage}%)
+              {item.grams_used}g ({item.percentage}%)
             </div>
           </div>
         ))}
@@ -63,8 +66,8 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
       {/* Total & Rating */}
       <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
         <div className="text-sm">
-          <span className="text-[var(--color-textMuted)]">Всего:</span>{' '}
-          <span className="font-medium">{session.total_grams}г</span>
+          <span className="text-[var(--color-textMuted)]">{t.totalSessionLabel}</span>{' '}
+          <span className="font-medium">{session.total_grams}g</span>
         </div>
 
         <div className="flex items-center gap-1">
@@ -97,13 +100,13 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
           onClick={() => onView(session)}
           className="text-sm text-[var(--color-primary)] hover:underline"
         >
-          Подробнее
+          {t.viewDetails}
         </button>
         <button
           onClick={() => onDelete(session.id)}
           className="text-sm text-[var(--color-danger)] hover:underline"
         >
-          Удалить
+          {t.deleteItem}
         </button>
       </div>
     </div>

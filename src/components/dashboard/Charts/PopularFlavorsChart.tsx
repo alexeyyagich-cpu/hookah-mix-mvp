@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from '@/lib/i18n'
+
 interface FlavorData {
   brand: string
   flavor: string
@@ -12,10 +14,12 @@ interface PopularFlavorsChartProps {
 }
 
 export function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
+  const t = useTranslation('manage')
+
   if (!data || data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-        Нет данных для отображения
+        {t.noChartData}
       </div>
     )
   }
@@ -47,7 +51,7 @@ export function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
                 <span className="font-medium">{item.flavor}</span>
                 <span className="text-[var(--color-textMuted)]">{item.brand}</span>
               </div>
-              <span className="text-[var(--color-textMuted)]">{item.grams}г</span>
+              <span className="text-[var(--color-textMuted)]">{item.grams}g</span>
             </div>
             <div className="h-2 rounded-full bg-[var(--color-bgHover)] overflow-hidden">
               <div

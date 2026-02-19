@@ -6,11 +6,11 @@ import { usePublicLounge } from '@/lib/hooks/useLoungeProfile'
 import { BrandLoader } from '@/components/BrandLoader'
 import {
   IconSmoke,
-  IconStar,
   IconTarget,
   IconCocktail,
 } from '@/components/Icons'
-import { COCKTAIL_METHOD_LABELS, COCKTAIL_METHOD_EMOJI, GLASS_LABELS } from '@/data/bar-recipes'
+import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
+import { useTranslation } from '@/lib/i18n'
 import type { PublicBarRecipe } from '@/types/lounge'
 
 // Demo tobacco inventory for menu
@@ -44,6 +44,21 @@ function groupByMethod(recipes: PublicBarRecipe[]) {
 
 export default function MenuPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
+  const t = useTranslation('hookah')
+  const tb = useTranslation('bar')
+
+  const METHOD_LABELS: Record<string, string> = {
+    build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
+    blend: tb.methodBlend, layer: tb.methodLayer, muddle: tb.methodMuddle,
+  }
+  const GLASS_LABELS: Record<string, string> = {
+    highball: tb.glassHighball, rocks: tb.glassRocks, coupe: tb.glassCoupe,
+    flute: tb.glassFlute, martini: tb.glassMartini, collins: tb.glassCollins,
+    hurricane: tb.glassHurricane, shot: tb.glassShot, wine: tb.glassWine,
+    beer: tb.glassBeer, copper_mug: tb.glassCopperMug, tiki: tb.glassTiki,
+    other: tb.glassOther,
+  }
+
   const { lounge, mixes, barRecipes, loading, error } = usePublicLounge(slug)
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -57,7 +72,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
     let result = DEMO_MENU_TOBACCOS
 
     if (selectedBrand) {
-      result = result.filter(t => t.brand === selectedBrand)
+      result = result.filter(item => item.brand === selectedBrand)
     }
 
     if (searchQuery) {
@@ -74,7 +89,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
     return result
   }, [selectedBrand, searchQuery, hasTobaccoMenu])
 
-  const allBrands = DEMO_MENU_TOBACCOS.map(t => t.brand)
+  const allBrands = DEMO_MENU_TOBACCOS.map(item => item.brand)
   const signatureMixes = mixes.filter(m => m.is_signature)
   const popularMixes = mixes.filter(m => !m.is_signature).sort((a, b) => b.popularity - a.popularity)
 
@@ -83,7 +98,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
-        <BrandLoader size="lg" text="Загрузка меню..." />
+        <BrandLoader size="lg" text={t.menuLoading} />
       </div>
     )
   }
@@ -92,13 +107,13 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold mb-2">Меню не найдено</h1>
+          <div className="text-6xl mb-4">{'\u{1F50D}'}</div>
+          <h1 className="text-2xl font-bold mb-2">{t.menuNotFound}</h1>
           <p className="text-[var(--color-textMuted)] mb-6">
-            Возможно, ссылка устарела или заведение скрыло меню
+            {t.menuNotFoundHint}
           </p>
           <Link href="/mix" className="btn btn-primary">
-            На главную
+            {t.loungeGoHome}
           </Link>
         </div>
       </div>
@@ -109,13 +124,13 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔒</div>
-          <h1 className="text-2xl font-bold mb-2">Меню скрыто</h1>
+          <div className="text-6xl mb-4">{'\u{1F512}'}</div>
+          <h1 className="text-2xl font-bold mb-2">{t.menuHidden}</h1>
           <p className="text-[var(--color-textMuted)] mb-6">
-            Заведение не публикует меню
+            {t.menuHiddenHint}
           </p>
           <Link href={`/lounge/${slug}`} className="btn btn-primary">
-            Страница заведения
+            {t.menuLoungePage}
           </Link>
         </div>
       </div>
@@ -124,10 +139,10 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
 
   // Dynamic title
   const pageTitle = hasTobaccoMenu && hasCocktailMenu
-    ? 'Меню'
+    ? t.menuTitleFull
     : hasCocktailMenu
-      ? 'Коктейльная карта'
-      : 'Меню табаков'
+      ? t.menuTitleCocktails
+      : t.menuTitleTobacco
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
@@ -148,7 +163,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
             )}
             <div>
               <div className="font-semibold">{lounge.name}</div>
-              <div className="text-xs text-[var(--color-textMuted)]">← О заведении</div>
+              <div className="text-xs text-[var(--color-textMuted)]">{t.menuAboutVenue}</div>
             </div>
           </Link>
           <Link
@@ -171,10 +186,10 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
           <h1 className="text-3xl font-bold mb-2">{pageTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
             {hasTobaccoMenu && hasCocktailMenu
-              ? 'Табаки, миксы и коктейли'
+              ? t.menuSubtitleFull
               : hasCocktailMenu
-                ? 'Выбирайте коктейль по вкусу'
-                : 'Выбирайте вкусы и создавайте идеальный микс'}
+                ? t.menuSubtitleCocktails
+                : t.menuSubtitleTobacco}
           </p>
         </div>
 
@@ -183,13 +198,13 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
           <section className="mb-12">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <IconCocktail size={24} className="text-[var(--color-primary)]" />
-              Коктейльная карта
+              {t.menuCocktailCard}
             </h2>
 
             <div className="space-y-8">
               {Object.entries(cocktailGroups).map(([method, recipes]) => {
-                const emoji = COCKTAIL_METHOD_EMOJI[method as keyof typeof COCKTAIL_METHOD_EMOJI] || '🍹'
-                const label = COCKTAIL_METHOD_LABELS[method as keyof typeof COCKTAIL_METHOD_LABELS] || method
+                const emoji = COCKTAIL_METHOD_EMOJI[method as keyof typeof COCKTAIL_METHOD_EMOJI] || '\u{1F379}'
+                const label = METHOD_LABELS[method as keyof typeof METHOD_LABELS] || method
 
                 return (
                   <div key={method}>
@@ -212,7 +227,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                             </div>
                             {lounge.show_prices && recipe.menu_price && (
                               <span className="text-lg font-bold text-[var(--color-primary)] whitespace-nowrap ml-2">
-                                {recipe.menu_price}€
+                                {recipe.menu_price}{'\u20AC'}
                               </span>
                             )}
                           </div>
@@ -224,7 +239,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                           )}
 
                           <div className="text-sm text-[var(--color-text)]">
-                            {recipe.ingredients.join(' · ')}
+                            {recipe.ingredients.join(' \u00B7 ')}
                           </div>
 
                           <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[var(--color-border)] text-xs text-[var(--color-textMuted)]">
@@ -232,7 +247,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                               <span>{GLASS_LABELS[recipe.glass] || recipe.glass}</span>
                             )}
                             {recipe.garnish_description && (
-                              <span>🌿 {recipe.garnish_description}</span>
+                              <span>{'\u{1F33F}'} {recipe.garnish_description}</span>
                             )}
                           </div>
                         </div>
@@ -248,11 +263,11 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
         {/* ===== HOOKAH MENU SECTION ===== */}
         {hasTobaccoMenu && (
           <>
-            {/* Section header — only when combined */}
+            {/* Section header -- only when combined */}
             {hasCocktailMenu && (
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                 <IconSmoke size={24} className="text-[var(--color-primary)]" />
-                Кальянное меню
+                {t.menuHookahMenu}
               </h2>
             )}
 
@@ -260,8 +275,8 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
             {lounge.show_popular_mixes && signatureMixes.length > 0 && (
               <section className="mb-10">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <span className="text-2xl">⭐</span>
-                  Фирменные миксы от шефа
+                  <span className="text-2xl">{'\u2B50'}</span>
+                  {t.menuSignatureMixes}
                 </h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {signatureMixes.map(mix => (
@@ -282,16 +297,16 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                         )}
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {mix.tobaccos.map((t, i) => (
+                        {mix.tobaccos.map((tb, i) => (
                           <span
                             key={i}
                             className="px-2 py-1 rounded-lg text-xs"
                             style={{
-                              backgroundColor: `${t.color}20`,
-                              borderLeft: `3px solid ${t.color}`,
+                              backgroundColor: `${tb.color}20`,
+                              borderLeft: `3px solid ${tb.color}`,
                             }}
                           >
-                            {t.brand} — {t.flavor} {t.percent}%
+                            {tb.brand} — {tb.flavor} {tb.percent}%
                           </span>
                         ))}
                       </div>
@@ -306,7 +321,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
               <section className="mb-10">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <IconTarget size={24} className="text-[var(--color-primary)]" />
-                  Популярные миксы
+                  {t.menuPopularMixes}
                 </h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {popularMixes.map(mix => (
@@ -327,22 +342,22 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                         )}
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {mix.tobaccos.map((t, i) => (
+                        {mix.tobaccos.map((tb, i) => (
                           <span
                             key={i}
                             className="px-2 py-1 rounded-lg text-xs"
                             style={{
-                              backgroundColor: `${t.color}20`,
-                              borderLeft: `3px solid ${t.color}`,
+                              backgroundColor: `${tb.color}20`,
+                              borderLeft: `3px solid ${tb.color}`,
                             }}
                           >
-                            {t.flavor} {t.percent}%
+                            {tb.flavor} {tb.percent}%
                           </span>
                         ))}
                       </div>
                       <div className="mt-3 pt-3 border-t border-[var(--color-border)] flex items-center gap-2 text-xs text-[var(--color-textMuted)]">
                         <IconSmoke size={14} />
-                        <span>Заказали {mix.popularity} раз</span>
+                        <span>{t.menuOrderedTimes(mix.popularity)}</span>
                       </div>
                     </div>
                   ))}
@@ -355,14 +370,14 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                   <IconSmoke size={24} className="text-[var(--color-primary)]" />
-                  Каталог табаков
+                  {t.menuTobaccoCatalog}
                 </h2>
 
                 {/* Search */}
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Поиск вкуса..."
+                    placeholder={t.menuSearchFlavor}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="input pl-10 w-full sm:w-64"
@@ -388,7 +403,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                       : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                   }`}
                 >
-                  Все бренды
+                  {t.menuAllBrands}
                 </button>
                 {allBrands.map(brand => (
                   <button
@@ -435,13 +450,13 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
 
                 {filteredTobaccos.length === 0 && (
                   <div className="text-center py-12 text-[var(--color-textMuted)]">
-                    <div className="text-4xl mb-4">🔍</div>
-                    <p>Ничего не найдено</p>
+                    <div className="text-4xl mb-4">{'\u{1F50D}'}</div>
+                    <p>{t.menuNothingFound}</p>
                     <button
                       onClick={() => { setSearchQuery(''); setSelectedBrand(null) }}
                       className="text-[var(--color-primary)] hover:underline mt-2"
                     >
-                      Сбросить фильтры
+                      {t.menuResetFilters}
                     </button>
                   </div>
                 )}
@@ -453,21 +468,21 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
         {/* CTA */}
         <section className="mt-12">
           <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30 text-center">
-            <h3 className="text-xl font-bold mb-2">Не можете выбрать?</h3>
+            <h3 className="text-xl font-bold mb-2">{t.menuCtaTitle}</h3>
             <p className="text-[var(--color-textMuted)] mb-4">
               {hasTobaccoMenu
-                ? 'Попробуйте наш калькулятор миксов или спросите у кальянщика'
-                : 'Спросите у бармена о коктейле дня'}
+                ? t.menuCtaHintTobacco
+                : t.menuCtaHintCocktails}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {hasTobaccoMenu && (
                 <Link href="/mix" className="btn btn-primary">
-                  Калькулятор миксов
+                  {t.menuMixCalculator}
                 </Link>
               )}
               {lounge.phone && (
                 <a href={`tel:${lounge.phone}`} className="btn btn-ghost">
-                  Позвонить
+                  {t.menuCallBtn}
                 </a>
               )}
             </div>
@@ -479,7 +494,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
       <footer className="border-t border-[var(--color-border)] py-6 mt-12">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-[var(--color-textMuted)]">
           <p>
-            Меню создано на платформе{' '}
+            {t.menuFooter}{' '}
             <Link href="/mix" className="text-[var(--color-primary)] hover:underline">
               Hookah Torus
             </Link>

@@ -234,4 +234,30 @@ export const bar: typeof BarType = {
   addRecipesToMenuForQuickSell: 'Add recipes to menu for quick selling',
   quickSellTitle: 'Quick sell',
   sold: 'Sold!',
+
+  // Units
+  litersShort: 'L',
+
+  // Method labels
+  methodBuild: 'Build',
+  methodStir: 'Stir',
+  methodShake: 'Shake',
+  methodBlend: 'Blend',
+  methodLayer: 'Layer',
+  methodMuddle: 'Muddle',
+
+  // Glass labels
+  glassHighball: 'Highball',
+  glassRocks: 'Rocks',
+  glassCoupe: 'Coupe',
+  glassFlute: 'Flute',
+  glassMartini: 'Martini',
+  glassCollins: 'Collins',
+  glassHurricane: 'Hurricane',
+  glassShot: 'Shot',
+  glassWine: 'Wine glass',
+  glassBeer: 'Beer glass',
+  glassCopperMug: 'Copper mug',
+  glassTiki: 'Tiki',
+  glassOther: 'Other',
 } as const

@@ -11,6 +11,7 @@ import type { BarInventoryItem } from '@/types/database'
 
 export default function BarInventoryPage() {
   const t = useTranslation('bar')
+  const tc = useTranslation('common')
   const {
     inventory,
     loading,
@@ -47,7 +48,7 @@ export default function BarInventoryPage() {
 
   const handleAdjust = async (id: string, amount: number) => {
     const type = amount > 0 ? 'purchase' : 'adjustment'
-    await adjustQuantity(id, amount, type, amount > 0 ? 'Поступление' : 'Корректировка')
+    await adjustQuantity(id, amount, type, amount > 0 ? t.receipt : t.adjustment)
   }
 
   // Stats
@@ -67,9 +68,8 @@ export default function BarInventoryPage() {
         <div>
           <h1 className="text-2xl font-bold">{t.inventoryTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {totalItems} позиций
-            {isFreeTier && ` из ${itemsLimit}`}
-            {totalVolumeMl > 0 && ` · ${(totalVolumeMl / 1000).toFixed(1)}л на складе`}
+            {isFreeTier ? t.itemsCountWithLimit(totalItems, itemsLimit!) : t.itemsCount(totalItems)}
+            {totalVolumeMl > 0 && ` · ${t.volumeInStock((totalVolumeMl / 1000).toFixed(1))}`}
           </p>
         </div>
         <button
@@ -87,21 +87,21 @@ export default function BarInventoryPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Всего позиций</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.totalItems}</div>
           <div className="text-2xl font-bold mt-1">{totalItems}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Объём (жидкости)</div>
-          <div className="text-2xl font-bold mt-1">{(totalVolumeMl / 1000).toFixed(1)}л</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.volumeLiquids}</div>
+          <div className="text-2xl font-bold mt-1">{(totalVolumeMl / 1000).toFixed(1)}{t.litersShort}</div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Заканчиваются</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.runningLow}</div>
           <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">
             {lowStockItems.length}
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">Закончились</div>
+          <div className="text-sm text-[var(--color-textMuted)]">{t.outOfStock}</div>
           <div className="text-2xl font-bold text-[var(--color-danger)] mt-1">
             {outOfStockItems.length}
           </div>
@@ -114,14 +114,13 @@ export default function BarInventoryPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔒</span>
             <div className="flex-1">
-              <h3 className="font-semibold">Достигнут лимит</h3>
+              <h3 className="font-semibold">{t.limitReached}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
-                Бесплатный тариф позволяет добавить до {itemsLimit} позиций.
-                Обновите подписку для безлимитного склада.
+                {t.freeTierLimit(itemsLimit!)}
               </p>
             </div>
             <a href="/pricing" className="btn btn-primary">
-              Обновить
+              {t.upgrade}
             </a>
           </div>
         </div>

@@ -20,8 +20,14 @@ import {
   IconSmoke,
 } from '@/components/Icons'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n'
+import { useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export function HookahSection() {
+  const t = useTranslation('manage')
+  const { locale } = useLocale()
   const { inventory } = useInventory()
   const { sessions } = useSessions()
   const { settings: notificationSettings } = useNotificationSettings()
@@ -75,29 +81,29 @@ export function HookahSection() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           icon={<IconSession size={20} />}
-          label="Сессий"
+          label={t.labelSessions}
           value={statistics?.totalSessions || 0}
           color="primary"
         />
         <StatsCard
           icon={<IconScale size={20} />}
-          label="Расход"
-          value={`${statistics?.totalGramsUsed || 0}г`}
-          subtext="табака использовано"
+          label={t.labelConsumption}
+          value={`${statistics?.totalGramsUsed || 0}g`}
+          subtext={t.subtextTobaccoUsed}
           color="success"
         />
         <StatsCard
           icon={<IconStar size={20} />}
-          label="Рейтинг"
+          label={t.labelRating}
           value={statistics?.averageRating ? `${statistics.averageRating}/5` : '—'}
-          subtext="средняя оценка"
+          subtext={t.subtextAvgRating}
           color="warning"
         />
         <StatsCard
           icon={<IconPercent size={20} />}
-          label="Совместимость"
+          label={t.labelCompatibility}
           value={statistics?.averageCompatibilityScore ? `${statistics.averageCompatibilityScore}%` : '—'}
-          subtext="в среднем"
+          subtext={t.subtextAverage}
           color="primary"
         />
       </div>
@@ -110,17 +116,17 @@ export function HookahSection() {
               <IconWarning size={20} />
             </div>
             <div>
-              <h3 className="font-semibold">Внимание к инвентарю</h3>
+              <h3 className="font-semibold">{t.inventoryAlert}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {outOfStockCount > 0 && (
-                  <span className="text-[var(--color-danger)]">{outOfStockCount} позиций закончились. </span>
+                  <span className="text-[var(--color-danger)]">{t.itemsOutOfStock(outOfStockCount)}</span>
                 )}
                 {lowStockCount > 0 && (
-                  <span className="text-[var(--color-warning)]">{lowStockCount} позиций на исходе.</span>
+                  <span className="text-[var(--color-warning)]">{t.itemsLowStock(lowStockCount)}</span>
                 )}
               </p>
               <Link href="/inventory" className="text-sm text-[var(--color-primary)] hover:underline mt-2 inline-block">
-                Проверить инвентарь →
+                {t.checkInventory}
               </Link>
             </div>
           </div>
@@ -131,9 +137,9 @@ export function HookahSection() {
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Расход табака</h2>
+            <h2 className="text-lg font-semibold">{t.tobaccoConsumption}</h2>
             <Link href="/statistics" className="text-sm text-[var(--color-primary)] hover:underline">
-              Подробнее →
+              {t.moreDetails}
             </Link>
           </div>
           {loading ? (
@@ -147,9 +153,9 @@ export function HookahSection() {
 
         <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Популярные вкусы</h2>
+            <h2 className="text-lg font-semibold">{t.popularFlavors}</h2>
             <Link href="/statistics" className="text-sm text-[var(--color-primary)] hover:underline">
-              Подробнее →
+              {t.moreDetails}
             </Link>
           </div>
           {loading ? (
@@ -165,9 +171,9 @@ export function HookahSection() {
       {/* Recent Sessions */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">Последние сессии</h2>
+          <h2 className="text-lg font-semibold">{t.recentSessions}</h2>
           <Link href="/sessions" className="text-sm text-[var(--color-primary)] hover:underline">
-            Все сессии →
+            {t.allSessions}
           </Link>
         </div>
         {sessions.length === 0 ? (
@@ -175,8 +181,8 @@ export function HookahSection() {
             <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
               <IconSmoke size={24} />
             </div>
-            <p>Пока нет сессий</p>
-            <p className="text-sm mt-2">Создайте первую забивку в калькуляторе миксов</p>
+            <p>{t.noSessionsYet}</p>
+            <p className="text-sm mt-2">{t.createFirstMix}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -191,10 +197,10 @@ export function HookahSection() {
                   </div>
                   <div>
                     <div className="font-medium">
-                      {session.session_items?.map(i => i.flavor).join(' + ') || 'Микс'}
+                      {session.session_items?.map(i => i.flavor).join(' + ') || t.mixFallback}
                     </div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {new Date(session.session_date).toLocaleDateString('ru-RU', {
+                      {new Date(session.session_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
                         day: 'numeric',
                         month: 'short',
                         hour: '2-digit',
@@ -211,7 +217,7 @@ export function HookahSection() {
                   }`}>
                     {session.compatibility_score || '—'}%
                   </div>
-                  <div className="text-sm text-[var(--color-textMuted)]">{session.total_grams}г</div>
+                  <div className="text-sm text-[var(--color-textMuted)]">{session.total_grams}g</div>
                 </div>
               </div>
             ))}
@@ -223,9 +229,9 @@ export function HookahSection() {
       {endingSoon.length > 0 && (
         <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Скоро закончится</h2>
+            <h2 className="text-lg font-semibold">{t.endingSoon}</h2>
             <Link href="/inventory" className="text-sm text-[var(--color-primary)] hover:underline">
-              Инвентарь →
+              {t.inventoryLink}
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -244,7 +250,7 @@ export function HookahSection() {
                   <div className="text-xs text-[var(--color-textMuted)]">{item.brand}</div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm text-[var(--color-textMuted)]">
-                      {item.quantity_grams.toFixed(0)}г
+                      {item.quantity_grams.toFixed(0)}g
                     </span>
                     <span
                       className="text-sm font-medium"
@@ -264,9 +270,9 @@ export function HookahSection() {
       {topMixes.length > 0 && (
         <div className="card p-5">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Популярные миксы</h2>
+            <h2 className="text-lg font-semibold">{t.popularMixes}</h2>
             <Link href="/mix" className="text-sm text-[var(--color-primary)] hover:underline">
-              Все миксы →
+              {t.allMixes}
             </Link>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
@@ -292,7 +298,7 @@ export function HookahSection() {
                   ))}
                 </div>
                 <div className="flex items-center justify-between text-xs text-[var(--color-textMuted)]">
-                  <span>Использован {mix.usage_count}×</span>
+                  <span>{t.usedCount(mix.usage_count)}</span>
                   {mix.compatibility_score && (
                     <span className={
                       mix.compatibility_score >= 80 ? 'text-[var(--color-success)]' :

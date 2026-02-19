@@ -1,6 +1,9 @@
 'use client'
 
 import type { PnLLineItem } from '@/lib/hooks/usePnL'
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 interface PnLChartProps {
   data: PnLLineItem[]
@@ -8,10 +11,13 @@ interface PnLChartProps {
 }
 
 export function PnLChart({ data, showHookah = true }: PnLChartProps) {
+  const t = useTranslation('manage')
+  const { locale } = useLocale()
+
   if (!data || data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-        Нет данных для отображения
+        {t.noChartData}
       </div>
     )
   }
@@ -39,9 +45,9 @@ export function PnLChart({ data, showHookah = true }: PnLChartProps) {
               {/* Tooltip */}
               <div className="absolute -top-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1.5 rounded-lg shadow-lg border border-[var(--color-border)]">
                 <div className="font-medium text-[var(--color-success)]">{day.barRevenue.toFixed(0)}€</div>
-                <div className="text-[var(--color-danger)]">Бар: -{day.barCost.toFixed(0)}€</div>
+                <div className="text-[var(--color-danger)]">{t.tooltipBar(parseFloat(day.barCost.toFixed(0)))}</div>
                 {showHookah && day.hookahCost > 0 && (
-                  <div className="text-[var(--color-warning)]">Табак: -{day.hookahCost.toFixed(0)}€</div>
+                  <div className="text-[var(--color-warning)]">{t.tooltipTobacco(parseFloat(day.hookahCost.toFixed(0)))}</div>
                 )}
                 <div className={day.profit >= 0 ? 'font-medium text-[var(--color-success)]' : 'font-medium text-[var(--color-danger)]'}>
                   = {day.profit.toFixed(0)}€
@@ -82,7 +88,7 @@ export function PnLChart({ data, showHookah = true }: PnLChartProps) {
           <div key={day.date} className="flex-1 text-center">
             {(data.length <= 7 || index === 0 || index === data.length - 1 || index === Math.floor(data.length / 2)) && (
               <div className="text-[10px] text-[var(--color-textMuted)]">
-                {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                {new Date(day.date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', { day: 'numeric', month: 'short' })}
               </div>
             )}
           </div>
@@ -93,16 +99,16 @@ export function PnLChart({ data, showHookah = true }: PnLChartProps) {
       <div className="flex items-center justify-center gap-4 text-xs text-[var(--color-textMuted)]">
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-[var(--color-success)]" />
-          Выручка
+          {t.chartRevenue}
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm bg-[var(--color-danger)]/40" />
-          Себестоимость бар
+          {t.chartBarCost}
         </div>
         {showHookah && (
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-sm bg-[var(--color-warning)]/60" />
-            Расход табака
+            {t.chartTobaccoCost}
           </div>
         )}
       </div>

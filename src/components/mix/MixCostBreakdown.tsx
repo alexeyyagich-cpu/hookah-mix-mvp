@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import type { Tobacco } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
 import {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€' }: Props) {
+  const t = useTranslation('hookah')
   const [sellingPrice, setSellingPrice] = useState<string>('')
 
   const costResult = useMemo(
@@ -55,7 +57,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
       >
         <p className="flex items-center gap-2">
           <IconCoin size={18} />
-          <span>Укажите цены закупки в инвентаре для расчёта себестоимости</span>
+          <span>{t.mixCostNoPricing}</span>
         </p>
       </div>
     )
@@ -67,7 +69,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
       <div className="flex items-center gap-2">
         <IconCoin size={18} className="text-[var(--color-primary)]" />
         <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-          Себестоимость
+          {t.mixCostHeader}
         </h3>
       </div>
 
@@ -88,7 +90,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
                 {item.tobacco.flavor}
               </span>
               <span style={{ color: 'var(--color-textMuted)' }}>
-                ({item.grams.toFixed(1)}г)
+                ({item.grams.toFixed(1)}g)
               </span>
             </div>
             <span
@@ -110,7 +112,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
           }}
         >
           <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-            Итого себестоимость:
+            {t.mixCostTotal}
           </span>
           <span
             className="text-xl font-bold"
@@ -130,7 +132,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
             color: 'var(--color-warning)',
           }}
         >
-          Нет цен: {costResult.missingPrices.join(', ')}
+          {t.mixCostMissing(costResult.missingPrices.join(', '))}
         </div>
       )}
 
@@ -157,7 +159,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
           {/* Custom price input */}
           <div className="flex items-center gap-3">
             <label className="text-sm" style={{ color: 'var(--color-textMuted)' }}>
-              Цена продажи:
+              {t.mixCostSellingPrice}
             </label>
             <div className="relative flex-1 max-w-[150px]">
               <span
@@ -195,7 +197,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
             >
               <div>
                 <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                  Прибыль
+                  {t.mixCostProfit}
                 </p>
                 <p
                   className="text-lg font-bold"
@@ -208,7 +210,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
               </div>
               <div className="text-right">
                 <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                  Маржа
+                  {t.mixCostMargin}
                 </p>
                 <p
                   className="text-lg font-bold"

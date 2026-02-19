@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, BarPortionUnit } from '@/types/database'
-import { COCKTAIL_METHOD_LABELS, GLASS_LABELS, RECIPE_PRESETS, type RecipePreset } from '@/data/bar-recipes'
+import { RECIPE_PRESETS, type RecipePreset } from '@/data/bar-recipes'
 import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
 
 type RecipeInput = Omit<BarRecipe, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'>
@@ -16,7 +17,7 @@ interface AddRecipeModalProps {
 }
 
 const METHODS: CocktailMethod[] = ['build', 'stir', 'shake', 'blend', 'layer', 'muddle']
-const GLASSES = Object.keys(GLASS_LABELS)
+const GLASS_KEYS = ['highball', 'rocks', 'coupe', 'flute', 'martini', 'collins', 'hurricane', 'shot', 'wine', 'beer', 'copper_mug', 'tiki', 'other']
 const PORTION_UNITS: BarPortionUnit[] = ['ml', 'g', 'pcs', 'oz', 'cl', 'dash', 'barspoon', 'drop', 'slice', 'sprig', 'wedge', 'twist']
 
 interface IngredientRow {
@@ -29,6 +30,20 @@ interface IngredientRow {
 }
 
 export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRecipeModalProps) {
+  const t = useTranslation('bar')
+
+  const METHOD_LABELS: Record<string, string> = {
+    build: t.methodBuild, stir: t.methodStir, shake: t.methodShake,
+    blend: t.methodBlend, layer: t.methodLayer, muddle: t.methodMuddle,
+  }
+  const GLASS_LABELS: Record<string, string> = {
+    highball: t.glassHighball, rocks: t.glassRocks, coupe: t.glassCoupe,
+    flute: t.glassFlute, martini: t.glassMartini, collins: t.glassCollins,
+    hurricane: t.glassHurricane, shot: t.glassShot, wine: t.glassWine,
+    beer: t.glassBeer, copper_mug: t.glassCopperMug, tiki: t.glassTiki,
+    other: t.glassOther,
+  }
+
   const [mode, setMode] = useState<'preset' | 'custom'>('preset')
   const [presetFilter, setPresetFilter] = useState('')
 
@@ -187,7 +202,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">
-              {editingRecipe ? 'Редактировать рецепт' : 'Новый рецепт'}
+              {editingRecipe ? t.editRecipe : t.newRecipeTitle}
             </h2>
             <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,7 +219,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   mode === 'preset' ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
                 }`}
               >
-                Из каталога
+                {t.fromCatalog}
               </button>
               <button
                 onClick={() => setMode('custom')}
@@ -212,7 +227,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   mode === 'custom' ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
                 }`}
               >
-                Свой рецепт
+                {t.customRecipe}
               </button>
             </div>
           )}
@@ -225,7 +240,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 type="text"
                 value={presetFilter}
                 onChange={e => setPresetFilter(e.target.value)}
-                placeholder="Поиск коктейля..."
+                placeholder={t.searchCocktail}
                 className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               />
               <div className="space-y-1 max-h-[50vh] overflow-y-auto">
@@ -238,7 +253,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium">{preset.name}</div>
                       <div className="text-xs text-[var(--color-textMuted)]">
-                        {preset.name_en} · {COCKTAIL_METHOD_LABELS[preset.method]} · {preset.ingredients.length} ингр.
+                        {preset.name_en} · {METHOD_LABELS[preset.method]} · {preset.ingredients.length} {t.ingredientsShort}
                       </div>
                     </div>
                     <svg className="w-4 h-4 text-[var(--color-textMuted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -253,11 +268,11 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
               {/* Basic Info */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Название *</label>
+                  <label className="block text-sm font-medium">{t.nameRequired}</label>
                   <input
                     type="text" value={name} onChange={e => setName(e.target.value)} required
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                    placeholder="Мохито"
+                    placeholder="Mojito"
                   />
                 </div>
                 <div className="space-y-2">
@@ -272,36 +287,36 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Метод</label>
+                  <label className="block text-sm font-medium">{t.methodLabel}</label>
                   <select value={method} onChange={e => setMethod(e.target.value as CocktailMethod)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                   >
-                    {METHODS.map(m => <option key={m} value={m}>{COCKTAIL_METHOD_LABELS[m]}</option>)}
+                    {METHODS.map(m => <option key={m} value={m}>{METHOD_LABELS[m]}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Бокал</label>
+                  <label className="block text-sm font-medium">{t.glassLabel}</label>
                   <select value={glass} onChange={e => setGlass(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                   >
-                    {GLASSES.map(g => <option key={g} value={g}>{GLASS_LABELS[g]}</option>)}
+                    {GLASS_KEYS.map(g => <option key={g} value={g}>{GLASS_LABELS[g]}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Сложность</label>
+                  <label className="block text-sm font-medium">{t.difficultyLabel}</label>
                   <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                   >
-                    <option value="1">Легко</option>
-                    <option value="2">Средне</option>
-                    <option value="3">Сложно</option>
+                    <option value="1">{t.easy}</option>
+                    <option value="2">{t.medium}</option>
+                    <option value="3">{t.hard}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Цена в меню (EUR)</label>
+                  <label className="block text-sm font-medium">{t.menuPriceEur}</label>
                   <input
                     type="number" step="0.01" value={menuPrice} onChange={e => setMenuPrice(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
@@ -309,11 +324,11 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">Гарнир</label>
+                  <label className="block text-sm font-medium">{t.garnishLabel}</label>
                   <input
                     type="text" value={garnish} onChange={e => setGarnish(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                    placeholder="Мята, лайм"
+                    placeholder={t.garnishPlaceholder}
                   />
                 </div>
               </div>
@@ -321,17 +336,17 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
               {/* Ingredients */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Ингредиенты *</label>
+                  <label className="text-sm font-medium">{t.ingredientsRequired}</label>
                   <button type="button" onClick={addIngredientRow}
                     className="text-xs text-[var(--color-primary)] hover:underline"
                   >
-                    + Добавить
+                    + {t.addBtn}
                   </button>
                 </div>
 
                 {ingredients.length === 0 && (
                   <p className="text-sm text-[var(--color-textMuted)] text-center py-4">
-                    Добавьте хотя бы один ингредиент
+                    {t.addAtLeastOne}
                   </p>
                 )}
 
@@ -355,7 +370,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                       type="text"
                       value={ing.ingredient_name}
                       onChange={e => updateIngredient(ing.key, 'ingredient_name', e.target.value)}
-                      placeholder="Название"
+                      placeholder={t.ingredientName}
                       className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
                     />
                     <input
@@ -390,7 +405,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
               <div className="flex gap-3 pt-2">
                 {!editingRecipe && (
                   <button type="button" onClick={() => setMode('preset')} className="btn btn-ghost">
-                    Назад
+                    {t.back}
                   </button>
                 )}
                 <button
@@ -398,7 +413,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   disabled={saving || !name.trim() || ingredients.length === 0}
                   className="btn btn-primary flex-1 disabled:opacity-50"
                 >
-                  {saving ? 'Сохранение...' : editingRecipe ? 'Сохранить' : 'Создать рецепт'}
+                  {saving ? t.saving : editingRecipe ? t.save : t.createRecipeBtn}
                 </button>
               </div>
             </form>

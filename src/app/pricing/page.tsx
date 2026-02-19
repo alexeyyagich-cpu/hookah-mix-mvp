@@ -16,67 +16,86 @@ const STRIPE_PRICES = {
   enterprise_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_YEARLY,
 }
 
-const plans = [
-  {
-    id: 'free',
-    name: 'Free',
-    priceMonthly: 0,
-    priceYearly: 0,
-    description: 'Для пробного использования',
-    features: [
-      { name: 'Позиций в инвентаре', value: '20', included: true },
-      { name: 'История сессий', value: '30 дней', included: true },
-      { name: 'Типов чаш', value: '3', included: true },
-      { name: 'Базовая статистика', included: true },
-      { name: 'Маркетплейс', included: false },
-      { name: 'Управление командой', included: false },
-      { name: 'API доступ', included: false },
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
+// Plans are built inside component to use i18n keys
+const PLAN_CONFIG = {
+  free: { priceMonthly: 0, priceYearly: 0 },
+  pro: {
     priceMonthly: 900,
     priceYearly: 9900,
     stripePriceMonthly: STRIPE_PRICES.pro_monthly,
     stripePriceYearly: STRIPE_PRICES.pro_yearly,
-    description: 'Для активных заведений',
-    features: [
-      { name: 'Позиций в инвентаре', value: '∞', included: true },
-      { name: 'История сессий', value: '∞', included: true },
-      { name: 'Типов чаш', value: '∞', included: true },
-      { name: 'Полная статистика', included: true },
-      { name: 'Маркетплейс', included: true },
-      { name: 'Экспорт CSV/PDF', included: true },
-      { name: 'Email уведомления', included: true },
-    ],
     isPopular: true,
   },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
+  enterprise: {
     priceMonthly: 2900,
     priceYearly: 29900,
     stripePriceMonthly: STRIPE_PRICES.enterprise_monthly,
     stripePriceYearly: STRIPE_PRICES.enterprise_yearly,
-    description: 'Для сетей заведений',
-    features: [
-      { name: 'Всё из Pro', value: '+', included: true },
-      { name: 'Неограниченные локации', included: true },
-      { name: 'Управление командой', included: true },
-      { name: 'Авто-заказ табака', included: true },
-      { name: 'API доступ', included: true },
-      { name: 'Кастомные интеграции', included: true },
-      { name: 'White-label брендинг', included: true },
-      { name: 'Приоритетная поддержка 24/7', included: true },
-      { name: 'Персональный менеджер', included: true },
-    ],
   },
-]
+}
 
 function PricingPageContent() {
   const tm = useTranslation('manage')
+  const ta = useTranslation('auth')
   const { user } = useAuth()
+
+  const plans = [
+    {
+      id: 'free',
+      name: 'Free',
+      priceMonthly: PLAN_CONFIG.free.priceMonthly,
+      priceYearly: PLAN_CONFIG.free.priceYearly,
+      description: ta.planDescFree,
+      features: [
+        { name: ta.featureInventoryItems, value: '20', included: true },
+        { name: ta.featureSessionHistory, value: ta.featureSessionDays('30'), included: true },
+        { name: ta.featureBowlTypes, value: '3', included: true },
+        { name: ta.featureBasicStats, included: true },
+        { name: ta.featureMarketplace, included: false },
+        { name: ta.featureTeamManagement, included: false },
+        { name: ta.featureApiAccess, included: false },
+      ],
+    },
+    {
+      id: 'pro',
+      name: 'Pro',
+      priceMonthly: PLAN_CONFIG.pro.priceMonthly,
+      priceYearly: PLAN_CONFIG.pro.priceYearly,
+      stripePriceMonthly: PLAN_CONFIG.pro.stripePriceMonthly,
+      stripePriceYearly: PLAN_CONFIG.pro.stripePriceYearly,
+      description: ta.planDescPro,
+      features: [
+        { name: ta.featureInventoryItems, value: '∞', included: true },
+        { name: ta.featureSessionHistory, value: '∞', included: true },
+        { name: ta.featureBowlTypes, value: '∞', included: true },
+        { name: ta.featureFullStats, included: true },
+        { name: ta.featureMarketplace, included: true },
+        { name: ta.featureExportCsvPdf, included: true },
+        { name: ta.featureEmailNotifications, included: true },
+      ],
+      isPopular: true,
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      priceMonthly: PLAN_CONFIG.enterprise.priceMonthly,
+      priceYearly: PLAN_CONFIG.enterprise.priceYearly,
+      stripePriceMonthly: PLAN_CONFIG.enterprise.stripePriceMonthly,
+      stripePriceYearly: PLAN_CONFIG.enterprise.stripePriceYearly,
+      description: ta.planDescEnterprise,
+      features: [
+        { name: ta.featureAllFromPro, value: '+', included: true },
+        { name: ta.featureUnlimitedLocations, included: true },
+        { name: ta.featureTeamManagement, included: true },
+        { name: ta.featureAutoOrder, included: true },
+        { name: ta.featureApiAccess, included: true },
+        { name: ta.featureCustomIntegrations, included: true },
+        { name: ta.featureWhiteLabel, included: true },
+        { name: ta.featurePrioritySupport, included: true },
+        { name: ta.featurePersonalManager, included: true },
+      ],
+    },
+  ]
   const { tier } = useSubscription()
   const searchParams = useSearchParams()
   const [isYearly, setIsYearly] = useState(true)
@@ -109,7 +128,7 @@ function PricingPageContent() {
     // Check if Stripe is configured
     const priceId = isYearly ? plan.stripePriceYearly : plan.stripePriceMonthly
     if (!priceId) {
-      alert('Stripe не настроен. Добавьте STRIPE_PRICE_* в переменные окружения.')
+      alert(ta.stripeNotConfigured)
       return
     }
 
@@ -136,7 +155,7 @@ function PricingPageContent() {
       }
     } catch (error) {
       void error
-      alert('Ошибка при создании сессии оплаты. Попробуйте позже.')
+      alert(ta.paymentError)
     } finally {
       setLoadingPlan(null)
     }
@@ -159,15 +178,15 @@ function PricingPageContent() {
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/mix" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-              Калькулятор
+              {ta.navCalculator}
             </Link>
             {user ? (
               <Link href="/dashboard" className="btn btn-primary">
-                Личный кабинет
+                {ta.dashboard}
               </Link>
             ) : (
               <Link href="/login" className="btn btn-primary">
-                Войти
+                {ta.signIn}
               </Link>
             )}
           </div>
@@ -179,7 +198,7 @@ function PricingPageContent() {
         {/* Canceled message */}
         {canceled && (
           <div className="mb-8 p-4 rounded-xl bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-center">
-            Оплата была отменена. Выберите тариф, чтобы попробовать снова.
+            {ta.paymentCanceled}
           </div>
         )}
 
@@ -189,7 +208,7 @@ function PricingPageContent() {
             {tm.pricingSubtitle}
           </h1>
           <p className="text-xl text-[var(--color-textMuted)] max-w-2xl mx-auto">
-            Инструменты для учета табака, анализа сессий и оптимизации работы вашего заведения
+            {ta.pricingHeroSubtitle}
           </p>
         </div>
 
@@ -203,7 +222,7 @@ function PricingPageContent() {
                 : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
             }`}
           >
-            Ежемесячно
+            {ta.billingMonthly}
           </button>
           <button
             onClick={() => setIsYearly(true)}
@@ -213,7 +232,7 @@ function PricingPageContent() {
                 : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
             }`}
           >
-            Ежегодно
+            {ta.billingYearly}
             <span className={`text-xs px-2 py-0.5 rounded-full ${
               isYearly ? 'bg-white/20' : 'bg-[var(--color-success)] text-white'
             }`}>
@@ -227,13 +246,13 @@ function PricingPageContent() {
           {plans.map((plan) => {
             const price = isYearly ? plan.priceYearly : plan.priceMonthly
             const priceDisplay = price === 0
-              ? 'Бесплатно'
+              ? ta.priceFree
               : isYearly
-                ? `$${(price / 100).toLocaleString('en-US')}/год`
-                : `$${(price / 100).toLocaleString('en-US')}/мес`
+                ? ta.pricePerYear(`$${(price / 100).toLocaleString('en-US')}`)
+                : ta.pricePerMonth(`$${(price / 100).toLocaleString('en-US')}`)
 
             const monthlyEquivalent = isYearly && price > 0
-              ? `≈ $${Math.round(price / 12 / 100)}/мес`
+              ? ta.priceMonthlyEquiv(`$${Math.round(price / 12 / 100)}`)
               : null
 
             return (
@@ -252,8 +271,8 @@ function PricingPageContent() {
                   tier === plan.id
                     ? tm.currentPlan
                     : price === 0
-                      ? 'Начать бесплатно'
-                      : 'Подключить'
+                      ? ta.startFree
+                      : ta.subscribe
                 }
               />
             )
@@ -262,33 +281,15 @@ function PricingPageContent() {
 
         {/* FAQ */}
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-8">Часто задаваемые вопросы</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">{ta.faqTitle}</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              {
-                q: 'Могу ли я отменить подписку?',
-                a: 'Да, вы можете отменить подписку в любой момент из личного кабинета. Доступ сохранится до конца оплаченного периода.',
-              },
-              {
-                q: 'Какие способы оплаты доступны?',
-                a: 'Мы принимаем банковские карты (Visa, Mastercard, American Express) через безопасную платежную систему Stripe.',
-              },
-              {
-                q: 'Есть ли пробный период для Pro?',
-                a: 'Да, для новых пользователей доступен 14-дневный пробный период Pro без ограничений и без карты.',
-              },
-              {
-                q: 'Могу ли я перейти на другой тариф?',
-                a: 'Да, вы можете повысить или понизить тариф в любой момент через личный кабинет.',
-              },
-              {
-                q: 'Что будет с моими данными при понижении тарифа?',
-                a: 'Ваши данные сохранятся, но доступ к некоторым функциям будет ограничен согласно выбранному тарифу.',
-              },
-              {
-                q: 'Возможен ли возврат средств?',
-                a: 'Да, в течение 14 дней после оплаты вы можете запросить полный возврат средств.',
-              },
+              { q: ta.faqQ1, a: ta.faqA1 },
+              { q: ta.faqQ2, a: ta.faqA2 },
+              { q: ta.faqQ3, a: ta.faqA3 },
+              { q: ta.faqQ4, a: ta.faqA4 },
+              { q: ta.faqQ5, a: ta.faqA5 },
+              { q: ta.faqQ6, a: ta.faqA6 },
             ].map((faq, index) => (
               <div key={index} className="card p-5">
                 <h3 className="font-semibold mb-2">{faq.q}</h3>
@@ -301,7 +302,7 @@ function PricingPageContent() {
         {/* CTA */}
         <div className="mt-16 text-center">
           <p className="text-[var(--color-textMuted)] mb-4">
-            Есть вопросы? Напишите нам
+            {ta.contactCta}
           </p>
           <a
             href="mailto:support@hookah-torus.com"

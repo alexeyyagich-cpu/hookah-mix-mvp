@@ -1,5 +1,9 @@
 'use client'
 
+import { useTranslation, useLocale } from '@/lib/i18n'
+
+const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+
 interface DailyData {
   date: string
   grams: number
@@ -11,15 +15,18 @@ interface ConsumptionChartProps {
 }
 
 export function ConsumptionChart({ data }: ConsumptionChartProps) {
+  const t = useTranslation('manage')
+  const { locale } = useLocale()
+
   if (!data || data.length === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-[var(--color-textMuted)]">
-        Нет данных для отображения
+        {t.noChartData}
       </div>
     )
   }
 
-const maxGrams = Math.max(...data.map(d => d.grams), 1)
+  const maxGrams = Math.max(...data.map(d => d.grams), 1)
   const chartHeight = 140 // Fixed height in pixels
 
   return (
@@ -37,8 +44,8 @@ const maxGrams = Math.max(...data.map(d => d.grams), 1)
             >
               {/* Tooltip - absolute positioned */}
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
-                <div className="font-medium">{day.grams}г</div>
-                <div className="text-[var(--color-textMuted)]">{day.sessions} сес.</div>
+                <div className="font-medium">{day.grams}g</div>
+                <div className="text-[var(--color-textMuted)]">{t.chartSessions(day.sessions)}</div>
               </div>
 
               {/* Bar */}
@@ -57,7 +64,7 @@ const maxGrams = Math.max(...data.map(d => d.grams), 1)
           <div key={day.date} className="flex-1 text-center">
             {(data.length <= 7 || index === 0 || index === data.length - 1) && (
               <div className="text-[10px] text-[var(--color-textMuted)]">
-                {new Date(day.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                {new Date(day.date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', { day: 'numeric', month: 'short' })}
               </div>
             )}
           </div>
@@ -68,7 +75,7 @@ const maxGrams = Math.max(...data.map(d => d.grams), 1)
       <div className="flex items-center justify-center gap-6 text-sm text-[var(--color-textMuted)]">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-[var(--color-primary)]" />
-          Расход (г)
+          {t.chartConsumptionG}
         </div>
       </div>
     </div>

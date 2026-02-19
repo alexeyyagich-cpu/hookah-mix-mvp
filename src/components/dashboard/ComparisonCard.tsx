@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 interface ComparisonCardProps {
   icon: ReactNode
@@ -21,6 +22,7 @@ export function ComparisonCard({
   isPercentChange = true,
   invertColor = false,
 }: ComparisonCardProps) {
+  const t = useTranslation('manage')
   const isPositive = invertColor ? change < 0 : change > 0
   const isNegative = invertColor ? change > 0 : change < 0
 
@@ -48,7 +50,7 @@ export function ComparisonCard({
         {/* Period A (Current) */}
         <div>
           <div className="text-2xl font-bold">{periodAValue}</div>
-          <div className="text-xs text-[var(--color-textMuted)]">Текущий</div>
+          <div className="text-xs text-[var(--color-textMuted)]">{t.periodCurrent}</div>
         </div>
 
         {/* Change indicator */}
@@ -65,7 +67,7 @@ export function ComparisonCard({
         {/* Period B (Previous) */}
         <div className="text-right">
           <div className="text-lg text-[var(--color-textMuted)]">{periodBValue}</div>
-          <div className="text-xs text-[var(--color-textMuted)]">Предыдущий</div>
+          <div className="text-xs text-[var(--color-textMuted)]">{t.periodPrevious}</div>
         </div>
       </div>
     </div>

@@ -229,4 +229,11 @@ export const market: typeof MarketType = {
   // Supplier card
   daysDelivery: (min: number, max: number) => `${min}-${max} Tage`,
   minOrderCard: (amount: number) => `Mindestbestellung: ${amount}\u20AC`,
+
+  // Units
+  gramsShort: 'g',
+  perPiece: 'Stk.',
+  packageInfo: (qty: number, grams: number, price: number) => `${qty} × ${grams}g • ${price}€/Stk.`,
+  totalGrams: (grams: number) => `${grams}g`,
+  packagePriceInfo: (grams: number, price: number) => `${grams}g für ${price}€`,
 }

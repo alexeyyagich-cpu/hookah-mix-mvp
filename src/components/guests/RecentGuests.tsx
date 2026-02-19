@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useInventory } from '@/lib/hooks/useInventory'
 import {
@@ -19,6 +20,7 @@ interface RecentGuestsProps {
 }
 
 export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) {
+  const t = useTranslation('hookah')
   const { recentGuests, loading, isOffline, searchGuests } = useGuests()
   const { inventory, loading: inventoryLoading } = useInventory()
   const [searchQuery, setSearchQuery] = useState('')
@@ -70,7 +72,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
   if (loading) {
     return (
       <div className="p-4 text-center" style={{ color: 'var(--color-textMuted)' }}>
-        Загрузка гостей...
+        {t.guestLoading}
       </div>
     )
   }
@@ -87,7 +89,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
           }}
         >
           <span>📴</span>
-          <span>Офлайн режим — данные из кэша</span>
+          <span>{t.guestOffline}</span>
         </div>
       )}
 
@@ -97,7 +99,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Поиск гостя по имени..."
+          placeholder={t.guestSearchPlaceholder}
           className="w-full px-4 py-3 pl-10 rounded-xl text-sm"
           style={{
             background: 'var(--color-bgHover)',
@@ -136,13 +138,13 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                   {selectedGuest.name}
                 </p>
                 <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                  {selectedGuest.visit_count} визитов
+                  {t.guestVisits(selectedGuest.visit_count)}
                 </p>
               </div>
             </div>
             <button
               onClick={handleClose}
-              aria-label="Закрыть информацию о госте"
+              aria-label={t.guestCloseInfo}
               className="icon-btn icon-btn-sm icon-btn-ghost"
             >
               <span aria-hidden="true">×</span>
@@ -155,7 +157,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
               {/* Mix preview */}
               <div className="space-y-2">
                 <p className="text-xs font-medium" style={{ color: 'var(--color-textMuted)' }}>
-                  Последний микс
+                  {t.guestLastMix}
                 </p>
                 {repeatResult.tobaccos.map((item, idx) => (
                   <div
@@ -187,12 +189,12 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
               {/* Mix info */}
               <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--color-textMuted)' }}>
                 {repeatResult.snapshot.compatibility_score && (
-                  <span>Совместимость: <strong style={{ color: 'var(--color-success)' }}>{repeatResult.snapshot.compatibility_score}%</strong></span>
+                  <span>{t.guestCompatibility} <strong style={{ color: 'var(--color-success)' }}>{repeatResult.snapshot.compatibility_score}%</strong></span>
                 )}
                 {repeatResult.snapshot.bowl_type && (
-                  <span>Чаша: {repeatResult.snapshot.bowl_type}</span>
+                  <span>{t.guestBowl} {repeatResult.snapshot.bowl_type}</span>
                 )}
-                <span>{repeatResult.snapshot.total_grams}г</span>
+                <span>{repeatResult.snapshot.total_grams}g</span>
               </div>
 
               {/* Heat recommendation */}
@@ -235,7 +237,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                   color: 'white',
                 }}
               >
-                🔄 Повторить последний микс
+                {t.guestRepeatMix}
               </button>
             </div>
           ) : (
@@ -251,7 +253,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                 <p className="font-medium">{repeatResult.message}</p>
                 {repeatResult.error === 'NO_LAST_MIX' && (
                   <p className="text-xs mt-2 opacity-80">
-                    Создайте микс для этого гостя
+                    {t.guestCreateMixHint}
                   </p>
                 )}
               </div>
@@ -265,7 +267,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
         <div className="space-y-2">
           {displayGuests.length === 0 ? (
             <div className="p-6 text-center" style={{ color: 'var(--color-textMuted)' }}>
-              {searchQuery ? 'Гости не найдены' : 'Нет недавних гостей'}
+              {searchQuery ? t.guestNotFound : t.guestNoRecent}
             </div>
           ) : (
             displayGuests.map(guest => (
@@ -291,15 +293,15 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                   <div className="flex items-center gap-2 mt-0.5">
                     {guest.last_mix_snapshot ? (
                       <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--color-success)', color: 'white' }}>
-                        Есть микс
+                        {t.guestHasMix}
                       </span>
                     ) : (
                       <span className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                        Нет микса
+                        {t.guestNoMix}
                       </span>
                     )}
                     <span className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                      {guest.visit_count} визитов
+                      {t.guestVisits(guest.visit_count)}
                     </span>
                   </div>
                 </div>

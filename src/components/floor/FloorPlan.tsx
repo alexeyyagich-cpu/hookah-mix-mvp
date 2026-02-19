@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { useTranslation } from '@/lib/i18n'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconPlus, IconSettings } from '@/components/Icons'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
@@ -28,20 +29,21 @@ const STATUS_COLORS: Record<TableStatus, { bg: string; border: string; text: str
   },
 }
 
-const STATUS_LABELS: Record<TableStatus, string> = {
-  available: 'Свободен',
-  occupied: 'Занят',
-  reserved: 'Забронирован',
-  cleaning: 'Уборка',
-}
-
 interface FloorPlanProps {
   onTableSelect?: (table: FloorTable) => void
   editable?: boolean
 }
 
 export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
+  const t = useTranslation('manage')
   const { tables, loading, addTable, updateTable, deleteTable, moveTable, setTableStatus } = useFloorPlan()
+
+  const STATUS_LABELS: Record<TableStatus, string> = {
+    available: t.statusAvailable,
+    occupied: t.statusOccupied,
+    reserved: t.statusReserved,
+    cleaning: t.statusCleaning,
+  }
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -100,9 +102,9 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
     const start = new Date(startTime)
     const now = new Date()
     const minutes = Math.floor((now.getTime() - start.getTime()) / 60000)
-    if (minutes < 60) return `${minutes} мин`
+    if (minutes < 60) return t.durationMin(minutes)
     const hours = Math.floor(minutes / 60)
-    return `${hours}ч ${minutes % 60}м`
+    return t.durationHourMin(hours, minutes % 60)
   }
 
   if (loading) {
@@ -139,7 +141,7 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
             }}
           >
             <IconPlus size={16} />
-            Добавить стол
+            {t.addTableBtn}
           </button>
         )}
       </div>
@@ -225,10 +227,10 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
         {tables.length === 0 && (
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <p className="text-lg font-medium mb-2" style={{ color: 'var(--color-textMuted)' }}>
-              Нет столов
+              {t.noTablesEmpty}
             </p>
             <p className="text-sm mb-4" style={{ color: 'var(--color-textMuted)' }}>
-              Добавьте столы для визуализации зала
+              {t.addTablesHint}
             </p>
             {editable && (
               <button
@@ -240,7 +242,7 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
                 }}
               >
                 <IconPlus size={18} />
-                Добавить стол
+                {t.addTableBtn}
               </button>
             )}
           </div>
@@ -320,6 +322,15 @@ interface TableModalProps {
 }
 
 function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableModalProps) {
+  const t = useTranslation('manage')
+
+  const STATUS_LABELS: Record<TableStatus, string> = {
+    available: t.statusAvailable,
+    occupied: t.statusOccupied,
+    reserved: t.statusReserved,
+    cleaning: t.statusCleaning,
+  }
+
   const [name, setName] = useState(table?.name || '')
   const [capacity, setCapacity] = useState(table?.capacity?.toString() || '4')
   const [shape, setShape] = useState<TableShape>(table?.shape || 'circle')
@@ -355,7 +366,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
-            {table ? 'Редактировать стол' : 'Новый стол'}
+            {table ? t.editTableTitle : t.newTableTitle}
           </h2>
           <button
             onClick={onClose}
@@ -368,12 +379,12 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Название</label>
+            <label className="block text-sm font-medium mb-1">{t.labelName}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Стол 1"
+              placeholder={t.placeholderTable}
               className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               required
             />
@@ -381,7 +392,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Вместимость</label>
+              <label className="block text-sm font-medium mb-1">{t.labelCapacity}</label>
               <input
                 type="number"
                 value={capacity}
@@ -392,22 +403,22 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Форма</label>
+              <label className="block text-sm font-medium mb-1">{t.labelShape}</label>
               <select
                 value={shape}
                 onChange={(e) => setShape(e.target.value as TableShape)}
                 className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               >
-                <option value="circle">Круглый</option>
-                <option value="square">Квадратный</option>
-                <option value="rectangle">Прямоугольный</option>
+                <option value="circle">{t.shapeCircle}</option>
+                <option value="square">{t.shapeSquare}</option>
+                <option value="rectangle">{t.shapeRectangle}</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Ширина (px)</label>
+              <label className="block text-sm font-medium mb-1">{t.labelWidth}</label>
               <input
                 type="number"
                 value={width}
@@ -418,7 +429,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Высота (px)</label>
+              <label className="block text-sm font-medium mb-1">{t.labelHeight}</label>
               <input
                 type="number"
                 value={height}
@@ -431,11 +442,11 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Заметки</label>
+            <label className="block text-sm font-medium mb-1">{t.labelNotes}</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="VIP-зона, у окна..."
+              placeholder={t.placeholderNotes}
               rows={2}
               className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none resize-none"
             />
@@ -444,7 +455,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
           {/* Status buttons for editing */}
           {table && onStatusChange && (
             <div>
-              <label className="block text-sm font-medium mb-2">Статус</label>
+              <label className="block text-sm font-medium mb-2">{t.labelStatus}</label>
               <div className="flex flex-wrap gap-2">
                 {(Object.keys(STATUS_LABELS) as TableStatus[]).map(status => (
                   <button
@@ -478,7 +489,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
                   color: 'white',
                 }}
               >
-                Удалить
+                {t.deleteBtn}
               </button>
             )}
             <div className="flex-1" />
@@ -491,7 +502,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
                 color: 'var(--color-text)',
               }}
             >
-              Отмена
+              {t.cancelBtn}
             </button>
             <button
               type="submit"
@@ -502,7 +513,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
                 color: 'var(--color-bg)',
               }}
             >
-              {saving ? 'Сохранение...' : 'Сохранить'}
+              {saving ? t.saving : t.saveBtn}
             </button>
           </div>
         </form>

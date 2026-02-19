@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
+import { useTranslation } from '@/lib/i18n'
 
 export function FloorStatusWidget() {
+  const t = useTranslation('manage')
   const { tables, loading } = useFloorPlan()
 
   if (loading || tables.length === 0) return null
@@ -14,17 +16,17 @@ export function FloorStatusWidget() {
   const cleaning = tables.filter(t => t.status === 'cleaning').length
 
   const statuses = [
-    { label: 'Свободно', count: available, color: 'var(--color-success)' },
-    { label: 'Занято', count: occupied, color: 'var(--color-danger)' },
-    { label: 'Бронь', count: reserved, color: 'var(--color-primary)' },
-    { label: 'Уборка', count: cleaning, color: 'var(--color-textMuted)' },
+    { label: t.widgetAvailable, count: available, color: 'var(--color-success)' },
+    { label: t.widgetOccupied, count: occupied, color: 'var(--color-danger)' },
+    { label: t.widgetReserved, count: reserved, color: 'var(--color-primary)' },
+    { label: t.widgetCleaning, count: cleaning, color: 'var(--color-textMuted)' },
   ]
 
   return (
     <Link href="/floor" className="card p-4 flex items-center justify-between hover:border-[var(--color-borderAccent)] transition-colors">
       <div className="flex items-center gap-3">
         <span className="text-lg">🗺️</span>
-        <span className="text-sm font-medium">Зал</span>
+        <span className="text-sm font-medium">{t.widgetFloor}</span>
       </div>
       <div className="flex items-center gap-4">
         {statuses.map(s => s.count > 0 && (
