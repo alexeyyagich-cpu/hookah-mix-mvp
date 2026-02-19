@@ -7,6 +7,10 @@ import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { IconSettings, IconCalendar } from '@/components/Icons'
 import { useTranslation, useLocale } from '@/lib/i18n'
+import { useAuth } from '@/lib/AuthContext'
+import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 import type { FloorTable, ReservationStatus } from '@/types/database'
@@ -22,17 +26,27 @@ export default function FloorPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
+  const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const floorPlan = useFloorPlan()
   const { tables, setTableStatus, loading } = floorPlan
-  const { reservations } = useReservations()
+  const { reservations, assignTable, refresh: refreshReservations } = useReservations()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
+  const [showQuickReserve, setShowQuickReserve] = useState(false)
+  const [showLinkPicker, setShowLinkPicker] = useState(false)
+  const [quickReserving, setQuickReserving] = useState(false)
+  const [quickForm, setQuickForm] = useState({
+    guest_name: '',
+    guest_phone: '',
+    guest_count: '2',
+    reservation_time: '',
+  })
 
   const today = new Date().toISOString().split('T')[0]
   const todayReservations = reservations
     .filter(r => r.reservation_date === today && r.status !== 'cancelled' && r.status !== 'completed')
     .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
-    .slice(0, 5)
 
   const stats = {
     total: tables.length,
@@ -46,8 +60,85 @@ export default function FloorPage() {
     ? tables.find(t => t.id === selectedTable.id) || selectedTable
     : null
 
+  // Find reservation linked to selected table
+  const linkedReservation = activeSelectedTable
+    ? todayReservations.find(r => r.table_id === activeSelectedTable.id)
+    : null
+
+  // Unlinked today's reservations (for link picker)
+  const unlinkedReservations = todayReservations.filter(r => !r.table_id)
+
   const handleTableSelect = (table: FloorTable) => {
     setSelectedTable(table)
+    setShowQuickReserve(false)
+    setShowLinkPicker(false)
+  }
+
+  const handleQuickReserve = async () => {
+    if (!activeSelectedTable || !quickForm.guest_name || !quickForm.reservation_time) return
+    setQuickReserving(true)
+
+    try {
+      if (isDemoMode) {
+        // Demo mode: just set table status
+        await setTableStatus(activeSelectedTable.id, 'reserved', quickForm.guest_name)
+        setShowQuickReserve(false)
+        setQuickForm({ guest_name: '', guest_phone: '', guest_count: '2', reservation_time: '' })
+        setQuickReserving(false)
+        return
+      }
+
+      if (!user || !isSupabaseConfigured) return
+      const supabase = createClient()
+
+      // Create reservation in DB
+      const { data: newRes, error } = await supabase
+        .from('reservations')
+        .insert({
+          profile_id: user.id,
+          table_id: activeSelectedTable.id,
+          guest_name: quickForm.guest_name,
+          guest_phone: quickForm.guest_phone || null,
+          guest_count: parseInt(quickForm.guest_count) || 2,
+          reservation_date: today,
+          reservation_time: quickForm.reservation_time,
+          source: 'walk_in' as const,
+          ...(organizationId ? { organization_id: organizationId } : {}),
+          ...(locationId ? { location_id: locationId } : {}),
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Set table status to reserved with guest name
+      await setTableStatus(activeSelectedTable.id, 'reserved', quickForm.guest_name)
+      await refreshReservations()
+
+      setShowQuickReserve(false)
+      setQuickForm({ guest_name: '', guest_phone: '', guest_count: '2', reservation_time: '' })
+    } catch (err) {
+      console.error('Quick reserve error:', err)
+    }
+    setQuickReserving(false)
+  }
+
+  const handleLinkReservation = async (reservationId: string) => {
+    if (!activeSelectedTable) return
+    await assignTable(reservationId, activeSelectedTable.id)
+
+    // Find the reservation to get the guest name
+    const res = todayReservations.find(r => r.id === reservationId)
+    if (res) {
+      await setTableStatus(activeSelectedTable.id, 'reserved', res.guest_name)
+    }
+    setShowLinkPicker(false)
+  }
+
+  const handleUnlinkReservation = async () => {
+    if (!linkedReservation || !activeSelectedTable) return
+    await assignTable(linkedReservation.id, null)
+    await setTableStatus(activeSelectedTable.id, 'available')
   }
 
   return (
@@ -114,7 +205,7 @@ export default function FloorPage() {
           <p className="text-sm text-[var(--color-textMuted)]">{tm.noTodayReservations}</p>
         ) : (
           <div className="space-y-2">
-            {todayReservations.map((r) => (
+            {todayReservations.slice(0, 5).map((r) => (
               <div
                 key={r.id}
                 className="flex items-center justify-between py-2 px-3 rounded-xl bg-[var(--color-bgHover)]"
@@ -123,6 +214,11 @@ export default function FloorPage() {
                   <span className="font-mono font-semibold text-sm">{r.reservation_time.slice(0, 5)}</span>
                   <span className="text-sm">{r.guest_name}</span>
                   <span className="text-xs text-[var(--color-textMuted)]">{r.guest_count} {tm.guestCountShort}</span>
+                  {r.table_id && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--color-warning)]/20 text-[var(--color-warning)]">
+                      {tables.find(t => t.id === r.table_id)?.name || `#${r.table_id.slice(0, 4)}`}
+                    </span>
+                  )}
                 </div>
                 <span
                   className="px-2 py-0.5 rounded-full text-xs font-medium text-white"
@@ -136,7 +232,7 @@ export default function FloorPage() {
         )}
       </div>
 
-      {/* Floor Plan — single useFloorPlan instance passed as props */}
+      {/* Floor Plan */}
       <div className="card p-6">
         <FloorPlan
           tables={tables}
@@ -156,10 +252,7 @@ export default function FloorPage() {
         <div
           className="card p-6"
           style={{
-            borderColor: activeSelectedTable.status === 'available' ? 'var(--color-success)' :
-                         activeSelectedTable.status === 'occupied' ? 'var(--color-primary)' :
-                         activeSelectedTable.status === 'reserved' ? 'var(--color-warning)' :
-                         'var(--color-border)',
+            borderColor: TABLE_STATUS_COLORS[activeSelectedTable.status].bg,
             borderWidth: '2px',
           }}
         >
@@ -204,13 +297,54 @@ export default function FloorPage() {
           )}
 
           {activeSelectedTable.notes && (
-            <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
+            <div className="p-3 rounded-xl bg-[var(--color-bgHover)] mb-4">
               <p className="text-sm text-[var(--color-textMuted)]">{activeSelectedTable.notes}</p>
             </div>
           )}
 
+          {/* Linked Reservation Details */}
+          {linkedReservation && (
+            <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--color-warning)', color: 'white', opacity: 0.95 }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-sm">{tm.reservationDetails}</span>
+                <button
+                  onClick={handleUnlinkReservation}
+                  className="text-xs px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
+                >
+                  {tm.unlinkReservation}
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="opacity-80">{tm.reservationGuest}:</span>{' '}
+                  <span className="font-medium">{linkedReservation.guest_name}</span>
+                </div>
+                <div>
+                  <span className="opacity-80">{tm.reservationTime}:</span>{' '}
+                  <span className="font-medium">{linkedReservation.reservation_time.slice(0, 5)}</span>
+                </div>
+                <div>
+                  <span className="opacity-80">{tm.reservationGuests}:</span>{' '}
+                  <span className="font-medium">{linkedReservation.guest_count}</span>
+                </div>
+                {linkedReservation.guest_phone && (
+                  <div>
+                    <span className="opacity-80">{tm.reservationPhone}:</span>{' '}
+                    <span className="font-medium">{linkedReservation.guest_phone}</span>
+                  </div>
+                )}
+              </div>
+              {linkedReservation.notes && (
+                <div className="mt-2 text-sm">
+                  <span className="opacity-80">{tm.reservationNotes}:</span>{' '}
+                  {linkedReservation.notes}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Status change buttons */}
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {([
               { status: 'available' as const, label: tm.statusAvailable, color: 'var(--color-success)' },
               { status: 'occupied' as const, label: tm.statusOccupied, color: 'var(--color-primary)' },
@@ -220,6 +354,17 @@ export default function FloorPage() {
               <button
                 key={status}
                 onClick={async () => {
+                  if (status === 'reserved' && activeSelectedTable.status !== 'reserved') {
+                    // Show quick reserve form instead of just toggling
+                    setShowQuickReserve(true)
+                    setShowLinkPicker(false)
+                    return
+                  }
+                  if (status === 'available' && linkedReservation) {
+                    // Unlink reservation when freeing table
+                    await handleUnlinkReservation()
+                    return
+                  }
                   await setTableStatus(activeSelectedTable.id, status)
                 }}
                 disabled={activeSelectedTable.status === status}
@@ -235,8 +380,106 @@ export default function FloorPage() {
             ))}
           </div>
 
+          {/* Quick Reserve Form */}
+          {showQuickReserve && (
+            <div className="mt-4 p-4 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/5">
+              <h3 className="font-semibold text-sm mb-3">{tm.quickReserve}</h3>
+
+              {/* Option to link existing reservation */}
+              {unlinkedReservations.length > 0 && !showLinkPicker && (
+                <button
+                  onClick={() => setShowLinkPicker(true)}
+                  className="w-full mb-3 px-3 py-2 rounded-xl text-sm font-medium border border-dashed border-[var(--color-warning)] text-[var(--color-warning)] hover:bg-[var(--color-warning)]/10 transition-colors"
+                >
+                  {tm.linkReservation} ({unlinkedReservations.length})
+                </button>
+              )}
+
+              {/* Link picker */}
+              {showLinkPicker && (
+                <div className="mb-3 space-y-2">
+                  {unlinkedReservations.map(r => (
+                    <button
+                      key={r.id}
+                      onClick={() => handleLinkReservation(r.id)}
+                      className="w-full flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)] hover:bg-[var(--color-warning)]/10 transition-colors text-left"
+                    >
+                      <div>
+                        <span className="font-medium text-sm">{r.guest_name}</span>
+                        <span className="text-xs text-[var(--color-textMuted)] ml-2">
+                          {r.guest_count} {tm.guestCountShort}
+                        </span>
+                      </div>
+                      <span className="font-mono text-sm font-semibold">{r.reservation_time.slice(0, 5)}</span>
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setShowLinkPicker(false)}
+                    className="w-full text-xs text-[var(--color-textMuted)] py-1"
+                  >
+                    {tm.cancelBtn}
+                  </button>
+                </div>
+              )}
+
+              {/* Or create new reservation */}
+              {!showLinkPicker && (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={quickForm.guest_name}
+                    onChange={(e) => setQuickForm(f => ({ ...f, guest_name: e.target.value }))}
+                    placeholder={tm.guestNamePlaceholder}
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="time"
+                      value={quickForm.reservation_time}
+                      onChange={(e) => setQuickForm(f => ({ ...f, reservation_time: e.target.value }))}
+                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                    />
+                    <input
+                      type="number"
+                      value={quickForm.guest_count}
+                      onChange={(e) => setQuickForm(f => ({ ...f, guest_count: e.target.value }))}
+                      min="1"
+                      max="20"
+                      placeholder={tm.guestCountLabel}
+                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                    />
+                    <input
+                      type="tel"
+                      value={quickForm.guest_phone}
+                      onChange={(e) => setQuickForm(f => ({ ...f, guest_phone: e.target.value }))}
+                      placeholder={tm.guestPhonePlaceholder}
+                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowQuickReserve(false)}
+                      className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
+                      style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                    >
+                      {tm.cancelBtn}
+                    </button>
+                    <button
+                      onClick={handleQuickReserve}
+                      disabled={quickReserving || !quickForm.guest_name || !quickForm.reservation_time}
+                      className="flex-1 px-3 py-2 rounded-xl text-sm font-medium disabled:opacity-50"
+                      style={{ background: 'var(--color-warning)', color: 'white' }}
+                    >
+                      {quickReserving ? tm.reserving : tm.reserveBtn}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <button
-            onClick={() => setSelectedTable(null)}
+            onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false) }}
             className="mt-3 px-4 py-2 rounded-xl text-sm w-full"
             style={{
               background: 'var(--color-bgHover)',

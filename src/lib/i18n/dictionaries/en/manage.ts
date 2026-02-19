@@ -260,6 +260,24 @@ export const manage: typeof ManageType = {
   confirmRemoveStaff: (name: string) => `Remove ${name} from team?`,
   confirmCancelInvitation: 'Cancel invitation?',
 
+  // Reservation on table
+  reservationDetails: 'Reservation',
+  reservationGuest: 'Guest',
+  reservationTime: 'Time',
+  reservationGuests: 'Guests',
+  reservationPhone: 'Phone',
+  reservationNotes: 'Notes',
+  noLinkedReservation: 'No linked reservation',
+  linkReservation: 'Link reservation',
+  unlinkReservation: 'Unlink',
+  quickReserve: 'Quick reservation',
+  guestNamePlaceholder: 'Guest name',
+  guestPhonePlaceholder: '+1...',
+  guestCountLabel: 'Guests',
+  reserveTimeLabel: 'Time',
+  reserveBtn: 'Reserve',
+  reserving: 'Reserving...',
+
   // FloorPlan component
   addTableBtn: 'Add table',
   noTablesEmpty: 'No tables',

@@ -266,6 +266,24 @@ export const manage = {
   confirmRemoveStaff: (name: string) => `Удалить ${name} из команды?`,
   confirmCancelInvitation: 'Отменить приглашение?',
 
+  // Reservation on table
+  reservationDetails: 'Бронирование',
+  reservationGuest: 'Гость',
+  reservationTime: 'Время',
+  reservationGuests: 'Гостей',
+  reservationPhone: 'Телефон',
+  reservationNotes: 'Заметки',
+  noLinkedReservation: 'Нет привязанного бронирования',
+  linkReservation: 'Привязать бронирование',
+  unlinkReservation: 'Отвязать',
+  quickReserve: 'Быстрое бронирование',
+  guestNamePlaceholder: 'Имя гостя',
+  guestPhonePlaceholder: '+49...',
+  guestCountLabel: 'Гостей',
+  reserveTimeLabel: 'Время',
+  reserveBtn: 'Забронировать',
+  reserving: 'Бронирование...',
+
   // FloorPlan component
   addTableBtn: 'Добавить стол',
   noTablesEmpty: 'Нет столов',
