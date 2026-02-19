@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type {
   MarketplaceOrder,
   MarketplaceOrderItem,
@@ -148,6 +149,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, isDemoMode } = useAuth()
+  const { organizationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -176,7 +178,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
         supplier:suppliers(*),
         order_items:marketplace_order_items(*)
       `)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('created_at', { ascending: false })
 
     if (ordersError) {
@@ -187,7 +189,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {
@@ -255,6 +257,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
         notes: notes || null,
         estimated_delivery_date: estimatedDelivery.toISOString().slice(0, 10),
         is_auto_order: isAutoOrder,
+        ...(organizationId ? { organization_id: organizationId } : {}),
       })
       .select()
       .single()
@@ -318,7 +321,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
       .from('marketplace_orders')
       .update(updates)
       .eq('id', orderId)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -327,7 +330,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
 
     await fetchOrders()
     return true
-  }, [user, isDemoMode, supabase, fetchOrders])
+  }, [user, isDemoMode, supabase, fetchOrders, organizationId])
 
   const getOrder = useCallback((id: string): MarketplaceOrderWithItems | undefined => {
     return orders.find(o => o.id === id)

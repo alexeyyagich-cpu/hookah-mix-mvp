@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
@@ -69,6 +70,7 @@ export function useBarSales(): UseBarSalesReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const { inventory, adjustQuantity } = useBarInventory()
   const { calculateCost } = useBarRecipes()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
@@ -93,7 +95,7 @@ export function useBarSales(): UseBarSalesReturn {
     const { data, error: fetchError } = await supabase
       .from('bar_sales')
       .select('*')
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('sold_at', { ascending: false })
       .limit(500)
 
@@ -106,7 +108,7 @@ export function useBarSales(): UseBarSalesReturn {
 
     setSales(data || [])
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) fetchSales()
@@ -146,6 +148,7 @@ export function useBarSales(): UseBarSalesReturn {
 
     const saleData = {
       profile_id: user.id,
+      ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       recipe_id: recipe.id,
       recipe_name: recipe.name,
       quantity,
@@ -181,7 +184,7 @@ export function useBarSales(): UseBarSalesReturn {
 
     setSales(prev => [data, ...prev])
     return data
-  }, [user, isDemoMode, supabase, calculateCost, adjustQuantity])
+  }, [user, isDemoMode, supabase, calculateCost, adjustQuantity, organizationId, locationId])
 
   const deleteSale = useCallback(async (id: string): Promise<boolean> => {
     if (!user) return false
@@ -195,7 +198,7 @@ export function useBarSales(): UseBarSalesReturn {
       .from('bar_sales')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -204,7 +207,7 @@ export function useBarSales(): UseBarSalesReturn {
 
     setSales(prev => prev.filter(s => s.id !== id))
     return true
-  }, [user, isDemoMode, supabase])
+  }, [user, isDemoMode, supabase, organizationId])
 
   const getAnalytics = useCallback((days: number = 7): BarAnalytics => {
     const cutoff = new Date()

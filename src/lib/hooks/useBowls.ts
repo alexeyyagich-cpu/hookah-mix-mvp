@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { BowlType } from '@/types/database'
 
 // Demo data for testing
@@ -32,6 +33,7 @@ export function useBowls(): UseBowlsReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -67,7 +69,7 @@ export function useBowls(): UseBowlsReturn {
     const { data, error: fetchError } = await supabase
       .from('bowl_types')
       .select('*')
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('name', { ascending: true })
 
     if (fetchError) {
@@ -98,7 +100,7 @@ export function useBowls(): UseBowlsReturn {
       await supabase
         .from('bowl_types')
         .update({ is_default: false })
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
     }
 
     // If this is the first bowl, make it default
@@ -109,6 +111,7 @@ export function useBowls(): UseBowlsReturn {
       .insert({
         ...bowl,
         profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
         is_default: isDefault,
       })
       .select()
@@ -130,7 +133,7 @@ export function useBowls(): UseBowlsReturn {
       .from('bowl_types')
       .update(updates)
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -151,7 +154,7 @@ export function useBowls(): UseBowlsReturn {
       .from('bowl_types')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -180,14 +183,14 @@ export function useBowls(): UseBowlsReturn {
     await supabase
       .from('bowl_types')
       .update({ is_default: false })
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     // Set new default
     const { error: updateError } = await supabase
       .from('bowl_types')
       .update({ is_default: true })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)

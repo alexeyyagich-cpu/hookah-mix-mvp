@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { KdsOrder, KdsOrderStatus, KdsOrderType, KdsOrderItem } from '@/types/database'
 
 // Demo KDS orders
@@ -115,6 +116,7 @@ export function useKDS(): UseKDSReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
   const lastNewCountRef = useRef(0)
   const audioUnlockedRef = useRef(false)
@@ -182,7 +184,7 @@ export function useKDS(): UseKDSReturn {
     const { data, error: fetchError } = await supabase
       .from('kds_orders')
       .select('*')
-      .eq('profile_id', effectiveProfileId)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || effectiveProfileId)
       .not('status', 'in', '("served","cancelled")')
       .order('created_at', { ascending: true })
 
@@ -204,7 +206,7 @@ export function useKDS(): UseKDSReturn {
 
     setOrders(newOrders)
     setLoading(false)
-  }, [effectiveProfileId, supabase, playBeep])
+  }, [effectiveProfileId, supabase, playBeep, organizationId])
 
   // Initial fetch + polling
   useEffect(() => {
@@ -221,6 +223,7 @@ export function useKDS(): UseKDSReturn {
 
     const orderData = {
       profile_id: effectiveProfileId,
+      ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       table_id: input.table_id,
       table_name: input.table_name,
       guest_name: input.guest_name,
@@ -257,7 +260,7 @@ export function useKDS(): UseKDSReturn {
     setOrders(prev => [...prev, data])
     lastNewCountRef.current += 1
     return data
-  }, [effectiveProfileId, isDemoMode, supabase])
+  }, [effectiveProfileId, isDemoMode, supabase, organizationId, locationId])
 
   const updateStatus = useCallback(async (orderId: string, newStatus: KdsOrderStatus): Promise<boolean> => {
     const now = new Date().toISOString()

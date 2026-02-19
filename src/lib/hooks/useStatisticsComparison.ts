@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { SessionWithItems } from '@/types/database'
 
 interface PeriodStats {
@@ -116,6 +117,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Presets for quick selection
@@ -195,23 +197,35 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
 
     try {
       // Fetch period A sessions
-      const { data: dataA, error: errorA } = await supabase
+      let queryA = supabase
         .from('sessions')
         .select('*, session_items (*)')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .gte('session_date', periodsConfig.periodA.start.toISOString())
         .lte('session_date', periodsConfig.periodA.end.toISOString())
+
+      if (organizationId && locationId) {
+        queryA = queryA.eq('location_id', locationId)
+      }
+
+      const { data: dataA, error: errorA } = await queryA
 
       if (errorA) throw errorA
       setSessionsA(dataA || [])
 
       // Fetch period B sessions
-      const { data: dataB, error: errorB } = await supabase
+      let queryB = supabase
         .from('sessions')
         .select('*, session_items (*)')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .gte('session_date', periodsConfig.periodB.start.toISOString())
         .lte('session_date', periodsConfig.periodB.end.toISOString())
+
+      if (organizationId && locationId) {
+        queryB = queryB.eq('location_id', locationId)
+      }
+
+      const { data: dataB, error: errorB } = await queryB
 
       if (errorB) throw errorB
       setSessionsB(dataB || [])
@@ -220,7 +234,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
     }
 
     setLoading(false)
-  }, [user, supabase, periodsConfig, isDemoMode])
+  }, [user, supabase, periodsConfig, isDemoMode, organizationId, locationId])
 
   useEffect(() => {
     fetchData()

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { calculateForecast, type ForecastResult } from '@/lib/utils/forecast'
 import type { SessionWithItems, TobaccoInventory, InventoryTransaction } from '@/types/database'
 
@@ -225,6 +226,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
   })
 
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -248,36 +250,54 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
 
     try {
       // Fetch sessions with items
-      const { data: sessionsData, error: sessionsError } = await supabase
+      let sessionsQuery = supabase
         .from('sessions')
         .select(`
           *,
           session_items (*)
         `)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .gte('session_date', dateRange.start.toISOString())
         .lte('session_date', dateRange.end.toISOString())
         .order('session_date', { ascending: false })
+
+      if (organizationId && locationId) {
+        sessionsQuery = sessionsQuery.eq('location_id', locationId)
+      }
+
+      const { data: sessionsData, error: sessionsError } = await sessionsQuery
 
       if (sessionsError) throw sessionsError
       setSessions(sessionsData || [])
 
       // Fetch inventory
-      const { data: inventoryData, error: inventoryError } = await supabase
+      let inventoryQuery = supabase
         .from('tobacco_inventory')
         .select('*')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+
+      if (organizationId && locationId) {
+        inventoryQuery = inventoryQuery.eq('location_id', locationId)
+      }
+
+      const { data: inventoryData, error: inventoryError } = await inventoryQuery
 
       if (inventoryError) throw inventoryError
       setInventory(inventoryData || [])
 
       // Fetch recent transactions
-      const { data: transactionsData, error: transactionsError } = await supabase
+      let transactionsQuery = supabase
         .from('inventory_transactions')
         .select('*')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('created_at', { ascending: false })
         .limit(50)
+
+      if (organizationId && locationId) {
+        transactionsQuery = transactionsQuery.eq('location_id', locationId)
+      }
+
+      const { data: transactionsData, error: transactionsError } = await transactionsQuery
 
       if (transactionsError) throw transactionsError
       setTransactions(transactionsData || [])
@@ -286,7 +306,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
     }
 
     setLoading(false)
-  }, [user, supabase, dateRange])
+  }, [user, supabase, dateRange, organizationId, locationId])
 
   useEffect(() => {
     fetchData()

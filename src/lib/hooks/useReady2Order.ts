@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { R2OConnectionStatus } from '@/types/database'
 
 interface R2OConnectionInfo {
@@ -42,6 +43,7 @@ export function useReady2Order(): UseReady2OrderReturn {
   const [syncResult, setSyncResult] = useState<{ synced: number; errors: number; total: number } | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Demo mode
@@ -65,7 +67,7 @@ export function useReady2Order(): UseReady2OrderReturn {
       const { data, error: fetchError } = await supabase
         .from('r2o_connections')
         .select('status, webhook_registered, last_sync_at, product_group_id, created_at')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .single()
 
       if (fetchError && fetchError.code !== 'PGRST116') {
@@ -77,7 +79,7 @@ export function useReady2Order(): UseReady2OrderReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {

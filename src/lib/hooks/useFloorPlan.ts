@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { FloorTable, TableStatus } from '@/types/database'
 
 // Demo floor tables
@@ -120,6 +121,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -143,7 +145,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       const { data, error: fetchError } = await supabase
         .from('floor_tables')
         .select('*')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('created_at', { ascending: true })
 
       if (fetchError) throw fetchError
@@ -153,7 +155,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {
@@ -184,6 +186,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
         .insert({
           ...table,
           profile_id: user.id,
+          ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
         })
         .select()
         .single()
@@ -195,7 +198,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       setError(err instanceof Error ? err.message : 'Ошибка добавления стола')
       return null
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId, locationId])
 
   const updateTable = useCallback(async (id: string, updates: Partial<FloorTable>) => {
     if (isDemoMode) {
@@ -212,7 +215,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
         .from('floor_tables')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
       setTables(prev => prev.map(t =>
@@ -221,7 +224,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка обновления стола')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const deleteTable = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -236,14 +239,14 @@ export function useFloorPlan(): UseFloorPlanReturn {
         .from('floor_tables')
         .delete()
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (deleteError) throw deleteError
       setTables(prev => prev.filter(t => t.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка удаления стола')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const moveTable = useCallback(async (id: string, x: number, y: number) => {
     await updateTable(id, { position_x: x, position_y: y })

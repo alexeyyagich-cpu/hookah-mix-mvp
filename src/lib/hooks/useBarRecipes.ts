@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
 import type {
@@ -75,6 +76,7 @@ export function useBarRecipes(): UseBarRecipesReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, isDemoMode } = useAuth()
+  const { organizationId } = useOrganizationContext()
   const { inventory: barInventory } = useBarInventory()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
@@ -98,7 +100,7 @@ export function useBarRecipes(): UseBarRecipesReturn {
     const { data: recipesData, error: fetchError } = await supabase
       .from('bar_recipes')
       .select('*')
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('name', { ascending: true })
 
     if (fetchError) {
@@ -127,7 +129,7 @@ export function useBarRecipes(): UseBarRecipesReturn {
 
     setRecipes(recipesWithIngredients)
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) fetchRecipes()
@@ -203,7 +205,11 @@ export function useBarRecipes(): UseBarRecipesReturn {
 
     const { data, error: insertError } = await supabase
       .from('bar_recipes')
-      .insert({ ...recipe, profile_id: user.id })
+      .insert({
+        ...recipe,
+        profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId } : {}),
+      })
       .select()
       .single()
 
@@ -254,7 +260,7 @@ export function useBarRecipes(): UseBarRecipesReturn {
       .from('bar_recipes')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -296,7 +302,7 @@ export function useBarRecipes(): UseBarRecipesReturn {
       .from('bar_recipes')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)

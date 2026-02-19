@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Review } from '@/types/database'
 
 // Demo reviews for dashboard
@@ -67,6 +68,7 @@ export function useReviews(): UseReviewsReturn {
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export function useReviews(): UseReviewsReturn {
       const { data, error: fetchError } = await supabase
         .from('reviews')
         .select('*')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('created_at', { ascending: false })
 
       if (fetchError) throw fetchError
@@ -99,7 +101,7 @@ export function useReviews(): UseReviewsReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {
@@ -122,7 +124,7 @@ export function useReviews(): UseReviewsReturn {
         .from('reviews')
         .update({ is_published: isPublished })
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
       setReviews(prev => prev.map(r =>
@@ -131,7 +133,7 @@ export function useReviews(): UseReviewsReturn {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка обновления отзыва')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const deleteReview = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -146,14 +148,14 @@ export function useReviews(): UseReviewsReturn {
         .from('reviews')
         .delete()
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (deleteError) throw deleteError
       setReviews(prev => prev.filter(r => r.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка удаления отзыва')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const averageRating = reviews.length > 0
     ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10
@@ -183,7 +185,7 @@ interface UsePublicReviewsReturn {
   submitting: boolean
 }
 
-export function usePublicReviews(profileId: string | undefined): UsePublicReviewsReturn {
+export function usePublicReviews(profileId: string | undefined, orgId?: string): UsePublicReviewsReturn {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -192,7 +194,7 @@ export function usePublicReviews(profileId: string | undefined): UsePublicReview
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   useEffect(() => {
-    if (!profileId || !supabase) {
+    if ((!profileId && !orgId) || !supabase) {
       setLoading(false)
       return
     }
@@ -203,7 +205,7 @@ export function usePublicReviews(profileId: string | undefined): UsePublicReview
         const { data, error: fetchError } = await supabase
           .from('reviews')
           .select('*')
-          .eq('profile_id', profileId)
+          .eq(orgId ? 'organization_id' : 'profile_id', orgId || profileId!)
           .eq('is_published', true)
           .order('created_at', { ascending: false })
 
@@ -216,17 +218,18 @@ export function usePublicReviews(profileId: string | undefined): UsePublicReview
     }
 
     fetchPublicReviews()
-  }, [profileId, supabase])
+  }, [profileId, orgId, supabase])
 
   const submitReview = useCallback(async (review: { author_name: string; rating: number; text?: string }): Promise<boolean> => {
-    if (!profileId || !supabase) return false
+    if ((!profileId && !orgId) || !supabase) return false
 
     setSubmitting(true)
     try {
       const { data, error: insertError } = await supabase
         .from('reviews')
         .insert({
-          profile_id: profileId,
+          profile_id: profileId || null,
+          ...(orgId ? { organization_id: orgId } : {}),
           author_name: review.author_name,
           rating: review.rating,
           text: review.text || null,
@@ -245,7 +248,7 @@ export function usePublicReviews(profileId: string | undefined): UsePublicReview
       setSubmitting(false)
       return false
     }
-  }, [profileId, supabase])
+  }, [profileId, orgId, supabase])
 
   return {
     reviews,

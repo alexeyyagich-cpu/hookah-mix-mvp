@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Guest, MixSnapshot, StrengthPreference, FlavorProfile } from '@/types/database'
 import {
   cacheGuestsLocally,
@@ -146,6 +147,7 @@ export function useGuests(): UseGuestsReturn {
   const [error, setError] = useState<string | null>(null)
   const [isOffline, setIsOffline] = useState(false)
   const { user, isDemoMode } = useAuth()
+  const { organizationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Monitor online/offline status
@@ -204,7 +206,7 @@ export function useGuests(): UseGuestsReturn {
       const { data, error: fetchError } = await supabase
         .from('guests')
         .select('*')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('last_visit_at', { ascending: false, nullsFirst: false })
         .order('name', { ascending: true })
 
@@ -231,7 +233,7 @@ export function useGuests(): UseGuestsReturn {
     }
 
     setLoading(false)
-  }, [user, supabase, isOffline])
+  }, [user, supabase, isOffline, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {
@@ -303,6 +305,7 @@ export function useGuests(): UseGuestsReturn {
       .from('guests')
       .insert({
         profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId } : {}),
         name: guest.name,
         phone: guest.phone || null,
         photo_url: guest.photo_url || null,
@@ -353,7 +356,7 @@ export function useGuests(): UseGuestsReturn {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -376,7 +379,7 @@ export function useGuests(): UseGuestsReturn {
       .from('guests')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -425,7 +428,7 @@ export function useGuests(): UseGuestsReturn {
       .from('guests')
       .update(updates)
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -469,7 +472,7 @@ export function useGuests(): UseGuestsReturn {
       .from('guests')
       .update(updates)
       .eq('id', guestId)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)

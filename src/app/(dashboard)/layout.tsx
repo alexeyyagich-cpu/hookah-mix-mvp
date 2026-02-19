@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { Toaster, toast } from 'sonner'
 import { AuthGuard } from '@/components/auth/AuthGuard'
+import { OrganizationProvider } from '@/lib/OrganizationContext'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { BrandLoader } from '@/components/BrandLoader'
 import { useInventory } from '@/lib/hooks/useInventory'
@@ -147,9 +148,11 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <OnboardingCheck>
-        <DashboardContent>{children}</DashboardContent>
-      </OnboardingCheck>
+      <OrganizationProvider>
+        <OnboardingCheck>
+          <DashboardContent>{children}</DashboardContent>
+        </OnboardingCheck>
+      </OrganizationProvider>
     </AuthGuard>
   )
 }

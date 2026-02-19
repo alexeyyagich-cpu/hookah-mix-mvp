@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { BarInventoryItem, BarTransaction, BarTransactionType } from '@/types/database'
 
 const DEMO_BAR_INVENTORY: BarInventoryItem[] = [
@@ -36,6 +37,7 @@ export function useBarInventory(): UseBarInventoryReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -65,7 +67,7 @@ export function useBarInventory(): UseBarInventoryReturn {
     const { data, error: fetchError } = await supabase
       .from('bar_inventory')
       .select('*')
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('category', { ascending: true })
       .order('name', { ascending: true })
 
@@ -77,7 +79,7 @@ export function useBarInventory(): UseBarInventoryReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) fetchInventory()
@@ -106,7 +108,11 @@ export function useBarInventory(): UseBarInventoryReturn {
 
     const { data, error: insertError } = await supabase
       .from('bar_inventory')
-      .insert({ ...item, profile_id: user.id })
+      .insert({
+        ...item,
+        profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+      })
       .select()
       .single()
 
@@ -118,6 +124,7 @@ export function useBarInventory(): UseBarInventoryReturn {
     if (item.quantity > 0) {
       await supabase.from('bar_transactions').insert({
         profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
         bar_inventory_id: data.id,
         type: 'purchase',
         quantity: item.quantity,
@@ -146,7 +153,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .from('bar_inventory')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -174,7 +181,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .from('bar_inventory')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -215,7 +222,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .from('bar_inventory')
       .update({ quantity: newQuantity, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -224,6 +231,7 @@ export function useBarInventory(): UseBarInventoryReturn {
 
     await supabase.from('bar_transactions').insert({
       profile_id: user.id,
+      ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       bar_inventory_id: id,
       type,
       quantity: quantityChange,

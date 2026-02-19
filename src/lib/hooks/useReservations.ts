@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Reservation, ReservationStatus } from '@/types/database'
 
 // Demo reservations
@@ -90,6 +91,7 @@ export function useReservations(): UseReservationsReturn {
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   useEffect(() => {
@@ -109,10 +111,16 @@ export function useReservations(): UseReservationsReturn {
     setError(null)
 
     try {
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from('reservations')
         .select('*')
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+
+      if (organizationId && locationId) {
+        query = query.eq('location_id', locationId)
+      }
+
+      const { data, error: fetchError } = await query
         .order('reservation_date', { ascending: true })
         .order('reservation_time', { ascending: true })
 
@@ -123,7 +131,7 @@ export function useReservations(): UseReservationsReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId, locationId])
 
   useEffect(() => {
     if (!isDemoMode) {
@@ -146,7 +154,7 @@ export function useReservations(): UseReservationsReturn {
         .from('reservations')
         .update({ status })
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
       setReservations(prev => prev.map(r =>
@@ -155,7 +163,7 @@ export function useReservations(): UseReservationsReturn {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка обновления статуса')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const assignTable = useCallback(async (id: string, tableId: string | null) => {
     if (isDemoMode) {
@@ -172,7 +180,7 @@ export function useReservations(): UseReservationsReturn {
         .from('reservations')
         .update({ table_id: tableId })
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
       setReservations(prev => prev.map(r =>
@@ -181,7 +189,7 @@ export function useReservations(): UseReservationsReturn {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка назначения стола')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const deleteReservation = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -196,14 +204,14 @@ export function useReservations(): UseReservationsReturn {
         .from('reservations')
         .delete()
         .eq('id', id)
-        .eq('profile_id', user.id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (deleteError) throw deleteError
       setReservations(prev => prev.filter(r => r.id !== id))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка удаления бронирования')
     }
-  }, [user, supabase, isDemoMode])
+  }, [user, supabase, isDemoMode, organizationId])
 
   return {
     reservations,
@@ -236,7 +244,7 @@ interface UsePublicReservationReturn {
   fetchSlots: (date: string) => Promise<void>
 }
 
-export function usePublicReservation(profileId: string | undefined): UsePublicReservationReturn {
+export function usePublicReservation(profileId: string | undefined, orgId?: string): UsePublicReservationReturn {
   const [occupiedSlots, setOccupiedSlots] = useState<{ date: string; time: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -245,14 +253,14 @@ export function usePublicReservation(profileId: string | undefined): UsePublicRe
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   const fetchSlots = useCallback(async (date: string) => {
-    if (!profileId || !supabase) return
+    if ((!profileId && !orgId) || !supabase) return
 
     setLoading(true)
     try {
       const { data, error: fetchError } = await supabase
         .from('reservations')
         .select('reservation_date, reservation_time')
-        .eq('profile_id', profileId)
+        .eq(orgId ? 'organization_id' : 'profile_id', orgId || profileId!)
         .eq('reservation_date', date)
         .in('status', ['pending', 'confirmed'])
 
@@ -264,7 +272,7 @@ export function usePublicReservation(profileId: string | undefined): UsePublicRe
       setError(err instanceof Error ? err.message : 'Ошибка загрузки слотов')
     }
     setLoading(false)
-  }, [profileId, supabase])
+  }, [profileId, orgId, supabase])
 
   const submitReservation = useCallback(async (reservation: {
     guest_name: string
@@ -274,14 +282,14 @@ export function usePublicReservation(profileId: string | undefined): UsePublicRe
     reservation_time: string
     notes?: string
   }): Promise<boolean> => {
-    if (!profileId || !supabase) return false
+    if ((!profileId && !orgId) || !supabase) return false
 
     setSubmitting(true)
     try {
       const { error: insertError } = await supabase
         .from('reservations')
         .insert({
-          profile_id: profileId,
+          profile_id: profileId || '',
           guest_name: reservation.guest_name,
           guest_phone: reservation.guest_phone || null,
           guest_count: reservation.guest_count,
@@ -289,6 +297,7 @@ export function usePublicReservation(profileId: string | undefined): UsePublicRe
           reservation_time: reservation.reservation_time,
           notes: reservation.notes || null,
           source: 'online' as const,
+          ...(orgId ? { organization_id: orgId } : {}),
         })
 
       if (insertError) throw insertError
@@ -299,7 +308,7 @@ export function usePublicReservation(profileId: string | undefined): UsePublicRe
       setSubmitting(false)
       return false
     }
-  }, [profileId, supabase])
+  }, [profileId, orgId, supabase])
 
   return {
     occupiedSlots,

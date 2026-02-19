@@ -1,7 +1,10 @@
 export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
 
-// User roles for access control
+// User roles for access control (legacy — kept for backward compat)
 export type UserRole = 'owner' | 'staff' | 'guest'
+
+// Organization roles (new multi-tenant system)
+export type OrgRole = 'owner' | 'manager' | 'hookah_master' | 'bartender' | 'cook'
 
 // Module system - switchable feature areas
 export type AppModule = 'hookah' | 'bar' | 'kitchen'
@@ -41,7 +44,7 @@ export interface Profile {
   created_at: string
 }
 
-// Staff invitation for team management
+// Staff invitation for team management (legacy — kept for backward compat)
 export interface StaffInvitation {
   id: string
   owner_profile_id: string
@@ -50,6 +53,64 @@ export interface StaffInvitation {
   role: 'staff'
   expires_at: string
   accepted_at: string | null
+  created_at: string
+}
+
+// ============================================================================
+// Multi-tenant types
+// ============================================================================
+
+export interface Organization {
+  id: string
+  name: string
+  slug: string | null
+  logo_url: string | null
+  subscription_tier: SubscriptionTier
+  subscription_expires_at: string | null
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Location {
+  id: string
+  organization_id: string
+  name: string
+  slug: string | null
+  address: string | null
+  phone: string | null
+  locale: string
+  timezone: string
+  active_modules: string[]
+  business_type: BusinessType | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OrgMember {
+  id: string
+  organization_id: string
+  location_id: string | null
+  user_id: string
+  role: OrgRole
+  display_name: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface InviteToken {
+  id: string
+  organization_id: string
+  location_id: string | null
+  email: string
+  role: OrgRole
+  token: string
+  invited_by: string
+  expires_at: string
+  accepted_at: string | null
+  accepted_by: string | null
   created_at: string
 }
 

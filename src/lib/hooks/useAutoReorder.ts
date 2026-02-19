@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { AutoReorderRule, TobaccoInventory, SupplierProduct } from '@/types/database'
 
 // Extended rule type with related data
@@ -63,6 +64,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, isDemoMode } = useAuth()
+  const { organizationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -90,7 +92,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
         tobacco:tobacco_inventory(*),
         product:supplier_products(*)
       `)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('created_at', { ascending: false })
 
     if (fetchError) {
@@ -101,7 +103,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {
@@ -132,6 +134,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
         profile_id: user.id,
         ...input,
         is_enabled: true,
+        ...(organizationId ? { organization_id: organizationId } : {}),
       })
       .select()
       .single()
@@ -160,7 +163,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       .from('auto_reorder_rules')
       .update(updates)
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -169,7 +172,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
 
     await fetchRules()
     return true
-  }, [user, isDemoMode, supabase, fetchRules])
+  }, [user, isDemoMode, supabase, fetchRules, organizationId])
 
   const deleteRule = useCallback(async (id: string): Promise<boolean> => {
     if (!user) return false
@@ -184,7 +187,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       .from('auto_reorder_rules')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -193,7 +196,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
 
     await fetchRules()
     return true
-  }, [user, isDemoMode, supabase, fetchRules])
+  }, [user, isDemoMode, supabase, fetchRules, organizationId])
 
   const toggleRule = useCallback(async (id: string): Promise<boolean> => {
     const rule = rules.find(r => r.id === id)

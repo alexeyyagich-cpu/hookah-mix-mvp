@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Session, SessionItem, SessionWithItems } from '@/types/database'
 
 // Demo bowl for sessions
@@ -80,6 +81,7 @@ export function useSessions(): UseSessionsReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -111,7 +113,7 @@ export function useSessions(): UseSessionsReturn {
         session_items (*),
         bowl_type:bowl_types (*)
       `)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('session_date', { ascending: false })
 
     // Apply date filter for free tier
@@ -150,6 +152,7 @@ export function useSessions(): UseSessionsReturn {
       .insert({
         ...sessionData,
         profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       })
       .select()
       .single()
@@ -200,6 +203,7 @@ export function useSessions(): UseSessionsReturn {
             // Record transaction
             await supabase.from('inventory_transactions').insert({
               profile_id: user.id,
+              ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
               tobacco_inventory_id: item.tobacco_inventory_id,
               type: 'session',
               quantity_grams: -item.grams_used,
@@ -222,7 +226,7 @@ export function useSessions(): UseSessionsReturn {
       .from('sessions')
       .update(updates)
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -253,7 +257,7 @@ export function useSessions(): UseSessionsReturn {
       .from('sessions')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -275,7 +279,7 @@ export function useSessions(): UseSessionsReturn {
         bowl_type:bowl_types (*)
       `)
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .single()
 
     if (fetchError) {

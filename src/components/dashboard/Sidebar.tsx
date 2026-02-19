@@ -6,8 +6,9 @@ import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useModules } from '@/lib/hooks/useModules'
-import { useRole, ROLE_LABELS, type Permission } from '@/lib/hooks/useRole'
-import { useTranslation } from '@/lib/i18n'
+import { useRole, ORG_ROLE_LABELS, type Permission } from '@/lib/hooks/useRole'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { AppModule } from '@/types/database'
 import {
   IconDashboard,
@@ -51,9 +52,11 @@ export function Sidebar() {
   const tc = useTranslation('common')
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
+  const { locale } = useLocale()
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
-  const { role, hasPermission, isOwner, isStaff } = useRole()
+  const { organization } = useOrganizationContext()
+  const { orgRole, hasPermission, isOwner, isStaff } = useRole()
   const { modules } = useModules()
 
   const navigationGroups: NavGroup[] = [
@@ -126,7 +129,8 @@ export function Sidebar() {
     }))
     .filter(group => group.items.length > 0)
 
-  const roleInfo = ROLE_LABELS[role]
+  const roleLabels = ORG_ROLE_LABELS[orgRole]
+  const roleName = roleLabels ? roleLabels[locale as keyof typeof roleLabels] || roleLabels.en : orgRole
 
   const NavContent = () => (
     <>
@@ -154,7 +158,7 @@ export function Sidebar() {
       {/* Business Info + Role */}
       <div className="p-4 border-b border-[var(--color-border)]">
         <div className="text-sm font-medium truncate">
-          {profile?.business_name || t.defaultBusiness}
+          {organization?.name || profile?.business_name || t.defaultBusiness}
         </div>
         <div className="text-xs text-[var(--color-textMuted)] mt-1">
           {profile?.owner_name || t.defaultUser}
@@ -170,7 +174,7 @@ export function Sidebar() {
               color: isOwner ? 'white' : 'var(--color-text)',
             }}
           >
-            {roleInfo.emoji} {tc.roles[role]}
+            {roleLabels?.emoji} {roleName}
           </span>
           {/* Subscription badge - only for owners */}
           {isOwner && (

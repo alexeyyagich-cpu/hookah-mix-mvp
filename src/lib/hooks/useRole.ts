@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useAuth } from '@/lib/AuthContext'
-import type { UserRole } from '@/types/database'
+import type { OrgRole, UserRole } from '@/types/database'
 
 // Permission definitions for each feature
 export type Permission =
@@ -18,6 +18,7 @@ export type Permission =
   | 'settings.edit'
   | 'team.view'
   | 'team.manage'
+  | 'billing.view'
   | 'guests.view'
   | 'guests.manage'
   | 'bowls.view'
@@ -25,59 +26,81 @@ export type Permission =
   | 'bar.view'
   | 'bar.edit'
   | 'bar.sales'
+  | 'kds.hookah'
+  | 'kds.bar'
+  | 'kds.kitchen'
+  | 'floor.view'
+  | 'floor.edit'
+  | 'pos.view'
+  | 'reviews.view'
+  | 'reservations.view'
 
-// Role-based permissions matrix
-const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+// New org-role-based permissions matrix (5 granular roles)
+const ORG_ROLE_PERMISSIONS: Record<OrgRole, Permission[]> = {
   owner: [
     'dashboard.view',
-    'inventory.view',
-    'inventory.edit',
-    'sessions.view',
-    'sessions.create',
+    'inventory.view', 'inventory.edit',
+    'sessions.view', 'sessions.create',
     'statistics.view',
-    'marketplace.view',
-    'marketplace.order',
-    'settings.view',
-    'settings.edit',
-    'team.view',
-    'team.manage',
-    'guests.view',
-    'guests.manage',
-    'bowls.view',
-    'bowls.edit',
-    'bar.view',
-    'bar.edit',
-    'bar.sales',
+    'marketplace.view', 'marketplace.order',
+    'settings.view', 'settings.edit',
+    'team.view', 'team.manage',
+    'billing.view',
+    'guests.view', 'guests.manage',
+    'bowls.view', 'bowls.edit',
+    'bar.view', 'bar.edit', 'bar.sales',
+    'kds.hookah', 'kds.bar', 'kds.kitchen',
+    'floor.view', 'floor.edit',
+    'pos.view',
+    'reviews.view', 'reservations.view',
   ],
-  staff: [
+  manager: [
+    'dashboard.view',
+    'inventory.view', 'inventory.edit',
+    'sessions.view', 'sessions.create',
+    'statistics.view',
+    'marketplace.view', 'marketplace.order',
+    'guests.view', 'guests.manage',
+    'bowls.view', 'bowls.edit',
+    'bar.view', 'bar.edit', 'bar.sales',
+    'kds.hookah', 'kds.bar', 'kds.kitchen',
+    'floor.view', 'floor.edit',
+    'pos.view',
+    'reviews.view', 'reservations.view',
+  ],
+  hookah_master: [
     'dashboard.view',
     'inventory.view',
-    // inventory.edit - NO
-    'sessions.view',
-    'sessions.create',
-    // statistics.view - NO
-    // marketplace - NO
-    // settings - NO
-    // team - NO
-    'guests.view',
-    'guests.manage',
+    'sessions.view', 'sessions.create',
+    'guests.view', 'guests.manage',
     'bowls.view',
-    // bowls.edit - NO
-    'bar.view',
-    // bar.edit - NO
-    // bar.sales - NO
+    'kds.hookah',
+    'floor.view',
+    'reviews.view', 'reservations.view',
   ],
-  guest: [
-    // Guests only access menu via /menu/[slug]
-    // No dashboard permissions
+  bartender: [
+    'dashboard.view',
+    'bar.view', 'bar.sales',
+    'kds.bar',
+    'floor.view',
   ],
+  cook: [
+    'kds.kitchen',
+  ],
+}
+
+// Legacy role mapping (backward compat during migration)
+const LEGACY_ROLE_TO_ORG: Record<UserRole, OrgRole> = {
+  owner: 'owner',
+  staff: 'hookah_master',
+  guest: 'cook', // guests get minimal permissions in dashboard context
 }
 
 // Navigation items configuration for each role
 export interface NavItem {
   name: string
   href: string
-  icon: string // Icon name reference
+  icon: string
   permission: Permission
 }
 
@@ -93,8 +116,15 @@ export const NAV_ITEMS: NavItem[] = [
 ]
 
 export interface UseRoleReturn {
+  /** Legacy role from profiles (backward compat) */
   role: UserRole
+  /** New org role from org_members */
+  orgRole: OrgRole
   isOwner: boolean
+  isManager: boolean
+  isHookahMaster: boolean
+  isBartender: boolean
+  isCook: boolean
   isStaff: boolean
   isGuest: boolean
   hasPermission: (permission: Permission) => boolean
@@ -107,14 +137,25 @@ export interface UseRoleReturn {
   canAccessMarketplace: boolean
 }
 
-export function useRole(): UseRoleReturn {
+/**
+ * useRole reads the user's role and computes permissions.
+ *
+ * During migration: reads from profile.role and maps to OrgRole via LEGACY_ROLE_TO_ORG.
+ * After migration: will read directly from org_members via useOrganizationContext.
+ *
+ * Accepts an optional orgRole override for when useOrganization data is available.
+ */
+export function useRole(orgRoleOverride?: OrgRole | null): UseRoleReturn {
   const { profile } = useAuth()
 
-  const role: UserRole = profile?.role || 'guest'
+  const legacyRole: UserRole = profile?.role || 'guest'
+
+  // Use orgRole from org_members if available, otherwise map from legacy role
+  const orgRole: OrgRole = orgRoleOverride || LEGACY_ROLE_TO_ORG[legacyRole]
 
   const permissions = useMemo(() => {
-    return new Set(ROLE_PERMISSIONS[role])
-  }, [role])
+    return new Set(ORG_ROLE_PERMISSIONS[orgRole])
+  }, [orgRole])
 
   const hasPermission = (permission: Permission): boolean => {
     return permissions.has(permission)
@@ -133,15 +174,19 @@ export function useRole(): UseRoleReturn {
   }, [permissions])
 
   return {
-    role,
-    isOwner: role === 'owner',
-    isStaff: role === 'staff',
-    isGuest: role === 'guest',
+    role: legacyRole,
+    orgRole,
+    isOwner: orgRole === 'owner',
+    isManager: orgRole === 'manager',
+    isHookahMaster: orgRole === 'hookah_master',
+    isBartender: orgRole === 'bartender',
+    isCook: orgRole === 'cook',
+    isStaff: legacyRole === 'staff',
+    isGuest: legacyRole === 'guest',
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
     allowedNavItems,
-    // Convenience shortcuts
     canEditInventory: hasPermission('inventory.edit'),
     canViewStatistics: hasPermission('statistics.view'),
     canManageTeam: hasPermission('team.manage'),
@@ -149,9 +194,17 @@ export function useRole(): UseRoleReturn {
   }
 }
 
-// Role display labels
+// Role display labels — supports both legacy and new org roles
 export const ROLE_LABELS: Record<UserRole, { ru: string; emoji: string }> = {
   owner: { ru: 'Владелец', emoji: '👑' },
   staff: { ru: 'Кальянщик', emoji: '🔥' },
   guest: { ru: 'Гость', emoji: '👤' },
+}
+
+export const ORG_ROLE_LABELS: Record<OrgRole, { ru: string; en: string; de: string; emoji: string }> = {
+  owner: { ru: 'Владелец', en: 'Owner', de: 'Inhaber', emoji: '👑' },
+  manager: { ru: 'Менеджер', en: 'Manager', de: 'Manager', emoji: '📋' },
+  hookah_master: { ru: 'Кальянщик', en: 'Hookah Master', de: 'Shisha-Meister', emoji: '🔥' },
+  bartender: { ru: 'Бармен', en: 'Bartender', de: 'Barkeeper', emoji: '🍸' },
+  cook: { ru: 'Повар', en: 'Cook', de: 'Koch', emoji: '👨‍🍳' },
 }

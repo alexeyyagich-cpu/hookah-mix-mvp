@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
 
 // Demo data for testing (prices in EUR, package_grams = 100g default)
@@ -35,6 +36,7 @@ export function useInventory(): UseInventoryReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
+  const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -68,7 +70,7 @@ export function useInventory(): UseInventoryReturn {
     const { data, error: fetchError } = await supabase
       .from('tobacco_inventory')
       .select('*')
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
       .order('brand', { ascending: true })
       .order('flavor', { ascending: true })
 
@@ -113,6 +115,7 @@ export function useInventory(): UseInventoryReturn {
       .insert({
         ...tobacco,
         profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       })
       .select()
       .single()
@@ -126,6 +129,7 @@ export function useInventory(): UseInventoryReturn {
     if (tobacco.quantity_grams > 0) {
       await supabase.from('inventory_transactions').insert({
         profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
         tobacco_inventory_id: data.id,
         type: 'purchase',
         quantity_grams: tobacco.quantity_grams,
@@ -157,7 +161,7 @@ export function useInventory(): UseInventoryReturn {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -188,7 +192,7 @@ export function useInventory(): UseInventoryReturn {
       .from('tobacco_inventory')
       .delete()
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
       setError(deleteError.message)
@@ -236,7 +240,7 @@ export function useInventory(): UseInventoryReturn {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .eq('profile_id', user.id)
+      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
       setError(updateError.message)
@@ -246,6 +250,7 @@ export function useInventory(): UseInventoryReturn {
     // Add transaction record
     await supabase.from('inventory_transactions').insert({
       profile_id: user.id,
+      ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       tobacco_inventory_id: id,
       type,
       quantity_grams: quantityChange,

@@ -3,100 +3,109 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/AuthContext'
-import type { Profile, StaffInvitation } from '@/types/database'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import type { OrgMember, InviteToken, OrgRole } from '@/types/database'
 
-// Demo staff for testing
-const DEMO_STAFF: Profile[] = [
+// Demo team members for testing
+const DEMO_MEMBERS: OrgMember[] = [
   {
-    id: 'demo-staff-1',
-    business_name: null,
-    owner_name: 'Marek Zielinski',
-    phone: '+48 512 345 678',
-    address: null,
-    logo_url: null,
-    subscription_tier: 'free',
-    subscription_expires_at: null,
-    role: 'staff',
-    owner_profile_id: 'demo-user-id',
-    venue_slug: null,
-    stripe_customer_id: null,
-    stripe_subscription_id: null,
-    onboarding_completed: true,
-    onboarding_skipped: false,
-    onboarding_step: null,
-    business_type: null,
-    active_modules: ['hookah'],
-    locale: null,
-    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    id: 'demo-member-owner',
+    organization_id: 'demo-org-id',
+    location_id: null,
+    user_id: 'demo-user-id',
+    role: 'owner',
+    display_name: 'Demo User',
+    is_active: true,
+    created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
-    id: 'demo-staff-2',
-    business_name: null,
-    owner_name: 'Laura Fischer',
-    phone: '+49 170 987 6543',
-    address: null,
-    logo_url: null,
-    subscription_tier: 'free',
-    subscription_expires_at: null,
-    role: 'staff',
-    owner_profile_id: 'demo-user-id',
-    venue_slug: null,
-    stripe_customer_id: null,
-    stripe_subscription_id: null,
-    onboarding_completed: true,
-    onboarding_skipped: false,
-    onboarding_step: null,
-    business_type: null,
-    active_modules: ['hookah'],
-    locale: null,
+    id: 'demo-member-1',
+    organization_id: 'demo-org-id',
+    location_id: 'demo-location-id',
+    user_id: 'demo-staff-1',
+    role: 'hookah_master',
+    display_name: 'Marek Zielinski',
+    is_active: true,
+    created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'demo-member-2',
+    organization_id: 'demo-org-id',
+    location_id: 'demo-location-id',
+    user_id: 'demo-staff-2',
+    role: 'bartender',
+    display_name: 'Laura Fischer',
+    is_active: true,
     created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
   },
 ]
 
-const DEMO_INVITATIONS: StaffInvitation[] = [
+const DEMO_INVITATIONS: InviteToken[] = [
   {
     id: 'demo-inv-1',
-    owner_profile_id: 'demo-user-id',
+    organization_id: 'demo-org-id',
+    location_id: 'demo-location-id',
     email: 'new.staff@example.com',
+    role: 'hookah_master',
     token: 'demo-token-123',
-    role: 'staff',
+    invited_by: 'demo-user-id',
     expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     accepted_at: null,
+    accepted_by: null,
     created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ]
 
 export interface UseTeamReturn {
-  staff: Profile[]
-  invitations: StaffInvitation[]
+  /** All org members (excluding current user) */
+  members: OrgMember[]
+  /** Pending invite tokens */
+  invitations: InviteToken[]
   loading: boolean
   error: string | null
-  inviteStaff: (email: string) => Promise<{ success: boolean; error?: string }>
-  removeStaff: (staffId: string) => Promise<{ success: boolean; error?: string }>
+  inviteMember: (email: string, role: OrgRole, locationId?: string | null) => Promise<{ success: boolean; error?: string }>
+  removeMember: (memberId: string) => Promise<{ success: boolean; error?: string }>
+  updateMemberRole: (memberId: string, newRole: OrgRole) => Promise<{ success: boolean; error?: string }>
   cancelInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string }>
   resendInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string }>
   refresh: () => Promise<void>
+  // Legacy compat aliases
+  staff: OrgMember[]
+  inviteStaff: (email: string) => Promise<{ success: boolean; error?: string }>
+  removeStaff: (staffId: string) => Promise<{ success: boolean; error?: string }>
 }
 
 export function useTeam(): UseTeamReturn {
-  const { user, profile, isDemoMode } = useAuth()
-  const [staff, setStaff] = useState<Profile[]>([])
-  const [invitations, setInvitations] = useState<StaffInvitation[]>([])
+  const { user, isDemoMode } = useAuth()
+  const { organizationId } = useOrganizationContext()
+  const [members, setMembers] = useState<OrgMember[]>([])
+  const [invitations, setInvitations] = useState<InviteToken[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const supabase = createClient()
 
   const loadTeam = useCallback(async () => {
-    if (!user || !profile) {
+    if (!user) {
       setLoading(false)
       return
     }
 
     // Demo mode
     if (isDemoMode) {
-      setStaff(DEMO_STAFF)
+      setMembers(DEMO_MEMBERS.filter(m => m.user_id !== 'demo-user-id'))
       setInvitations(DEMO_INVITATIONS)
+      setLoading(false)
+      return
+    }
+
+    if (!organizationId) {
+      // Legacy mode — no org yet
+      setMembers([])
+      setInvitations([])
       setLoading(false)
       return
     }
@@ -105,53 +114,61 @@ export function useTeam(): UseTeamReturn {
     setError(null)
 
     try {
-      // Load staff members (profiles with owner_profile_id = current user)
-      const { data: staffData, error: staffError } = await supabase
-        .from('profiles')
+      // Load org members (excluding current user)
+      const { data: memberData, error: memberErr } = await supabase
+        .from('org_members')
         .select('*')
-        .eq('owner_profile_id', user.id)
-        .eq('role', 'staff')
+        .eq('organization_id', organizationId)
+        .eq('is_active', true)
+        .neq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (staffError) throw staffError
+      if (memberErr) throw memberErr
 
       // Load pending invitations
-      const { data: invData, error: invError } = await supabase
-        .from('staff_invitations')
+      const { data: invData, error: invErr } = await supabase
+        .from('invite_tokens')
         .select('*')
-        .eq('owner_profile_id', user.id)
+        .eq('organization_id', organizationId)
         .is('accepted_at', null)
         .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false })
 
-      if (invError) throw invError
+      if (invErr) throw invErr
 
-      setStaff(staffData || [])
-      setInvitations(invData || [])
+      setMembers((memberData || []) as OrgMember[])
+      setInvitations((invData || []) as InviteToken[])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load team')
     } finally {
       setLoading(false)
     }
-  }, [user, profile, isDemoMode, supabase])
+  }, [user, isDemoMode, organizationId, supabase])
 
   useEffect(() => {
     loadTeam()
   }, [loadTeam])
 
-  const inviteStaff = async (email: string): Promise<{ success: boolean; error?: string }> => {
-    if (!user) return { success: false, error: 'Not authenticated' }
+  const inviteMember = async (
+    email: string,
+    role: OrgRole,
+    locationId?: string | null
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!user || !organizationId) return { success: false, error: 'Not authenticated' }
 
     // Demo mode
     if (isDemoMode) {
-      const newInvitation: StaffInvitation = {
+      const newInvitation: InviteToken = {
         id: `demo-inv-${Date.now()}`,
-        owner_profile_id: user.id,
+        organization_id: 'demo-org-id',
+        location_id: locationId || 'demo-location-id',
         email,
+        role,
         token: `demo-token-${Date.now()}`,
-        role: 'staff',
+        invited_by: user.id,
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         accepted_at: null,
+        accepted_by: null,
         created_at: new Date().toISOString(),
       }
       setInvitations(prev => [newInvitation, ...prev])
@@ -161,9 +178,9 @@ export function useTeam(): UseTeamReturn {
     try {
       // Check if already invited
       const { data: existing } = await supabase
-        .from('staff_invitations')
+        .from('invite_tokens')
         .select('id')
-        .eq('owner_profile_id', user.id)
+        .eq('organization_id', organizationId)
         .eq('email', email.toLowerCase())
         .is('accepted_at', null)
         .single()
@@ -172,35 +189,31 @@ export function useTeam(): UseTeamReturn {
         return { success: false, error: 'Приглашение уже отправлено' }
       }
 
-      // Check if already staff
-      const { data: existingStaff } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('owner_profile_id', user.id)
-        .eq('role', 'staff')
-        // In production, would also check by email
-        .single()
-
-      if (existingStaff) {
-        return { success: false, error: 'Пользователь уже в команде' }
-      }
-
-      // Generate invite token
-      const token = crypto.randomUUID()
-
+      // Insert invite token
       const { error } = await supabase
-        .from('staff_invitations')
+        .from('invite_tokens')
         .insert({
-          owner_profile_id: user.id,
+          organization_id: organizationId,
+          location_id: locationId || null,
           email: email.toLowerCase(),
-          token,
-          role: 'staff',
+          role,
+          invited_by: user.id,
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         })
 
       if (error) throw error
 
-      // In production, would send email here
+      // Send invite email via API
+      try {
+        await fetch('/api/invite/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.toLowerCase(), role, organizationId }),
+        })
+      } catch {
+        // Email sending is best-effort — invite still created
+      }
+
       await loadTeam()
       return { success: true }
     } catch (err) {
@@ -208,22 +221,22 @@ export function useTeam(): UseTeamReturn {
     }
   }
 
-  const removeStaff = async (staffId: string): Promise<{ success: boolean; error?: string }> => {
-    if (!user) return { success: false, error: 'Not authenticated' }
+  const removeMember = async (memberId: string): Promise<{ success: boolean; error?: string }> => {
+    if (!user || !organizationId) return { success: false, error: 'Not authenticated' }
 
     // Demo mode
     if (isDemoMode) {
-      setStaff(prev => prev.filter(s => s.id !== staffId))
+      setMembers(prev => prev.filter(m => m.id !== memberId))
       return { success: true }
     }
 
     try {
-      // Remove owner_profile_id reference (don't delete the profile)
+      // Deactivate member (soft delete)
       const { error } = await supabase
-        .from('profiles')
-        .update({ owner_profile_id: null, role: 'owner' })
-        .eq('id', staffId)
-        .eq('owner_profile_id', user.id)
+        .from('org_members')
+        .update({ is_active: false })
+        .eq('id', memberId)
+        .eq('organization_id', organizationId)
 
       if (error) throw error
 
@@ -234,8 +247,32 @@ export function useTeam(): UseTeamReturn {
     }
   }
 
+  const updateMemberRole = async (memberId: string, newRole: OrgRole): Promise<{ success: boolean; error?: string }> => {
+    if (!user || !organizationId) return { success: false, error: 'Not authenticated' }
+
+    if (isDemoMode) {
+      setMembers(prev => prev.map(m => m.id === memberId ? { ...m, role: newRole } : m))
+      return { success: true }
+    }
+
+    try {
+      const { error } = await supabase
+        .from('org_members')
+        .update({ role: newRole })
+        .eq('id', memberId)
+        .eq('organization_id', organizationId)
+
+      if (error) throw error
+
+      await loadTeam()
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to update role' }
+    }
+  }
+
   const cancelInvitation = async (invitationId: string): Promise<{ success: boolean; error?: string }> => {
-    if (!user) return { success: false, error: 'Not authenticated' }
+    if (!user || !organizationId) return { success: false, error: 'Not authenticated' }
 
     // Demo mode
     if (isDemoMode) {
@@ -245,10 +282,10 @@ export function useTeam(): UseTeamReturn {
 
     try {
       const { error } = await supabase
-        .from('staff_invitations')
+        .from('invite_tokens')
         .delete()
         .eq('id', invitationId)
-        .eq('owner_profile_id', user.id)
+        .eq('organization_id', organizationId)
 
       if (error) throw error
 
@@ -260,7 +297,7 @@ export function useTeam(): UseTeamReturn {
   }
 
   const resendInvitation = async (invitationId: string): Promise<{ success: boolean; error?: string }> => {
-    if (!user) return { success: false, error: 'Not authenticated' }
+    if (!user || !organizationId) return { success: false, error: 'Not authenticated' }
 
     // Demo mode
     if (isDemoMode) {
@@ -276,17 +313,16 @@ export function useTeam(): UseTeamReturn {
 
     try {
       const { error } = await supabase
-        .from('staff_invitations')
+        .from('invite_tokens')
         .update({
           token: crypto.randomUUID(),
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         })
         .eq('id', invitationId)
-        .eq('owner_profile_id', user.id)
+        .eq('organization_id', organizationId)
 
       if (error) throw error
 
-      // In production, would resend email here
       await loadTeam()
       return { success: true }
     } catch (err) {
@@ -295,14 +331,19 @@ export function useTeam(): UseTeamReturn {
   }
 
   return {
-    staff,
+    members,
     invitations,
     loading,
     error,
-    inviteStaff,
-    removeStaff,
+    inviteMember,
+    removeMember,
+    updateMemberRole,
     cancelInvitation,
     resendInvitation,
     refresh: loadTeam,
+    // Legacy compat aliases
+    staff: members,
+    inviteStaff: (email: string) => inviteMember(email, 'hookah_master'),
+    removeStaff: removeMember,
   }
 }
