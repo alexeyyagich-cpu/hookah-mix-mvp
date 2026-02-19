@@ -17,7 +17,11 @@ export function AuthGuard({ children, fallback }: AuthGuardProps) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login')
+      // Grace period: allow token refresh to complete before redirecting
+      const timer = setTimeout(() => {
+        router.push('/login')
+      }, 2000)
+      return () => clearTimeout(timer)
     }
   }, [user, loading, router])
 

@@ -133,20 +133,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getInitialSession()
 
-    // Listen for auth changes
+    // Listen for auth changes — filter events to avoid transient null during token refresh
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-
-        if (session?.user) {
-          const profileData = await fetchProfile(session.user.id)
-          setProfile(profileData)
-        } else {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED') {
+          setSession(session)
+          setUser(session?.user ?? null)
+          if (session?.user) {
+            const profileData = await fetchProfile(session.user.id)
+            setProfile(profileData)
+          }
+          setLoading(false)
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null)
+          setUser(null)
           setProfile(null)
+          setLoading(false)
         }
-
-        setLoading(false)
       }
     )
 

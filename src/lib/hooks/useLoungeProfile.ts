@@ -174,40 +174,55 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
   }
 }
 
-// Demo cocktails for public menu
+// Demo cocktails for public menu — Leipzig hookah lounge
 const DEMO_BAR_RECIPES: PublicBarRecipe[] = [
   {
-    id: 'pub-r1',
-    name: 'Мохито',
-    name_en: 'Mojito',
+    id: 'pub-r1', name: 'Мохито', name_en: 'Mojito',
     description: 'Освежающий кубинский коктейль с мятой и лаймом',
-    method: 'muddle',
-    glass: 'highball',
-    garnish_description: 'Мята, лайм',
-    menu_price: 12,
+    method: 'muddle', glass: 'highball', garnish_description: 'Мята, лайм', menu_price: 9,
     ingredients: ['Белый ром', 'Сок лайма', 'Сахарный сироп', 'Содовая', 'Мята'],
   },
   {
-    id: 'pub-r2',
-    name: 'Негрони',
-    name_en: 'Negroni',
+    id: 'pub-r2', name: 'Негрони', name_en: 'Negroni',
     description: 'Итальянская классика с горьковатым послевкусием',
-    method: 'stir',
-    glass: 'rocks',
-    garnish_description: 'Долька апельсина',
-    menu_price: 14,
+    method: 'stir', glass: 'rocks', garnish_description: 'Долька апельсина', menu_price: 11,
     ingredients: ['Джин', 'Кампари', 'Сладкий вермут'],
   },
   {
-    id: 'pub-r3',
-    name: 'Джин-Тоник',
-    name_en: 'Gin & Tonic',
-    description: null,
-    method: 'build',
-    glass: 'highball',
-    garnish_description: 'Долька лайма',
-    menu_price: 10,
+    id: 'pub-r3', name: 'Апероль Шприц', name_en: 'Aperol Spritz',
+    description: 'Итальянский аперитив — горький, свежий, идеальный на террасе',
+    method: 'build', glass: 'wine', garnish_description: 'Долька апельсина', menu_price: 9,
+    ingredients: ['Апероль', 'Просекко', 'Содовая'],
+  },
+  {
+    id: 'pub-r4', name: 'Эспрессо Мартини', name_en: 'Espresso Martini',
+    description: 'Кофейный коктейль с водкой — энергия и вкус',
+    method: 'shake', glass: 'coupe', garnish_description: 'Три зерна кофе', menu_price: 11,
+    ingredients: ['Водка', 'Кофейный ликёр', 'Эспрессо'],
+  },
+  {
+    id: 'pub-r5', name: 'Leipzig Sour', name_en: 'Leipzig Sour',
+    description: 'Авторский сауэр с облепихой и мёдом — наш бестселлер',
+    method: 'shake', glass: 'coupe', garnish_description: 'Облепиха, тимьян', menu_price: 12,
+    ingredients: ['Джин', 'Облепиховый сироп', 'Медовый сироп', 'Сок лимона'],
+  },
+  {
+    id: 'pub-r6', name: 'Московский мул', name_en: 'Moscow Mule',
+    description: 'Водка с имбирным пивом и лаймом в медной кружке',
+    method: 'build', glass: 'copper_mug', garnish_description: 'Лайм, имбирь', menu_price: 9,
+    ingredients: ['Водка', 'Имбирное пиво', 'Сок лайма'],
+  },
+  {
+    id: 'pub-r7', name: 'Джин-Тоник', name_en: 'Gin & Tonic',
+    description: 'Лёгкий лонг-дринк с ботаникой',
+    method: 'build', glass: 'highball', garnish_description: 'Долька лайма, розмарин', menu_price: 8,
     ingredients: ['Джин', 'Тоник'],
+  },
+  {
+    id: 'pub-r8', name: 'Tropical Hookah', name_en: 'Tropical Hookah',
+    description: 'Безалкогольный тропический коктейль — идеально к кальяну',
+    method: 'shake', glass: 'highball', garnish_description: 'Ананас, зонтик', menu_price: 7,
+    ingredients: ['Ананасовый сок', 'Маракуйя пюре', 'Кокосовый сироп', 'Сок лайма'],
   },
 ]
 

@@ -15,42 +15,165 @@ import type {
   RecipeCostBreakdown,
 } from '@/types/database'
 
+// Demo recipes — Leipzig hookah lounge bar menu
+const ts = new Date().toISOString()
+const ing = (id: string, rid: string, name: string, qty: number, unit: string, order: number, invId: string | null = null): BarRecipeIngredient => ({
+  id, recipe_id: rid, bar_inventory_id: invId, ingredient_name: name,
+  quantity: qty, unit: unit as BarRecipeIngredient['unit'], is_optional: false, sort_order: order, created_at: ts,
+})
+
 const DEMO_RECIPES: BarRecipeWithIngredients[] = [
+  // === КЛАССИКА ===
   {
     id: 'demo-r1', profile_id: 'demo', name: 'Мохито', name_en: 'Mojito',
-    description: 'Освежающий кубинский коктейль', method: 'muddle', glass: 'highball',
-    garnish_description: 'Мята, лайм', menu_price: 12, is_on_menu: true, is_favorite: true,
+    description: 'Освежающий кубинский коктейль с мятой и лаймом', method: 'muddle', glass: 'highball',
+    garnish_description: 'Мята, лайм', menu_price: 9, is_on_menu: true, is_favorite: true,
     image_url: null, serving_size_ml: null, prep_time_seconds: 120, difficulty: 1, notes: null,
-    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+    created_at: ts, updated_at: ts,
     ingredients: [
-      { id: 'di1', recipe_id: 'demo-r1', bar_inventory_id: 'b3', ingredient_name: 'Белый ром', quantity: 50, unit: 'ml', is_optional: false, sort_order: 0, created_at: new Date().toISOString() },
-      { id: 'di2', recipe_id: 'demo-r1', bar_inventory_id: 'b5', ingredient_name: 'Сок лайма', quantity: 30, unit: 'ml', is_optional: false, sort_order: 1, created_at: new Date().toISOString() },
-      { id: 'di3', recipe_id: 'demo-r1', bar_inventory_id: 'b4', ingredient_name: 'Сахарный сироп', quantity: 20, unit: 'ml', is_optional: false, sort_order: 2, created_at: new Date().toISOString() },
-      { id: 'di4', recipe_id: 'demo-r1', bar_inventory_id: null, ingredient_name: 'Содовая', quantity: 60, unit: 'ml', is_optional: false, sort_order: 3, created_at: new Date().toISOString() },
-      { id: 'di5', recipe_id: 'demo-r1', bar_inventory_id: 'b6', ingredient_name: 'Мята', quantity: 8, unit: 'pcs', is_optional: false, sort_order: 4, created_at: new Date().toISOString() },
+      ing('di1', 'demo-r1', 'Белый ром', 50, 'ml', 0, 'b3'),
+      ing('di2', 'demo-r1', 'Сок лайма', 30, 'ml', 1, 'b5'),
+      ing('di3', 'demo-r1', 'Сахарный сироп', 20, 'ml', 2, 'b4'),
+      ing('di4', 'demo-r1', 'Содовая', 60, 'ml', 3),
+      ing('di5', 'demo-r1', 'Мята', 8, 'pcs', 4, 'b6'),
     ],
   },
   {
     id: 'demo-r2', profile_id: 'demo', name: 'Негрони', name_en: 'Negroni',
-    description: 'Итальянская классика', method: 'stir', glass: 'rocks',
-    garnish_description: 'Долька апельсина', menu_price: 14, is_on_menu: true, is_favorite: false,
+    description: 'Итальянская классика с горьковатым послевкусием', method: 'stir', glass: 'rocks',
+    garnish_description: 'Долька апельсина', menu_price: 11, is_on_menu: true, is_favorite: true,
     image_url: null, serving_size_ml: null, prep_time_seconds: 60, difficulty: 1, notes: null,
-    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+    created_at: ts, updated_at: ts,
     ingredients: [
-      { id: 'di6', recipe_id: 'demo-r2', bar_inventory_id: 'b2', ingredient_name: 'Джин', quantity: 30, unit: 'ml', is_optional: false, sort_order: 0, created_at: new Date().toISOString() },
-      { id: 'di7', recipe_id: 'demo-r2', bar_inventory_id: null, ingredient_name: 'Кампари', quantity: 30, unit: 'ml', is_optional: false, sort_order: 1, created_at: new Date().toISOString() },
-      { id: 'di8', recipe_id: 'demo-r2', bar_inventory_id: null, ingredient_name: 'Сладкий вермут', quantity: 30, unit: 'ml', is_optional: false, sort_order: 2, created_at: new Date().toISOString() },
+      ing('di6', 'demo-r2', 'Джин', 30, 'ml', 0, 'b2'),
+      ing('di7', 'demo-r2', 'Кампари', 30, 'ml', 1),
+      ing('di8', 'demo-r2', 'Сладкий вермут', 30, 'ml', 2),
     ],
   },
   {
     id: 'demo-r3', profile_id: 'demo', name: 'Джин-Тоник', name_en: 'Gin & Tonic',
-    description: null, method: 'build', glass: 'highball',
-    garnish_description: 'Долька лайма', menu_price: 10, is_on_menu: true, is_favorite: false,
+    description: 'Лёгкий лонг-дринк с ботаникой', method: 'build', glass: 'highball',
+    garnish_description: 'Долька лайма, розмарин', menu_price: 8, is_on_menu: true, is_favorite: false,
     image_url: null, serving_size_ml: null, prep_time_seconds: 30, difficulty: 1, notes: null,
-    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+    created_at: ts, updated_at: ts,
     ingredients: [
-      { id: 'di9', recipe_id: 'demo-r3', bar_inventory_id: 'b2', ingredient_name: 'Джин', quantity: 50, unit: 'ml', is_optional: false, sort_order: 0, created_at: new Date().toISOString() },
-      { id: 'di10', recipe_id: 'demo-r3', bar_inventory_id: 'b8', ingredient_name: 'Тоник', quantity: 150, unit: 'ml', is_optional: false, sort_order: 1, created_at: new Date().toISOString() },
+      ing('di9', 'demo-r3', 'Джин', 50, 'ml', 0, 'b2'),
+      ing('di10', 'demo-r3', 'Тоник', 150, 'ml', 1, 'b8'),
+    ],
+  },
+  {
+    id: 'demo-r4', profile_id: 'demo', name: 'Апероль Шприц', name_en: 'Aperol Spritz',
+    description: 'Итальянский аперитив — горький, свежий, идеальный на террасе', method: 'build', glass: 'wine',
+    garnish_description: 'Долька апельсина', menu_price: 9, is_on_menu: true, is_favorite: true,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 30, difficulty: 1, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di11', 'demo-r4', 'Апероль', 60, 'ml', 0),
+      ing('di12', 'demo-r4', 'Просекко', 90, 'ml', 1),
+      ing('di13', 'demo-r4', 'Содовая', 30, 'ml', 2),
+    ],
+  },
+  {
+    id: 'demo-r5', profile_id: 'demo', name: 'Маргарита', name_en: 'Margarita',
+    description: 'Классический мексиканский коктейль с текилой и лаймом', method: 'shake', glass: 'coupe',
+    garnish_description: 'Соль на ободке, лайм', menu_price: 10, is_on_menu: true, is_favorite: false,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 90, difficulty: 2, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di14', 'demo-r5', 'Текила бланко', 50, 'ml', 0),
+      ing('di15', 'demo-r5', 'Трипл Сек', 20, 'ml', 1),
+      ing('di16', 'demo-r5', 'Сок лайма', 25, 'ml', 2, 'b5'),
+    ],
+  },
+  {
+    id: 'demo-r6', profile_id: 'demo', name: 'Виски Сауэр', name_en: 'Whiskey Sour',
+    description: 'Бурбон с лимоном и бархатной пеной', method: 'shake', glass: 'rocks',
+    garnish_description: 'Вишня, долька лимона', menu_price: 11, is_on_menu: true, is_favorite: false,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 90, difficulty: 2, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di17', 'demo-r6', 'Бурбон', 50, 'ml', 0, 'b1'),
+      ing('di18', 'demo-r6', 'Сок лимона', 25, 'ml', 1),
+      ing('di19', 'demo-r6', 'Сахарный сироп', 15, 'ml', 2, 'b4'),
+      ing('di20', 'demo-r6', 'Яичный белок', 1, 'pcs', 3),
+    ],
+  },
+  {
+    id: 'demo-r7', profile_id: 'demo', name: 'Эспрессо Мартини', name_en: 'Espresso Martini',
+    description: 'Кофейный коктейль с водкой — энергия и вкус', method: 'shake', glass: 'coupe',
+    garnish_description: 'Три зерна кофе', menu_price: 11, is_on_menu: true, is_favorite: true,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 120, difficulty: 2, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di21', 'demo-r7', 'Водка', 40, 'ml', 0),
+      ing('di22', 'demo-r7', 'Кофейный ликёр', 20, 'ml', 1),
+      ing('di23', 'demo-r7', 'Эспрессо', 30, 'ml', 2),
+      ing('di24', 'demo-r7', 'Сахарный сироп', 10, 'ml', 3, 'b4'),
+    ],
+  },
+  // === АВТОРСКИЕ ===
+  {
+    id: 'demo-r8', profile_id: 'demo', name: 'Leipzig Sour', name_en: 'Leipzig Sour',
+    description: 'Авторский сауэр с облепихой и мёдом — наш бестселлер', method: 'shake', glass: 'coupe',
+    garnish_description: 'Облепиха, тимьян', menu_price: 12, is_on_menu: true, is_favorite: true,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 120, difficulty: 3, notes: 'Signature cocktail',
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di25', 'demo-r8', 'Джин', 45, 'ml', 0, 'b2'),
+      ing('di26', 'demo-r8', 'Облепиховый сироп', 20, 'ml', 1),
+      ing('di27', 'demo-r8', 'Медовый сироп', 15, 'ml', 2),
+      ing('di28', 'demo-r8', 'Сок лимона', 25, 'ml', 3),
+      ing('di29', 'demo-r8', 'Яичный белок', 1, 'pcs', 4),
+    ],
+  },
+  {
+    id: 'demo-r9', profile_id: 'demo', name: 'Smoke & Honey', name_en: 'Smoke & Honey',
+    description: 'Дымный Old Fashioned с мёдом и апельсином', method: 'stir', glass: 'rocks',
+    garnish_description: 'Апельсиновая цедра, корица', menu_price: 13, is_on_menu: true, is_favorite: false,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 90, difficulty: 3, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di30', 'demo-r9', 'Бурбон', 60, 'ml', 0, 'b1'),
+      ing('di31', 'demo-r9', 'Медовый сироп', 15, 'ml', 1),
+      ing('di32', 'demo-r9', 'Ангостура биттерс', 2, 'dash', 2),
+    ],
+  },
+  {
+    id: 'demo-r10', profile_id: 'demo', name: 'Tropical Hookah', name_en: 'Tropical Hookah',
+    description: 'Безалкогольный тропический коктейль — идеально к кальяну', method: 'shake', glass: 'highball',
+    garnish_description: 'Ананас, зонтик', menu_price: 7, is_on_menu: true, is_favorite: false,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 60, difficulty: 1, notes: 'Non-alcoholic',
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di33', 'demo-r10', 'Ананасовый сок', 100, 'ml', 0),
+      ing('di34', 'demo-r10', 'Маракуйя пюре', 30, 'ml', 1),
+      ing('di35', 'demo-r10', 'Кокосовый сироп', 15, 'ml', 2),
+      ing('di36', 'demo-r10', 'Сок лайма', 15, 'ml', 3, 'b5'),
+    ],
+  },
+  // === ЛОНГ ДРИНКИ ===
+  {
+    id: 'demo-r11', profile_id: 'demo', name: 'Московский мул', name_en: 'Moscow Mule',
+    description: 'Водка с имбирным пивом и лаймом в медной кружке', method: 'build', glass: 'copper_mug',
+    garnish_description: 'Лайм, имбирь', menu_price: 9, is_on_menu: true, is_favorite: false,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 30, difficulty: 1, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di37', 'demo-r11', 'Водка', 50, 'ml', 0),
+      ing('di38', 'demo-r11', 'Имбирное пиво', 120, 'ml', 1),
+      ing('di39', 'demo-r11', 'Сок лайма', 15, 'ml', 2, 'b5'),
+    ],
+  },
+  {
+    id: 'demo-r12', profile_id: 'demo', name: 'Куба Либре', name_en: 'Cuba Libre',
+    description: 'Ром, кола и лайм — классика Карибов', method: 'build', glass: 'highball',
+    garnish_description: 'Долька лайма', menu_price: 8, is_on_menu: true, is_favorite: false,
+    image_url: null, serving_size_ml: null, prep_time_seconds: 30, difficulty: 1, notes: null,
+    created_at: ts, updated_at: ts,
+    ingredients: [
+      ing('di40', 'demo-r12', 'Золотой ром', 50, 'ml', 0),
+      ing('di41', 'demo-r12', 'Кола', 120, 'ml', 1),
+      ing('di42', 'demo-r12', 'Сок лайма', 10, 'ml', 2, 'b5'),
     ],
   },
 ]
