@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { BarInventoryItem, BarIngredientCategory, BarUnitType } from '@/types/database'
-import { BAR_INGREDIENT_PRESETS, BAR_CATEGORY_LABELS, BAR_CATEGORY_EMOJI, BAR_UNIT_LABELS } from '@/data/bar-ingredients'
+import { BAR_INGREDIENT_PRESETS, BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
 interface AddBarIngredientModalProps {
   isOpen: boolean
@@ -19,6 +19,16 @@ const CATEGORIES: BarIngredientCategory[] = [
 
 export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, canAddMore }: AddBarIngredientModalProps) {
   const t = useTranslation('bar')
+  const { locale } = useLocale()
+  const CATEGORY_LABELS: Record<string, string> = {
+    spirit: t.catSpirit, liqueur: t.catLiqueur, wine: t.catWine,
+    beer: t.catBeer, mixer: t.catMixer, syrup: t.catSyrup,
+    juice: t.catJuice, bitter: t.catBitter, garnish: t.catGarnish,
+    ice: t.catIce, other: t.catOther,
+  }
+  const UNIT_LABELS: Record<string, string> = {
+    ml: t.unitMl, g: t.unitG, pcs: t.unitPcs,
+  }
   const [mode, setMode] = useState<'catalog' | 'custom'>('catalog')
   const [catalogFilter, setCatalogFilter] = useState('')
   const [catalogCategory, setCatalogCategory] = useState<BarIngredientCategory | 'all'>('all')
@@ -66,7 +76,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
 
   const selectFromCatalog = (preset: typeof BAR_INGREDIENT_PRESETS[0]) => {
     setMode('custom')
-    setName(preset.name)
+    setName(getLocaleName(preset, locale))
     setBrand(preset.brand)
     setCategory(preset.category)
     setUnitType(preset.defaultUnit)
@@ -75,7 +85,10 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
 
   const filteredPresets = BAR_INGREDIENT_PRESETS.filter(p => {
     if (catalogCategory !== 'all' && p.category !== catalogCategory) return false
-    if (catalogFilter && !p.name.toLowerCase().includes(catalogFilter.toLowerCase())) return false
+    if (catalogFilter) {
+      const q = catalogFilter.toLowerCase()
+      if (!p.name.toLowerCase().includes(q) && !p.name_en.toLowerCase().includes(q)) return false
+    }
     return true
   })
 
@@ -182,7 +195,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                         : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
                     }`}
                   >
-                    {BAR_CATEGORY_EMOJI[cat]} {BAR_CATEGORY_LABELS[cat]}
+                    {BAR_CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
                   </button>
                 ))}
               </div>
@@ -197,9 +210,9 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   >
                     <span className="text-lg">{BAR_CATEGORY_EMOJI[preset.category]}</span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate">{preset.name}</div>
+                      <div className="text-sm font-medium truncate">{getLocaleName(preset, locale)}</div>
                       <div className="text-xs text-[var(--color-textMuted)]">
-                        {BAR_CATEGORY_LABELS[preset.category]} · {preset.defaultPackageSize}{BAR_UNIT_LABELS[preset.defaultUnit]}
+                        {CATEGORY_LABELS[preset.category]} · {preset.defaultPackageSize}{UNIT_LABELS[preset.defaultUnit]}
                       </div>
                     </div>
                     <svg className="w-4 h-4 text-[var(--color-textMuted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -249,7 +262,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   >
                     {CATEGORIES.map(cat => (
                       <option key={cat} value={cat}>
-                        {BAR_CATEGORY_EMOJI[cat]} {BAR_CATEGORY_LABELS[cat]}
+                        {BAR_CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
                       </option>
                     ))}
                   </select>
@@ -309,7 +322,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">{t.packageVolume(BAR_UNIT_LABELS[unitType])}</label>
+                  <label className="block text-sm font-medium">{t.packageVolume(UNIT_LABELS[unitType])}</label>
                   <input
                     type="number"
                     step="any"

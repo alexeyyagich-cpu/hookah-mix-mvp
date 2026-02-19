@@ -112,4 +112,9 @@ export const common: typeof CommonType = {
     heatResistance: 'Hitzebeständigkeit',
     selected: 'ausgewählt',
   },
+
+  // Legal
+  legalTerms: 'AGB',
+  legalPrivacy: 'Datenschutz',
+  legalAllRights: 'Alle Rechte vorbehalten.',
 } as const

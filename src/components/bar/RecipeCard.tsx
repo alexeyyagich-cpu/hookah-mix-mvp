@@ -1,9 +1,8 @@
 'use client'
 
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, RecipeCost } from '@/types/database'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
-import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
 
 interface RecipeCardProps {
   recipe: BarRecipeWithIngredients
@@ -16,6 +15,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdit, onDelete }: RecipeCardProps) {
   const t = useTranslation('bar')
+  const { locale } = useLocale()
 
   const METHOD_LABELS: Record<string, string> = {
     build: t.methodBuild, stir: t.methodStir, shake: t.methodShake,
@@ -29,6 +29,12 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
     other: t.glassOther,
   }
   const DIFFICULTY_LABELS: Record<number, string> = { 1: t.easy, 2: t.medium, 3: t.hard }
+  const PORTION_LABELS: Record<string, string> = {
+    ml: t.portionMl, g: t.portionG, pcs: t.portionPcs,
+    oz: t.portionOz, cl: t.portionCl, dash: t.portionDash,
+    barspoon: t.portionBarspoon, drop: t.portionDrop, slice: t.portionSlice,
+    sprig: t.portionSprig, wedge: t.portionWedge, twist: t.portionTwist,
+  }
 
   const marginColor = cost.margin !== null
     ? cost.margin >= 60 ? 'success' : cost.margin >= 40 ? 'warning' : 'danger'
@@ -39,9 +45,12 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-base truncate">{recipe.name}</h3>
-          {recipe.name_en && (
+          <h3 className="font-semibold text-base truncate">{getLocaleName(recipe, locale)}</h3>
+          {locale === 'ru' && recipe.name_en && (
             <p className="text-xs text-[var(--color-textMuted)]">{recipe.name_en}</p>
+          )}
+          {locale !== 'ru' && recipe.name_en && (
+            <p className="text-xs text-[var(--color-textMuted)]">{recipe.name}</p>
           )}
         </div>
         <div className="flex items-center gap-1 ml-2">
@@ -77,7 +86,7 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
       {/* Ingredients summary */}
       <div className="text-xs text-[var(--color-textMuted)] mb-3 line-clamp-2">
         {recipe.ingredients.map(ing =>
-          `${ing.ingredient_name} ${ing.quantity}${BAR_PORTION_LABELS[ing.unit]}`
+          `${ing.ingredient_name} ${ing.quantity}${PORTION_LABELS[ing.unit]}`
         ).join(' · ')}
       </div>
 

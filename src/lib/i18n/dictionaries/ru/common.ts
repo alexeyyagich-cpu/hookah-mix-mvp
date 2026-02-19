@@ -126,4 +126,9 @@ export const common = {
     heatResistance: 'жаростойкость',
     selected: 'выбран',
   },
+
+  // Legal
+  legalTerms: 'Условия',
+  legalPrivacy: 'Конфиденциальность',
+  legalAllRights: 'Все права защищены.',
 }

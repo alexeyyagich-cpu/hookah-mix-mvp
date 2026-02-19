@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import { IconPlus, IconMinus, IconClose, IconCocktail, IconBowl } from '@/components/Icons'
 import type { FloorTable, BarRecipeWithIngredients, KdsOrderItem } from '@/types/database'
 import type { CreateKdsOrderInput } from '@/lib/hooks/useKDS'
@@ -38,6 +38,7 @@ export function NewOrderModal({
   isHookahActive,
 }: NewOrderModalProps) {
   const t = useTranslation('manage')
+  const { locale } = useLocale()
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'bar' | 'hookah'>(isBarActive ? 'bar' : 'hookah')
   const [barItems, setBarItems] = useState<BarItemEntry[]>([])
@@ -112,9 +113,9 @@ export function NewOrderModal({
       // Create bar order
       if (hasBarItems) {
         const items: KdsOrderItem[] = barItems.map(e => ({
-          name: e.recipe.name,
+          name: getLocaleName(e.recipe, locale),
           quantity: e.quantity,
-          details: e.recipe.name_en || null,
+          details: locale === 'ru' ? (e.recipe.name_en || null) : e.recipe.name,
         }))
         await onCreateOrder({ ...base, type: 'bar', items })
       }
@@ -243,7 +244,7 @@ export function NewOrderModal({
                             : 'border-[var(--color-border)] hover:border-[var(--color-primary)]/30'
                         }`}
                       >
-                        <div className="font-medium truncate">{recipe.name}</div>
+                        <div className="font-medium truncate">{getLocaleName(recipe, locale)}</div>
                         {recipe.menu_price && (
                           <div className="text-xs text-[var(--color-textMuted)] mt-0.5">{recipe.menu_price}€</div>
                         )}
@@ -267,7 +268,7 @@ export function NewOrderModal({
                       key={entry.recipe.id}
                       className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--color-bgHover)]"
                     >
-                      <span className="text-sm font-medium truncate flex-1 mr-2">{entry.recipe.name}</span>
+                      <span className="text-sm font-medium truncate flex-1 mr-2">{getLocaleName(entry.recipe, locale)}</span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => updateBarItemQty(entry.recipe.id, -1)}

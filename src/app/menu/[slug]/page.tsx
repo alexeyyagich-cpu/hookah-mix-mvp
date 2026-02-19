@@ -10,7 +10,7 @@ import {
   IconCocktail,
 } from '@/components/Icons'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { PublicBarRecipe } from '@/types/lounge'
 
 // Demo tobacco inventory for menu
@@ -46,6 +46,7 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
   const { slug } = use(params)
   const t = useTranslation('hookah')
   const tb = useTranslation('bar')
+  const { locale } = useLocale()
 
   const METHOD_LABELS: Record<string, string> = {
     build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
@@ -220,9 +221,12 @@ export default function MenuPage({ params }: { params: Promise<{ slug: string }>
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <h4 className="font-semibold">{recipe.name}</h4>
-                              {recipe.name_en && (
+                              <h4 className="font-semibold">{getLocaleName(recipe, locale)}</h4>
+                              {locale === 'ru' && recipe.name_en && (
                                 <span className="text-xs text-[var(--color-textMuted)]">{recipe.name_en}</span>
+                              )}
+                              {locale !== 'ru' && recipe.name_en && (
+                                <span className="text-xs text-[var(--color-textMuted)]">{recipe.name}</span>
                               )}
                             </div>
                             {lounge.show_prices && recipe.menu_price && (

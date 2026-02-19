@@ -246,6 +246,38 @@ export const bar: typeof BarType = {
   methodLayer: 'Schichten',
   methodMuddle: 'Stoßen',
 
+  // Category labels
+  catSpirit: 'Spirituosen',
+  catLiqueur: 'Liköre',
+  catWine: 'Wein / Champagner',
+  catBeer: 'Bier',
+  catMixer: 'Mixer / Limonade',
+  catSyrup: 'Sirupe',
+  catJuice: 'Säfte',
+  catBitter: 'Bitter',
+  catGarnish: 'Garnituren',
+  catIce: 'Eis',
+  catOther: 'Sonstiges',
+
+  // Unit labels
+  unitMl: 'ml',
+  unitG: 'g',
+  unitPcs: 'Stk.',
+
+  // Portion labels
+  portionMl: 'ml',
+  portionG: 'g',
+  portionPcs: 'Stk.',
+  portionOz: 'oz',
+  portionCl: 'cl',
+  portionDash: 'Dash',
+  portionBarspoon: 'Barlöffel',
+  portionDrop: 'Tropfen',
+  portionSlice: 'Scheibe',
+  portionSprig: 'Zweig',
+  portionWedge: 'Spalte',
+  portionTwist: 'Zeste',
+
   // Glass labels
   glassHighball: 'Highball',
   glassRocks: 'Rocks',

@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, BarPortionUnit } from '@/types/database'
 import { RECIPE_PRESETS, type RecipePreset } from '@/data/bar-recipes'
-import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
 
 type RecipeInput = Omit<BarRecipe, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'>
 type IngredientInput = Omit<BarRecipeIngredient, 'id' | 'recipe_id' | 'created_at'>
@@ -31,6 +30,7 @@ interface IngredientRow {
 
 export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRecipeModalProps) {
   const t = useTranslation('bar')
+  const { locale } = useLocale()
 
   const METHOD_LABELS: Record<string, string> = {
     build: t.methodBuild, stir: t.methodStir, shake: t.methodShake,
@@ -42,6 +42,12 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
     hurricane: t.glassHurricane, shot: t.glassShot, wine: t.glassWine,
     beer: t.glassBeer, copper_mug: t.glassCopperMug, tiki: t.glassTiki,
     other: t.glassOther,
+  }
+  const PORTION_LABELS: Record<string, string> = {
+    ml: t.portionMl, g: t.portionG, pcs: t.portionPcs,
+    oz: t.portionOz, cl: t.portionCl, dash: t.portionDash,
+    barspoon: t.portionBarspoon, drop: t.portionDrop, slice: t.portionSlice,
+    sprig: t.portionSprig, wedge: t.portionWedge, twist: t.portionTwist,
   }
 
   const [mode, setMode] = useState<'preset' | 'custom'>('preset')
@@ -251,9 +257,9 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors text-left"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium">{preset.name}</div>
+                      <div className="text-sm font-medium">{getLocaleName(preset, locale)}</div>
                       <div className="text-xs text-[var(--color-textMuted)]">
-                        {preset.name_en} · {METHOD_LABELS[preset.method]} · {preset.ingredients.length} {t.ingredientsShort}
+                        {locale === 'ru' ? preset.name_en : preset.name} · {METHOD_LABELS[preset.method]} · {preset.ingredients.length} {t.ingredientsShort}
                       </div>
                     </div>
                     <svg className="w-4 h-4 text-[var(--color-textMuted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -387,7 +393,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                       className="w-24 px-2 py-2 rounded-lg bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
                     >
                       {PORTION_UNITS.map(u => (
-                        <option key={u} value={u}>{BAR_PORTION_LABELS[u]}</option>
+                        <option key={u} value={u}>{PORTION_LABELS[u]}</option>
                       ))}
                     </select>
                     <button type="button" onClick={() => removeIngredient(ing.key)}

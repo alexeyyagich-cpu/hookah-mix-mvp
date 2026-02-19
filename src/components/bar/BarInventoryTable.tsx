@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
-import { BAR_CATEGORY_LABELS, BAR_CATEGORY_EMOJI, BAR_UNIT_LABELS } from '@/data/bar-ingredients'
+import { BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
 interface BarInventoryTableProps {
   inventory: BarInventoryItem[]
@@ -15,6 +15,15 @@ interface BarInventoryTableProps {
 
 export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading }: BarInventoryTableProps) {
   const t = useTranslation('bar')
+  const CATEGORY_LABELS: Record<string, string> = {
+    spirit: t.catSpirit, liqueur: t.catLiqueur, wine: t.catWine,
+    beer: t.catBeer, mixer: t.catMixer, syrup: t.catSyrup,
+    juice: t.catJuice, bitter: t.catBitter, garnish: t.catGarnish,
+    ice: t.catIce, other: t.catOther,
+  }
+  const UNIT_LABELS: Record<string, string> = {
+    ml: t.unitMl, g: t.unitG, pcs: t.unitPcs,
+  }
   const [sortField, setSortField] = useState<keyof BarInventoryItem>('category')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [filter, setFilter] = useState('')
@@ -35,7 +44,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
     .filter(item =>
       item.name.toLowerCase().includes(filter.toLowerCase()) ||
       (item.brand || '').toLowerCase().includes(filter.toLowerCase()) ||
-      BAR_CATEGORY_LABELS[item.category].toLowerCase().includes(filter.toLowerCase())
+      CATEGORY_LABELS[item.category].toLowerCase().includes(filter.toLowerCase())
     )
     .sort((a, b) => {
       const aValue = a[sortField]
@@ -73,7 +82,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   }
 
   const formatQuantity = (item: BarInventoryItem) => {
-    const unit = BAR_UNIT_LABELS[item.unit_type]
+    const unit = UNIT_LABELS[item.unit_type]
     if (item.unit_type === 'ml' && item.quantity >= 1000) {
       return `${(item.quantity / 1000).toFixed(1)}l`
     }
@@ -159,7 +168,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                   <tr key={item.id} className="hover:bg-[var(--color-bgHover)] transition-colors">
                     <td className="px-4 py-3">
                       <span className="text-sm">
-                        {BAR_CATEGORY_EMOJI[item.category]} {BAR_CATEGORY_LABELS[item.category]}
+                        {BAR_CATEGORY_EMOJI[item.category]} {CATEGORY_LABELS[item.category]}
                       </span>
                     </td>
                     <td className="px-4 py-3">

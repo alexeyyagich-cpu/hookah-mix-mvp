@@ -251,6 +251,38 @@ export const bar = {
   methodLayer: 'Лейер',
   methodMuddle: 'Мадл',
 
+  // Category labels
+  catSpirit: 'Крепкий алкоголь',
+  catLiqueur: 'Ликёры',
+  catWine: 'Вино / Шампанское',
+  catBeer: 'Пиво',
+  catMixer: 'Миксеры / Газировка',
+  catSyrup: 'Сиропы',
+  catJuice: 'Соки',
+  catBitter: 'Биттеры',
+  catGarnish: 'Гарниры',
+  catIce: 'Лёд',
+  catOther: 'Прочее',
+
+  // Unit labels
+  unitMl: 'мл',
+  unitG: 'г',
+  unitPcs: 'шт',
+
+  // Portion labels
+  portionMl: 'мл',
+  portionG: 'г',
+  portionPcs: 'шт',
+  portionOz: 'унция',
+  portionCl: 'сл',
+  portionDash: 'дэш',
+  portionBarspoon: 'бар. ложка',
+  portionDrop: 'капля',
+  portionSlice: 'слайс',
+  portionSprig: 'веточка',
+  portionWedge: 'долька',
+  portionTwist: 'цедра',
+
   // Glass labels
   glassHighball: 'Хайбол',
   glassRocks: 'Рокс',

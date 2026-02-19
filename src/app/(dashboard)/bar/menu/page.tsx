@@ -3,11 +3,11 @@
 import { useState, useMemo } from 'react'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
-import { BAR_PORTION_LABELS } from '@/data/bar-ingredients'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
+  const { locale } = useLocale()
 
   const METHOD_LABELS: Record<string, string> = {
     build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
@@ -21,6 +21,12 @@ export default function BarMenuPage() {
     other: tb.glassOther,
   }
   const DIFFICULTY_LABELS: Record<number, string> = { 1: tb.easy, 2: tb.medium, 3: tb.hard }
+  const PORTION_LABELS: Record<string, string> = {
+    ml: tb.portionMl, g: tb.portionG, pcs: tb.portionPcs,
+    oz: tb.portionOz, cl: tb.portionCl, dash: tb.portionDash,
+    barspoon: tb.portionBarspoon, drop: tb.portionDrop, slice: tb.portionSlice,
+    sprig: tb.portionSprig, wedge: tb.portionWedge, twist: tb.portionTwist,
+  }
 
   const {
     recipes,
@@ -183,9 +189,12 @@ export default function BarMenuPage() {
                       return (
                         <tr key={recipe.id} className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-bgHover)] transition-colors">
                           <td className="px-4 py-3">
-                            <div className="font-medium text-sm">{recipe.name}</div>
-                            {recipe.name_en && (
+                            <div className="font-medium text-sm">{getLocaleName(recipe, locale)}</div>
+                            {locale === 'ru' && recipe.name_en && (
                               <div className="text-xs text-[var(--color-textMuted)]">{recipe.name_en}</div>
+                            )}
+                            {locale !== 'ru' && recipe.name_en && (
+                              <div className="text-xs text-[var(--color-textMuted)]">{recipe.name}</div>
                             )}
                             {recipe.glass && GLASS_LABELS[recipe.glass] && (
                               <div className="text-xs text-[var(--color-textMuted)]">{GLASS_LABELS[recipe.glass]}</div>
@@ -194,7 +203,7 @@ export default function BarMenuPage() {
                           <td className="px-4 py-3 hidden sm:table-cell">
                             <div className="text-xs text-[var(--color-textMuted)] line-clamp-2">
                               {recipe.ingredients.map(ing =>
-                                `${ing.ingredient_name} ${ing.quantity}${BAR_PORTION_LABELS[ing.unit]}`
+                                `${ing.ingredient_name} ${ing.quantity}${PORTION_LABELS[ing.unit]}`
                               ).join(', ')}
                             </div>
                           </td>

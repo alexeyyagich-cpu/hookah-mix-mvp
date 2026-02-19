@@ -5,7 +5,6 @@ import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
 import { AddBarIngredientModal } from '@/components/bar/AddBarIngredientModal'
-import { BAR_UNIT_LABELS } from '@/data/bar-ingredients'
 import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
 
