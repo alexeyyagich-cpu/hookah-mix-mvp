@@ -741,10 +741,29 @@ export interface BarAnalytics {
 export type KdsOrderStatus = 'new' | 'preparing' | 'ready' | 'served' | 'cancelled'
 export type KdsOrderType = 'bar' | 'hookah'
 
+export interface KdsHookahTobacco {
+  tobacco_id: string
+  brand: string
+  flavor: string
+  percent: number
+  color: string
+}
+
+export interface KdsHookahData {
+  tobaccos: KdsHookahTobacco[]
+  total_grams: number
+  bowl_name: string | null
+  bowl_id: string | null
+  heat_setup: { coals: number; packing: PackingStyle } | null
+  strength: StrengthPreference | null
+  compatibility_score: number | null
+}
+
 export interface KdsOrderItem {
   name: string
   quantity: number
   details: string | null
+  hookah_data?: KdsHookahData | null
 }
 
 export interface KdsOrder {

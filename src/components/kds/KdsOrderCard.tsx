@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconTimer, IconCocktail, IconBowl, IconClose } from '@/components/Icons'
-import type { KdsOrder, KdsOrderStatus } from '@/types/database'
+import type { KdsOrder, KdsOrderStatus, KdsHookahData } from '@/types/database'
 
 interface KdsOrderCardProps {
   order: KdsOrder
@@ -86,6 +86,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
 
   const isBar = order.type === 'bar'
   const canCancel = order.status === 'new' || order.status === 'preparing'
+  const hookahData: KdsHookahData | null = !isBar && order.items[0]?.hookah_data ? order.items[0].hookah_data : null
 
   return (
     <div className={`card border-l-4 ${BORDER_COLORS[order.status]} p-4 space-y-3 transition-all`}>
@@ -132,21 +133,56 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
       </div>
 
       {/* Items */}
-      <div className="space-y-1.5">
-        {order.items.map((item, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <span className="text-xs text-[var(--color-textMuted)] mt-0.5 w-4 flex-shrink-0">
-              {item.quantity > 1 ? `${item.quantity}x` : ''}
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium">{item.name}</div>
-              {item.details && (
-                <div className="text-xs text-[var(--color-textMuted)]">{item.details}</div>
-              )}
-            </div>
+      {hookahData ? (
+        <div className="space-y-2">
+          {/* Tobacco pills */}
+          <div className="flex flex-wrap gap-1.5">
+            {hookahData.tobaccos.map((tob, i) => (
+              <span
+                key={i}
+                className="px-2 py-1 rounded-full text-xs font-medium"
+                style={{
+                  background: tob.color + '20',
+                  color: tob.color,
+                  border: `1px solid ${tob.color}40`,
+                }}
+              >
+                {tob.flavor} {tob.percent}%
+              </span>
+            ))}
           </div>
-        ))}
-      </div>
+          {/* Mix details */}
+          <div className="text-xs text-[var(--color-textMuted)] flex flex-wrap gap-x-2">
+            <span>{t.gramsShortLabel(hookahData.total_grams)}</span>
+            {hookahData.bowl_name && <span>{hookahData.bowl_name}</span>}
+            {hookahData.heat_setup && (
+              <span>
+                {t.coalsLabel(hookahData.heat_setup.coals)}, {
+                  hookahData.heat_setup.packing === 'fluffy' ? t.packingFluffy :
+                  hookahData.heat_setup.packing === 'semi-dense' ? t.packingSemiDense :
+                  t.packingDense
+                }
+              </span>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          {order.items.map((item, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <span className="text-xs text-[var(--color-textMuted)] mt-0.5 w-4 flex-shrink-0">
+                {item.quantity > 1 ? `${item.quantity}x` : ''}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium">{item.name}</div>
+                {item.details && (
+                  <div className="text-xs text-[var(--color-textMuted)]">{item.details}</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Notes */}
       {order.notes && (

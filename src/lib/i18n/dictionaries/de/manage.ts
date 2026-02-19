@@ -297,6 +297,26 @@ export const manage: typeof ManageType = {
   servePacking: 'Packung',
   serveGrams: (n: number) => `${n}g`,
 
+  // Structured KDS Hookah
+  hookahModeStructured: 'Baukasten',
+  hookahModeFreetext: 'Freitext',
+  tobaccoSearch: 'Tabak suchen...',
+  noTobaccoResults: 'Kein Tabak gefunden',
+  selectedTobaccosLabel: 'Ausgewählte Tabake',
+  totalGramsLabel: 'Gramm',
+  bowlLabel: 'Kopf',
+  noBowlSelected: 'Kein Kopf',
+  useLastMixBtn: 'Mix wiederholen',
+  useLastMix: (name: string) => `Mix von ${name}`,
+  noTobaccosSelected: 'Mind. einen Tabak hinzufügen',
+  autoHeatSetup: 'Hitze-Empfehlung',
+  coalsLabel: (n: number) => `${n} Kohlen`,
+  packingFluffy: 'Locker',
+  packingSemiDense: 'Mittel',
+  packingDense: 'Dicht',
+  gramsShortLabel: (n: number) => `${n}g`,
+  inStock: 'Auf Lager',
+
   // FloorPlan component
   addTableBtn: 'Tisch hinzufügen',
   noTablesEmpty: 'Keine Tische',

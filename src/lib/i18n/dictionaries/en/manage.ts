@@ -297,6 +297,26 @@ export const manage: typeof ManageType = {
   servePacking: 'Packing',
   serveGrams: (n: number) => `${n}g`,
 
+  // Structured KDS Hookah
+  hookahModeStructured: 'Builder',
+  hookahModeFreetext: 'Free text',
+  tobaccoSearch: 'Search tobacco...',
+  noTobaccoResults: 'No tobacco found',
+  selectedTobaccosLabel: 'Selected tobaccos',
+  totalGramsLabel: 'Grams',
+  bowlLabel: 'Bowl',
+  noBowlSelected: 'No bowl',
+  useLastMixBtn: 'Repeat mix',
+  useLastMix: (name: string) => `${name}'s mix`,
+  noTobaccosSelected: 'Add at least one tobacco',
+  autoHeatSetup: 'Heat recommendation',
+  coalsLabel: (n: number) => `${n} coals`,
+  packingFluffy: 'Fluffy',
+  packingSemiDense: 'Semi-dense',
+  packingDense: 'Dense',
+  gramsShortLabel: (n: number) => `${n}g`,
+  inStock: 'In stock',
+
   // FloorPlan component
   addTableBtn: 'Add table',
   noTablesEmpty: 'No tables',

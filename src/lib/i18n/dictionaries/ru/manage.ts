@@ -303,6 +303,26 @@ export const manage = {
   servePacking: 'Забивка',
   serveGrams: (n: number) => `${n}г`,
 
+  // Structured KDS Hookah
+  hookahModeStructured: 'Конструктор',
+  hookahModeFreetext: 'Свободный текст',
+  tobaccoSearch: 'Поиск табака...',
+  noTobaccoResults: 'Табак не найден',
+  selectedTobaccosLabel: 'Выбранные табаки',
+  totalGramsLabel: 'Граммы',
+  bowlLabel: 'Чаша',
+  noBowlSelected: 'Без чаши',
+  useLastMixBtn: 'Повторить микс',
+  useLastMix: (name: string) => `Микс ${name}`,
+  noTobaccosSelected: 'Добавьте хотя бы один табак',
+  autoHeatSetup: 'Рекомендация по жару',
+  coalsLabel: (n: number) => `${n} угля`,
+  packingFluffy: 'Воздушная',
+  packingSemiDense: 'Средняя',
+  packingDense: 'Плотная',
+  gramsShortLabel: (n: number) => `${n}г`,
+  inStock: 'В наличии',
+
   // FloorPlan component
   addTableBtn: 'Добавить стол',
   noTablesEmpty: 'Нет столов',

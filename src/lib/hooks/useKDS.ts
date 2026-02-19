@@ -36,10 +36,26 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     guest_name: 'Max W.',
     type: 'hookah',
     items: [
-      { name: 'Darkside Supernova + MH Pinkman', quantity: 1, details: '20г, чаша Phunnel Large' },
+      {
+        name: 'Supernova (50%) + Pinkman (50%)',
+        quantity: 1,
+        details: '20г, Phunnel Large',
+        hookah_data: {
+          tobaccos: [
+            { tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', percent: 50, color: '#06B6D4' },
+            { tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', percent: 50, color: '#EC4899' },
+          ],
+          total_grams: 20,
+          bowl_name: 'Phunnel Large',
+          bowl_id: null,
+          heat_setup: { coals: 3, packing: 'semi-dense' },
+          strength: 'strong',
+          compatibility_score: 85,
+        },
+      },
     ],
     status: 'new',
-    notes: 'Средняя крепость',
+    notes: null,
     created_at: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
     completed_at: null,
@@ -70,7 +86,23 @@ const DEMO_KDS_ORDERS: KdsOrder[] = [
     guest_name: 'Tomasz K.',
     type: 'hookah',
     items: [
-      { name: 'Tangiers Cane Mint + Darkside Bananapapa', quantity: 1, details: '18г, чаша Phunnel Medium' },
+      {
+        name: 'Cane Mint (60%) + Bananapapa (40%)',
+        quantity: 1,
+        details: '18г, Phunnel Medium',
+        hookah_data: {
+          tobaccos: [
+            { tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', percent: 60, color: '#10B981' },
+            { tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', percent: 40, color: '#FACC15' },
+          ],
+          total_grams: 18,
+          bowl_name: 'Phunnel Medium',
+          bowl_id: null,
+          heat_setup: { coals: 3, packing: 'semi-dense' },
+          strength: 'medium',
+          compatibility_score: 78,
+        },
+      },
     ],
     status: 'preparing',
     notes: null,

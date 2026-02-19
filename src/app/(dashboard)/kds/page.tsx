@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react'
 import { useKDS } from '@/lib/hooks/useKDS'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
+import { useBowls } from '@/lib/hooks/useBowls'
+import { useInventory } from '@/lib/hooks/useInventory'
+import { useGuests } from '@/lib/hooks/useGuests'
 import { useModules } from '@/lib/hooks/useModules'
 import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
@@ -19,6 +22,9 @@ export default function KdsPage() {
   const { orders, loading, error, createOrder, updateStatus, cancelOrder } = useKDS()
   const { tables } = useFloorPlan()
   const { recipes } = useBarRecipes()
+  const { bowls } = useBowls()
+  const { inventory } = useInventory()
+  const { guests } = useGuests()
   const { isBarActive, isHookahActive } = useModules()
 
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
@@ -218,6 +224,9 @@ export default function KdsPage() {
         recipes={recipes}
         isBarActive={isBarActive}
         isHookahActive={isHookahActive}
+        bowls={bowls}
+        inventory={inventory}
+        guests={guests}
       />
     </div>
   )

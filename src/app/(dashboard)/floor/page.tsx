@@ -11,6 +11,7 @@ import { IconSettings, IconCalendar } from '@/components/Icons'
 import { useTranslation, useLocale } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
+import { useKDS } from '@/lib/hooks/useKDS'
 import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
@@ -38,6 +39,7 @@ export default function FloorPage() {
   const { guests, recordVisit } = useGuests()
   const { inventory } = useInventory()
   const { createSession } = useSessions()
+  const { createOrder: createKdsOrder } = useKDS()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
   const [showQuickReserve, setShowQuickReserve] = useState(false)
@@ -173,6 +175,50 @@ export default function FloorPage() {
 
       // Record visit in guest CRM
       await recordVisit(occupiedGuest.id, snapshot)
+
+      // Send KDS order (non-blocking)
+      try {
+        await createKdsOrder({
+          table_id: activeSelectedTable?.id || null,
+          table_name: activeSelectedTable?.name || null,
+          guest_name: occupiedGuest.name,
+          type: 'hookah',
+          items: [{
+            name: resolvedTobaccos
+              .filter(rt => rt.available || rt.replacement)
+              .map(rt => {
+                const tob = rt.replacement || rt.tobacco
+                return `${tob.flavor} (${rt.percent}%)`
+              })
+              .join(' + '),
+            quantity: 1,
+            details: `${snapshot.total_grams}g, ${snapshot.bowl_type || ''}`,
+            hookah_data: {
+              tobaccos: resolvedTobaccos
+                .filter(rt => rt.available || rt.replacement)
+                .map(rt => {
+                  const tob = rt.replacement || rt.tobacco
+                  return {
+                    tobacco_id: tob.id,
+                    brand: tob.brand,
+                    flavor: tob.flavor,
+                    percent: rt.percent,
+                    color: tob.color,
+                  }
+                }),
+              total_grams: snapshot.total_grams,
+              bowl_name: snapshot.bowl_type || null,
+              bowl_id: null,
+              heat_setup: snapshot.heat_setup || null,
+              strength: snapshot.strength || null,
+              compatibility_score: snapshot.compatibility_score,
+            },
+          }],
+          notes: null,
+        })
+      } catch (e) {
+        console.error('KDS order failed:', e)
+      }
 
       setServeStatus('served')
       setTimeout(() => setServeStatus('idle'), 1500)
