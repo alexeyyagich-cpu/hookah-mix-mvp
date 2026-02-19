@@ -309,8 +309,8 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
   }, [user, supabase, dateRange, organizationId, locationId])
 
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    if (!isDemoMode) fetchData()
+  }, [fetchData, isDemoMode])
 
   const statistics = useMemo<Statistics | null>(() => {
     if (!sessions.length && !inventory.length) return null

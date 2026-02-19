@@ -85,8 +85,8 @@ export function useInventory(): UseInventoryReturn {
   }, [user, supabase])
 
   useEffect(() => {
-    fetchInventory()
-  }, [fetchInventory])
+    if (!isDemoMode) fetchInventory()
+  }, [fetchInventory, isDemoMode])
 
   const addTobacco = async (
     tobacco: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>

@@ -83,16 +83,33 @@ export function useBowls(): UseBowlsReturn {
   }, [user, supabase])
 
   useEffect(() => {
-    fetchBowls()
-  }, [fetchBowls])
+    if (!isDemoMode) fetchBowls()
+  }, [fetchBowls, isDemoMode])
 
   const addBowl = async (
     bowl: Omit<BowlType, 'id' | 'profile_id' | 'created_at'>
   ): Promise<BowlType | null> => {
-    if (!user || !supabase) return null
+    if (!user) return null
     if (!canAddMore) {
       setError(`Достигнут лимит (${bowlsLimit} чаш). Обновите подписку для добавления больше чаш.`)
       return null
+    }
+
+    if (isDemoMode || !supabase) {
+      const isDefault = bowls.length === 0 || bowl.is_default
+      const newBowl: BowlType = {
+        ...bowl,
+        id: `demo-${Date.now()}`,
+        profile_id: 'demo',
+        is_default: isDefault,
+        created_at: new Date().toISOString(),
+      }
+      if (isDefault) {
+        setBowls(prev => [...prev.map(b => ({ ...b, is_default: false })), newBowl])
+      } else {
+        setBowls(prev => [...prev, newBowl])
+      }
+      return newBowl
     }
 
     // If this is set as default, unset other defaults
@@ -127,7 +144,12 @@ export function useBowls(): UseBowlsReturn {
   }
 
   const updateBowl = async (id: string, updates: Partial<BowlType>): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    if (isDemoMode || !supabase) {
+      setBowls(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b))
+      return true
+    }
 
     const { error: updateError } = await supabase
       .from('bowl_types')
@@ -145,7 +167,12 @@ export function useBowls(): UseBowlsReturn {
   }
 
   const deleteBowl = async (id: string): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    if (isDemoMode || !supabase) {
+      setBowls(prev => prev.filter(b => b.id !== id))
+      return true
+    }
 
     const bowl = bowls.find(b => b.id === id)
     const wasDefault = bowl?.is_default
@@ -177,7 +204,12 @@ export function useBowls(): UseBowlsReturn {
   }
 
   const setDefaultBowl = async (id: string): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    if (isDemoMode || !supabase) {
+      setBowls(prev => prev.map(b => ({ ...b, is_default: b.id === id })))
+      return true
+    }
 
     // Unset all defaults
     await supabase

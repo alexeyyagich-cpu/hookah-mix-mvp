@@ -142,15 +142,31 @@ export function useSessions(): UseSessionsReturn {
   }, [user, supabase, historyDays])
 
   useEffect(() => {
-    fetchSessions()
-  }, [fetchSessions])
+    if (!isDemoMode) fetchSessions()
+  }, [fetchSessions, isDemoMode])
 
   const createSession = async (
     sessionData: Omit<Session, 'id' | 'profile_id'>,
     items: Omit<SessionItem, 'id' | 'session_id'>[],
     deductFromInventory = true
   ): Promise<Session | null> => {
-    if (!user || !supabase) return null
+    if (!user) return null
+
+    if (isDemoMode || !supabase) {
+      const newSession: Session = {
+        ...sessionData,
+        id: `demo-${Date.now()}`,
+        profile_id: 'demo',
+        created_by: null,
+      }
+      const newItems = items.map((item, i) => ({
+        ...item,
+        id: `demo-item-${Date.now()}-${i}`,
+        session_id: newSession.id,
+      }))
+      setSessions(prev => [{ ...newSession, session_items: newItems, bowl_type: null } as SessionWithItems, ...prev])
+      return newSession
+    }
 
     // Create session — created_by always tracks the actual logged-in user
     const { data: session, error: sessionError } = await supabase
@@ -227,7 +243,12 @@ export function useSessions(): UseSessionsReturn {
   }
 
   const updateSession = async (id: string, updates: Partial<Session>): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    if (isDemoMode || !supabase) {
+      setSessions(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s))
+      return true
+    }
 
     const { error: updateError } = await supabase
       .from('sessions')
@@ -245,7 +266,12 @@ export function useSessions(): UseSessionsReturn {
   }
 
   const deleteSession = async (id: string): Promise<boolean> => {
-    if (!user || !supabase) return false
+    if (!user) return false
+
+    if (isDemoMode || !supabase) {
+      setSessions(prev => prev.filter(s => s.id !== id))
+      return true
+    }
 
     // Delete session items first
     await supabase
