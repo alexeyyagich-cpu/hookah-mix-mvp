@@ -49,28 +49,51 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [draggedTable, setDraggedTable] = useState<string | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, table: FloorTable) => {
+  // Unified pointer handling for mouse + touch
+  const getPointerPos = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('touches' in e) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    }
+    return { x: e.clientX, y: e.clientY }
+  }
+
+  const getPointerEndPos = (e: React.MouseEvent | React.TouchEvent) => {
+    if ('changedTouches' in e) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }
+    }
+    return { x: e.clientX, y: e.clientY }
+  }
+
+  const handlePointerDown = useCallback((e: React.MouseEvent | React.TouchEvent, table: FloorTable) => {
     if (!editable) return
     e.preventDefault()
     const rect = containerRef.current?.getBoundingClientRect()
     if (!rect) return
 
+    const pos = 'touches' in e
+      ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      : { x: e.clientX, y: e.clientY }
+
     setDraggedTable(table.id)
+    setIsDragging(false)
     setDragOffset({
-      x: e.clientX - rect.left - table.position_x,
-      y: e.clientY - rect.top - table.position_y,
+      x: pos.x - rect.left - table.position_x,
+      y: pos.y - rect.top - table.position_y,
     })
   }, [editable])
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const handlePointerMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (!draggedTable || !containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
-    const x = Math.max(0, Math.min(rect.width - 60, e.clientX - rect.left - dragOffset.x))
-    const y = Math.max(0, Math.min(rect.height - 60, e.clientY - rect.top - dragOffset.y))
+    const pos = getPointerPos(e)
+    const x = Math.max(0, Math.min(rect.width - 60, pos.x - rect.left - dragOffset.x))
+    const y = Math.max(0, Math.min(rect.height - 60, pos.y - rect.top - dragOffset.y))
 
-    // Update position visually (optimistic update)
+    setIsDragging(true)
+
     const tableEl = document.getElementById(`table-${draggedTable}`)
     if (tableEl) {
       tableEl.style.left = `${x}px`
@@ -78,24 +101,31 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
     }
   }, [draggedTable, dragOffset])
 
-  const handleMouseUp = useCallback(async (e: React.MouseEvent) => {
+  const handlePointerUp = useCallback(async (e: React.MouseEvent | React.TouchEvent) => {
     if (!draggedTable || !containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
-    const x = Math.max(0, Math.min(rect.width - 60, e.clientX - rect.left - dragOffset.x))
-    const y = Math.max(0, Math.min(rect.height - 60, e.clientY - rect.top - dragOffset.y))
+    const pos = getPointerEndPos(e)
+    const x = Math.max(0, Math.min(rect.width - 60, pos.x - rect.left - dragOffset.x))
+    const y = Math.max(0, Math.min(rect.height - 60, pos.y - rect.top - dragOffset.y))
 
-    await moveTable(draggedTable, Math.round(x), Math.round(y))
+    if (isDragging) {
+      await moveTable(draggedTable, Math.round(x), Math.round(y))
+    }
     setDraggedTable(null)
-  }, [draggedTable, dragOffset, moveTable])
+    setIsDragging(false)
+  }, [draggedTable, dragOffset, isDragging, moveTable])
 
-  const handleTableClick = useCallback((table: FloorTable) => {
+  const handleTableClick = useCallback((e: React.MouseEvent | React.TouchEvent, table: FloorTable) => {
+    // In edit mode, don't handle click if we just finished dragging
+    if (isDragging) return
+
     setSelectedTable(table)
     if (editable) {
       setIsEditModalOpen(true)
     } else {
       onTableSelect?.(table)
     }
-  }, [editable, onTableSelect])
+  }, [editable, onTableSelect, isDragging])
 
   const formatDuration = (startTime: string | null): string => {
     if (!startTime) return ''
@@ -156,9 +186,12 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
           height: '400px',
           minHeight: '400px',
         }}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseMove={handlePointerMove}
+        onMouseUp={handlePointerUp}
+        onMouseLeave={handlePointerUp}
+        onTouchMove={handlePointerMove}
+        onTouchEnd={handlePointerUp}
+        onTouchCancel={handlePointerUp}
       >
         {/* Grid pattern */}
         <div
@@ -178,13 +211,24 @@ export function FloorPlan({ onTableSelect, editable = false }: FloorPlanProps) {
             <div
               key={table.id}
               id={`table-${table.id}`}
-              onClick={() => handleTableClick(table)}
-              onMouseDown={(e) => handleMouseDown(e, table)}
+              role="button"
+              tabIndex={0}
+              onClick={(e) => handleTableClick(e, table)}
+              onTouchEnd={(e) => {
+                if (!editable && !isDragging) {
+                  e.preventDefault()
+                  handleTableClick(e, table)
+                }
+              }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleTableClick(e as unknown as React.MouseEvent, table) }}
+              onMouseDown={(e) => handlePointerDown(e, table)}
+              onTouchStart={(e) => handlePointerDown(e, table)}
               className={`
                 absolute flex flex-col items-center justify-center
-                transition-shadow cursor-pointer select-none
+                transition-all cursor-pointer select-none
+                hover:scale-105 hover:brightness-110 active:scale-95
                 ${editable ? 'cursor-move' : ''}
-                ${draggedTable === table.id ? 'shadow-xl z-10' : 'shadow-lg'}
+                ${draggedTable === table.id ? 'shadow-xl z-10 scale-105' : 'shadow-lg'}
                 ${isOccupied ? 'animate-pulse-subtle' : ''}
               `}
               style={{

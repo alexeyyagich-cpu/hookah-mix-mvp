@@ -22,7 +22,7 @@ export default function FloorPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
-  const { tables } = useFloorPlan()
+  const { tables, setTableStatus } = useFloorPlan()
   const { reservations } = useReservations()
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
@@ -199,9 +199,36 @@ export default function FloorPage() {
             </div>
           )}
 
+          {/* Status change buttons */}
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {([
+              { status: 'available' as const, label: tm.statusAvailable, color: 'var(--color-success)' },
+              { status: 'occupied' as const, label: tm.statusOccupied, color: 'var(--color-primary)' },
+              { status: 'reserved' as const, label: tm.statusReserved, color: 'var(--color-warning)' },
+              { status: 'cleaning' as const, label: tm.statusCleaning, color: 'var(--color-textMuted)' },
+            ] as const).map(({ status, label, color }) => (
+              <button
+                key={status}
+                onClick={async () => {
+                  await setTableStatus(selectedTable.id, status, status === 'reserved' ? selectedTable.current_guest_name : undefined)
+                  setSelectedTable({ ...selectedTable, status })
+                }}
+                disabled={selectedTable.status === status}
+                className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                style={{
+                  background: selectedTable.status === status ? color : 'var(--color-bgHover)',
+                  color: selectedTable.status === status ? 'white' : 'var(--color-text)',
+                  opacity: selectedTable.status === status ? 1 : 0.8,
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={() => setSelectedTable(null)}
-            className="mt-4 px-4 py-2 rounded-xl text-sm"
+            className="mt-3 px-4 py-2 rounded-xl text-sm w-full"
             style={{
               background: 'var(--color-bgHover)',
               color: 'var(--color-text)',
