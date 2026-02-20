@@ -336,15 +336,23 @@ export function SmokeCanvasBackground({ imageSrc, disabled = false, className = 
         />
       )}
 
-      {/* Layer 2: Vignette overlay for depth */}
+      {/* Layer 2: Dark overlay for text readability */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.6) 100%)',
+          background: 'rgba(0,0,0,0.55)',
         }}
       />
 
-      {/* Layer 3: Bottom cover to hide any watermarks in the source image */}
+      {/* Layer 3: Vignette overlay for depth */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.4) 100%)',
+        }}
+      />
+
+      {/* Layer 4: Bottom cover to hide any watermarks in the source image */}
       <div
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{
