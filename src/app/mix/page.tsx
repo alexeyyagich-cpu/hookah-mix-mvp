@@ -592,23 +592,46 @@ function MixPageInner() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-24 relative z-10">
         {/* Guest welcome banner — show when no tobaccos selected in guest mode */}
         {isGuestMode && selectedIds.length === 0 && (
-          <div className="card p-6 mb-6 text-center border-2 border-dashed animate-fadeInUp" style={{ borderColor: 'var(--color-primary)', background: 'var(--color-primary)10' }}>
-            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
-              {t.guestWelcomeTitle || 'Создайте свой микс!'}
+          <div className="card p-6 mb-6 animate-fadeInUp" style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.08) 0%, rgba(168,85,247,0.08) 50%, rgba(56,189,248,0.08) 100%)', border: '1px solid var(--color-border)' }}>
+            {/* Steps */}
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-primary)', color: 'white' }}>1</span>
+                <span className="text-sm font-medium hidden sm:inline" style={{ color: 'var(--color-text)' }}>{t.guestStep1 || 'Выберите категорию'}</span>
+              </div>
+              <span style={{ color: 'var(--color-textMuted)' }}>{'\u2192'}</span>
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-border)', color: 'var(--color-text)' }}>2</span>
+                <span className="text-sm hidden sm:inline" style={{ color: 'var(--color-textMuted)' }}>{t.guestStep2 || 'Нажмите на вкус'}</span>
+              </div>
+              <span style={{ color: 'var(--color-textMuted)' }}>{'\u2192'}</span>
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-border)', color: 'var(--color-text)' }}>3</span>
+                <span className="text-sm hidden sm:inline" style={{ color: 'var(--color-textMuted)' }}>{t.guestStep3 || 'Готовый микс!'}</span>
+              </div>
+            </div>
+
+            <h2 className="text-xl font-bold mb-1 text-center" style={{ color: 'var(--color-text)' }}>
+              {t.guestWelcomeTitle}
             </h2>
-            <p className="text-sm mb-4" style={{ color: 'var(--color-textMuted)' }}>
-              {t.guestWelcomeHint || 'Выберите вкусы из каталога ниже или начните с категории'}
+            <p className="text-sm mb-5 text-center" style={{ color: 'var(--color-textMuted)' }}>
+              {t.guestWelcomeHint}
             </p>
-            <div className="flex flex-wrap gap-2 justify-center">
+
+            {/* Category grid */}
+            <div className="grid grid-cols-5 sm:grid-cols-5 gap-2 max-w-lg mx-auto">
               {CATEGORIES.map(cat => (
                 <button
                   key={cat}
                   onClick={() => { setSelectedCategory(cat); setShowCategoryFilter(true); }}
-                  className="pill hover:scale-105 transition-transform"
-                  style={{ fontSize: '0.875rem' }}
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all hover:scale-105 active:scale-95"
+                  style={{
+                    background: 'var(--color-bgCard)',
+                    border: '1px solid var(--color-border)',
+                  }}
                 >
-                  <span>{CATEGORY_EMOJI[cat]}</span>
-                  <span>{CATEGORY_LABELS[cat]}</span>
+                  <span className="text-2xl">{CATEGORY_EMOJI[cat]}</span>
+                  <span className="text-xs font-medium" style={{ color: 'var(--color-text)' }}>{CATEGORY_LABELS[cat]}</span>
                 </button>
               ))}
             </div>
@@ -620,6 +643,11 @@ function MixPageInner() {
           {selectedTobaccos.length === 0 && !isGuestMode && (
             <span className="text-sm" style={{ color: 'var(--color-textMuted)' }}>
               {t.mixSelectHint}
+            </span>
+          )}
+          {isGuestMode && selectedTobaccos.length > 0 && selectedTobaccos.length < 2 && (
+            <span className="text-sm animate-fadeInUp" style={{ color: 'var(--color-primary)' }}>
+              {t.guestHintMore || `\u2191 ${2 - selectedTobaccos.length === 1 ? 'Добавьте ещё 1 вкус' : 'Добавьте ещё вкусы'} для микса`}
             </span>
           )}
           {selectedTobaccos.map((t, i) => (
