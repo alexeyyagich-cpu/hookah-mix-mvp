@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         if (!valid || !profileId) {
           await sendMessage(
             chatId,
-            '❌ <b>Ссылка устарела или недействительна</b>\n\nПолучите новую ссылку в разделе <b>Настройки</b> приложения.',
+            '❌ <b>Link expired or invalid</b>\n\nGet a new link in the <b>Settings</b> section of the app.',
             { parseMode: 'HTML' }
           )
           return NextResponse.json({ ok: true })
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           if (!profile) {
             await sendMessage(
               chatId,
-              '❌ <b>Профиль не найден</b>\n\nПолучите новую ссылку в разделе <b>Настройки</b> приложения.',
+              '❌ <b>Profile not found</b>\n\nGet a new link in the <b>Settings</b> section of the app.',
               { parseMode: 'HTML' }
             )
             return NextResponse.json({ ok: true })
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
             await sendMessage(
               chatId,
-              '✅ <b>Подключение обновлено!</b>\n\nВаш аккаунт Hookah Torus привязан к этому чату. Вы будете получать уведомления.',
+              '✅ <b>Connection updated!</b>\n\nYour Hookah Torus account is linked to this chat. You will receive notifications.',
               { parseMode: 'HTML' }
             )
           } else {
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
             await sendMessage(
               chatId,
-              '🎉 <b>Подключено!</b>\n\nВаш аккаунт Hookah Torus успешно привязан к Telegram.\n\nТеперь вы будете получать уведомления о:\n• Низком запасе табака\n• Обновлениях заказов\n\nНастройте уведомления в разделе <b>Настройки</b> приложения.',
+              '🎉 <b>Connected!</b>\n\nYour Hookah Torus account is now linked to Telegram.\n\nYou will receive notifications about:\n• Low tobacco stock\n• Order updates\n\nConfigure notifications in the <b>Settings</b> section of the app.',
               { parseMode: 'HTML' }
             )
           }
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         // Start without token - just welcome message
         await sendMessage(
           chatId,
-          '👋 <b>Добро пожаловать в Hookah Torus Bot!</b>\n\nЧтобы подключить бота к вашему аккаунту, используйте ссылку из раздела <b>Настройки</b> в приложении.',
+          '👋 <b>Welcome to Hookah Torus Bot!</b>\n\nTo connect the bot to your account, use the link from the <b>Settings</b> section in the app.',
           { parseMode: 'HTML' }
         )
       }
@@ -148,18 +148,18 @@ export async function POST(request: NextRequest) {
         if (connection) {
           await sendMessage(
             chatId,
-            `📊 <b>Статус подключения</b>\n\n` +
-            `Заведение: ${connection.profiles?.business_name || 'Не указано'}\n` +
-            `Уведомления: ${connection.notifications_enabled ? '✅' : '❌'}\n` +
-            `Низкий запас: ${connection.low_stock_alerts ? '✅' : '❌'}\n` +
-            `Напоминания: ${connection.session_reminders ? '✅' : '❌'}\n` +
-            `Ежедневный отчёт: ${connection.daily_summary ? '✅' : '❌'}`,
+            `📊 <b>Connection Status</b>\n\n` +
+            `Business: ${connection.profiles?.business_name || 'Not set'}\n` +
+            `Notifications: ${connection.notifications_enabled ? '✅' : '❌'}\n` +
+            `Low stock: ${connection.low_stock_alerts ? '✅' : '❌'}\n` +
+            `Reminders: ${connection.session_reminders ? '✅' : '❌'}\n` +
+            `Daily report: ${connection.daily_summary ? '✅' : '❌'}`,
             { parseMode: 'HTML' }
           )
         } else {
           await sendMessage(
             chatId,
-            '❌ Telegram не подключён к аккаунту Hookah Torus.\n\nИспользуйте ссылку из настроек приложения для подключения.',
+            '❌ Telegram is not connected to a Hookah Torus account.\n\nUse the link from the app settings to connect.',
             { parseMode: 'HTML' }
           )
         }
@@ -170,11 +170,11 @@ export async function POST(request: NextRequest) {
     if (messageText === '/help') {
       await sendMessage(
         chatId,
-        '📖 <b>Доступные команды:</b>\n\n' +
-        '/start - Начать или подключить аккаунт\n' +
-        '/status - Проверить статус подключения\n' +
-        '/help - Показать справку\n\n' +
-        'Настройте уведомления в разделе <b>Настройки → Telegram</b> в приложении.',
+        '📖 <b>Available commands:</b>\n\n' +
+        '/start - Start or connect your account\n' +
+        '/status - Check connection status\n' +
+        '/help - Show help\n\n' +
+        'Configure notifications in <b>Settings → Telegram</b> in the app.',
         { parseMode: 'HTML' }
       )
     }

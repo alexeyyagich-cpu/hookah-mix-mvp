@@ -111,25 +111,25 @@ export async function sendNotification(notification: TelegramNotification) {
 // Notification formatters
 
 export function formatLowStockAlert(items: { brand: string; flavor: string; quantity: number }[]): string {
-  const lines = items.map(item => `• ${item.brand} ${item.flavor}: ${item.quantity}г`)
+  const lines = items.map(item => `• ${item.brand} ${item.flavor}: ${item.quantity}g`)
   return `
-<b>⚠️ Низкий запас табака</b>
+<b>⚠️ Low Tobacco Stock</b>
 
-Следующие позиции заканчиваются:
+The following items are running low:
 
 ${lines.join('\n')}
 
-<a href="${process.env.NEXT_PUBLIC_APP_URL}/inventory">Открыть инвентарь</a>
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/inventory">Open Inventory</a>
   `.trim()
 }
 
 export function formatSessionReminder(tableNames: string[], duration: number): string {
   return `
-<b>⏰ Напоминание о сессиях</b>
+<b>⏰ Session Reminder</b>
 
-Столы ${tableNames.join(', ')} заняты более ${duration} минут.
+Tables ${tableNames.join(', ')} have been occupied for over ${duration} minutes.
 
-<a href="${process.env.NEXT_PUBLIC_APP_URL}/floor">Открыть план зала</a>
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/floor">Open Floor Plan</a>
   `.trim()
 }
 
@@ -147,13 +147,13 @@ export function formatOrderStatusUpdate(
   }
 
   return `
-<b>${statusEmoji[status] || '📋'} Обновление заказа</b>
+<b>${statusEmoji[status] || '📋'} Order Update</b>
 
-Заказ: ${orderNumber}
-Поставщик: ${supplierName}
-Статус: ${status}
+Order: ${orderNumber}
+Supplier: ${supplierName}
+Status: ${status}
 
-<a href="${process.env.NEXT_PUBLIC_APP_URL}/marketplace/orders">Открыть заказы</a>
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/marketplace/orders">View Orders</a>
   `.trim()
 }
 
@@ -164,14 +164,14 @@ export function formatDailySummary(stats: {
   revenue?: number
 }): string {
   return `
-<b>📊 Ежедневный отчёт</b>
+<b>📊 Daily Report</b>
 
-• Сессий сегодня: ${stats.sessionsToday}
-• Использовано табака: ${stats.tobaccoUsed}г
-• Позиций с низким запасом: ${stats.lowStockCount}
-${stats.revenue ? `• Выручка: €${stats.revenue.toFixed(2)}` : ''}
+• Sessions today: ${stats.sessionsToday}
+• Tobacco used: ${stats.tobaccoUsed}g
+• Low stock items: ${stats.lowStockCount}
+${stats.revenue ? `• Revenue: €${stats.revenue.toFixed(2)}` : ''}
 
-<a href="${process.env.NEXT_PUBLIC_APP_URL}/statistics">Подробная статистика</a>
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/statistics">Detailed Statistics</a>
   `.trim()
 }
 
