@@ -13,9 +13,8 @@ export const webhookSecretConfigured = Boolean(TELEGRAM_WEBHOOK_SECRET)
 // Verify webhook request is from Telegram
 export function verifyWebhookSecret(secretHeader: string | null): boolean {
   if (!TELEGRAM_WEBHOOK_SECRET) {
-    // If no secret configured, skip verification (dev mode)
-    // TELEGRAM_WEBHOOK_SECRET not configured - skipping verification
-    return true
+    // Fail closed: reject all requests when secret is not configured
+    return false
   }
   return secretHeader === TELEGRAM_WEBHOOK_SECRET
 }

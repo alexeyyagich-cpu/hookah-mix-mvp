@@ -6,6 +6,16 @@ export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify webhook secret from URL query parameter
+    const webhookSecret = process.env.R2O_WEBHOOK_SECRET
+    if (!webhookSecret) {
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+    }
+    const urlSecret = request.nextUrl.searchParams.get('secret')
+    if (urlSecret !== webhookSecret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json() as R2OWebhookEvent
 
     if (!body.event || !body.accountId) {
@@ -87,20 +97,11 @@ export async function POST(request: NextRequest) {
 
             if (mapping) {
               const gramsUsed = invoiceItem.item_quantity || 1
-              // Decrement inventory
-              const { data: inventory } = await supabaseAdmin
-                .from('tobacco_inventory')
-                .select('quantity_grams')
-                .eq('id', mapping.tobacco_inventory_id)
-                .single()
-
-              if (inventory) {
-                const newQuantity = Math.max(0, inventory.quantity_grams - gramsUsed)
-                await supabaseAdmin
-                  .from('tobacco_inventory')
-                  .update({ quantity_grams: newQuantity })
-                  .eq('id', mapping.tobacco_inventory_id)
-              }
+              // Atomic decrement via RPC (prevents race conditions)
+              await supabaseAdmin.rpc('decrement_tobacco_inventory', {
+                p_inventory_id: mapping.tobacco_inventory_id,
+                p_grams_used: gramsUsed,
+              })
             }
           }
 

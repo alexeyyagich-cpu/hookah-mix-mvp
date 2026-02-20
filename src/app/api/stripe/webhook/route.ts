@@ -123,15 +123,29 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const userId = session.subscription
-    ? (await stripe.subscriptions.retrieve(session.subscription as string)).metadata.supabase_user_id
-    : session.metadata?.supabase_user_id
+  const userId = session.metadata?.supabase_user_id
 
   if (!userId) {
     console.error('No user ID found in checkout session')
     return
   }
 
+  const supabase = getSupabaseAdmin()
+  const customerId = session.customer as string
+
+  // Link Stripe customer ID to profile
+  if (customerId) {
+    await supabase
+      .from('profiles')
+      .update({ stripe_customer_id: customerId })
+      .eq('id', userId)
+  }
+
+  // If a subscription was created, update the profile
+  if (session.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+    await updateUserSubscription(userId, subscription)
+  }
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
@@ -182,8 +196,17 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
     if (error) {
       console.error('Failed to update subscription:', error)
     }
-  } else if (status === 'past_due' || status === 'unpaid') {
-    // Keep the tier but mark as past due (could add a flag for this)
+  } else if (status === 'past_due' || status === 'unpaid' || status === 'canceled') {
+    // Downgrade to free on failed payment or cancellation
+    const supabase = getSupabaseAdmin()
+    await supabase
+      .from('profiles')
+      .update({
+        subscription_tier: 'free',
+        subscription_expires_at: null,
+        stripe_subscription_id: status === 'canceled' ? null : subscription.id,
+      })
+      .eq('id', userId)
   }
 }
 
@@ -218,9 +241,46 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
-  // Could send confirmation email here
+  // Renewal payment — ensure subscription tier is correct
+  const invoiceAny = invoice as unknown as Record<string, unknown>
+  const subscriptionId = (invoiceAny.subscription || invoiceAny.subscription_id) as string | null
+  if (!subscriptionId || !stripe) return
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+  const customerId = (invoiceAny.customer || invoiceAny.customer_id) as string
+
+  const supabase = getSupabaseAdmin()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('stripe_customer_id', customerId)
+    .single()
+
+  if (profile) {
+    await updateUserSubscription(profile.id, subscription)
+  }
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  // Could send payment failed email here
+  // Mark subscription as expired when payment fails
+  const invoiceAny = invoice as unknown as Record<string, unknown>
+  const customerId = (invoiceAny.customer || invoiceAny.customer_id) as string
+  if (!customerId) return
+
+  const supabase = getSupabaseAdmin()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('stripe_customer_id', customerId)
+    .single()
+
+  if (profile) {
+    await supabase
+      .from('profiles')
+      .update({
+        subscription_tier: 'free',
+        subscription_expires_at: null,
+      })
+      .eq('id', profile.id)
+  }
 }

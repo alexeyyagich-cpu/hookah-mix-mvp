@@ -99,6 +99,7 @@ export const settings: typeof SettingsType = {
   deleteAccountDesc: 'Alle Daten werden unwiderruflich gelöscht',
   deleteConfirm1: 'Sind Sie sicher? Alle Daten werden unwiderruflich gelöscht.',
   deleteConfirm2: 'Diese Aktion kann nicht rückgängig gemacht werden. Fortfahren?',
+  deleteError: 'Konto konnte nicht gelöscht werden',
   portalError: 'Portal konnte nicht geöffnet werden',
   portalOpenError: 'Fehler beim Öffnen des Abonnementportals',
 } as const

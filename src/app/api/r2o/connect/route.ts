@@ -71,9 +71,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json().catch(() => ({}))
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
-    const redirectUri = body.redirectUri || `${appUrl}/api/r2o/callback`
+    const redirectUri = `${appUrl}/api/r2o/callback`
 
     // Request grant access from r2o
     const grant = await grantAccessToken(developerToken, redirectUri)

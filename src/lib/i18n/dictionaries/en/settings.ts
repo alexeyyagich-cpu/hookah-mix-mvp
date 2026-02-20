@@ -99,6 +99,7 @@ export const settings: typeof SettingsType = {
   deleteAccountDesc: 'All data will be permanently deleted',
   deleteConfirm1: 'Are you sure? All data will be permanently deleted.',
   deleteConfirm2: 'This action cannot be undone. Continue?',
+  deleteError: 'Failed to delete account',
   portalError: 'Could not open portal',
   portalOpenError: 'Error opening subscription portal',
 } as const

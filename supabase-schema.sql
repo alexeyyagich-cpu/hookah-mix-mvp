@@ -1297,3 +1297,27 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_shifts_one_open_per_profile
 -- =============================================
 ALTER TABLE public.kds_orders ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'staff'
   CHECK (source IN ('staff', 'guest_qr'));
+
+-- =============================================
+-- Atomic inventory decrement RPC
+-- =============================================
+CREATE OR REPLACE FUNCTION public.decrement_tobacco_inventory(
+  p_inventory_id UUID,
+  p_grams_used NUMERIC
+)
+RETURNS NUMERIC
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_new_quantity NUMERIC;
+BEGIN
+  UPDATE public.tobacco_inventory
+  SET quantity_grams = GREATEST(0, quantity_grams - p_grams_used),
+      updated_at = now()
+  WHERE id = p_inventory_id
+  RETURNING quantity_grams INTO v_new_quantity;
+
+  RETURN COALESCE(v_new_quantity, -1);
+END;
+$$;

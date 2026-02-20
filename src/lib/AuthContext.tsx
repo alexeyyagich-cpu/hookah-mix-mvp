@@ -159,7 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [supabase, fetchProfile])
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     if (!supabase) {
       return { error: new Error('Supabase not configured') }
     }
@@ -168,9 +168,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
     })
     return { error }
-  }
+  }, [supabase])
 
-  const signUp = async (
+  const signUp = useCallback(async (
     email: string,
     password: string,
     metadata?: { business_name?: string; owner_name?: string }
@@ -186,25 +186,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
     })
     return { error }
-  }
+  }, [supabase])
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     if (supabase) {
       await supabase.auth.signOut()
     }
     setUser(null)
     setSession(null)
     setProfile(null)
-  }
+  }, [supabase])
 
   // Demo mode login
-  const signInDemo = () => {
+  const signInDemo = useCallback(() => {
     setUser(DEMO_USER)
     setProfile(DEMO_PROFILE)
     setSession({ user: DEMO_USER } as Session)
-  }
+  }, [])
 
-  const resetPasswordForEmail = async (email: string) => {
+  const resetPasswordForEmail = useCallback(async (email: string) => {
     if (!supabase) {
       return { error: new Error('Supabase not configured') }
     }
@@ -212,34 +212,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       redirectTo: `${window.location.origin}/update-password`,
     })
     return { error }
-  }
+  }, [supabase])
 
-  const updatePassword = async (newPassword: string) => {
+  const updatePassword = useCallback(async (newPassword: string) => {
     if (!supabase) {
       return { error: new Error('Supabase not configured') }
     }
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     return { error }
-  }
+  }, [supabase])
+
+  const value = useMemo<AuthContextType>(() => ({
+    user,
+    session,
+    profile,
+    loading,
+    isConfigured: isSupabaseConfigured,
+    isDemoMode: DEMO_MODE || user?.email === 'demo@hookahtorus.com',
+    signIn,
+    signUp,
+    signOut,
+    signInDemo,
+    refreshProfile,
+    resetPasswordForEmail,
+    updatePassword,
+  }), [user, session, profile, loading, signIn, signUp, signOut, signInDemo, refreshProfile, resetPasswordForEmail, updatePassword])
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        profile,
-        loading,
-        isConfigured: isSupabaseConfigured,
-        isDemoMode: DEMO_MODE || user?.email === 'demo@hookahtorus.com',
-        signIn,
-        signUp,
-        signOut,
-        signInDemo,
-        refreshProfile,
-        resetPasswordForEmail,
-        updatePassword,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

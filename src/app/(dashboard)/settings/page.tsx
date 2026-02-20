@@ -49,6 +49,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [portalLoading, setPortalLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // QR Menu state
   const [venueSlug, setVenueSlug] = useState(profile?.venue_slug || '')
@@ -141,7 +142,27 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     if (!confirm(ts.deleteConfirm1)) return
     if (!confirm(ts.deleteConfirm2)) return
-    await signOut()
+
+    setDeleteLoading(true)
+    try {
+      const res = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmation: 'DELETE' }),
+      })
+      if (res.ok) {
+        await signOut()
+      } else {
+        const data = await res.json()
+        setMessage(tc.error + ': ' + (data.error || ts.deleteError))
+        setTimeout(() => setMessage(''), 5000)
+      }
+    } catch {
+      setMessage(ts.deleteError)
+      setTimeout(() => setMessage(''), 5000)
+    } finally {
+      setDeleteLoading(false)
+    }
   }
 
   const handleManageSubscription = async () => {
@@ -957,9 +978,10 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={handleDeleteAccount}
-              className="btn bg-[var(--color-danger)] text-white hover:opacity-80"
+              disabled={deleteLoading}
+              className="btn bg-[var(--color-danger)] text-white hover:opacity-80 disabled:opacity-50"
             >
-              {ts.deleteAccount}
+              {deleteLoading ? tc.loading : ts.deleteAccount}
             </button>
           </div>
         </div>

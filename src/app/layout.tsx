@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/lib/ThemeContext";
 import { AuthProvider } from "@/lib/AuthContext";
 import { LocaleProviderBridge } from "@/lib/i18n/LocaleProviderBridge";
+import CookieConsent from "@/components/CookieConsent";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -144,7 +145,10 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           <LocaleProviderBridge>
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider>
+              {children}
+              <CookieConsent />
+            </ThemeProvider>
           </LocaleProviderBridge>
         </AuthProvider>
       </body>

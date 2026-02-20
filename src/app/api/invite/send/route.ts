@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -8,15 +10,46 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hookahtorus.com'
 
 export async function POST(req: NextRequest) {
   try {
+    // Verify authentication
+    const cookieStore = await cookies()
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+        },
+      }
+    )
+
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { email, role, organizationId } = await req.json()
 
     if (!email || !role || !organizationId) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
     }
 
-    // Load org name and invite token
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Verify the authenticated user owns this organization
+    const { data: membership } = await supabase
+      .from('organization_members')
+      .select('role')
+      .eq('organization_id', organizationId)
+      .eq('profile_id', user.id)
+      .single()
+
+    if (!membership || (membership.role !== 'owner' && membership.role !== 'manager')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Load org name and invite token
     const { data: org } = await supabase
       .from('organizations')
       .select('name')
@@ -77,7 +110,7 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    return NextResponse.json({ success: true, joinUrl })
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Invite send error:', error)
     return NextResponse.json({ error: 'Failed to send invite' }, { status: 500 })

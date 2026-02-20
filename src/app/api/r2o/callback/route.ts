@@ -51,10 +51,13 @@ export async function GET(request: NextRequest) {
       // Product group creation is optional
     }
 
-    // Register webhook for invoice events
+    // Register webhook for invoice events (include secret in URL for verification)
     let webhookRegistered = false
     try {
-      const webhookUrl = `${appUrl}/api/r2o/webhooks`
+      const webhookSecret = process.env.R2O_WEBHOOK_SECRET
+      const webhookUrl = webhookSecret
+        ? `${appUrl}/api/r2o/webhooks?secret=${encodeURIComponent(webhookSecret)}`
+        : `${appUrl}/api/r2o/webhooks`
       await registerWebhook(accountToken, webhookUrl, ['invoice.created'])
       webhookRegistered = true
     } catch {

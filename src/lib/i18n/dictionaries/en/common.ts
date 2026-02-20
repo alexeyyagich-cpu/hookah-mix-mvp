@@ -117,4 +117,10 @@ export const common: typeof CommonType = {
   legalTerms: 'Terms',
   legalPrivacy: 'Privacy',
   legalAllRights: 'All rights reserved.',
+
+  // Cookie consent
+  cookieText: 'We use cookies to ensure the site works properly and to improve our service.',
+  privacyPolicy: 'Privacy Policy',
+  accept: 'Accept',
+  decline: 'Decline',
 } as const

@@ -131,4 +131,10 @@ export const common = {
   legalTerms: 'Условия',
   legalPrivacy: 'Конфиденциальность',
   legalAllRights: 'Все права защищены.',
+
+  // Cookie consent
+  cookieText: 'Мы используем файлы cookie для обеспечения работы сайта и улучшения качества обслуживания.',
+  privacyPolicy: 'Политика конфиденциальности',
+  accept: 'Принять',
+  decline: 'Отклонить',
 }
