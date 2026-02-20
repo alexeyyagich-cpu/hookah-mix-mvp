@@ -30,6 +30,9 @@ export default function LegalLayout({
             <Link href="/legal/privacy" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
               {tc.legalPrivacy}
             </Link>
+            <Link href="/legal/impressum" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
+              {tc.legalImpressum}
+            </Link>
           </nav>
         </div>
       </header>

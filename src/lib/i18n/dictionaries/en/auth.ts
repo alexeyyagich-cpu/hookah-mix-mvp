@@ -125,6 +125,7 @@ export const auth: typeof AuthType = {
   footerLegal: 'Legal',
   footerTerms: 'Terms of service',
   footerPrivacy: 'Privacy policy',
+  footerImpressum: 'Legal notice',
   footerCopyright: (year: number) => `\u00A9 ${year} Hookah Torus. All rights reserved.`,
 
   // Pricing page

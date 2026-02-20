@@ -344,6 +344,7 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
                 <li><Link href="/legal/terms" className="hover:text-[var(--color-text)]">{t.footerTerms}</Link></li>
                 <li><Link href="/legal/privacy" className="hover:text-[var(--color-text)]">{t.footerPrivacy}</Link></li>
+                <li><Link href="/legal/impressum" className="hover:text-[var(--color-text)]">{t.footerImpressum}</Link></li>
               </ul>
             </div>
           </div>

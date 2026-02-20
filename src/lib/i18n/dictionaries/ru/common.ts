@@ -130,6 +130,7 @@ export const common = {
   // Legal
   legalTerms: 'Условия',
   legalPrivacy: 'Конфиденциальность',
+  legalImpressum: 'Impressum',
   legalAllRights: 'Все права защищены.',
 
   // Cookie consent

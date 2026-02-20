@@ -129,6 +129,7 @@ export const auth = {
   footerLegal: 'Правовая информация',
   footerTerms: 'Условия использования',
   footerPrivacy: 'Политика конфиденциальности',
+  footerImpressum: 'Impressum',
   footerCopyright: (year: number) => `© ${year} Hookah Torus. Все права защищены.`,
 
   // Pricing page

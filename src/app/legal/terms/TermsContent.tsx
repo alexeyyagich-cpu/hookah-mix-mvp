@@ -11,7 +11,7 @@ function RuTerms() {
       <h2>1. Общие положения</h2>
       <p>
         Настоящие Условия использования (&laquo;Условия&raquo;) регулируют использование
-        веб-приложения Hookah Torus (&laquo;Сервис&raquo;), расположенного по адресу hookah-torus.com.
+        веб-приложения Hookah Torus (&laquo;Сервис&raquo;), расположенного по адресу hookahtorus.com.
         Регистрируясь и используя Сервис, вы соглашаетесь с настоящими Условиями.
       </p>
 
@@ -90,7 +90,7 @@ function RuTerms() {
       <h2>10. Контакты</h2>
       <p>
         По любым вопросам обращайтесь по адресу:{' '}
-        <a href="mailto:support@hookah-torus.com">support@hookah-torus.com</a>
+        <a href="mailto:htorus@hookahtorus.com">htorus@hookahtorus.com</a>
       </p>
     </article>
   )
@@ -105,7 +105,7 @@ function EnTerms() {
       <h2>1. General Provisions</h2>
       <p>
         These Terms of Service (&ldquo;Terms&rdquo;) govern the use of the Hookah Torus
-        web application (&ldquo;Service&rdquo;), accessible at hookah-torus.com.
+        web application (&ldquo;Service&rdquo;), accessible at hookahtorus.com.
         By registering for and using the Service, you agree to be bound by these Terms.
       </p>
 
@@ -183,7 +183,7 @@ function EnTerms() {
       <h2>10. Contact Information</h2>
       <p>
         For any questions, please contact us at:{' '}
-        <a href="mailto:support@hookah-torus.com">support@hookah-torus.com</a>
+        <a href="mailto:htorus@hookahtorus.com">htorus@hookahtorus.com</a>
       </p>
     </article>
   )
@@ -198,7 +198,7 @@ function DeTerms() {
       <h2>1. Allgemeine Bestimmungen</h2>
       <p>
         Diese Allgemeinen Gesch&auml;ftsbedingungen (&bdquo;AGB&ldquo;) regeln die Nutzung
-        der Webanwendung Hookah Torus (&bdquo;Dienst&ldquo;), erreichbar unter hookah-torus.com.
+        der Webanwendung Hookah Torus (&bdquo;Dienst&ldquo;), erreichbar unter hookahtorus.com.
         Mit der Registrierung und Nutzung des Dienstes erkl&auml;ren Sie sich mit diesen AGB einverstanden.
       </p>
 
@@ -277,7 +277,7 @@ function DeTerms() {
       <h2>10. Kontakt</h2>
       <p>
         Bei Fragen wenden Sie sich bitte an:{' '}
-        <a href="mailto:support@hookah-torus.com">support@hookah-torus.com</a>
+        <a href="mailto:htorus@hookahtorus.com">htorus@hookahtorus.com</a>
       </p>
     </article>
   )
