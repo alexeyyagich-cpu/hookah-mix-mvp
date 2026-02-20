@@ -1,18 +1,18 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AI Рекомендации миксов',
-  description: 'Получите персональные рекомендации миксов табака на основе ваших предпочтений. AI подберёт идеальное сочетание вкусов для вашего кальяна.',
+  title: 'AI Mix Recommendations',
+  description: 'Get personalized tobacco mix recommendations based on your preferences. AI picks the perfect flavor combination for your hookah.',
   keywords: [
-    'AI рекомендации кальяна',
-    'подбор микса табака',
-    'персональный микс',
-    'рекомендации табака',
-    'hookah recommendations',
+    'AI hookah recommendations',
+    'tobacco mix suggestions',
+    'personalized hookah mix',
+    'shisha flavor recommendations',
+    'hookah AI assistant',
   ],
   openGraph: {
-    title: 'AI Рекомендации миксов | Hookah Torus',
-    description: 'Персональные рекомендации миксов табака на основе AI',
+    title: 'AI Mix Recommendations | Hookah Torus',
+    description: 'Personalized AI-powered tobacco mix recommendations for hookah',
     url: 'https://hookah-torus.com/recommend',
   },
   alternates: {

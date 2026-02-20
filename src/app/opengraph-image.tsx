@@ -4,7 +4,7 @@ import { join } from 'path'
 
 export const runtime = 'nodejs' // Changed to nodejs to allow fs access
 
-export const alt = 'Hookah Torus - Калькулятор миксов и управление кальянной'
+export const alt = 'Hookah Torus - Mix Calculator & Lounge Management'
 export const size = {
   width: 1200,
   height: 630,
@@ -93,7 +93,7 @@ export default async function Image() {
               border: '1px solid rgba(99, 102, 241, 0.3)',
             }}
           >
-            <span style={{ fontSize: 14, color: '#a5b4fc' }}>B2B платформа для кальянных</span>
+            <span style={{ fontSize: 14, color: '#a5b4fc' }}>B2B platform for hookah lounges</span>
           </div>
 
           {/* Title */}
@@ -119,7 +119,7 @@ export default async function Image() {
               lineHeight: 1.4,
             }}
           >
-            Управляйте кальянной как профи
+            Manage your hookah lounge like a pro
           </span>
 
           {/* Features row */}
@@ -146,7 +146,7 @@ export default async function Image() {
                 <path d="M12 2C12 2 9 5 9 8C9 10 10.5 11 12 11C13.5 11 15 10 15 8C15 5 12 2 12 2Z" fill="#ec4899" />
                 <ellipse cx="12" cy="15" rx="6" ry="2.5" stroke="#ec4899" strokeWidth="2" fill="none" />
               </svg>
-              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Миксы</span>
+              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Mixes</span>
             </div>
 
             {/* Feature 2 */}
@@ -165,7 +165,7 @@ export default async function Image() {
                 <rect x="3" y="5" width="18" height="14" rx="2" stroke="#f59e0b" strokeWidth="2" />
                 <path d="M3 9H21" stroke="#f59e0b" strokeWidth="2" />
               </svg>
-              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Инвентарь</span>
+              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Inventory</span>
             </div>
 
             {/* Feature 3 */}
@@ -183,7 +183,7 @@ export default async function Image() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M3 20L9 14L13 18L21 10" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Аналитика</span>
+              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Analytics</span>
             </div>
 
             {/* Feature 4 */}
@@ -202,7 +202,7 @@ export default async function Image() {
                 <circle cx="9" cy="7" r="3" stroke="#6366f1" strokeWidth="2" />
                 <path d="M3 19C3 15.6863 5.68629 13 9 13" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Гости</span>
+              <span style={{ fontSize: 13, color: '#e2e8f0' }}>Guests</span>
             </div>
           </div>
         </div>

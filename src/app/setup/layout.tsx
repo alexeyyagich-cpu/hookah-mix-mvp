@@ -1,18 +1,18 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Настройка кальяна',
-  description: 'Рекомендации по настройке кальяна: выбор чаши, количество углей, время прогрева. Оптимальная забивка для разных миксов табака.',
+  title: 'Hookah Setup',
+  description: 'Hookah setup recommendations: bowl selection, coal count, heat management. Optimal packing for different tobacco mixes.',
   keywords: [
-    'настройка кальяна',
-    'забивка табака',
-    'hookah setup',
-    'выбор чаши',
-    'угли для кальяна',
+    'hookah setup guide',
+    'tobacco packing tips',
+    'hookah bowl selection',
+    'hookah coal management',
+    'shisha heat management',
   ],
   openGraph: {
-    title: 'Настройка кальяна | Hookah Torus',
-    description: 'Рекомендации по настройке кальяна для идеального курения',
+    title: 'Hookah Setup | Hookah Torus',
+    description: 'Setup recommendations for the perfect hookah session',
     url: 'https://hookah-torus.com/setup',
   },
   alternates: {

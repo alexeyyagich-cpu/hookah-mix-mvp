@@ -1,18 +1,18 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Тарифы',
-  description: 'Выберите подходящий тариф Hookah Torus. Free для начала, Pro для активных заведений, Enterprise для сетей. Управление инвентарём, статистика, API доступ.',
+  title: 'Pricing',
+  description: 'Choose the right Hookah Torus plan. Free to get started, Pro for active lounges, Enterprise for chains. Inventory management, analytics, API access.',
   keywords: [
-    'тарифы кальянной',
-    'hookah management pricing',
-    'управление кальянной стоимость',
-    'Pro тариф',
-    'Enterprise',
+    'hookah software pricing',
+    'hookah management plans',
+    'lounge management cost',
+    'Pro plan',
+    'Enterprise hookah',
   ],
   openGraph: {
-    title: 'Тарифы | Hookah Torus',
-    description: 'Выберите подходящий тариф для управления кальянной',
+    title: 'Pricing | Hookah Torus',
+    description: 'Choose the right plan for your hookah lounge management',
     url: 'https://hookah-torus.com/pricing',
   },
   alternates: {
@@ -27,50 +27,50 @@ const faqSchema = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "Могу ли я отменить подписку?",
+      name: "Can I cancel my subscription?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Да, вы можете отменить подписку в любой момент. Доступ сохранится до конца оплаченного периода.",
+        text: "Yes, you can cancel your subscription at any time. Access remains until the end of the paid period.",
       },
     },
     {
       "@type": "Question",
-      name: "Какие способы оплаты доступны?",
+      name: "What payment methods are available?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Мы принимаем банковские карты (Visa, Mastercard), PayPal и банковские переводы.",
+        text: "We accept credit cards (Visa, Mastercard), PayPal, and bank transfers.",
       },
     },
     {
       "@type": "Question",
-      name: "Есть ли пробный период для Pro?",
+      name: "Is there a free trial for Pro?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Да, для новых пользователей доступен 14-дневный пробный период Pro без ограничений.",
+        text: "Yes, new users get a 14-day Pro trial with no restrictions.",
       },
     },
     {
       "@type": "Question",
-      name: "Могу ли я перейти на другой тариф?",
+      name: "Can I switch to a different plan?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Да, вы можете повысить или понизить тариф в любой момент. При повышении разница будет пропорционально списана.",
+        text: "Yes, you can upgrade or downgrade your plan at any time. When upgrading, the difference is prorated.",
       },
     },
     {
       "@type": "Question",
-      name: "Что будет с моими данными при понижении тарифа?",
+      name: "What happens to my data if I downgrade?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Ваши данные сохранятся, но доступ к старой истории и дополнительным позициям в инвентаре будет ограничен.",
+        text: "Your data is preserved, but access to older history and additional inventory slots will be limited.",
       },
     },
     {
       "@type": "Question",
-      name: "Как работает пробный период?",
+      name: "How does the free trial work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "После регистрации вы получаете 14 дней Pro-доступа. Карта не требуется, отмена автоматическая.",
+        text: "After signing up you get 14 days of Pro access. No credit card required, cancellation is automatic.",
       },
     },
   ],

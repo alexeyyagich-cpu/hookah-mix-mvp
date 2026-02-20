@@ -12,19 +12,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Hookah Torus | Калькулятор миксов и управление кальянной",
+    default: "Hookah Torus | Mix Calculator & Lounge Management",
     template: "%s | Hookah Torus",
   },
-  description: "Создавайте идеальные миксы табака с AI-рекомендациями. Управляйте инвентарём, отслеживайте сессии и радуйте гостей. Полная платформа для кальянных заведений.",
+  description: "Create perfect tobacco mixes with AI recommendations. Manage inventory, track sessions, and delight your guests. The complete B2B platform for hookah lounges.",
   keywords: [
-    "кальянный калькулятор",
-    "миксы табака",
     "hookah mix calculator",
-    "управление кальянной",
-    "инвентарь табака",
-    "AI рекомендации миксов",
-    "кальянный бизнес",
-    "lounge management",
+    "tobacco mix builder",
+    "hookah lounge management",
+    "shisha inventory tracker",
+    "AI mix recommendations",
+    "hookah business software",
+    "lounge management platform",
+    "hookah session tracking",
   ],
   authors: [{ name: "Hookah Torus" }],
   creator: "Hookah Torus",
@@ -35,17 +35,17 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "ru_RU",
+    locale: "en_US",
     url: "https://hookah-torus.com",
     siteName: "Hookah Torus",
-    title: "Hookah Torus — Калькулятор миксов и управление кальянной",
-    description: "Создавайте идеальные миксы табака с AI-рекомендациями. Полная платформа для кальянных заведений.",
+    title: "Hookah Torus | Mix Calculator & Lounge Management",
+    description: "Create perfect tobacco mixes with AI recommendations. The complete B2B platform for hookah lounges.",
     // images auto-generated from opengraph-image.tsx
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hookah Torus — Калькулятор миксов",
-    description: "Создавайте идеальные миксы табака с AI-рекомендациями",
+    title: "Hookah Torus | Mix Calculator & Lounge Management",
+    description: "Create perfect tobacco mixes with AI recommendations",
     // images auto-generated from twitter-image.tsx
   },
   robots: {
@@ -74,7 +74,7 @@ const jsonLd = {
       "@id": "https://hookah-torus.com/#website",
       url: "https://hookah-torus.com",
       name: "Hookah Torus",
-      description: "Калькулятор миксов и платформа управления кальянной",
+      description: "Mix calculator and hookah lounge management platform",
       publisher: {
         "@id": "https://hookah-torus.com/#organization",
       },
@@ -128,7 +128,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
