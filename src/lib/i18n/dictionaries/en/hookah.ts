@@ -334,6 +334,18 @@ export const hookah: typeof HookahType = {
   mixAddFavorite: 'Add to favorites',
   mixDelete: 'Delete',
 
+  // Mix result labels
+  mixStrengthLabel: 'Strength',
+  mixHeatLabel: 'Heat',
+  mixRiskLabel: 'Risk',
+  mixRecommendedSetup: 'Recommended Setup',
+  mixBowlLabel: 'Bowl',
+  mixPackLabel: 'Pack',
+  mixCoalsLabel: 'Coals',
+  mixCoalsPcs: 'pcs',
+  mixHeatUpLabel: 'Heat-up',
+  mixHeatUpMin: 'min',
+
   // MixCostBreakdown
   mixCostNoPricing: 'Set purchase prices in inventory to calculate cost',
   mixCostHeader: 'Cost breakdown',

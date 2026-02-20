@@ -650,11 +650,13 @@ function MixPageInner() {
               {t.guestHintMore || `\u2191 ${2 - selectedTobaccos.length === 1 ? 'Добавьте ещё 1 вкус' : 'Добавьте ещё вкусы'} для микса`}
             </span>
           )}
-          {selectedTobaccos.map((t, i) => (
+          {selectedTobaccos.map((t, i) => {
+            const canRemove = selectedTobaccos.length > 2;
+            return (
             <button
               key={t.id}
-              onClick={() => toggleTobacco(t.id)}
-              className="pill animate-scaleIn group"
+              onClick={() => canRemove && toggleTobacco(t.id)}
+              className={`pill animate-scaleIn ${canRemove ? 'group cursor-pointer' : 'cursor-default'}`}
               style={{
                 borderColor: t.color,
                 borderWidth: "2px",
@@ -663,9 +665,10 @@ function MixPageInner() {
             >
               <span className="w-3 h-3 rounded-full" style={{ background: t.color }} />
               <span style={{ color: "var(--color-text)" }}>{t.flavor}</span>
-              <span className="opacity-40 group-hover:opacity-100 transition-opacity ml-1">×</span>
+              {canRemove && <span className="opacity-40 group-hover:opacity-100 transition-opacity ml-1">×</span>}
             </button>
-          ))}
+            );
+          })}
           {isAtLimit && (
             <span className="badge badge-warning animate-fadeInUp">Max 3</span>
           )}
@@ -912,7 +915,7 @@ function MixPageInner() {
                     <div className="mb-2" style={{ color: "var(--color-primary)" }}>
                       <IconStrength size={24} />
                     </div>
-                    <div className="label">Strength</div>
+                    <div className="label">{t.mixStrengthLabel || 'Strength'}</div>
                     <div className="value" style={{ color: "var(--color-text)" }}>
                       {result.finalStrength}
                     </div>
@@ -921,7 +924,7 @@ function MixPageInner() {
                     <div className="mb-2" style={{ color: "var(--color-warning)" }}>
                       <IconHeat size={24} />
                     </div>
-                    <div className="label">Heat</div>
+                    <div className="label">{t.mixHeatLabel || 'Heat'}</div>
                     <div className="value" style={{ color: "var(--color-text)" }}>
                       {result.finalHeatLoad}
                     </div>
@@ -943,7 +946,7 @@ function MixPageInner() {
                     >
                       <IconWarning size={24} />
                     </div>
-                    <div className="label">Risk</div>
+                    <div className="label">{t.mixRiskLabel || 'Risk'}</div>
                     <div
                       className="value text-xl uppercase"
                       style={{
@@ -960,7 +963,7 @@ function MixPageInner() {
                 <div className="pt-5 border-t" style={{ borderColor: "var(--color-border)" }}>
                   <h3 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--color-text)" }}>
                     <IconSettings size={18} color="var(--color-primary)" />
-                    Recommended Setup
+                    {t.mixRecommendedSetup || 'Recommended Setup'}
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     <div
@@ -975,7 +978,7 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          Bowl
+                          {t.mixBowlLabel || 'Bowl'}
                         </p>
                         <p className="font-semibold text-sm capitalize" style={{ color: "var(--color-text)" }}>
                           {result.setup.bowlType}
@@ -995,7 +998,7 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          Pack
+                          {t.mixPackLabel || 'Pack'}
                         </p>
                         <p className="font-semibold text-sm capitalize" style={{ color: "var(--color-text)" }}>
                           {result.setup.packing}
@@ -1015,10 +1018,10 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          Coals
+                          {t.mixCoalsLabel || 'Coals'}
                         </p>
                         <p className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>
-                          {result.setup.coals} pcs
+                          {result.setup.coals} {t.mixCoalsPcs || 'pcs'}
                         </p>
                       </div>
                     </div>
@@ -1035,10 +1038,10 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          Heat-up
+                          {t.mixHeatUpLabel || 'Heat-up'}
                         </p>
                         <p className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>
-                          {result.setup.heatUpMinutes} min
+                          {result.setup.heatUpMinutes} {t.mixHeatUpMin || 'min'}
                         </p>
                       </div>
                     </div>
@@ -1046,7 +1049,7 @@ function MixPageInner() {
                 </div>
 
                 {/* Cost Breakdown - only show if logged in and inventory loaded */}
-                {user && !inventoryLoading && inventory.length > 0 && (
+                {isBusinessUser && !inventoryLoading && inventory.length > 0 && (
                   <div className="pt-5 border-t" style={{ borderColor: "var(--color-border)" }}>
                     <MixCostBreakdown
                       items={items}

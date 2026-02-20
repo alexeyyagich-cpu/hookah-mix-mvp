@@ -340,6 +340,18 @@ export const hookah = {
   mixAddFavorite: 'В избранное',
   mixDelete: 'Удалить',
 
+  // Mix result labels
+  mixStrengthLabel: 'Крепость',
+  mixHeatLabel: 'Жар',
+  mixRiskLabel: 'Риск',
+  mixRecommendedSetup: 'Рекомендуемая настройка',
+  mixBowlLabel: 'Чаша',
+  mixPackLabel: 'Забивка',
+  mixCoalsLabel: 'Угли',
+  mixCoalsPcs: 'шт',
+  mixHeatUpLabel: 'Прогрев',
+  mixHeatUpMin: 'мин',
+
   // MixCostBreakdown
   mixCostNoPricing: 'Укажите цены закупки в инвентаре для расчёта себестоимости',
   mixCostHeader: 'Себестоимость',
