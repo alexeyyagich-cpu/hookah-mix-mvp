@@ -210,16 +210,18 @@ function MixPageInner() {
     }, 100);
   }, []);
 
-  // Apply first popular mix on initial load (without scrolling)
+  // Apply first popular mix on initial load (without scrolling) — skip in guest mode
   React.useEffect(() => {
     if (hasInitializedRef.current) return;
     hasInitializedRef.current = true;
+
+    if (isGuestMode) return; // Guest mode starts empty
 
     const topMix = MIX_RECIPES.find(m => m.popularity >= 5);
     if (topMix) {
       applyMixRecipe(topMix, false); // Don't scroll on initial load
     }
-  }, [applyMixRecipe]);
+  }, [applyMixRecipe, isGuestMode]);
 
   const filteredTobaccos = useMemo(() => {
     let result = TOBACCOS;
