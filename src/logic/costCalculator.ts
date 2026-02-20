@@ -42,10 +42,10 @@ export interface ProfitAnalysis {
 
 // Common package sizes in grams
 export const PACKAGE_SIZES = [
-  { value: 25, label: '25г' },
-  { value: 100, label: '100г' },
-  { value: 200, label: '200г' },
-  { value: 250, label: '250г' },
+  { value: 25, label: '25g' },
+  { value: 100, label: '100g' },
+  { value: 200, label: '200g' },
+  { value: 250, label: '250g' },
 ] as const
 
 // Default markup multipliers for price suggestions
@@ -206,5 +206,5 @@ export function formatPrice(price: number | null, currency = '€'): string {
  */
 export function formatPricePerGram(pricePerGram: number | null, currency = '€'): string {
   if (pricePerGram === null) return '—'
-  return `${currency}${pricePerGram.toFixed(3)}/г`
+  return `${currency}${pricePerGram.toFixed(3)}/g`
 }

@@ -45,16 +45,16 @@ const BRANDS = getBrandNames();
 
 // Ordered categories for consistent display
 const CATEGORIES: Category[] = [
-  "fruit",    // Фрукты
-  "berry",    // Ягоды
-  "citrus",   // Цитрус
-  "tropical", // Тропики
-  "mint",     // Свежесть
-  "dessert",  // Десерты
-  "soda",     // Напитки
-  "candy",    // Сладости
-  "spice",    // Специи
-  "herbal",   // Травы
+  "fruit",
+  "berry",
+  "citrus",
+  "tropical",
+  "mint",
+  "dessert",
+  "soda",
+  "candy",
+  "spice",
+  "herbal",
 ];
 
 // Category labels and icons for better UX

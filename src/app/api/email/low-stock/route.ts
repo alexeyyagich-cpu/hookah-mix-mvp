@@ -89,10 +89,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate and send email
-    const html = generateLowStockEmailHtml(items, profile.business_name || 'Ваше заведение')
+    const html = generateLowStockEmailHtml(items, profile.business_name || 'Your business')
     const result = await sendEmail({
       to: authUser.user.email,
-      subject: `Низкий запас табака (${items.length} позиций)`,
+      subject: `Low tobacco stock (${items.length} items)`,
       html,
     })
 

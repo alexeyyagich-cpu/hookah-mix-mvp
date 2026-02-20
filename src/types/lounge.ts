@@ -77,18 +77,18 @@ export type LoungeFeature =
 
 export const LOUNGE_FEATURES: Record<LoungeFeature, { label: string; icon: string }> = {
   wifi: { label: 'Wi-Fi', icon: '📶' },
-  parking: { label: 'Парковка', icon: '🅿️' },
-  terrace: { label: 'Терраса', icon: '🌿' },
-  vip_rooms: { label: 'VIP-комнаты', icon: '👑' },
-  food: { label: 'Кухня', icon: '🍽️' },
-  alcohol: { label: 'Бар', icon: '🍸' },
-  live_music: { label: 'Живая музыка', icon: '🎵' },
+  parking: { label: 'Parking', icon: '🅿️' },
+  terrace: { label: 'Terrace', icon: '🌿' },
+  vip_rooms: { label: 'VIP Rooms', icon: '👑' },
+  food: { label: 'Kitchen', icon: '🍽️' },
+  alcohol: { label: 'Bar', icon: '🍸' },
+  live_music: { label: 'Live Music', icon: '🎵' },
   dj: { label: 'DJ', icon: '🎧' },
-  karaoke: { label: 'Караоке', icon: '🎤' },
-  board_games: { label: 'Настолки', icon: '🎲' },
+  karaoke: { label: 'Karaoke', icon: '🎤' },
+  board_games: { label: 'Board Games', icon: '🎲' },
   playstation: { label: 'PlayStation', icon: '🎮' },
-  hookah_delivery: { label: 'Доставка кальянов', icon: '🚗' },
-  reservations: { label: 'Бронирование', icon: '📅' },
+  hookah_delivery: { label: 'Hookah Delivery', icon: '🚗' },
+  reservations: { label: 'Reservations', icon: '📅' },
 }
 
 // Events for lounges (foundation for future)

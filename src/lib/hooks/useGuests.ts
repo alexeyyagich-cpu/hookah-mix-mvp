@@ -22,7 +22,7 @@ const DEMO_GUESTS: Guest[] = [
     name: 'Alex',
     phone: '+48 512 345 678',
     photo_url: null,
-    notes: 'Постоянный гость, любит крепкие миксы',
+    notes: 'Regular guest, likes strong mixes',
     strength_preference: 'strong',
     flavor_profiles: ['fresh', 'citrus'],
     last_mix_snapshot: {
@@ -50,7 +50,7 @@ const DEMO_GUESTS: Guest[] = [
     name: 'Maria',
     phone: '+49 170 987 6543',
     photo_url: null,
-    notes: 'Предпочитает лёгкие фруктовые',
+    notes: 'Prefers light fruity mixes',
     strength_preference: 'light',
     flavor_profiles: ['fruity', 'sweet'],
     last_mix_snapshot: {
@@ -92,7 +92,7 @@ const DEMO_GUESTS: Guest[] = [
     name: 'Anna',
     phone: '+48 601 555 123',
     photo_url: null,
-    notes: 'VIP гость',
+    notes: 'VIP guest',
     strength_preference: 'medium',
     flavor_profiles: ['fruity', 'fresh'],
     last_mix_snapshot: {

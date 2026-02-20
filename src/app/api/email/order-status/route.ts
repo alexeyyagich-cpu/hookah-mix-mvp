@@ -10,11 +10,11 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 const STATUS_TEXT: Record<string, string> = {
-  pending: 'Ожидает обработки',
-  confirmed: 'Подтверждён',
-  shipped: 'Отправлен',
-  delivered: 'Доставлен',
-  cancelled: 'Отменён',
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
 }
 
 export async function POST(request: NextRequest) {
@@ -106,12 +106,12 @@ export async function POST(request: NextRequest) {
         total,
         estimatedDelivery,
       },
-      profile.business_name || 'Ваше заведение'
+      profile.business_name || 'Your business'
     )
 
     const result = await sendEmail({
       to: authUser.user.email,
-      subject: `Заказ ${orderNumber}: ${STATUS_TEXT[status] || status}`,
+      subject: `Order ${orderNumber}: ${STATUS_TEXT[status] || status}`,
       html,
     })
 
