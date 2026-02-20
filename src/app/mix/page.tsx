@@ -658,8 +658,17 @@ function MixPageInner() {
                   </p>
                 </div>
                 <span
-                  className="text-2xl font-bold tabular-nums"
-                  style={{ color: isAtLimit ? "var(--color-warning)" : "var(--color-textMuted)" }}
+                  className={`text-2xl font-bold tabular-nums ${selectedIds.length === 0 ? 'animate-shimmer' : ''}`}
+                  style={{
+                    ...(selectedIds.length === 0
+                      ? {
+                          background: 'linear-gradient(90deg, var(--color-primary), #a78bfa, var(--color-primary))',
+                          backgroundSize: '200% 100%',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }
+                      : { color: isAtLimit ? 'var(--color-warning)' : 'var(--color-textMuted)' }),
+                  }}
                 >
                   {selectedIds.length}/3
                 </span>
