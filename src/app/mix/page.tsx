@@ -291,11 +291,13 @@ function MixPageInner() {
     setSelectedIds(prev => {
       const exists = prev.includes(id);
       if (exists) {
-        return prev.length > 2 ? prev.filter(x => x !== id) : prev;
+        // In guest mode allow removing down to 0; otherwise minimum 2
+        const minCount = isGuestMode ? 0 : 2;
+        return prev.length > minCount ? prev.filter(x => x !== id) : prev;
       }
       return prev.length < 3 ? [...prev, id] : prev;
     });
-  }, []);
+  }, [isGuestMode]);
 
   const normalizePercents = useCallback((changedId: string, nextValue: number) => {
     const ids = selectedIds;
@@ -480,19 +482,21 @@ function MixPageInner() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Main actions - always visible */}
-            {/* Подбор */}
-            <Link
-              href="/recommend"
-              className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
-              style={{
-                background: "var(--color-bgHover)",
-                border: "1px solid var(--color-border)",
-                color: "var(--color-text)",
-              }}
-            >
-              <IconTarget size={16} />
-              <span className="hidden md:inline">{t.mixNavRecommend}</span>
-            </Link>
+            {/* Подбор — hidden for guests */}
+            {!isGuestMode && (
+              <Link
+                href="/recommend"
+                className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
+                style={{
+                  background: "var(--color-bgHover)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
+                }}
+              >
+                <IconTarget size={16} />
+                <span className="hidden md:inline">{t.mixNavRecommend}</span>
+              </Link>
+            )}
 
             {/* Миксы dropdown */}
             <div className="relative">
@@ -652,7 +656,8 @@ function MixPageInner() {
             </span>
           )}
           {selectedTobaccos.map((t, i) => {
-            const canRemove = selectedTobaccos.length > 2;
+            const minCount = isGuestMode ? 0 : 2;
+            const canRemove = selectedTobaccos.length > minCount;
             return (
             <button
               key={t.id}
@@ -670,16 +675,6 @@ function MixPageInner() {
             </button>
             );
           })}
-          {selectedTobaccos.length >= 2 && (
-            <button
-              onClick={() => { setSelectedIds([]); setPercents({}); }}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs opacity-40 hover:opacity-100 transition-opacity"
-              style={{ background: 'var(--color-bgHover)', color: 'var(--color-textMuted)' }}
-              title={t.guestTryAnother || 'Очистить'}
-            >
-              ×
-            </button>
-          )}
           {isAtLimit && (
             <span className="badge badge-warning animate-fadeInUp">Max 3</span>
           )}
