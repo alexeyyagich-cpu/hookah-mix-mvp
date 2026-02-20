@@ -1,4 +1,4 @@
-import { Tobacco, Category } from "@/data/tobaccos";
+import { Tobacco } from "@/data/tobaccos";
 
 export type MixItem = { tobacco: Tobacco; percent: number };
 

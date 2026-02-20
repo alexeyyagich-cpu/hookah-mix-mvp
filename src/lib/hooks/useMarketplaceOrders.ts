@@ -6,10 +6,8 @@ import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type {
   MarketplaceOrder,
-  MarketplaceOrderItem,
   MarketplaceOrderWithItems,
   OrderStatus,
-  Supplier,
   Cart,
 } from '@/types/database'
 

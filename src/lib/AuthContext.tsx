@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured, isDemoMode as DEMO_MODE } from '@/lib/config'
-import type { User, Session, SupabaseClient } from '@supabase/supabase-js'
+import type { User, Session } from '@supabase/supabase-js'
 import type { Profile } from '@/types/database'
 
 // Demo user data for testing

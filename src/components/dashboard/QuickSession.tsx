@@ -7,7 +7,7 @@ import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { IconSmoke, IconTimer } from '@/components/Icons'
 import { SessionTimer } from '@/components/session/SessionTimer'
-import type { Session, SessionItem, TobaccoInventory } from '@/types/database'
+import type { Session, SessionItem } from '@/types/database'
 
 interface MixItem {
   tobacco: typeof TOBACCOS[0]

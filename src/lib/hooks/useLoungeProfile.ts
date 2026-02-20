@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/AuthContext'
-import type { LoungeProfile, PublicMix, PublicBarRecipe, WorkingHours, LoungeFeature } from '@/types/lounge'
+import type { LoungeProfile, PublicMix, PublicBarRecipe } from '@/types/lounge'
 
 // Demo lounge profile
 const DEMO_LOUNGE: LoungeProfile = {

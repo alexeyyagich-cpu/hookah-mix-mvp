@@ -10,7 +10,7 @@ import { InventoryTable } from '@/components/dashboard/InventoryTable'
 import { AddTobaccoModal } from '@/components/dashboard/AddTobaccoModal'
 import { ScanButton } from '@/components/inventory/BarcodeScanner'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
-import { IconExport, IconChart, IconLock, IconPlus } from '@/components/Icons'
+import { IconExport, IconChart, IconLock } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
@@ -108,12 +108,7 @@ export default function InventoryPage() {
     await adjustQuantity(id, amount, type, amount > 0 ? t.adjustPurchase : t.adjustCorrection)
   }
 
-  const totalValue = inventory.reduce((sum, item) => {
-    if (item.purchase_price) {
-      return sum + (item.purchase_price * item.quantity_grams / 1000) // assuming price per kg
-    }
-    return sum
-  }, 0)
+
 
   const totalGrams = inventory.reduce((sum, item) => sum + item.quantity_grams, 0)
 

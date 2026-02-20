@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import ProgressRing from "@/components/ProgressRing";
 import {

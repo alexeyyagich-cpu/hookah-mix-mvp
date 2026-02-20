@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslation } from "@/lib/i18n";
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from "@/data/tobaccos";
 

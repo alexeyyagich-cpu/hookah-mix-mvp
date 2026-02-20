@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
-import type { Supplier, SupplierWithProducts, SupplierProduct } from '@/types/database'
+import type { Supplier, SupplierWithProducts } from '@/types/database'
 
 // Demo data for testing
 const DEMO_SUPPLIERS: Supplier[] = [

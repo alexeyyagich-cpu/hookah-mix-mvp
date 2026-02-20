@@ -12,7 +12,7 @@ import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
 import { IconPlus, IconMenuList } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
-import type { KdsOrderStatus, KdsOrderType } from '@/types/database'
+import type { KdsOrderStatus } from '@/types/database'
 
 type TypeFilter = 'all' | 'bar' | 'hookah'
 type MobileColumn = 'new' | 'preparing' | 'ready'

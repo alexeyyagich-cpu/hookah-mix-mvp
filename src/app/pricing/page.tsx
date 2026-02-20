@@ -103,11 +103,6 @@ function PricingPageContent() {
 
   const canceled = searchParams.get('canceled')
 
-  const formatPrice = (price: number) => {
-    if (price === 0) return tm.free
-    return `$${(price / 100).toFixed(0)}`
-  }
-
   const handleSelectPlan = async (plan: typeof plans[0]) => {
     // Free plan - just redirect to register or dashboard
     if (plan.id === 'free') {

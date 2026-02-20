@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { useModules } from '@/lib/hooks/useModules'
 import { useBarSales } from '@/lib/hooks/useBarSales'

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { TOBACCOS, getBrandNames, getCategories, type Category } from "@/data/tobaccos";
+import { TOBACCOS, getBrandNames, type Category } from "@/data/tobaccos";
 import MixPieChart from "@/components/MixPieChart";
 import ProgressRing from "@/components/ProgressRing";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
@@ -368,7 +368,7 @@ function MixPageInner() {
 
 
   // Handle loading a saved mix
-  const handleLoadSavedMix = useCallback((tobaccos: import("@/types/database").SavedMixTobacco[], mixId: string) => {
+  const handleLoadSavedMix = useCallback((tobaccos: import("@/types/database").SavedMixTobacco[], _mixId: string) => {
     const matchedIds: string[] = [];
     const newPercents: Record<string, number> = {};
 
@@ -417,7 +417,7 @@ function MixPageInner() {
   }, [items, result, saveMix]);
 
   // Handle quick repeat from guest
-  const handleRepeatGuestMix = useCallback((snapshot: MixSnapshot, tobaccos: { tobacco: typeof TOBACCOS[0]; percent: number }[]) => {
+  const handleRepeatGuestMix = useCallback((_snapshot: MixSnapshot, tobaccos: { tobacco: typeof TOBACCOS[0]; percent: number }[]) => {
     const matchedIds: string[] = [];
     const newPercents: Record<string, number> = {};
 
