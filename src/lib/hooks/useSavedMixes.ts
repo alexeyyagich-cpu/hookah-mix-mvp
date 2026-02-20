@@ -11,7 +11,7 @@ const DEMO_MIXES: SavedMix[] = [
   {
     id: '1',
     profile_id: 'demo',
-    name: 'Летний вечер',
+    name: 'Summer Evening',
     tobaccos: [
       { tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', percent: 60, color: '#FF6B9D' },
       { tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', percent: 40, color: '#00D9A5' },
@@ -20,13 +20,13 @@ const DEMO_MIXES: SavedMix[] = [
     is_favorite: true,
     usage_count: 15,
     rating: 5,
-    notes: 'Идеальный микс для летнего вечера. Свежесть мяты отлично сочетается с Pinkman.',
+    notes: 'Perfect mix for a summer evening. Mint freshness pairs great with Pinkman.',
     created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: '2',
     profile_id: 'demo',
-    name: 'Фруктовый микс',
+    name: 'Fruity Mix',
     tobaccos: [
       { tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', percent: 50, color: '#FF4B4B' },
       { tobacco_id: 'mh2', brand: 'Musthave', flavor: 'Lemon-Lime', percent: 50, color: '#FFE500' },
@@ -41,7 +41,7 @@ const DEMO_MIXES: SavedMix[] = [
   {
     id: '3',
     profile_id: 'demo',
-    name: 'Тропический рай',
+    name: 'Tropical Paradise',
     tobaccos: [
       { tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', percent: 40, color: '#FFD93D' },
       { tobacco_id: 'bb1', brand: 'Black Burn', flavor: 'Something Berry', percent: 35, color: '#FF6B9D' },
@@ -51,7 +51,7 @@ const DEMO_MIXES: SavedMix[] = [
     is_favorite: true,
     usage_count: 5,
     rating: null,
-    notes: 'Нужно попробовать с меньшим количеством мяты',
+    notes: 'Try with less mint next time',
     created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ]
@@ -103,7 +103,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
       if (fetchError) throw fetchError
       setSavedMixes(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки миксов')
+      setError(err instanceof Error ? err.message : 'Failed to load mixes')
     }
 
     setLoading(false)
@@ -158,7 +158,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
 
       setSavedMixes(prev => [data, ...prev])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка сохранения микса')
+      setError(err instanceof Error ? err.message : 'Failed to save mix')
       throw err
     }
   }, [user, supabase, isDemoMode])
@@ -184,7 +184,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
 
       setSavedMixes(prev => prev.filter(m => m.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка удаления микса')
+      setError(err instanceof Error ? err.message : 'Failed to delete mix')
       throw err
     }
   }, [user, supabase, isDemoMode])
@@ -217,7 +217,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
         m.id === id ? { ...m, is_favorite: !m.is_favorite } : m
       ))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления микса')
+      setError(err instanceof Error ? err.message : 'Failed to update mix')
       throw err
     }
   }, [user, supabase, savedMixes, isDemoMode])
@@ -281,7 +281,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
         m.id === id ? { ...m, ...updates } : m
       ))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления микса')
+      setError(err instanceof Error ? err.message : 'Failed to update mix')
       throw err
     }
   }, [user, supabase, isDemoMode])

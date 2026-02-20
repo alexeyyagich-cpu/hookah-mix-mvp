@@ -91,7 +91,7 @@ export function useBowls(): UseBowlsReturn {
   ): Promise<BowlType | null> => {
     if (!user) return null
     if (!canAddMore) {
-      setError(`Достигнут лимит (${bowlsLimit} чаш). Обновите подписку для добавления больше чаш.`)
+      setError(`Limit reached (${bowlsLimit} bowls). Upgrade your plan to add more.`)
       return null
     }
 

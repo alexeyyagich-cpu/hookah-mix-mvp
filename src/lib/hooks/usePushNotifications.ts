@@ -75,7 +75,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
   const subscribe = useCallback(async (): Promise<boolean> => {
     if (!state.isSupported) {
-      setState(prev => ({ ...prev, error: 'Push-уведомления не поддерживаются' }))
+      setState(prev => ({ ...prev, error: 'Push notifications are not supported' }))
       return false
     }
 
@@ -90,7 +90,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
           ...prev,
           permission,
           loading: false,
-          error: 'Разрешение на уведомления отклонено',
+          error: 'Notification permission denied',
         }))
         return false
       }
@@ -122,8 +122,8 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       }))
 
       // Show confirmation notification
-      sendLocalNotificationInternal('Уведомления включены', {
-        body: 'Вы будете получать уведомления о низком остатке табака',
+      sendLocalNotificationInternal('Notifications enabled', {
+        body: 'You will receive low stock alerts',
         tag: 'subscription-confirmed',
       })
 
@@ -133,7 +133,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Ошибка подписки',
+        error: error instanceof Error ? error.message : 'Subscription failed',
       }))
       return false
     }
@@ -164,7 +164,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Ошибка отписки',
+        error: error instanceof Error ? error.message : 'Unsubscribe failed',
       }))
       return false
     }
@@ -227,9 +227,9 @@ export function triggerLowStockNotification(items: Array<{ brand: string; flavor
   if (localStorage.getItem(PUSH_SUBSCRIBED_KEY) !== 'true') return
 
   const count = items.length
-  const title = `Низкий остаток: ${count} ${count === 1 ? 'позиция' : count < 5 ? 'позиции' : 'позиций'}`
-  const body = items.slice(0, 3).map(i => `${i.brand} ${i.flavor}: ${i.quantity}г`).join('\n')
-    + (count > 3 ? `\n...и ещё ${count - 3}` : '')
+  const title = `Low stock: ${count} ${count === 1 ? 'item' : 'items'}`
+  const body = items.slice(0, 3).map(i => `${i.brand} ${i.flavor}: ${i.quantity}g`).join('\n')
+    + (count > 3 ? `\n...and ${count - 3} more` : '')
 
   sendLocalNotificationInternal(title, {
     body,

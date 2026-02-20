@@ -15,13 +15,13 @@ function generateDemoSales(): BarSale[] {
   const now = new Date()
   const sales: BarSale[] = []
   const cocktails = [
-    { name: 'Мохито', price: 9, cost: 2.4, recipe_id: 'demo-r1' },
-    { name: 'Негрони', price: 11, cost: 3.2, recipe_id: 'demo-r2' },
-    { name: 'Джин-Тоник', price: 8, cost: 1.9, recipe_id: 'demo-r3' },
-    { name: 'Апероль Шприц', price: 9, cost: 2.6, recipe_id: 'demo-r4' },
-    { name: 'Эспрессо Мартини', price: 11, cost: 3.0, recipe_id: 'demo-r7' },
+    { name: 'Mojito', price: 9, cost: 2.4, recipe_id: 'demo-r1' },
+    { name: 'Negroni', price: 11, cost: 3.2, recipe_id: 'demo-r2' },
+    { name: 'Gin & Tonic', price: 8, cost: 1.9, recipe_id: 'demo-r3' },
+    { name: 'Aperol Spritz', price: 9, cost: 2.6, recipe_id: 'demo-r4' },
+    { name: 'Espresso Martini', price: 11, cost: 3.0, recipe_id: 'demo-r7' },
     { name: 'Leipzig Sour', price: 12, cost: 3.5, recipe_id: 'demo-r8' },
-    { name: 'Московский мул', price: 9, cost: 2.1, recipe_id: 'demo-r11' },
+    { name: 'Moscow Mule', price: 9, cost: 2.1, recipe_id: 'demo-r11' },
     { name: 'Tropical Hookah', price: 7, cost: 1.5, recipe_id: 'demo-r10' },
   ]
 
@@ -147,7 +147,7 @@ export function useBarSales(): UseBarSalesReturn {
         ing.bar_inventory_id,
         -deductAmount,
         'sale',
-        `Продажа: ${recipe.name} x${quantity}`
+        `Sale: ${recipe.name} x${quantity}`
       )
     }
 

@@ -68,9 +68,9 @@ const HEAT_RECOMMENDATIONS: Record<StrengthPreference, { coals: number; packing:
 }
 
 const PACKING_LABELS: Record<PackingStyle, string> = {
-  fluffy: 'Воздушная',
-  'semi-dense': 'Средняя',
-  dense: 'Плотная',
+  fluffy: 'Fluffy',
+  'semi-dense': 'Semi-dense',
+  dense: 'Dense',
 }
 
 // ============================================================================
@@ -93,7 +93,7 @@ export function quickRepeatGuest(
     return {
       success: false,
       error: 'NO_GUEST',
-      message: 'Гость не найден',
+      message: 'Guest not found',
     }
   }
 
@@ -102,7 +102,7 @@ export function quickRepeatGuest(
     return {
       success: false,
       error: 'NO_LAST_MIX',
-      message: `У ${guest.name} нет сохранённого микса`,
+      message: `${guest.name} has no saved mix`,
     }
   }
 
@@ -121,10 +121,10 @@ export function quickRepeatGuest(
         warnings.push({
           type: 'REPLACED',
           tobacco_id: item.tobacco_id,
-          message: `${item.flavor} заменён на ${replacement.flavor}`,
+          message: `${item.flavor} replaced with ${replacement.flavor}`,
           replacement: {
             tobacco: replacement,
-            reason: 'Табак больше не доступен',
+            reason: 'Tobacco no longer available',
           },
         })
         resolvedTobaccos.push({
@@ -150,10 +150,10 @@ export function quickRepeatGuest(
           warnings.push({
             type: 'OUT_OF_STOCK',
             tobacco_id: item.tobacco_id,
-            message: `${tobacco.flavor} нет в наличии`,
+            message: `${tobacco.flavor} out of stock`,
             replacement: {
               tobacco: replacement,
-              reason: `Замена: ${replacement.brand} ${replacement.flavor}`,
+              reason: `Replacement: ${replacement.brand} ${replacement.flavor}`,
             },
           })
           resolvedTobaccos.push({
@@ -167,7 +167,7 @@ export function quickRepeatGuest(
           warnings.push({
             type: 'OUT_OF_STOCK',
             tobacco_id: item.tobacco_id,
-            message: `${tobacco.flavor} нет в наличии (замена не найдена)`,
+            message: `${tobacco.flavor} out of stock (no replacement found)`,
           })
           resolvedTobaccos.push({
             tobacco,
@@ -182,7 +182,7 @@ export function quickRepeatGuest(
         warnings.push({
           type: 'LOW_STOCK',
           tobacco_id: item.tobacco_id,
-          message: `${tobacco.flavor}: осталось ${stockGrams}г (нужно ${Math.round(gramsNeeded)}г)`,
+          message: `${tobacco.flavor}: ${stockGrams}g left (need ${Math.round(gramsNeeded)}g)`,
         })
         resolvedTobaccos.push({
           tobacco,
@@ -219,7 +219,7 @@ export function quickRepeatGuest(
     return {
       success: false,
       error: 'ALL_UNAVAILABLE',
-      message: 'Все табаки из микса недоступны',
+      message: 'All tobaccos in this mix are unavailable',
     }
   }
 
@@ -286,7 +286,7 @@ export function getHeatRecommendation(
  * Format heat setup for display
  */
 export function formatHeatSetup(setup: HeatSetup): string {
-  return `${setup.coals} угля, ${PACKING_LABELS[setup.packing]} забивка`
+  return `${setup.coals} coals, ${PACKING_LABELS[setup.packing]} pack`
 }
 
 // ============================================================================

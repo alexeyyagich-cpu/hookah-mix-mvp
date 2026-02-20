@@ -95,13 +95,13 @@ export function calculateForecast(
  */
 export function formatForecastDays(days: number | null): string {
   if (days === null) return '∞'
-  if (days <= 0) return 'Закончился'
-  if (days === 1) return '~1 день'
-  if (days < 7) return `~${days} дн.`
-  if (days < 14) return '~1 нед.'
-  if (days < 30) return `~${Math.round(days / 7)} нед.`
-  if (days < 60) return '~1 мес.'
-  return `~${Math.round(days / 30)} мес.`
+  if (days <= 0) return 'Out of stock'
+  if (days === 1) return '~1 day'
+  if (days < 7) return `~${days} days`
+  if (days < 14) return '~1 week'
+  if (days < 30) return `~${Math.round(days / 7)} weeks`
+  if (days < 60) return '~1 month'
+  return `~${Math.round(days / 30)} months`
 }
 
 /**

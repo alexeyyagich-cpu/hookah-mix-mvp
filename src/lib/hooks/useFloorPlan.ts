@@ -12,7 +12,7 @@ const DEMO_TABLES: FloorTable[] = [
   {
     id: '1',
     profile_id: 'demo',
-    name: 'Стол 1',
+    name: 'Table 1',
     capacity: 4,
     shape: 'circle',
     position_x: 50,
@@ -30,7 +30,7 @@ const DEMO_TABLES: FloorTable[] = [
   {
     id: '2',
     profile_id: 'demo',
-    name: 'Стол 2',
+    name: 'Table 2',
     capacity: 6,
     shape: 'rectangle',
     position_x: 200,
@@ -41,7 +41,7 @@ const DEMO_TABLES: FloorTable[] = [
     current_session_id: null,
     current_guest_name: null,
     session_start_time: null,
-    notes: 'У окна',
+    notes: 'By the window',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -57,16 +57,16 @@ const DEMO_TABLES: FloorTable[] = [
     height: 100,
     status: 'reserved',
     current_session_id: null,
-    current_guest_name: 'Бронь: Max W.',
+    current_guest_name: 'Reserved: Max W.',
     session_start_time: null,
-    notes: 'VIP-зона',
+    notes: 'VIP zone',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
     id: '4',
     profile_id: 'demo',
-    name: 'Стол 3',
+    name: 'Table 3',
     capacity: 2,
     shape: 'circle',
     position_x: 280,
@@ -84,7 +84,7 @@ const DEMO_TABLES: FloorTable[] = [
   {
     id: '5',
     profile_id: 'demo',
-    name: 'Барная стойка',
+    name: 'Bar counter',
     capacity: 4,
     shape: 'rectangle',
     position_x: 380,
@@ -151,7 +151,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       if (fetchError) throw fetchError
       setTables(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки плана зала')
+      setError(err instanceof Error ? err.message : 'Failed to load floor plan')
     }
 
     setLoading(false)
@@ -195,7 +195,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       setTables(prev => [...prev, data])
       return data
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка добавления стола')
+      setError(err instanceof Error ? err.message : 'Failed to add table')
       return null
     }
   }, [user, supabase, isDemoMode, organizationId, locationId])
@@ -222,7 +222,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
         t.id === id ? { ...t, ...updates, updated_at: new Date().toISOString() } : t
       ))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления стола')
+      setError(err instanceof Error ? err.message : 'Failed to update table')
     }
   }, [user, supabase, isDemoMode, organizationId])
 
@@ -244,7 +244,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       if (deleteError) throw deleteError
       setTables(prev => prev.filter(t => t.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка удаления стола')
+      setError(err instanceof Error ? err.message : 'Failed to delete table')
     }
   }, [user, supabase, isDemoMode, organizationId])
 

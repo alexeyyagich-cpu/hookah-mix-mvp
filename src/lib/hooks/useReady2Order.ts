@@ -75,7 +75,7 @@ export function useReady2Order(): UseReady2OrderReturn {
       }
       setConnection(data || null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки POS подключения')
+      setError(err instanceof Error ? err.message : 'Failed to load POS connection')
     }
 
     setLoading(false)
@@ -105,7 +105,7 @@ export function useReady2Order(): UseReady2OrderReturn {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Ошибка подключения POS')
+        throw new Error(data.error || 'Failed to connect POS')
       }
 
       if (data.grantAccessUri) {
@@ -138,7 +138,7 @@ export function useReady2Order(): UseReady2OrderReturn {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка подключения POS')
+      setError(err instanceof Error ? err.message : 'Failed to connect POS')
     }
   }, [isDemoMode, fetchConnection])
 
@@ -157,13 +157,13 @@ export function useReady2Order(): UseReady2OrderReturn {
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.error || 'Ошибка отключения POS')
+        throw new Error(data.error || 'Failed to disconnect POS')
       }
 
       setConnection(null)
       setSyncResult(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка отключения POS')
+      setError(err instanceof Error ? err.message : 'Failed to disconnect POS')
     }
   }, [isDemoMode])
 
@@ -189,13 +189,13 @@ export function useReady2Order(): UseReady2OrderReturn {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Ошибка синхронизации')
+        throw new Error(data.error || 'Sync failed')
       }
 
       setSyncResult(data)
       setConnection(prev => prev ? { ...prev, last_sync_at: new Date().toISOString() } : null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка синхронизации')
+      setError(err instanceof Error ? err.message : 'Sync failed')
     }
 
     setSyncing(false)

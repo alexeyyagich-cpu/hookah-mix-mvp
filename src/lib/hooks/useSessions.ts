@@ -21,7 +21,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     session_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 20,
     compatibility_score: 92,
-    notes: 'Отличный микс!',
+    notes: 'Great mix!',
     rating: 5,
     duration_minutes: 52,
     session_items: [
@@ -57,7 +57,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
     session_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     total_grams: 15,
     compatibility_score: 78,
-    notes: 'Попробовать с меньшей пропорцией мяты',
+    notes: 'Try with less mint next time',
     rating: 3,
     duration_minutes: null,
     session_items: [
@@ -231,7 +231,7 @@ export function useSessions(): UseSessionsReturn {
               type: 'session',
               quantity_grams: -item.grams_used,
               session_id: session.id,
-              notes: `Сессия: ${item.brand} ${item.flavor}`,
+              notes: `Session: ${item.brand} ${item.flavor}`,
             })
           }
         }

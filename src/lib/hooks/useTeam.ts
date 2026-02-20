@@ -209,7 +209,7 @@ export function useTeam(): UseTeamReturn {
         .single()
 
       if (existing) {
-        return { success: false, error: 'Приглашение уже отправлено' }
+        return { success: false, error: 'Invitation already sent' }
       }
 
       // Insert invite token

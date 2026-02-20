@@ -132,7 +132,7 @@ export function Sidebar() {
     .filter(group => group.items.length > 0)
 
   const roleLabels = ORG_ROLE_LABELS[orgRole]
-  const roleName = roleLabels ? roleLabels[locale as keyof typeof roleLabels] || roleLabels.en : orgRole
+  const roleName = roleLabels ? (locale === 'de' ? roleLabels.de : roleLabels.label) : orgRole
 
   const NavContent = () => (
     <>

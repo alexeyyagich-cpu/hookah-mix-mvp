@@ -50,7 +50,7 @@ const DEMO_RESERVATIONS: Reservation[] = [
     reservation_time: '21:00',
     duration_minutes: 180,
     status: 'confirmed',
-    notes: 'VIP-зона',
+    notes: 'VIP zone',
     source: 'phone',
     created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
@@ -127,7 +127,7 @@ export function useReservations(): UseReservationsReturn {
       if (fetchError) throw fetchError
       setReservations(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки бронирований')
+      setError(err instanceof Error ? err.message : 'Failed to load reservations')
     }
 
     setLoading(false)
@@ -161,7 +161,7 @@ export function useReservations(): UseReservationsReturn {
         r.id === id ? { ...r, status } : r
       ))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления статуса')
+      setError(err instanceof Error ? err.message : 'Failed to update status')
     }
   }, [user, supabase, isDemoMode, organizationId])
 
@@ -187,7 +187,7 @@ export function useReservations(): UseReservationsReturn {
         r.id === id ? { ...r, table_id: tableId } : r
       ))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка назначения стола')
+      setError(err instanceof Error ? err.message : 'Failed to assign table')
     }
   }, [user, supabase, isDemoMode, organizationId])
 
@@ -209,7 +209,7 @@ export function useReservations(): UseReservationsReturn {
       if (deleteError) throw deleteError
       setReservations(prev => prev.filter(r => r.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка удаления бронирования')
+      setError(err instanceof Error ? err.message : 'Failed to delete reservation')
     }
   }, [user, supabase, isDemoMode, organizationId])
 
@@ -269,7 +269,7 @@ export function usePublicReservation(profileId: string | undefined, orgId?: stri
         (data || []).map(d => ({ date: d.reservation_date, time: d.reservation_time }))
       )
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки слотов')
+      setError(err instanceof Error ? err.message : 'Failed to load time slots')
     }
     setLoading(false)
   }, [profileId, orgId, supabase])
@@ -304,7 +304,7 @@ export function usePublicReservation(profileId: string | undefined, orgId?: stri
       setSubmitting(false)
       return true
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка создания бронирования')
+      setError(err instanceof Error ? err.message : 'Failed to create reservation')
       setSubmitting(false)
       return false
     }

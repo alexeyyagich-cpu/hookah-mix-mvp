@@ -82,19 +82,19 @@ const PROFILE_TO_CATEGORIES: Record<FlavorProfile, Category[]> = {
 }
 
 // UI display labels for flavor profiles
-export const FLAVOR_PROFILE_LABELS: Record<FlavorProfile, { emoji: string; label: string; labelRu: string }> = {
-  fresh: { emoji: '🌿', label: 'Fresh/Cool', labelRu: 'Свежий/Холодный' },
-  fruity: { emoji: '🍑', label: 'Fruity', labelRu: 'Фруктовый' },
-  sweet: { emoji: '🍪', label: 'Sweet', labelRu: 'Сладкий' },
-  citrus: { emoji: '🍋', label: 'Citrus', labelRu: 'Цитрусовый' },
-  spicy: { emoji: '🌶️', label: 'Spicy/Herbal', labelRu: 'Пряный/Травяной' },
-  soda: { emoji: '🥤', label: 'Soda', labelRu: 'Содовый' },
+export const FLAVOR_PROFILE_LABELS: Record<FlavorProfile, { emoji: string; label: string }> = {
+  fresh: { emoji: '🌿', label: 'Fresh/Cool' },
+  fruity: { emoji: '🍑', label: 'Fruity' },
+  sweet: { emoji: '🍪', label: 'Sweet' },
+  citrus: { emoji: '🍋', label: 'Citrus' },
+  spicy: { emoji: '🌶️', label: 'Spicy/Herbal' },
+  soda: { emoji: '🥤', label: 'Soda' },
 }
 
-export const STRENGTH_LABELS: Record<StrengthPreference, { emoji: string; label: string; labelRu: string }> = {
-  light: { emoji: '🌤️', label: 'Light', labelRu: 'Лёгкий' },
-  medium: { emoji: '⛅', label: 'Medium', labelRu: 'Средний' },
-  strong: { emoji: '🔥', label: 'Strong', labelRu: 'Крепкий' },
+export const STRENGTH_LABELS: Record<StrengthPreference, { emoji: string; label: string }> = {
+  light: { emoji: '🌤️', label: 'Light' },
+  medium: { emoji: '⛅', label: 'Medium' },
+  strong: { emoji: '🔥', label: 'Strong' },
 }
 
 // ============================================================================
@@ -136,7 +136,7 @@ function calculateTobaccoMatchScore(
   // Strength match (40 points)
   if (matchesStrength(tobacco, preferences.strength)) {
     score += 40
-    reasons.push(`Крепость: ${STRENGTH_LABELS[preferences.strength].labelRu}`)
+    reasons.push(`Strength: ${STRENGTH_LABELS[preferences.strength].label}`)
   }
 
   // Category match (40 points)
@@ -145,7 +145,7 @@ function calculateTobaccoMatchScore(
     // Find which profile this category belongs to
     for (const profile of preferences.flavorProfiles) {
       if (PROFILE_TO_CATEGORIES[profile].includes(tobacco.category)) {
-        reasons.push(`${FLAVOR_PROFILE_LABELS[profile].emoji} ${FLAVOR_PROFILE_LABELS[profile].labelRu}`)
+        reasons.push(`${FLAVOR_PROFILE_LABELS[profile].emoji} ${FLAVOR_PROFILE_LABELS[profile].label}`)
         break
       }
     }
@@ -157,7 +157,7 @@ function calculateTobaccoMatchScore(
   if (pairingMatches.length > 0) {
     score += Math.min(pairingMatches.length * 5, 20)
     if (pairingMatches.length >= 2) {
-      reasons.push('Отлично сочетается')
+      reasons.push('Pairs well')
     }
   }
 
@@ -213,7 +213,7 @@ function findReplacement(
     originalBrand: missingBrand,
     originalFlavor: missingFlavor,
     replacement: best.tobacco,
-    reason: `Замена: ${best.tobacco.brand} ${best.tobacco.flavor} (${original.category})`
+    reason: `Replacement: ${best.tobacco.brand} ${best.tobacco.flavor} (${original.category})`
   }
 }
 
@@ -310,7 +310,7 @@ export function recommendMixes(
       for (const profile of preferences.flavorProfiles) {
         const profileCategories = PROFILE_TO_CATEGORIES[profile]
         if (profileCategories.some(cat => ingredientCategories.includes(cat))) {
-          reasons.push(`${FLAVOR_PROFILE_LABELS[profile].emoji} ${FLAVOR_PROFILE_LABELS[profile].labelRu}`)
+          reasons.push(`${FLAVOR_PROFILE_LABELS[profile].emoji} ${FLAVOR_PROFILE_LABELS[profile].label}`)
         }
       }
     }
@@ -382,7 +382,7 @@ export function recommendMixes(
     results.push({
       mix,
       matchScore: score,
-      matchReasons: reasons.length > 0 ? reasons : ['Популярный микс'],
+      matchReasons: reasons.length > 0 ? reasons : ['Popular mix'],
       availability,
       missingTobaccos,
       replacements

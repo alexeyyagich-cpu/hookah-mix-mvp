@@ -97,7 +97,7 @@ export function useReviews(): UseReviewsReturn {
       if (fetchError) throw fetchError
       setReviews(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки отзывов')
+      setError(err instanceof Error ? err.message : 'Failed to load reviews')
     }
 
     setLoading(false)
@@ -131,7 +131,7 @@ export function useReviews(): UseReviewsReturn {
         r.id === id ? { ...r, is_published: isPublished } : r
       ))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления отзыва')
+      setError(err instanceof Error ? err.message : 'Failed to update review')
     }
   }, [user, supabase, isDemoMode, organizationId])
 
@@ -153,7 +153,7 @@ export function useReviews(): UseReviewsReturn {
       if (deleteError) throw deleteError
       setReviews(prev => prev.filter(r => r.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка удаления отзыва')
+      setError(err instanceof Error ? err.message : 'Failed to delete review')
     }
   }, [user, supabase, isDemoMode, organizationId])
 
@@ -212,7 +212,7 @@ export function usePublicReviews(profileId: string | undefined, orgId?: string):
         if (fetchError) throw fetchError
         setReviews(data || [])
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ошибка загрузки отзывов')
+        setError(err instanceof Error ? err.message : 'Failed to load reviews')
       }
       setLoading(false)
     }
@@ -244,7 +244,7 @@ export function usePublicReviews(profileId: string | undefined, orgId?: string):
       setSubmitting(false)
       return true
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка отправки отзыва')
+      setError(err instanceof Error ? err.message : 'Failed to submit review')
       setSubmitting(false)
       return false
     }

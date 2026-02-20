@@ -36,8 +36,8 @@ export default function TeamPage() {
   const getRoleLabel = (role: OrgRole) => {
     const labels = ORG_ROLE_LABELS[role]
     if (!labels) return role
-    const key = locale as keyof typeof labels
-    return `${labels.emoji} ${labels[key] || labels.en}`
+    const name = locale === 'de' ? labels.de : labels.label
+    return `${labels.emoji} ${name}`
   }
 
   const handleInvite = async (e: React.FormEvent) => {

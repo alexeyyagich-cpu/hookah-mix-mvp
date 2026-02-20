@@ -76,7 +76,7 @@ export function useTelegram(): UseTelegramReturn {
       }
       setConnection(data || null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки подключения Telegram')
+      setError(err instanceof Error ? err.message : 'Failed to load Telegram connection')
     }
 
     setLoading(false)
@@ -108,7 +108,7 @@ export function useTelegram(): UseTelegramReturn {
       if (updateError) throw updateError
       setConnection(prev => prev ? { ...prev, ...settings, updated_at: new Date().toISOString() } : null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка обновления настроек')
+      setError(err instanceof Error ? err.message : 'Failed to update settings')
     }
   }, [user, supabase, connection, isDemoMode])
 
@@ -132,7 +132,7 @@ export function useTelegram(): UseTelegramReturn {
       if (deleteError) throw deleteError
       setConnection(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка отключения Telegram')
+      setError(err instanceof Error ? err.message : 'Failed to disconnect Telegram')
     }
   }, [user, supabase, connection, isDemoMode])
 

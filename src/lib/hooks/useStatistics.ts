@@ -78,7 +78,7 @@ const DEMO_SESSIONS: SessionWithItems[] = [
   {
     id: '7', profile_id: 'demo', created_by: null, guest_id: null, bowl_type_id: '1',
     session_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    total_grams: 20, compatibility_score: 95, notes: 'Отличный микс!', rating: 5, duration_minutes: 55,
+    total_grams: 20, compatibility_score: 95, notes: 'Great mix!', rating: 5, duration_minutes: 55,
     session_items: [
       { id: '11', session_id: '7', tobacco_inventory_id: '1', tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', grams_used: 12, percentage: 60 },
       { id: '12', session_id: '7', tobacco_inventory_id: '5', tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', grams_used: 8, percentage: 40 },
@@ -156,8 +156,8 @@ const DEMO_TRANSACTIONS: InventoryTransaction[] = [
   // 6 days ago
   { id: '11', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '10', notes: 'Supernova', created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
   // Initial purchases
-  { id: '12', profile_id: 'demo', tobacco_inventory_id: '1', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Закупка', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '13', profile_id: 'demo', tobacco_inventory_id: '3', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Закупка', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '12', profile_id: 'demo', tobacco_inventory_id: '1', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Purchase', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '13', profile_id: 'demo', tobacco_inventory_id: '3', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Purchase', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
 ]
 
 interface ConsumptionByBrand {
@@ -302,7 +302,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       if (transactionsError) throw transactionsError
       setTransactions(transactionsData || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки статистики')
+      setError(err instanceof Error ? err.message : 'Failed to load statistics')
     }
 
     setLoading(false)

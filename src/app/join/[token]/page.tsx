@@ -163,7 +163,7 @@ export default function JoinPage() {
             </div>
             <h2 className="text-xl font-bold">Join {invite.org_name}</h2>
             <p className="text-[var(--color-textMuted)]">
-              You&apos;ve been invited as <strong>{roleLabel?.en || invite.role}</strong>.
+              You&apos;ve been invited as <strong>{roleLabel?.label || invite.role}</strong>.
               Log in or create an account to accept.
             </p>
             <div className="flex flex-col gap-3">
@@ -190,7 +190,7 @@ export default function JoinPage() {
             </div>
             <h2 className="text-xl font-bold">Join {invite.org_name}</h2>
             <p className="text-[var(--color-textMuted)]">
-              You&apos;ve been invited as <strong>{roleLabel?.en || invite.role}</strong>.
+              You&apos;ve been invited as <strong>{roleLabel?.label || invite.role}</strong>.
             </p>
             <button onClick={handleAccept} className="btn btn-primary w-full">
               Accept Invitation

@@ -161,7 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     if (!supabase) {
-      return { error: new Error('Supabase не настроен') }
+      return { error: new Error('Supabase not configured') }
     }
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -176,7 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     metadata?: { business_name?: string; owner_name?: string }
   ) => {
     if (!supabase) {
-      return { error: new Error('Supabase не настроен') }
+      return { error: new Error('Supabase not configured') }
     }
     const { error } = await supabase.auth.signUp({
       email,
@@ -206,7 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPasswordForEmail = async (email: string) => {
     if (!supabase) {
-      return { error: new Error('Supabase не настроен') }
+      return { error: new Error('Supabase not configured') }
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/update-password`,
@@ -216,7 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updatePassword = async (newPassword: string) => {
     if (!supabase) {
-      return { error: new Error('Supabase не настроен') }
+      return { error: new Error('Supabase not configured') }
     }
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     return { error }

@@ -105,14 +105,14 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { name: 'Обзор', href: '/dashboard', icon: 'dashboard', permission: 'dashboard.view' },
-  { name: 'Инвентарь', href: '/inventory', icon: 'inventory', permission: 'inventory.view' },
-  { name: 'Маркетплейс', href: '/marketplace', icon: 'shop', permission: 'marketplace.view' },
-  { name: 'Чаши', href: '/bowls', icon: 'bowl', permission: 'bowls.view' },
-  { name: 'Сессии', href: '/sessions', icon: 'session', permission: 'sessions.view' },
-  { name: 'Статистика', href: '/statistics', icon: 'chart', permission: 'statistics.view' },
-  { name: 'Команда', href: '/settings/team', icon: 'team', permission: 'team.view' },
-  { name: 'Настройки', href: '/settings', icon: 'settings', permission: 'settings.view' },
+  { name: 'Overview', href: '/dashboard', icon: 'dashboard', permission: 'dashboard.view' },
+  { name: 'Inventory', href: '/inventory', icon: 'inventory', permission: 'inventory.view' },
+  { name: 'Marketplace', href: '/marketplace', icon: 'shop', permission: 'marketplace.view' },
+  { name: 'Bowls', href: '/bowls', icon: 'bowl', permission: 'bowls.view' },
+  { name: 'Sessions', href: '/sessions', icon: 'session', permission: 'sessions.view' },
+  { name: 'Statistics', href: '/statistics', icon: 'chart', permission: 'statistics.view' },
+  { name: 'Team', href: '/settings/team', icon: 'team', permission: 'team.view' },
+  { name: 'Settings', href: '/settings', icon: 'settings', permission: 'settings.view' },
 ]
 
 export interface UseRoleReturn {
@@ -195,16 +195,16 @@ export function useRole(orgRoleOverride?: OrgRole | null): UseRoleReturn {
 }
 
 // Role display labels — supports both legacy and new org roles
-export const ROLE_LABELS: Record<UserRole, { ru: string; emoji: string }> = {
-  owner: { ru: 'Владелец', emoji: '👑' },
-  staff: { ru: 'Кальянщик', emoji: '🔥' },
-  guest: { ru: 'Гость', emoji: '👤' },
+export const ROLE_LABELS: Record<UserRole, { label: string; emoji: string }> = {
+  owner: { label: 'Owner', emoji: '👑' },
+  staff: { label: 'Hookah Master', emoji: '🔥' },
+  guest: { label: 'Guest', emoji: '👤' },
 }
 
-export const ORG_ROLE_LABELS: Record<OrgRole, { ru: string; en: string; de: string; emoji: string }> = {
-  owner: { ru: 'Владелец', en: 'Owner', de: 'Inhaber', emoji: '👑' },
-  manager: { ru: 'Менеджер', en: 'Manager', de: 'Manager', emoji: '📋' },
-  hookah_master: { ru: 'Кальянщик', en: 'Hookah Master', de: 'Shisha-Meister', emoji: '🔥' },
-  bartender: { ru: 'Бармен', en: 'Bartender', de: 'Barkeeper', emoji: '🍸' },
-  cook: { ru: 'Повар', en: 'Cook', de: 'Koch', emoji: '👨‍🍳' },
+export const ORG_ROLE_LABELS: Record<OrgRole, { label: string; en: string; de: string; emoji: string }> = {
+  owner: { label: 'Owner', en: 'Owner', de: 'Inhaber', emoji: '👑' },
+  manager: { label: 'Manager', en: 'Manager', de: 'Manager', emoji: '📋' },
+  hookah_master: { label: 'Hookah Master', en: 'Hookah Master', de: 'Shisha-Meister', emoji: '🔥' },
+  bartender: { label: 'Bartender', en: 'Bartender', de: 'Barkeeper', emoji: '🍸' },
+  cook: { label: 'Chef', en: 'Chef', de: 'Koch', emoji: '👨‍🍳' },
 }

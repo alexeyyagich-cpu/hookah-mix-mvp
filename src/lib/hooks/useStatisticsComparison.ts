@@ -151,17 +151,17 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
 
     return [
       {
-        name: 'Эта неделя vs прошлая',
+        name: 'This week vs last',
         periodA: { start: thisWeekStart, end: thisWeekEnd },
         periodB: { start: lastWeekStart, end: lastWeekEnd },
       },
       {
-        name: 'Этот месяц vs прошлый',
+        name: 'This month vs last',
         periodA: { start: thisMonthStart, end: thisMonthEnd },
         periodB: { start: lastMonthStart, end: lastMonthEnd },
       },
       {
-        name: 'Последние 30 дней vs предыдущие',
+        name: 'Last 30 days vs previous',
         periodA: { start: last30Start, end: last30End },
         periodB: { start: prev30Start, end: prev30End },
       },
@@ -230,7 +230,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
       if (errorB) throw errorB
       setSessionsB(dataB || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки данных')
+      setError(err instanceof Error ? err.message : 'Failed to load data')
     }
 
     setLoading(false)

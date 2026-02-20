@@ -77,7 +77,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
         setSettings(data)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки настроек')
+      setError(err instanceof Error ? err.message : 'Failed to load settings')
     }
 
     setLoading(false)
@@ -113,7 +113,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
       // Update local state
       setSettings(prev => prev ? { ...prev, ...updates } : null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка сохранения настроек')
+      setError(err instanceof Error ? err.message : 'Failed to save settings')
       throw err
     }
   }, [user, supabase, settings, isDemoMode])
