@@ -106,8 +106,8 @@ function MixPageInner() {
   const { inventory, loading: inventoryLoading } = useInventory();
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>(isGuestMode ? [] : [TOBACCOS[0].id, TOBACCOS[1].id]);
-  const [percents, setPercents] = useState<Record<string, number>>(isGuestMode ? {} : {
+  const [selectedIds, setSelectedIds] = useState<string[]>([TOBACCOS[0].id, TOBACCOS[1].id]);
+  const [percents, setPercents] = useState<Record<string, number>>({
     [TOBACCOS[0].id]: 60,
     [TOBACCOS[1].id]: 40,
   });
@@ -127,6 +127,16 @@ function MixPageInner() {
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const mixRatioRef = React.useRef<HTMLDivElement>(null);
   const hasInitializedRef = React.useRef(false);
+  const guestInitRef = React.useRef(false);
+
+  // Clear auto-selection in guest mode (useEffect because useSearchParams resolves after first render)
+  React.useEffect(() => {
+    if (isGuestMode && !guestInitRef.current) {
+      guestInitRef.current = true;
+      setSelectedIds([]);
+      setPercents({});
+    }
+  }, [isGuestMode]);
 
   // Apply a preset mix recipe
   const applyMixRecipe = useCallback((mix: MixRecipe, scrollToResults = true) => {
