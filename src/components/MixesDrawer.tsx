@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslation } from "@/lib/i18n";
+import { useTranslation, useLocale } from "@/lib/i18n";
 import { MIX_RECIPES, MIX_CATEGORY_INFO, getMixCategories, type MixRecipe } from "@/data/mixes";
 
 type Props = {
@@ -12,6 +12,8 @@ type Props = {
 
 export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
   const t = useTranslation("hookah");
+  const { locale } = useLocale();
+  const useEn = locale === "en" || locale === "de";
   const [selectedCategory, setSelectedCategory] = useState<MixRecipe["category"] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -19,10 +21,12 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
 
   const filteredMixes = MIX_RECIPES.filter(mix => {
     const matchesCategory = !selectedCategory || mix.category === selectedCategory;
+    const desc = useEn ? mix.description_en : mix.description;
+    const tags = useEn ? mix.tags_en : mix.tags;
     const matchesSearch = !searchQuery ||
       mix.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mix.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      mix.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 
@@ -159,6 +163,8 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
 
 function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
   const t = useTranslation("hookah");
+  const { locale } = useLocale();
+  const useEn = locale === "en" || locale === "de";
   const [isExpanded, setIsExpanded] = useState(false);
 
   const difficultyColors = {
@@ -195,7 +201,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
               </h3>
             </div>
             <p className="text-xs line-clamp-2" style={{ color: "var(--color-textMuted)" }}>
-              {mix.description}
+              {useEn ? mix.description_en : mix.description}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1">
@@ -277,7 +283,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {mix.tags.map((tag, i) => (
+            {(useEn ? mix.tags_en : mix.tags).map((tag, i) => (
               <span
                 key={i}
                 className="text-[10px] px-2 py-1 rounded-lg"

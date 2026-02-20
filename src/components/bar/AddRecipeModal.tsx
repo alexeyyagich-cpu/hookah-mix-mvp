@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, BarPortionUnit } from '@/types/database'
 import { RECIPE_PRESETS, type RecipePreset } from '@/data/bar-recipes'
+import { BAR_INGREDIENT_PRESETS } from '@/data/bar-ingredients'
 
 type RecipeInput = Omit<BarRecipe, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'>
 type IngredientInput = Omit<BarRecipeIngredient, 'id' | 'recipe_id' | 'created_at'>
@@ -108,20 +109,25 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
 
   const selectPreset = (preset: RecipePreset) => {
     setMode('custom')
-    setName(preset.name)
-    setNameEn(preset.name_en)
+    setName(getLocaleName(preset, locale))
+    setNameEn(locale === 'ru' ? preset.name_en : preset.name)
     setMethod(preset.method)
     setGlass(preset.glass)
     setGarnish(preset.garnish)
     setDifficulty(preset.difficulty.toString())
-    setIngredients(preset.ingredients.map((ing, i) => ({
-      key: `preset-${i}`,
-      ingredient_name: ing.name,
-      quantity: ing.quantity.toString(),
-      unit: ing.unit,
-      bar_inventory_id: null,
-      is_optional: ing.is_optional || false,
-    })))
+    setIngredients(preset.ingredients.map((ing, i) => {
+      // Look up localized ingredient name from bar-ingredients catalog
+      const catalogItem = ing.preset_id ? BAR_INGREDIENT_PRESETS.find(p => p.id === ing.preset_id) : null
+      const ingredientName = catalogItem ? getLocaleName(catalogItem, locale) : ing.name
+      return {
+        key: `preset-${i}`,
+        ingredient_name: ingredientName,
+        quantity: ing.quantity.toString(),
+        unit: ing.unit,
+        bar_inventory_id: null,
+        is_optional: ing.is_optional || false,
+      }
+    }))
   }
 
   const addIngredientRow = () => {

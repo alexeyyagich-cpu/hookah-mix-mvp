@@ -4,6 +4,7 @@ export type MixRecipe = {
   id: string;
   name: string;
   description: string;
+  description_en: string;
   category: "refreshing" | "sweet" | "fruity" | "dessert" | "exotic" | "classic";
   ingredients: {
     flavor: string;
@@ -12,6 +13,7 @@ export type MixRecipe = {
     category: Category;
   }[];
   tags: string[];
+  tags_en: string[];
   difficulty: "easy" | "medium" | "advanced";
   popularity: number; // 1-5
 };
@@ -23,6 +25,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-1",
     name: "Cool Banana Man",
     description: "Ягодная свежесть с банановой сладостью и холодком",
+    description_en: "Berry freshness with banana sweetness and a cool finish",
     category: "refreshing",
     ingredients: [
       { flavor: "Pinkman", brand: "Musthave", percent: 50, category: "berry" },
@@ -30,6 +33,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Supernova", brand: "Darkside", percent: 10, category: "mint" },
     ],
     tags: ["ягоды", "банан", "свежесть", "популярный"],
+    tags_en: ["berries", "banana", "freshness", "popular"],
     difficulty: "easy",
     popularity: 5,
   },
@@ -37,12 +41,14 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-2",
     name: "Watermelon Chill",
     description: "Освежающий арбуз с мятой — классика лета",
+    description_en: "Refreshing watermelon with mint — a summer classic",
     category: "refreshing",
     ingredients: [
       { flavor: "Torpedo", brand: "Darkside", percent: 90, category: "fruit" },
       { flavor: "Supernova", brand: "Darkside", percent: 10, category: "mint" },
     ],
     tags: ["арбуз", "мята", "лето", "классика"],
+    tags_en: ["watermelon", "mint", "summer", "classic"],
     difficulty: "easy",
     popularity: 5,
   },
@@ -50,6 +56,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-3",
     name: "Citrus Blast",
     description: "Взрывной цитрусовый микс с освежающими нотами",
+    description_en: "Explosive citrus mix with refreshing notes",
     category: "refreshing",
     ingredients: [
       { flavor: "Overdose", brand: "Black Burn", percent: 50, category: "citrus" },
@@ -57,6 +64,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Cane Mint", brand: "Tangiers", percent: 20, category: "mint" },
     ],
     tags: ["цитрус", "лимон", "лайм", "свежесть"],
+    tags_en: ["citrus", "lemon", "lime", "freshness"],
     difficulty: "medium",
     popularity: 4,
   },
@@ -66,6 +74,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-4",
     name: "Tropical Paradise",
     description: "Тропический рай с манго, ананасом и маракуйей",
+    description_en: "Tropical paradise with mango, pineapple, and passion fruit",
     category: "fruity",
     ingredients: [
       { flavor: "Falling Star", brand: "Darkside", percent: 40, category: "tropical" },
@@ -73,6 +82,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Fruity Dust", brand: "Darkside", percent: 25, category: "tropical" },
     ],
     tags: ["тропики", "манго", "ананас", "экзотика"],
+    tags_en: ["tropical", "mango", "pineapple", "exotic"],
     difficulty: "medium",
     popularity: 5,
   },
@@ -80,6 +90,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-5",
     name: "Berry Explosion",
     description: "Ягодный взрыв — смородина, малина и черника",
+    description_en: "Berry explosion — currant, raspberry, and blueberry",
     category: "fruity",
     ingredients: [
       { flavor: "Wild Forest", brand: "Darkside", percent: 40, category: "berry" },
@@ -87,6 +98,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Raspberries", brand: "Black Burn", percent: 25, category: "berry" },
     ],
     tags: ["ягоды", "смородина", "малина", "насыщенный"],
+    tags_en: ["berries", "currant", "raspberry", "rich"],
     difficulty: "easy",
     popularity: 4,
   },
@@ -94,6 +106,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-6",
     name: "Peach Dream",
     description: "Нежный персик с йогуртовыми нотами",
+    description_en: "Delicate peach with yogurt notes",
     category: "fruity",
     ingredients: [
       { flavor: "Kashmir Peach", brand: "Tangiers", percent: 50, category: "fruit" },
@@ -101,6 +114,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Peach Killer", brand: "Black Burn", percent: 20, category: "fruit" },
     ],
     tags: ["персик", "йогурт", "нежный", "кремовый"],
+    tags_en: ["peach", "yogurt", "delicate", "creamy"],
     difficulty: "medium",
     popularity: 4,
   },
@@ -110,6 +124,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-7",
     name: "Choco Cookie",
     description: "Шоколадное печенье с нотами какао и ванили",
+    description_en: "Chocolate cookie with cocoa and vanilla notes",
     category: "dessert",
     ingredients: [
       { flavor: "Cookie", brand: "Musthave", percent: 50, category: "dessert" },
@@ -117,6 +132,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Bounty Hunter", brand: "Darkside", percent: 20, category: "dessert" },
     ],
     tags: ["печенье", "шоколад", "десерт", "сладкий"],
+    tags_en: ["cookie", "chocolate", "dessert", "sweet"],
     difficulty: "medium",
     popularity: 4,
   },
@@ -124,6 +140,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-8",
     name: "Cheesecake Dream",
     description: "Кремовый чизкейк с ягодным топпингом",
+    description_en: "Creamy cheesecake with berry topping",
     category: "dessert",
     ingredients: [
       { flavor: "Cheesecake", brand: "Black Burn", percent: 50, category: "dessert" },
@@ -131,6 +148,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Milky Rice", brand: "Musthave", percent: 20, category: "dessert" },
     ],
     tags: ["чизкейк", "клубника", "кремовый", "десерт"],
+    tags_en: ["cheesecake", "strawberry", "creamy", "dessert"],
     difficulty: "advanced",
     popularity: 3,
   },
@@ -140,6 +158,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-9",
     name: "Earl Grey Lounge",
     description: "Аристократичный чай Эрл Грей с цитрусовыми нотами",
+    description_en: "Aristocratic Earl Grey tea with citrus notes",
     category: "exotic",
     ingredients: [
       { flavor: "Earl Grey", brand: "Musthave", percent: 60, category: "herbal" },
@@ -147,6 +166,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Supernova", brand: "Darkside", percent: 10, category: "mint" },
     ],
     tags: ["чай", "бергамот", "цитрус", "премиум"],
+    tags_en: ["tea", "bergamot", "citrus", "premium"],
     difficulty: "medium",
     popularity: 4,
   },
@@ -154,6 +174,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-10",
     name: "Spicy Morocco",
     description: "Восточные специи с пряными травами",
+    description_en: "Eastern spices with aromatic herbs",
     category: "exotic",
     ingredients: [
       { flavor: "Morocco", brand: "Musthave", percent: 55, category: "spice" },
@@ -161,6 +182,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Orange Soda", brand: "Tangiers", percent: 20, category: "soda" },
     ],
     tags: ["специи", "восток", "пряный", "уникальный"],
+    tags_en: ["spices", "oriental", "aromatic", "unique"],
     difficulty: "advanced",
     popularity: 3,
   },
@@ -170,6 +192,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-11",
     name: "Cola Ice",
     description: "Классическая кола с ледяной свежестью",
+    description_en: "Classic cola with icy freshness",
     category: "classic",
     ingredients: [
       { flavor: "Cola", brand: "Musthave", percent: 60, category: "soda" },
@@ -177,6 +200,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Ice Baby", brand: "Black Burn", percent: 15, category: "berry" },
     ],
     tags: ["кола", "лёд", "классика", "газировка"],
+    tags_en: ["cola", "ice", "classic", "soda"],
     difficulty: "easy",
     popularity: 5,
   },
@@ -184,12 +208,14 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-12",
     name: "Apple Mint Classic",
     description: "Вечная классика — яблоко с мятой",
+    description_en: "Timeless classic — apple with mint",
     category: "classic",
     ingredients: [
       { flavor: "Apple Shock", brand: "Black Burn", percent: 60, category: "fruit" },
       { flavor: "Cane Mint", brand: "Tangiers", percent: 40, category: "mint" },
     ],
     tags: ["яблоко", "мята", "классика", "простой"],
+    tags_en: ["apple", "mint", "classic", "simple"],
     difficulty: "easy",
     popularity: 5,
   },
@@ -199,6 +225,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-13",
     name: "Candy Shop",
     description: "Барбарисовые леденцы с ягодным послевкусием",
+    description_en: "Barberry hard candy with a berry aftertaste",
     category: "sweet",
     ingredients: [
       { flavor: "Barberry Candy", brand: "Musthave", percent: 50, category: "candy" },
@@ -206,6 +233,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Something Berry", brand: "Black Burn", percent: 15, category: "berry" },
     ],
     tags: ["леденец", "барбарис", "сладкий", "конфеты"],
+    tags_en: ["hard candy", "barberry", "sweet", "candy"],
     difficulty: "easy",
     popularity: 4,
   },
@@ -213,6 +241,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-14",
     name: "Prosecco Party",
     description: "Игристый просекко с тропическими фруктами",
+    description_en: "Sparkling prosecco with tropical fruits",
     category: "sweet",
     ingredients: [
       { flavor: "Prosecco", brand: "Musthave", percent: 50, category: "soda" },
@@ -220,6 +249,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Grapefruit", brand: "Musthave", percent: 20, category: "citrus" },
     ],
     tags: ["просекко", "праздник", "игристый", "премиум"],
+    tags_en: ["prosecco", "party", "sparkling", "premium"],
     difficulty: "medium",
     popularity: 4,
   },
@@ -229,6 +259,7 @@ export const MIX_RECIPES: MixRecipe[] = [
     id: "mix-15",
     name: "Winter Forest",
     description: "Зимний лес — хвоя, мята и ягоды",
+    description_en: "Winter forest — pine, mint, and berries",
     category: "refreshing",
     ingredients: [
       { flavor: "Elka", brand: "Black Burn", percent: 50, category: "herbal" },
@@ -236,6 +267,7 @@ export const MIX_RECIPES: MixRecipe[] = [
       { flavor: "Supernova", brand: "Darkside", percent: 10, category: "mint" },
     ],
     tags: ["зима", "ёлка", "хвоя", "новый год"],
+    tags_en: ["winter", "pine tree", "conifer", "new year"],
     difficulty: "medium",
     popularity: 4,
   },

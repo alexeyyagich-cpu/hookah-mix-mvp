@@ -212,7 +212,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium truncate">{getLocaleName(preset, locale)}</div>
                       <div className="text-xs text-[var(--color-textMuted)]">
-                        {CATEGORY_LABELS[preset.category]} · {preset.defaultPackageSize}{UNIT_LABELS[preset.defaultUnit]}
+                        {locale === 'ru' ? preset.name_en : preset.name} · {CATEGORY_LABELS[preset.category]} · {preset.defaultPackageSize}{UNIT_LABELS[preset.defaultUnit]}
                       </div>
                     </div>
                     <svg className="w-4 h-4 text-[var(--color-textMuted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
