@@ -1056,6 +1056,53 @@ function MixPageInner() {
                     />
                   </div>
                 )}
+
+                {/* Guest CTA — actions after creating a mix */}
+                {isGuestMode && (
+                  <div className="pt-5 mt-2 border-t" style={{ borderColor: "var(--color-border)" }}>
+                    <div className="space-y-3">
+                      {/* Show to hookah master */}
+                      <button
+                        onClick={() => {
+                          const mixText = items.map(it => `${it.tobacco.brand} ${it.tobacco.flavor} — ${it.percent}%`).join('\n');
+                          const fullText = `${t.guestMixSummary || 'Мой микс'}:\n${mixText}\n\n${t.guestCompatibilityShare || 'Совместимость'}: ${result.compatibility.score}%`;
+                          if (navigator.share) {
+                            navigator.share({ title: 'Hookah Mix', text: fullText }).catch(() => {});
+                          } else {
+                            navigator.clipboard.writeText(fullText);
+                            alert(t.guestCopied || 'Скопировано!');
+                          }
+                        }}
+                        className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
+                        style={{ background: 'var(--color-primary)', color: 'white' }}
+                      >
+                        <span>📋</span>
+                        <span>{t.guestShowMaster || 'Показать кальянщику'}</span>
+                      </button>
+
+                      {/* Try another */}
+                      <button
+                        onClick={() => { setSelectedIds([]); setPercents({}); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
+                        style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}
+                      >
+                        <span>{t.guestTryAnother || 'Попробовать другой микс'}</span>
+                      </button>
+
+                      {/* Back to menu */}
+                      {venueSlug && (
+                        <Link
+                          href={`/menu/${venueSlug}`}
+                          className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
+                          style={{ color: 'var(--color-textMuted)' }}
+                        >
+                          <span>{'\u2190'}</span>
+                          <span>{t.backToMenu}</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                )}
               </section>
             )}
           </div>
