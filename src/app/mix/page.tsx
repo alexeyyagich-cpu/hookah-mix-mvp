@@ -670,6 +670,16 @@ function MixPageInner() {
             </button>
             );
           })}
+          {selectedTobaccos.length >= 2 && (
+            <button
+              onClick={() => { setSelectedIds([]); setPercents({}); }}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs opacity-40 hover:opacity-100 transition-opacity"
+              style={{ background: 'var(--color-bgHover)', color: 'var(--color-textMuted)' }}
+              title={t.guestTryAnother || 'Очистить'}
+            >
+              ×
+            </button>
+          )}
           {isAtLimit && (
             <span className="badge badge-warning animate-fadeInUp">Max 3</span>
           )}
