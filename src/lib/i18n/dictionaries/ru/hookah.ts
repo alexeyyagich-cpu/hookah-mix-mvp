@@ -393,6 +393,8 @@ export const hookah = {
   mixNavLogin: 'Войти',
   mixSelectTobacco: 'Выберите табак',
   mixSelectHint: 'Выберите 2-3 вкуса для микса',
+  guestWelcomeTitle: 'Создайте свой идеальный микс!',
+  guestWelcomeHint: 'Выберите категорию вкусов или найдите табак в каталоге ниже',
   mixFlavorFilter: 'Фильтр по вкусам',
   mixAllFlavors: 'Все вкусы',
   mixMixRecipes: 'Рецепты миксов',

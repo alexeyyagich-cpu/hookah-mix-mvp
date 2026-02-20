@@ -387,6 +387,8 @@ export const hookah: typeof HookahType = {
   mixNavLogin: 'Anmelden',
   mixSelectTobacco: 'Tabak auswählen',
   mixSelectHint: 'Wählen Sie 2-3 Geschmacksrichtungen für einen Mix',
+  guestWelcomeTitle: 'Erstellen Sie Ihren perfekten Mix!',
+  guestWelcomeHint: 'Wählen Sie eine Geschmackskategorie oder stöbern Sie im Katalog',
   mixFlavorFilter: 'Nach Geschmack filtern',
   mixAllFlavors: 'Alle Geschmäcker',
   mixMixRecipes: 'Mix-Rezepte',

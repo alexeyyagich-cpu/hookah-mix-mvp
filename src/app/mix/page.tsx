@@ -106,8 +106,8 @@ function MixPageInner() {
   const { inventory, loading: inventoryLoading } = useInventory();
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([TOBACCOS[0].id, TOBACCOS[1].id]);
-  const [percents, setPercents] = useState<Record<string, number>>({
+  const [selectedIds, setSelectedIds] = useState<string[]>(isGuestMode ? [] : [TOBACCOS[0].id, TOBACCOS[1].id]);
+  const [percents, setPercents] = useState<Record<string, number>>(isGuestMode ? {} : {
     [TOBACCOS[0].id]: 60,
     [TOBACCOS[1].id]: 40,
   });
@@ -578,8 +578,38 @@ function MixPageInner() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-24 relative z-10">
+        {/* Guest welcome banner — show when no tobaccos selected in guest mode */}
+        {isGuestMode && selectedIds.length === 0 && (
+          <div className="card p-6 mb-6 text-center border-2 border-dashed animate-fadeInUp" style={{ borderColor: 'var(--color-primary)', background: 'var(--color-primary)10' }}>
+            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
+              {t.guestWelcomeTitle || 'Создайте свой микс!'}
+            </h2>
+            <p className="text-sm mb-4" style={{ color: 'var(--color-textMuted)' }}>
+              {t.guestWelcomeHint || 'Выберите вкусы из каталога ниже или начните с категории'}
+            </p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => { setSelectedCategory(cat); setShowCategoryFilter(true); }}
+                  className="pill hover:scale-105 transition-transform"
+                  style={{ fontSize: '0.875rem' }}
+                >
+                  <span>{CATEGORY_EMOJI[cat]}</span>
+                  <span>{CATEGORY_LABELS[cat]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Selected chips */}
         <div className="flex flex-wrap items-center gap-2 mb-6 min-h-[44px]">
+          {selectedTobaccos.length === 0 && !isGuestMode && (
+            <span className="text-sm" style={{ color: 'var(--color-textMuted)' }}>
+              {t.mixSelectHint}
+            </span>
+          )}
           {selectedTobaccos.map((t, i) => (
             <button
               key={t.id}
