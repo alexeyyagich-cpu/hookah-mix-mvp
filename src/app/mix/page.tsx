@@ -602,17 +602,17 @@ function MixPageInner() {
             <div className="flex items-center justify-center gap-3 mb-5">
               <div className="flex items-center gap-2">
                 <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-primary)', color: 'white' }}>1</span>
-                <span className="text-sm font-medium hidden sm:inline" style={{ color: 'var(--color-text)' }}>{t.guestStep1 || 'Выберите категорию'}</span>
+                <span className="text-sm font-medium hidden sm:inline" style={{ color: 'var(--color-text)' }}>{t.guestStep1}</span>
               </div>
               <span style={{ color: 'var(--color-textMuted)' }}>{'\u2192'}</span>
               <div className="flex items-center gap-2">
                 <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-border)', color: 'var(--color-text)' }}>2</span>
-                <span className="text-sm hidden sm:inline" style={{ color: 'var(--color-textMuted)' }}>{t.guestStep2 || 'Нажмите на вкус'}</span>
+                <span className="text-sm hidden sm:inline" style={{ color: 'var(--color-textMuted)' }}>{t.guestStep2}</span>
               </div>
               <span style={{ color: 'var(--color-textMuted)' }}>{'\u2192'}</span>
               <div className="flex items-center gap-2">
                 <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-border)', color: 'var(--color-text)' }}>3</span>
-                <span className="text-sm hidden sm:inline" style={{ color: 'var(--color-textMuted)' }}>{t.guestStep3 || 'Готовый микс!'}</span>
+                <span className="text-sm hidden sm:inline" style={{ color: 'var(--color-textMuted)' }}>{t.guestStep3}</span>
               </div>
             </div>
 
@@ -652,7 +652,7 @@ function MixPageInner() {
           )}
           {isGuestMode && selectedTobaccos.length > 0 && selectedTobaccos.length < 2 && (
             <span className="text-sm animate-fadeInUp" style={{ color: 'var(--color-primary)' }}>
-              {t.guestHintMore || `\u2191 ${2 - selectedTobaccos.length === 1 ? 'Добавьте ещё 1 вкус' : 'Добавьте ещё вкусы'} для микса`}
+              {t.guestHintMore}
             </span>
           )}
           {selectedTobaccos.map((t, i) => {
@@ -921,7 +921,7 @@ function MixPageInner() {
                     <div className="mb-2" style={{ color: "var(--color-primary)" }}>
                       <IconStrength size={24} />
                     </div>
-                    <div className="label">{t.mixStrengthLabel || 'Strength'}</div>
+                    <div className="label">{t.mixStrengthLabel}</div>
                     <div className="value" style={{ color: "var(--color-text)" }}>
                       {result.finalStrength}
                     </div>
@@ -930,7 +930,7 @@ function MixPageInner() {
                     <div className="mb-2" style={{ color: "var(--color-warning)" }}>
                       <IconHeat size={24} />
                     </div>
-                    <div className="label">{t.mixHeatLabel || 'Heat'}</div>
+                    <div className="label">{t.mixHeatLabel}</div>
                     <div className="value" style={{ color: "var(--color-text)" }}>
                       {result.finalHeatLoad}
                     </div>
@@ -952,7 +952,7 @@ function MixPageInner() {
                     >
                       <IconWarning size={24} />
                     </div>
-                    <div className="label">{t.mixRiskLabel || 'Risk'}</div>
+                    <div className="label">{t.mixRiskLabel}</div>
                     <div
                       className="value text-xl uppercase"
                       style={{
@@ -969,7 +969,7 @@ function MixPageInner() {
                 <div className="pt-5 border-t" style={{ borderColor: "var(--color-border)" }}>
                   <h3 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: "var(--color-text)" }}>
                     <IconSettings size={18} color="var(--color-primary)" />
-                    {t.mixRecommendedSetup || 'Recommended Setup'}
+                    {t.mixRecommendedSetup}
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     <div
@@ -984,7 +984,7 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          {t.mixBowlLabel || 'Bowl'}
+                          {t.mixBowlLabel}
                         </p>
                         <p className="font-semibold text-sm capitalize" style={{ color: "var(--color-text)" }}>
                           {result.setup.bowlType}
@@ -1004,7 +1004,7 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          {t.mixPackLabel || 'Pack'}
+                          {t.mixPackLabel}
                         </p>
                         <p className="font-semibold text-sm capitalize" style={{ color: "var(--color-text)" }}>
                           {result.setup.packing}
@@ -1024,10 +1024,10 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          {t.mixCoalsLabel || 'Coals'}
+                          {t.mixCoalsLabel}
                         </p>
                         <p className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>
-                          {result.setup.coals} {t.mixCoalsPcs || 'pcs'}
+                          {result.setup.coals} {t.mixCoalsPcs}
                         </p>
                       </div>
                     </div>
@@ -1044,10 +1044,10 @@ function MixPageInner() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--color-textMuted)" }}>
-                          {t.mixHeatUpLabel || 'Heat-up'}
+                          {t.mixHeatUpLabel}
                         </p>
                         <p className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>
-                          {result.setup.heatUpMinutes} {t.mixHeatUpMin || 'min'}
+                          {result.setup.heatUpMinutes} {t.mixHeatUpMin}
                         </p>
                       </div>
                     </div>
@@ -1077,7 +1077,7 @@ function MixPageInner() {
                         style={{ background: 'var(--color-primary)', color: 'white' }}
                       >
                         <span>📋</span>
-                        <span>{t.guestShowMaster || 'Показать кальянщику'}</span>
+                        <span>{t.guestShowMaster}</span>
                       </button>
 
                       {/* Try another */}
@@ -1086,7 +1086,7 @@ function MixPageInner() {
                         className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
                         style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}
                       >
-                        <span>{t.guestTryAnother || 'Попробовать другой микс'}</span>
+                        <span>{t.guestTryAnother}</span>
                       </button>
 
                       {/* Back to menu */}
@@ -1366,10 +1366,10 @@ function MixPageInner() {
             {/* Header */}
             <div className="text-center mb-5">
               <p className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
-                {t.guestMixSummary || 'Мой микс'}
+                {t.guestMixSummary}
               </p>
               <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
-                {t.guestCompatibilityShare || 'Совместимость'}: <span style={{ color: 'var(--color-success)', fontWeight: 700 }}>{result.compatibility.score}%</span>
+                {t.guestCompatibilityShare}: <span style={{ color: 'var(--color-success)', fontWeight: 700 }}>{result.compatibility.score}%</span>
               </p>
             </div>
 
@@ -1390,20 +1390,20 @@ function MixPageInner() {
             {/* Setup summary */}
             <div className="grid grid-cols-2 gap-2 mb-5 text-xs">
               <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixBowlLabel || 'Bowl'}</p>
+                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixBowlLabel}</p>
                 <p className="font-semibold capitalize" style={{ color: 'var(--color-text)' }}>{result.setup.bowlType}</p>
               </div>
               <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixPackLabel || 'Pack'}</p>
+                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixPackLabel}</p>
                 <p className="font-semibold capitalize" style={{ color: 'var(--color-text)' }}>{result.setup.packing}</p>
               </div>
               <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixCoalsLabel || 'Coals'}</p>
-                <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{result.setup.coals} {t.mixCoalsPcs || 'шт'}</p>
+                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixCoalsLabel}</p>
+                <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{result.setup.coals} {t.mixCoalsPcs}</p>
               </div>
               <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixHeatUpLabel || 'Heat-up'}</p>
-                <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{result.setup.heatUpMinutes} {t.mixHeatUpMin || 'мин'}</p>
+                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixHeatUpLabel}</p>
+                <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{result.setup.heatUpMinutes} {t.mixHeatUpMin}</p>
               </div>
             </div>
 

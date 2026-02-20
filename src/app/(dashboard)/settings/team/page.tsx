@@ -287,7 +287,7 @@ export default function TeamPage() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  {locale === 'ru' ? 'Роль' : locale === 'de' ? 'Rolle' : 'Role'}
+                  {tm.memberRole}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {INVITABLE_ROLES.map(r => (
