@@ -243,11 +243,11 @@ function PricingPageContent() {
             const priceDisplay = price === 0
               ? ta.priceFree
               : isYearly
-                ? ta.pricePerYear(`$${(price / 100).toLocaleString('en-US')}`)
-                : ta.pricePerMonth(`$${(price / 100).toLocaleString('en-US')}`)
+                ? ta.pricePerYear(`${(price / 100).toFixed(0)}\u20AC`)
+                : ta.pricePerMonth(`${(price / 100).toFixed(0)}\u20AC`)
 
             const monthlyEquivalent = isYearly && price > 0
-              ? ta.priceMonthlyEquiv(`$${Math.round(price / 12 / 100)}`)
+              ? ta.priceMonthlyEquiv(`${Math.round(price / 12 / 100)}\u20AC`)
               : null
 
             return (
@@ -300,10 +300,10 @@ function PricingPageContent() {
             {ta.contactCta}
           </p>
           <a
-            href="mailto:support@hookah-torus.com"
+            href="mailto:htorus@hookahtorus.com"
             className="text-[var(--color-primary)] hover:underline"
           >
-            support@hookah-torus.com
+            htorus@hookahtorus.com
           </a>
         </div>
       </main>

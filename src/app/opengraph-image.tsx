@@ -217,7 +217,7 @@ export default async function Image() {
             color: '#4b5563',
           }}
         >
-          hookah-torus.com
+          hookahtorus.com
         </div>
       </div>
     ),

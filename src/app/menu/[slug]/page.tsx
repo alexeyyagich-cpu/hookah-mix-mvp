@@ -3,7 +3,7 @@
 import { use, useState, useMemo, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { usePublicLounge } from '@/lib/hooks/useLoungeProfile'
+import { usePublicLounge, type PublicTobaccoGroup } from '@/lib/hooks/useLoungeProfile'
 import { BrandLoader } from '@/components/BrandLoader'
 import {
   IconSmoke,
@@ -13,15 +13,6 @@ import {
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { PublicBarRecipe } from '@/types/lounge'
-
-// Demo tobacco inventory for menu
-const DEMO_MENU_TOBACCOS = [
-  { brand: 'Musthave', flavors: ['Pinkman', 'Blueberry', 'Banana Mama', 'Milky Rice', 'Lemon-Lime', 'Grapefruit'] },
-  { brand: 'Darkside', flavors: ['Supernova', 'Falling Star', 'Wild Forest', 'Dark Mint', 'Kalee Grap', 'Safari Melon'] },
-  { brand: 'Tangiers', flavors: ['Cane Mint', 'Pineapple', 'Kashmir Peach', 'Orange Soda', 'Horchata', 'Maraschino Cherry'] },
-  { brand: 'Al Fakher', flavors: ['Double Apple', 'Grape', 'Mint', 'Watermelon', 'Peach'] },
-  { brand: 'Fumari', flavors: ['White Gummy Bear', 'Tropical Punch', 'Blueberry Muffin', 'Spiced Chai'] },
-]
 
 const BRAND_COLORS: Record<string, string> = {
   'Musthave': '#EC4899',
@@ -70,7 +61,7 @@ function MenuPageInner({ slug }: { slug: string }) {
     other: tb.glassOther,
   }
 
-  const { lounge, mixes, barRecipes, tables, loading, error } = usePublicLounge(slug)
+  const { lounge, mixes, barRecipes, tobaccoMenu, tables, loading, error } = usePublicLounge(slug)
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -89,13 +80,13 @@ function MenuPageInner({ slug }: { slug: string }) {
   const [selectedHookahFlavor, setSelectedHookahFlavor] = useState<{ brand: string; flavor: string } | null>(null)
   const [hookahStrength, setHookahStrength] = useState<'light' | 'medium' | 'strong'>('medium')
 
-  const hasTobaccoMenu = mixes.length > 0 || slug === 'demo-lounge'
+  const hasTobaccoMenu = mixes.length > 0 || tobaccoMenu.length > 0
   const hasCocktailMenu = barRecipes.length > 0
 
   // Filter tobaccos by brand and search
   const filteredTobaccos = useMemo(() => {
-    if (!hasTobaccoMenu) return []
-    let result = DEMO_MENU_TOBACCOS
+    if (!hasTobaccoMenu || tobaccoMenu.length === 0) return []
+    let result: PublicTobaccoGroup[] = tobaccoMenu
 
     if (selectedBrand) {
       result = result.filter(item => item.brand === selectedBrand)
@@ -113,9 +104,9 @@ function MenuPageInner({ slug }: { slug: string }) {
     }
 
     return result
-  }, [selectedBrand, searchQuery, hasTobaccoMenu])
+  }, [selectedBrand, searchQuery, hasTobaccoMenu, tobaccoMenu])
 
-  const allBrands = DEMO_MENU_TOBACCOS.map(item => item.brand)
+  const allBrands = tobaccoMenu.map(item => item.brand)
   const signatureMixes = mixes.filter(m => m.is_signature)
   const popularMixes = mixes.filter(m => !m.is_signature).sort((a, b) => b.popularity - a.popularity)
   const cocktailGroups = useMemo(() => groupByMethod(barRecipes), [barRecipes])

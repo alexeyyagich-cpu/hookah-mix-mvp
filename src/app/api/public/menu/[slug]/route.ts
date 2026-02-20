@@ -59,6 +59,27 @@ export async function GET(
     ingredients: ingredientMap[r.id] || [],
   }))
 
+  // Fetch tobacco inventory (brand + flavor for public menu)
+  const { data: tobaccos } = await supabase
+    .from('tobacco_inventory')
+    .select('brand, flavor, quantity_grams')
+    .eq('profile_id', profile.id)
+    .gt('quantity_grams', 0)
+    .order('brand', { ascending: true })
+
+  // Group tobaccos by brand
+  const tobaccoMap: Record<string, string[]> = {}
+  for (const t of tobaccos || []) {
+    if (!tobaccoMap[t.brand]) tobaccoMap[t.brand] = []
+    if (!tobaccoMap[t.brand].includes(t.flavor)) {
+      tobaccoMap[t.brand].push(t.flavor)
+    }
+  }
+  const tobaccoMenu = Object.entries(tobaccoMap).map(([brand, flavors]) => ({
+    brand,
+    flavors: flavors.sort(),
+  }))
+
   // Fetch floor tables for QR ordering
   const { data: tables } = await supabase
     .from('floor_tables')
@@ -74,6 +95,7 @@ export async function GET(
       slug: profile.venue_slug,
     },
     barRecipes,
+    tobaccoMenu,
     tables: tables || [],
   })
 }

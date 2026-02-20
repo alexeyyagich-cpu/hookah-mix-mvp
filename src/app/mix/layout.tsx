@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Mix Calculator | Hookah Torus',
     description: 'Create perfect hookah tobacco mixes with strength calculation and packing tips',
-    url: 'https://hookah-torus.com/mix',
+    url: 'https://hookahtorus.com/mix',
   },
   alternates: {
     canonical: '/mix',

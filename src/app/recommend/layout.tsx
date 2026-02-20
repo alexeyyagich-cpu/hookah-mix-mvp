@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AI Mix Recommendations | Hookah Torus',
     description: 'Personalized AI-powered tobacco mix recommendations for hookah',
-    url: 'https://hookah-torus.com/recommend',
+    url: 'https://hookahtorus.com/recommend',
   },
   alternates: {
     canonical: '/recommend',

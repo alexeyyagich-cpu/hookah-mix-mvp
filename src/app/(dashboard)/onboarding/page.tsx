@@ -50,11 +50,11 @@ export default function OnboardingPage() {
   const [bowlCapacity, setBowlCapacity] = useState('18')
   const [isCustomBowl, setIsCustomBowl] = useState(false)
 
-  // Tobacco step state
+  // Tobacco step state — multi-select
   const [tobaccoBrand, setTobaccoBrand] = useState('Darkside')
-  const [tobaccoFlavor, setTobaccoFlavor] = useState('')
+  const [selectedFlavors, setSelectedFlavors] = useState<Set<string>>(new Set())
   const [tobaccoQuantity, setTobaccoQuantity] = useState('100')
-  const [isCustomFlavor, setIsCustomFlavor] = useState(false)
+  const [addedCount, setAddedCount] = useState(0)
 
   // Setup tab for hookah_bar
   const [setupTab, setSetupTab] = useState<'hookah' | 'bar'>('hookah')
@@ -121,21 +121,52 @@ export default function OnboardingPage() {
     setSaving(false)
   }
 
-  const handleTobaccoSave = async () => {
-    if (!tobaccoFlavor) return
-    setSaving(true)
-    const catalogItem = TOBACCOS.find(t => t.brand === tobaccoBrand && t.flavor === tobaccoFlavor)
-    await addTobacco({
-      tobacco_id: catalogItem?.id || `custom-${Date.now()}`,
-      brand: tobaccoBrand,
-      flavor: tobaccoFlavor,
-      quantity_grams: parseInt(tobaccoQuantity) || 100,
-      purchase_price: null,
-      package_grams: null,
-      purchase_date: null,
-      expiry_date: null,
-      notes: null,
+  const toggleFlavor = (flavor: string) => {
+    setSelectedFlavors(prev => {
+      const next = new Set(prev)
+      if (next.has(flavor)) next.delete(flavor)
+      else next.add(flavor)
+      return next
     })
+  }
+
+  const toggleAllFlavors = () => {
+    const brandFlavors = getFlavorsByBrand(tobaccoBrand)
+    const allSelected = brandFlavors.every(f => selectedFlavors.has(f))
+    setSelectedFlavors(prev => {
+      const next = new Set(prev)
+      if (allSelected) {
+        brandFlavors.forEach(f => next.delete(f))
+      } else {
+        brandFlavors.forEach(f => next.add(f))
+      }
+      return next
+    })
+  }
+
+  const handleBulkTobaccoSave = async () => {
+    if (selectedFlavors.size === 0) return
+    setSaving(true)
+    const qty = parseInt(tobaccoQuantity) || 100
+    let added = 0
+    for (const flavor of selectedFlavors) {
+      const catalogItem = TOBACCOS.find(t => t.flavor === flavor)
+      if (!catalogItem) continue
+      await addTobacco({
+        tobacco_id: catalogItem.id,
+        brand: catalogItem.brand,
+        flavor: catalogItem.flavor,
+        quantity_grams: qty,
+        purchase_price: null,
+        package_grams: null,
+        purchase_date: null,
+        expiry_date: null,
+        notes: null,
+      })
+      added++
+    }
+    setAddedCount(prev => prev + added)
+    setSelectedFlavors(new Set())
     setSaving(false)
   }
 
@@ -433,58 +464,76 @@ export default function OnboardingPage() {
 
                   <hr className="border-[var(--color-border)]" />
 
-                  {/* Tobacco section */}
+                  {/* Tobacco section — multi-select */}
                   <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
                     <p className="text-sm font-medium mb-1">{t.addTobaccoPrompt}</p>
                     <p className="text-xs text-[var(--color-textMuted)]">{t.addTobaccoPromptDesc}</p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t.brand}</label>
-                    <select
-                      value={tobaccoBrand}
-                      onChange={(e) => { setTobaccoBrand(e.target.value); setTobaccoFlavor(''); setIsCustomFlavor(false); }}
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                    >
-                      {getBrandNames().map(b => <option key={b} value={b}>{b}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">{t.flavor}</label>
-                    {isCustomFlavor ? (
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={tobaccoFlavor}
-                          onChange={(e) => setTobaccoFlavor(e.target.value)}
-                          placeholder={t.enterFlavorName}
-                          className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => { setIsCustomFlavor(false); setTobaccoFlavor(''); }}
-                          className="px-3 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)]"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
-                      <select
-                        value={tobaccoFlavor}
-                        onChange={(e) => {
-                          if (e.target.value === '__custom__') { setIsCustomFlavor(true); setTobaccoFlavor(''); }
-                          else setTobaccoFlavor(e.target.value);
-                        }}
-                        className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  {addedCount > 0 && (
+                    <div className="p-2 rounded-lg bg-[var(--color-success)]/10 text-[var(--color-success)] text-sm text-center">
+                      {t.tobaccosAdded(addedCount)}
+                    </div>
+                  )}
+
+                  {/* Brand tabs */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {getBrandNames().map(b => (
+                      <button
+                        key={b}
+                        onClick={() => setTobaccoBrand(b)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          tobaccoBrand === b
+                            ? 'bg-[var(--color-primary)] text-white'
+                            : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                        }`}
                       >
-                        <option value="">{t.selectFlavorPrompt}</option>
-                        {getFlavorsByBrand(tobaccoBrand).map(f => <option key={f} value={f}>{f}</option>)}
-                        <option value="__custom__">{t.otherFlavorOption}</option>
-                      </select>
+                        {b}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Select all / flavor count */}
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={toggleAllFlavors}
+                      className="text-xs text-[var(--color-primary)] hover:underline"
+                    >
+                      {getFlavorsByBrand(tobaccoBrand).every(f => selectedFlavors.has(f))
+                        ? t.deselectAll
+                        : t.selectAll}
+                    </button>
+                    {selectedFlavors.size > 0 && (
+                      <span className="text-xs text-[var(--color-textMuted)]">
+                        {t.selectedCount(selectedFlavors.size)}
+                      </span>
                     )}
                   </div>
+
+                  {/* Flavor chip grid */}
+                  <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                    {getFlavorsByBrand(tobaccoBrand).map(flavor => {
+                      const isSelected = selectedFlavors.has(flavor)
+                      return (
+                        <button
+                          key={flavor}
+                          onClick={() => toggleFlavor(flavor)}
+                          className={`px-3 py-2 rounded-xl text-sm transition-colors ${
+                            isSelected
+                              ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/50'
+                              : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                          }`}
+                        >
+                          {isSelected && <span className="mr-1">{'\u2713'}</span>}
+                          {flavor}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Quantity per item */}
                   <div>
-                    <label className="block text-sm font-medium mb-2">{t.quantityGramsLabel}</label>
+                    <label className="block text-sm font-medium mb-2">{t.quantityPerItemLabel}</label>
                     <input
                       type="number"
                       value={tobaccoQuantity}
@@ -494,13 +543,13 @@ export default function OnboardingPage() {
                     />
                   </div>
 
-                  {tobaccoFlavor && (
+                  {selectedFlavors.size > 0 && (
                     <button
-                      onClick={handleTobaccoSave}
+                      onClick={handleBulkTobaccoSave}
                       disabled={saving}
-                      className="btn btn-ghost w-full text-[var(--color-primary)] disabled:opacity-50"
+                      className="btn btn-primary w-full disabled:opacity-50"
                     >
-                      {saving ? tc.saving : `+ ${t.addTobacco}`}
+                      {saving ? tc.saving : t.addSelectedTobaccos(selectedFlavors.size)}
                     </button>
                   )}
                 </div>

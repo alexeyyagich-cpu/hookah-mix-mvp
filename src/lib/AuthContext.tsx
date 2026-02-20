@@ -9,7 +9,7 @@ import type { Profile } from '@/types/database'
 // Demo user data for testing
 const DEMO_USER: User = {
   id: 'demo-user-id',
-  email: 'demo@hookah-mix.com',
+  email: 'demo@hookahtorus.com',
   app_metadata: {},
   user_metadata: { business_name: 'Demo Lounge', owner_name: 'Demo User' },
   aud: 'authenticated',

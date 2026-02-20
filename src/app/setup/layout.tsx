@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Hookah Setup | Hookah Torus',
     description: 'Setup recommendations for the perfect hookah session',
-    url: 'https://hookah-torus.com/setup',
+    url: 'https://hookahtorus.com/setup',
   },
   alternates: {
     canonical: '/setup',

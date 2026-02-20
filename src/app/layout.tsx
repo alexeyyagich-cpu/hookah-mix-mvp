@@ -29,14 +29,14 @@ export const metadata: Metadata = {
   authors: [{ name: "Hookah Torus" }],
   creator: "Hookah Torus",
   publisher: "Hookah Torus",
-  metadataBase: new URL("https://hookah-torus.com"),
+  metadataBase: new URL("https://hookahtorus.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://hookah-torus.com",
+    url: "https://hookahtorus.com",
     siteName: "Hookah Torus",
     title: "Hookah Torus | Mix Calculator & Lounge Management",
     description: "Create perfect tobacco mixes with AI recommendations. The complete B2B platform for hookah lounges.",
@@ -71,37 +71,37 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://hookah-torus.com/#website",
-      url: "https://hookah-torus.com",
+      "@id": "https://hookahtorus.com/#website",
+      url: "https://hookahtorus.com",
       name: "Hookah Torus",
       description: "Mix calculator and hookah lounge management platform",
       publisher: {
-        "@id": "https://hookah-torus.com/#organization",
+        "@id": "https://hookahtorus.com/#organization",
       },
     },
     {
       "@type": "Organization",
-      "@id": "https://hookah-torus.com/#organization",
+      "@id": "https://hookahtorus.com/#organization",
       name: "Hookah Torus",
-      url: "https://hookah-torus.com",
+      url: "https://hookahtorus.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://hookah-torus.com/images/logo.png",
+        url: "https://hookahtorus.com/images/logo.png",
         width: 512,
         height: 512,
       },
       contactPoint: {
         "@type": "ContactPoint",
-        email: "support@hookah-mix.com",
+        email: "htorus@hookahtorus.com",
         contactType: "customer support",
       },
     },
     {
       "@type": "SoftwareApplication",
-      "@id": "https://hookah-torus.com/#app",
+      "@id": "https://hookahtorus.com/#app",
       name: "Hookah Torus",
       description: "AI-powered hookah mix calculator and lounge management platform",
-      url: "https://hookah-torus.com",
+      url: "https://hookahtorus.com",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       offers: {

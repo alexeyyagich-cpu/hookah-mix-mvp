@@ -241,11 +241,27 @@ const DEMO_TABLES: PublicTable[] = [
   { id: '5', name: 'Bar counter' },
 ]
 
+// Tobacco menu item for public display
+export interface PublicTobaccoGroup {
+  brand: string
+  flavors: string[]
+}
+
+// Demo tobacco menu
+const DEMO_TOBACCO_MENU: PublicTobaccoGroup[] = [
+  { brand: 'Musthave', flavors: ['Pinkman', 'Blueberry', 'Banana Mama', 'Milky Rice', 'Lemon-Lime', 'Grapefruit'] },
+  { brand: 'Darkside', flavors: ['Supernova', 'Falling Star', 'Wild Forest', 'Dark Mint', 'Kalee Grap', 'Safari Melon'] },
+  { brand: 'Tangiers', flavors: ['Cane Mint', 'Pineapple', 'Kashmir Peach', 'Orange Soda', 'Horchata', 'Maraschino Cherry'] },
+  { brand: 'Al Fakher', flavors: ['Double Apple', 'Grape', 'Mint', 'Watermelon', 'Peach'] },
+  { brand: 'Fumari', flavors: ['White Gummy Bear', 'Tropical Punch', 'Blueberry Muffin', 'Spiced Chai'] },
+]
+
 // Hook for public lounge viewing (by slug)
 interface UsePublicLoungeReturn {
   lounge: LoungeProfile | null
   mixes: PublicMix[]
   barRecipes: PublicBarRecipe[]
+  tobaccoMenu: PublicTobaccoGroup[]
   tables: PublicTable[]
   loading: boolean
   error: string | null
@@ -255,6 +271,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
   const [lounge, setLounge] = useState<LoungeProfile | null>(null)
   const [mixes, setMixes] = useState<PublicMix[]>([])
   const [barRecipes, setBarRecipes] = useState<PublicBarRecipe[]>([])
+  const [tobaccoMenu, setTobaccoMenu] = useState<PublicTobaccoGroup[]>([])
   const [tables, setTables] = useState<PublicTable[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -265,6 +282,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
       setLounge(DEMO_LOUNGE)
       setMixes(DEMO_MIXES)
       setBarRecipes(DEMO_BAR_RECIPES)
+      setTobaccoMenu(DEMO_TOBACCO_MENU)
       setTables(DEMO_TABLES)
       setLoading(false)
     } else {
@@ -287,6 +305,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
             show_popular_mixes: true,
           })
           setBarRecipes(data.barRecipes || [])
+          setTobaccoMenu(data.tobaccoMenu || [])
           setTables(data.tables || [])
           setLoading(false)
         })
@@ -297,5 +316,5 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
     }
   }, [slug])
 
-  return { lounge, mixes, barRecipes, tables, loading, error }
+  return { lounge, mixes, barRecipes, tobaccoMenu, tables, loading, error }
 }

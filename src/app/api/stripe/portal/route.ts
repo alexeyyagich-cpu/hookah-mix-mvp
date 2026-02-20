@@ -85,10 +85,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create billing portal session
+    // Create billing portal session (locale: auto-detect from browser)
     const session = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+      locale: 'auto',
     })
 
     return NextResponse.json({ url: session.url })

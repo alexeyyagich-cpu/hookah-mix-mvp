@@ -28,75 +28,26 @@ export const PRICE_TO_TIER: Record<string, 'pro' | 'enterprise'> = {
   [STRIPE_PRICES.enterprise_yearly]: 'enterprise',
 }
 
-// Plan details for UI
+// Plan details (prices in EUR cents, matching pricing page)
 export const PLANS = {
   free: {
     name: 'Free',
-    nameRu: 'Free',
     price: 0,
     priceYearly: 0,
-    features: [
-      '10 inventory items',
-      '1 bowl type',
-      '30-day history',
-      'Basic statistics',
-    ],
-    featuresRu: [
-      '10 inventory items',
-      '1 bowl type',
-      '30-day history',
-      'Basic statistics',
-    ],
   },
   pro: {
     name: 'Pro',
-    nameRu: 'Pro',
-    price: 990, // EUR cents per month (9.90 EUR)
-    priceYearly: 9900, // EUR cents per year (99 EUR, ~17% discount)
+    price: 900, // EUR cents per month (9 EUR)
+    priceYearly: 9900, // EUR cents per year (99 EUR)
     stripePriceMonthly: STRIPE_PRICES.pro_monthly,
     stripePriceYearly: STRIPE_PRICES.pro_yearly,
-    features: [
-      'Unlimited inventory',
-      'Unlimited bowl types',
-      'Full history',
-      'Advanced statistics',
-      'Marketplace access',
-      'Team management',
-      'Export data',
-    ],
-    featuresRu: [
-      'Unlimited inventory',
-      'Unlimited bowl types',
-      'Full history',
-      'Advanced statistics',
-      'Marketplace access',
-      'Team management',
-      'Export data',
-    ],
   },
   enterprise: {
     name: 'Enterprise',
-    nameRu: 'Enterprise',
-    price: 2990, // EUR cents per month (29.90 EUR)
+    price: 2900, // EUR cents per month (29 EUR)
     priceYearly: 29900, // EUR cents per year (299 EUR)
     stripePriceMonthly: STRIPE_PRICES.enterprise_monthly,
     stripePriceYearly: STRIPE_PRICES.enterprise_yearly,
-    features: [
-      'Everything in Pro',
-      'Auto-reorder rules',
-      'API access',
-      'Priority support',
-      'Custom integrations',
-      'White-label options',
-    ],
-    featuresRu: [
-      'Everything in Pro',
-      'Auto-reorder rules',
-      'API access',
-      'Priority support',
-      'Custom integrations',
-      'White-label options',
-    ],
   },
 } as const
 

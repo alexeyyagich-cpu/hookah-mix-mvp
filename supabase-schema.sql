@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   -- Onboarding state
   onboarding_completed BOOLEAN DEFAULT false,
   onboarding_skipped BOOLEAN DEFAULT false,
-  onboarding_step TEXT DEFAULT 'welcome' CHECK (onboarding_step IN ('welcome', 'business', 'bowl', 'tobacco', 'complete')),
+  onboarding_step TEXT DEFAULT 'welcome' CHECK (onboarding_step IN ('welcome', 'business_type', 'business', 'setup', 'complete', 'bowl', 'tobacco')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -36,6 +36,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS venue_slug TEXT;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT UNIQUE;
 -- ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;
+
+-- Migration: Update onboarding_step constraint to match new step values:
+-- ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_onboarding_step_check;
+-- ALTER TABLE public.profiles ADD CONSTRAINT profiles_onboarding_step_check CHECK (onboarding_step IN ('welcome', 'business_type', 'business', 'setup', 'complete', 'bowl', 'tobacco'));
 
 -- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;

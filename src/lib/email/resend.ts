@@ -7,7 +7,7 @@ export const resend = resendApiKey ? new Resend(resendApiKey) : null
 export const isEmailConfigured = Boolean(resendApiKey)
 
 // Email sender
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Hookah Torus <noreply@hookah-torus.com>'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Hookah Torus <noreply@hookahtorus.com>'
 
 interface SendEmailOptions {
   to: string
@@ -98,7 +98,7 @@ export function generateLowStockEmailHtml(items: LowStockItem[], businessName: s
           </table>
 
           <div style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookah-torus.com'}/inventory"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/inventory"
                style="display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
               Open Inventory
             </a>
@@ -176,7 +176,7 @@ export function generateOrderStatusEmailHtml(data: OrderStatusEmailData, busines
           </div>
 
           <div style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookah-torus.com'}/marketplace/orders"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/marketplace/orders"
                style="display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
               View Orders
             </a>
@@ -243,7 +243,7 @@ export function generateDailySummaryEmailHtml(data: DailySummaryData, businessNa
           </div>
 
           <div style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookah-torus.com'}/dashboard"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/dashboard"
                style="display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
               Open Dashboard
             </a>
@@ -300,7 +300,7 @@ export function generateWelcomeEmailHtml(ownerName: string, businessName: string
           </div>
 
           <div style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookah-torus.com'}/onboarding"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/onboarding"
                style="display: inline-block; background: #ff6b35; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
               Start Setup
             </a>
