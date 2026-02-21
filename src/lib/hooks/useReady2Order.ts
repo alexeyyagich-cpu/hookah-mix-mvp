@@ -64,18 +64,23 @@ export function useReady2Order(): UseReady2OrderReturn {
     setError(null)
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('r2o_connections')
-        .select('status, webhook_registered, last_sync_at, product_group_id, created_at')
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-        .single()
+      const { data, error: fetchError } = await Promise.race([
+        supabase
+          .from('r2o_connections')
+          .select('status, webhook_registered, last_sync_at, product_group_id, created_at')
+          .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+          .single(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000)),
+      ])
 
       if (fetchError && fetchError.code !== 'PGRST116') {
         throw fetchError
       }
       setConnection(data || null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load POS connection')
+      if (err instanceof Error && err.message !== 'timeout') {
+        setError(err.message)
+      }
     }
 
     setLoading(false)

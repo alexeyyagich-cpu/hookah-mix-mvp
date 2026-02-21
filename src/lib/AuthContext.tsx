@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured, isDemoMode as DEMO_MODE } from '@/lib/config'
-import type { User, Session } from '@supabase/supabase-js'
+import type { User, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import type { Profile } from '@/types/database'
 
 // Demo user data for testing
@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes — filter events to avoid transient null during token refresh
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED') {
           setSession(session)
           setUser(session?.user ?? null)

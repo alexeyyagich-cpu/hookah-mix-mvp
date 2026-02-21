@@ -54,6 +54,8 @@ export function useEmailSettings(): UseEmailSettingsReturn {
     setLoading(true)
     setError(null)
 
+    const timeout = setTimeout(() => setLoading(false), 8000)
+
     try {
       const { data, error: fetchError } = await supabase
         .from('email_settings')
@@ -91,6 +93,7 @@ export function useEmailSettings(): UseEmailSettingsReturn {
       setError(err instanceof Error ? err.message : 'Failed to load email settings')
     }
 
+    clearTimeout(timeout)
     setLoading(false)
   }, [user, supabase])
 

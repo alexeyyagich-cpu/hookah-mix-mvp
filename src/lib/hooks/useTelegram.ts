@@ -64,6 +64,8 @@ export function useTelegram(): UseTelegramReturn {
     setLoading(true)
     setError(null)
 
+    const timeout = setTimeout(() => setLoading(false), 8000)
+
     try {
       const { data, error: fetchError } = await supabase
         .from('telegram_connections')
@@ -79,6 +81,7 @@ export function useTelegram(): UseTelegramReturn {
       setError(err instanceof Error ? err.message : 'Failed to load Telegram connection')
     }
 
+    clearTimeout(timeout)
     setLoading(false)
   }, [user, supabase])
 
