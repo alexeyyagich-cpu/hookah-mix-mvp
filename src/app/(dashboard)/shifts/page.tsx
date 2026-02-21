@@ -447,6 +447,12 @@ function ReconciliationPanel({
             <div className="text-xs text-[var(--color-textMuted)]">{tm.cashBarRevenueLabel}</div>
             <div className="font-semibold text-[var(--color-success)]">+{r.cash.barRevenue}€</div>
           </div>
+          {r.cash.hookahRevenue > 0 && (
+            <div>
+              <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahRevenueLabel}</div>
+              <div className="font-semibold text-[var(--color-success)]">+{r.cash.hookahRevenue}€</div>
+            </div>
+          )}
           <div>
             <div className="text-xs text-[var(--color-textMuted)]">{tm.cashExpectedLabel}</div>
             <div className="font-semibold">{r.cash.expectedCash}€</div>
@@ -496,6 +502,20 @@ function ReconciliationPanel({
               <div className="text-xs text-[var(--color-textMuted)]">{tm.shiftHookahCost}</div>
               <div className="font-semibold">{r.hookah.tobaccoCost}€</div>
             </div>
+            {r.hookah.revenue > 0 && (
+              <div>
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahRevenueLabel}</div>
+                <div className="font-semibold text-[var(--color-success)]">{r.hookah.revenue}€</div>
+              </div>
+            )}
+            {r.hookah.revenue > 0 && (
+              <div>
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahProfitLabel}</div>
+                <div className={`font-semibold ${r.hookah.profit >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
+                  {r.hookah.profit}€
+                </div>
+              </div>
+            )}
           </div>
           {r.hookah.topTobaccos.length > 0 && (
             <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
@@ -558,6 +578,42 @@ function ReconciliationPanel({
         </div>
       )}
 
+      {/* Payroll section */}
+      {r.payroll && (
+        <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
+          <h4 className="text-xs font-semibold text-[var(--color-textMuted)] uppercase mb-3 flex items-center gap-1.5">
+            <IconCoin size={14} />
+            {tm.payrollSection}
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {r.payroll.staffName && (
+              <div>
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.openedByLabel}</div>
+                <div className="font-semibold">{r.payroll.staffName}</div>
+              </div>
+            )}
+            <div>
+              <div className="text-xs text-[var(--color-textMuted)]">{tm.hoursWorked}</div>
+              <div className="font-semibold">{r.payroll.hoursWorked}{tm.hoursShort}</div>
+            </div>
+            <div>
+              <div className="text-xs text-[var(--color-textMuted)]">{tm.basePay}</div>
+              <div className="font-semibold">{r.payroll.basePay}€</div>
+            </div>
+            {r.payroll.commissionPay > 0 && (
+              <div>
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.commissionPay} ({r.payroll.commissionPercent}%)</div>
+                <div className="font-semibold">{r.payroll.commissionPay}€</div>
+              </div>
+            )}
+            <div>
+              <div className="text-xs text-[var(--color-textMuted)]">{tm.totalPay}</div>
+              <div className="font-semibold text-[var(--color-primary)]">{r.payroll.totalPay}€</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* KDS section */}
       {r.kds.totalOrders > 0 && (
         <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
@@ -588,6 +644,26 @@ function ReconciliationPanel({
                 <div className="font-semibold">{r.kds.avgCompletionMinutes} {tm.minutesShort}</div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Tips section */}
+      {r.tips.count > 0 && (
+        <div className="p-4 rounded-xl bg-[var(--color-bgHover)]">
+          <h4 className="text-xs font-semibold text-[var(--color-textMuted)] uppercase mb-3 flex items-center gap-1.5">
+            <IconCoin size={14} />
+            {tm.reconciliationTips}
+          </h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-xs text-[var(--color-textMuted)]">{tm.tipsReceivedCount}</div>
+              <div className="font-semibold">{r.tips.count}</div>
+            </div>
+            <div>
+              <div className="text-xs text-[var(--color-textMuted)]">{tm.tipsReceivedTotal}</div>
+              <div className="font-semibold text-[var(--color-success)]">{r.tips.total}€</div>
+            </div>
           </div>
         </div>
       )}

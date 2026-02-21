@@ -782,6 +782,15 @@ export function IconMenuList({ size = 24, color = "currentColor", className }: I
   );
 }
 
+export function IconCrown({ size = 24, color = "currentColor", className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M2 17l3-8 4 4 3-6 3 6 4-4 3 8H2z" stroke={color} strokeWidth="2" strokeLinejoin="round" />
+      <path d="M3 20h18" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconModule({ size = 24, color = "currentColor", className }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>

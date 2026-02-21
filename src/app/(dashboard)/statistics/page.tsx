@@ -12,6 +12,7 @@ import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart
 import { PopularFlavorsChart } from '@/components/dashboard/Charts/PopularFlavorsChart'
 import { BrandPieChart } from '@/components/dashboard/Charts/BrandPieChart'
 import { exportStatisticsCSV, exportStatisticsPDF } from '@/lib/utils/exportReport'
+import { ABCAnalysisPanel } from '@/components/dashboard/ABCAnalysisPanel'
 import {
   IconSmoke,
   IconChart,
@@ -27,7 +28,7 @@ import { useTranslation, useLocale } from '@/lib/i18n'
 
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
-type ViewMode = 'overview' | 'comparison'
+type ViewMode = 'overview' | 'comparison' | 'abc'
 
 export default function StatisticsPage() {
   const tm = useTranslation('manage')
@@ -151,6 +152,16 @@ export default function StatisticsPage() {
               }`}
             >
               {tm.viewComparison}
+            </button>
+            <button
+              onClick={() => setViewMode('abc')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'abc'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                  : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+              }`}
+            >
+              {tm.viewABC}
             </button>
           </div>
 
@@ -521,6 +532,14 @@ export default function StatisticsPage() {
           )}
         </>
       ) : null}
+
+      {/* ABC Analysis Mode */}
+      {viewMode === 'abc' && (
+        <div className="card p-5">
+          <h2 className="text-lg font-semibold mb-4">{tm.viewABC}</h2>
+          <ABCAnalysisPanel />
+        </div>
+      )}
     </div>
   )
 }

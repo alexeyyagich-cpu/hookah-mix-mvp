@@ -2,8 +2,11 @@
 
 import { useState } from 'react'
 import { useTeam } from '@/lib/hooks/useTeam'
+import { useTips } from '@/lib/hooks/useTips'
+import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
+import { TipQRCode } from '@/components/dashboard/TipQRCode'
 import { useTranslation, useLocale } from '@/lib/i18n'
 import { useRouter } from 'next/navigation'
 import type { OrgRole } from '@/types/database'
@@ -14,11 +17,14 @@ const INVITABLE_ROLES: OrgRole[] = ['manager', 'hookah_master', 'bartender', 'co
 
 export default function TeamPage() {
   const tm = useTranslation('manage')
+  const ts = useTranslation('settings')
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const router = useRouter()
   const { isOwner } = useRole()
-  const { members, invitations, loading, error, inviteMember, removeMember, updateMemberRole, cancelInvitation, resendInvitation } = useTeam()
+  const { members, invitations, loading, error, inviteMember, removeMember, updateMemberRole, updateMemberPayroll, cancelInvitation, resendInvitation } = useTeam()
+  const { staffProfiles, createStaffProfile, toggleTipEnabled, getTipStats } = useTips()
+  const { isFreeTier } = useSubscription()
 
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -180,6 +186,43 @@ export default function TeamPage() {
                     <div className="text-xs text-[var(--color-textMuted)] mt-1">
                       {tm.memberSince(formatDate(member.created_at))}
                     </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center gap-1">
+                        <label className="text-xs text-[var(--color-textMuted)]">{tm.hourlyRate}:</label>
+                        <input
+                          type="number"
+                          defaultValue={member.hourly_rate}
+                          min="0"
+                          step="0.5"
+                          className="w-16 px-1.5 py-0.5 rounded text-xs bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value) || 0
+                            if (val !== member.hourly_rate) {
+                              updateMemberPayroll(member.id, val, member.sales_commission_percent)
+                            }
+                          }}
+                        />
+                        <span className="text-xs text-[var(--color-textMuted)]">€/{tm.hoursShort}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <label className="text-xs text-[var(--color-textMuted)]">{tm.salesCommission}:</label>
+                        <input
+                          type="number"
+                          defaultValue={member.sales_commission_percent}
+                          min="0"
+                          max="100"
+                          step="0.5"
+                          className="w-14 px-1.5 py-0.5 rounded text-xs bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value) || 0
+                            if (val !== member.sales_commission_percent) {
+                              updateMemberPayroll(member.id, member.hourly_rate, val)
+                            }
+                          }}
+                        />
+                        <span className="text-xs text-[var(--color-textMuted)]">%</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <button
@@ -262,6 +305,86 @@ export default function TeamPage() {
           </div>
         </div>
       )}
+
+      {/* QR Tips Section */}
+      <div className="card">
+        <div className="p-4 border-b border-[var(--color-border)]">
+          <h2 className="font-semibold">{ts.tipSection}</h2>
+          <p className="text-sm text-[var(--color-textMuted)] mt-1">{ts.tipSectionDesc}</p>
+        </div>
+
+        {isFreeTier ? (
+          <div className="p-8 text-center">
+            <div className="text-4xl mb-3">💡</div>
+            <p className="font-medium mb-1">{ts.tipProOnly}</p>
+            <p className="text-sm text-[var(--color-textMuted)]">{ts.tipProOnlyDesc}</p>
+          </div>
+        ) : members.length === 0 ? (
+          <div className="p-8 text-center text-[var(--color-textMuted)]">
+            {ts.tipNoStaff}
+          </div>
+        ) : (
+          <div className="divide-y divide-[var(--color-border)]">
+            {members.map((member) => {
+              const profile = staffProfiles.find(p => p.org_member_id === member.id)
+              const stats = profile ? getTipStats(profile.id) : null
+
+              return (
+                <div key={member.id} className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="font-medium">{member.display_name || tm.defaultStaffName}</div>
+                    {profile ? (
+                      <button
+                        onClick={() => toggleTipEnabled(profile.id)}
+                        className={`text-xs px-3 py-1 rounded-full font-medium ${
+                          profile.is_tip_enabled
+                            ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]'
+                            : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
+                        }`}
+                      >
+                        {profile.is_tip_enabled ? ts.tipEnabled : ts.tipDisabled}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={async () => {
+                          await createStaffProfile(member.id, member.display_name || 'Staff')
+                        }}
+                        className="text-xs px-3 py-1 rounded-full font-medium bg-[var(--color-primary)]/20 text-[var(--color-primary)]"
+                      >
+                        {ts.tipCreateProfile}
+                      </button>
+                    )}
+                  </div>
+
+                  {profile && profile.is_tip_enabled && (
+                    <div className="flex items-start gap-6">
+                      <TipQRCode slug={profile.tip_slug} displayName={profile.display_name} />
+                      {stats && stats.count > 0 && (
+                        <div className="flex-1 space-y-2 mt-2">
+                          <div className="grid grid-cols-3 gap-2 text-center">
+                            <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
+                              <div className="text-xs text-[var(--color-textMuted)]">{ts.tipTotal}</div>
+                              <div className="font-semibold">{stats.total}€</div>
+                            </div>
+                            <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
+                              <div className="text-xs text-[var(--color-textMuted)]">{ts.tipCount}</div>
+                              <div className="font-semibold">{stats.count}</div>
+                            </div>
+                            <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
+                              <div className="text-xs text-[var(--color-textMuted)]">{ts.tipAvg}</div>
+                              <div className="font-semibold">{stats.avgTip.toFixed(1)}€</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Invite Modal */}
       {showInviteModal && (

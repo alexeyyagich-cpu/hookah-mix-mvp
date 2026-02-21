@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendMessage, verifyWebhookSecret, verifyConnectionToken } from '@/lib/telegram/bot'
+import { sendMessage, verifyWebhookSecret, verifyConnectionToken, formatDailyReport, formatLowStockReport, formatShiftReport } from '@/lib/telegram/bot'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import type { TelegramUpdate } from '@/lib/telegram/types'
 
@@ -173,10 +173,154 @@ export async function POST(request: NextRequest) {
         '📖 <b>Available commands:</b>\n\n' +
         '/start - Start or connect your account\n' +
         '/status - Check connection status\n' +
+        '/report - Today\'s revenue & session report\n' +
+        '/stock - Low stock alert\n' +
+        '/shift - Current/last shift summary\n' +
         '/help - Show help\n\n' +
         'Configure notifications in <b>Settings → Telegram</b> in the app.',
         { parseMode: 'HTML' }
       )
+    }
+
+    // Handle /report command — today's sessions, revenue, profit
+    if (messageText === '/report' && supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      const { data: connection } = await supabase
+        .from('telegram_connections')
+        .select('profile_id')
+        .eq('chat_id', chatId)
+        .single()
+
+      if (!connection) {
+        await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
+      } else {
+        const todayStart = new Date()
+        todayStart.setHours(0, 0, 0, 0)
+
+        const { data: sessions } = await supabase
+          .from('sessions')
+          .select('total_grams, selling_price')
+          .eq('profile_id', connection.profile_id)
+          .gte('session_date', todayStart.toISOString())
+
+        const { data: barSales } = await supabase
+          .from('bar_sales')
+          .select('total_revenue, total_cost, quantity')
+          .eq('profile_id', connection.profile_id)
+          .gte('sold_at', todayStart.toISOString())
+
+        const sessionsArr = sessions || []
+        const salesArr = barSales || []
+        const hookahRevenue = sessionsArr.reduce((s, x) => s + (x.selling_price || 0), 0)
+        const tobaccoGrams = sessionsArr.reduce((s, x) => s + x.total_grams, 0)
+        const barRevenue = salesArr.reduce((s, x) => s + x.total_revenue, 0)
+        const barCost = salesArr.reduce((s, x) => s + x.total_cost, 0)
+        const totalRevenue = hookahRevenue + barRevenue
+
+        await sendMessage(chatId, formatDailyReport({
+          sessions: sessionsArr.length,
+          tobaccoGrams,
+          hookahRevenue,
+          barSales: salesArr.reduce((s, x) => s + x.quantity, 0),
+          barRevenue,
+          totalRevenue,
+          totalCost: barCost,
+          profit: totalRevenue - barCost,
+        }), { parseMode: 'HTML' })
+      }
+    }
+
+    // Handle /stock command — low stock items
+    if (messageText === '/stock' && supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      const { data: connection } = await supabase
+        .from('telegram_connections')
+        .select('profile_id')
+        .eq('chat_id', chatId)
+        .single()
+
+      if (!connection) {
+        await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
+      } else {
+        const { data: settings } = await supabase
+          .from('notification_settings')
+          .select('low_stock_threshold')
+          .eq('profile_id', connection.profile_id)
+          .single()
+
+        const threshold = settings?.low_stock_threshold || 50
+
+        const { data: inventory } = await supabase
+          .from('tobacco_inventory')
+          .select('brand, flavor, quantity_grams')
+          .eq('profile_id', connection.profile_id)
+          .lte('quantity_grams', threshold)
+          .order('quantity_grams', { ascending: true })
+
+        await sendMessage(chatId, formatLowStockReport(
+          (inventory || []).map(i => ({ brand: i.brand, flavor: i.flavor, quantity: i.quantity_grams, threshold }))
+        ), { parseMode: 'HTML' })
+      }
+    }
+
+    // Handle /shift command — current or last shift summary
+    if (messageText === '/shift' && supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
+      const { data: connection } = await supabase
+        .from('telegram_connections')
+        .select('profile_id')
+        .eq('chat_id', chatId)
+        .single()
+
+      if (!connection) {
+        await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
+      } else {
+        // Get the most recent shift (open or last closed)
+        const { data: shifts } = await supabase
+          .from('shifts')
+          .select('*')
+          .eq('profile_id', connection.profile_id)
+          .order('opened_at', { ascending: false })
+          .limit(1)
+
+        const shift = shifts?.[0]
+        if (!shift) {
+          await sendMessage(chatId, formatShiftReport(null), { parseMode: 'HTML' })
+        } else {
+          const start = new Date(shift.opened_at)
+          const end = shift.closed_at ? new Date(shift.closed_at) : new Date()
+
+          const { data: sessions } = await supabase
+            .from('sessions')
+            .select('selling_price')
+            .eq('profile_id', connection.profile_id)
+            .gte('session_date', start.toISOString())
+            .lte('session_date', end.toISOString())
+
+          const { data: barSales } = await supabase
+            .from('bar_sales')
+            .select('total_revenue, quantity')
+            .eq('profile_id', connection.profile_id)
+            .gte('sold_at', start.toISOString())
+            .lte('sold_at', end.toISOString())
+
+          const sessionsArr = sessions || []
+          const salesArr = barSales || []
+          const hookahRevenue = sessionsArr.reduce((s, x) => s + (x.selling_price || 0), 0)
+          const barRevenue = salesArr.reduce((s, x) => s + x.total_revenue, 0)
+
+          await sendMessage(chatId, formatShiftReport({
+            staffName: shift.opened_by_name || null,
+            openedAt: shift.opened_at,
+            closedAt: shift.closed_at,
+            sessions: sessionsArr.length,
+            barSales: salesArr.reduce((s, x) => s + x.quantity, 0),
+            hookahRevenue,
+            barRevenue,
+            totalRevenue: hookahRevenue + barRevenue,
+          }), { parseMode: 'HTML' })
+        }
+      }
     }
 
     return NextResponse.json({ ok: true })

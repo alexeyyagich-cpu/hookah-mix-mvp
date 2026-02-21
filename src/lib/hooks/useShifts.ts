@@ -9,6 +9,7 @@ import { useSessions } from '@/lib/hooks/useSessions'
 import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useKDS } from '@/lib/hooks/useKDS'
 import { useInventory } from '@/lib/hooks/useInventory'
+import { useTeam } from '@/lib/hooks/useTeam'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 
 // Demo shifts — realistic week of data
@@ -152,6 +153,7 @@ export function useShifts(): UseShiftsReturn {
   const { sales } = useBarSales()
   const { orders: kdsOrders } = useKDS()
   const { inventory: tobaccoInventory } = useInventory()
+  const { members: teamMembers } = useTeam()
 
   // Effective profile ID: staff uses owner's ID
   const effectiveProfileId = useMemo(() => {
@@ -307,12 +309,16 @@ export function useShifts(): UseShiftsReturn {
 
     let totalGrams = 0
     let totalTobaccoCost = 0
+    let hookahRevenue = 0
     const tobaccoUsage: Record<string, { brand: string; flavor: string; grams: number }> = {}
     const compatScores: number[] = []
 
     for (const session of shiftSessions) {
       if (session.compatibility_score !== null) {
         compatScores.push(session.compatibility_score)
+      }
+      if (session.selling_price) {
+        hookahRevenue += session.selling_price
       }
       totalGrams += session.total_grams
       for (const item of session.session_items || []) {
@@ -375,9 +381,30 @@ export function useShifts(): UseShiftsReturn {
       }
     }
 
+    // --- PAYROLL ---
+    const staffMember = teamMembers.find(m => m.user_id === shift.opened_by)
+    let payrollData: ShiftReconciliation['payroll'] = null
+    if (staffMember && (staffMember.hourly_rate > 0 || staffMember.sales_commission_percent > 0)) {
+      const shiftDurationMs = (shift.closed_at ? new Date(shift.closed_at).getTime() : Date.now()) - new Date(shift.opened_at).getTime()
+      const hoursWorked = Math.round((shiftDurationMs / 3600000) * 100) / 100
+      const basePay = Math.round(hoursWorked * staffMember.hourly_rate * 100) / 100
+      const totalShiftRevenue = barRevenue + hookahRevenue
+      const commissionPay = Math.round(totalShiftRevenue * staffMember.sales_commission_percent / 100 * 100) / 100
+      payrollData = {
+        staffName: staffMember.display_name,
+        hoursWorked,
+        hourlyRate: staffMember.hourly_rate,
+        basePay,
+        commissionPercent: staffMember.sales_commission_percent,
+        commissionPay,
+        totalPay: Math.round((basePay + commissionPay) * 100) / 100,
+      }
+    }
+
     // --- CASH ---
     const startingCash = shift.starting_cash || 0
-    const expectedCash = startingCash + barRevenue
+    const hookahRevenueRounded = Math.round(hookahRevenue * 100) / 100
+    const expectedCash = startingCash + barRevenue + hookahRevenueRounded
 
     return {
       hookah: {
@@ -388,6 +415,8 @@ export function useShifts(): UseShiftsReturn {
           : null,
         topTobaccos,
         tobaccoCost: Math.round(totalTobaccoCost * 100) / 100,
+        revenue: hookahRevenueRounded,
+        profit: Math.round((hookahRevenue - totalTobaccoCost) * 100) / 100,
       },
       bar: {
         salesCount: barSalesCount,
@@ -407,14 +436,17 @@ export function useShifts(): UseShiftsReturn {
       cash: {
         startingCash,
         barRevenue: Math.round(barRevenue * 100) / 100,
+        hookahRevenue: hookahRevenueRounded,
         expectedCash: Math.round(expectedCash * 100) / 100,
         actualCash: shift.closing_cash,
         difference: shift.closing_cash !== null
           ? Math.round((shift.closing_cash - expectedCash) * 100) / 100
           : null,
       },
+      payroll: payrollData,
+      tips: { count: 0, total: 0 },
     }
-  }, [sessions, sales, kdsOrders, tobaccoInventory])
+  }, [sessions, sales, kdsOrders, tobaccoInventory, teamMembers])
 
   return {
     shifts,

@@ -174,6 +174,94 @@ ${stats.revenue ? `• Revenue: €${stats.revenue.toFixed(2)}` : ''}
   `.trim()
 }
 
+// Report formatters for bot commands
+
+export function formatDailyReport(data: {
+  sessions: number
+  tobaccoGrams: number
+  hookahRevenue: number
+  barSales: number
+  barRevenue: number
+  totalRevenue: number
+  totalCost: number
+  profit: number
+}): string {
+  return `
+<b>📊 Today's Report</b>
+
+<b>Hookah</b>
+• Sessions: ${data.sessions}
+• Tobacco used: ${data.tobaccoGrams}g
+• Revenue: €${data.hookahRevenue.toFixed(2)}
+
+<b>Bar</b>
+• Sales: ${data.barSales}
+• Revenue: €${data.barRevenue.toFixed(2)}
+
+<b>Totals</b>
+• Revenue: €${data.totalRevenue.toFixed(2)}
+• Cost: €${data.totalCost.toFixed(2)}
+• Profit: €${data.profit.toFixed(2)}
+
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/reports">Full P&L Report</a>
+  `.trim()
+}
+
+export function formatLowStockReport(items: { brand: string; flavor: string; quantity: number; threshold: number }[]): string {
+  if (items.length === 0) {
+    return '✅ <b>All stock levels are OK</b>\n\nNo items below threshold.'
+  }
+
+  const lines = items.map(item =>
+    `• ${item.brand} ${item.flavor}: <b>${item.quantity}g</b> (threshold: ${item.threshold}g)`
+  )
+  return `
+<b>📦 Low Stock Report</b>
+
+${items.length} item(s) below threshold:
+
+${lines.join('\n')}
+
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/inventory">Open Inventory</a>
+  `.trim()
+}
+
+export function formatShiftReport(shift: {
+  staffName: string | null
+  openedAt: string
+  closedAt: string | null
+  sessions: number
+  barSales: number
+  hookahRevenue: number
+  barRevenue: number
+  totalRevenue: number
+} | null): string {
+  if (!shift) {
+    return '💤 <b>No active or recent shift</b>\n\nOpen a shift in the app to start tracking.'
+  }
+
+  const status = shift.closedAt ? '✅ Closed' : '🟢 Active'
+  const duration = shift.closedAt
+    ? Math.round((new Date(shift.closedAt).getTime() - new Date(shift.openedAt).getTime()) / 3600000 * 10) / 10
+    : Math.round((Date.now() - new Date(shift.openedAt).getTime()) / 3600000 * 10) / 10
+
+  return `
+<b>🕐 Shift Summary</b>
+
+Status: ${status}
+${shift.staffName ? `Staff: ${shift.staffName}` : ''}
+Duration: ${duration}h
+
+• Hookah sessions: ${shift.sessions}
+• Bar sales: ${shift.barSales}
+• Hookah revenue: €${shift.hookahRevenue.toFixed(2)}
+• Bar revenue: €${shift.barRevenue.toFixed(2)}
+• Total revenue: €${shift.totalRevenue.toFixed(2)}
+
+<a href="${process.env.NEXT_PUBLIC_APP_URL}/shifts">Open Shifts</a>
+  `.trim()
+}
+
 // Generate deep link for connecting Telegram
 export function generateConnectLink(profileId: string): string {
   if (!TELEGRAM_BOT_TOKEN) return ''

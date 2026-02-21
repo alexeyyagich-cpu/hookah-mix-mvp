@@ -170,6 +170,7 @@ export default function FloorPage() {
           notes: null,
           rating: null,
           duration_minutes: null,
+          selling_price: null,
           created_by: user.id,
           guest_id: occupiedGuest.id,
         },

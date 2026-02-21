@@ -9,11 +9,14 @@ import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { InventoryTable } from '@/components/dashboard/InventoryTable'
 import { AddTobaccoModal } from '@/components/dashboard/AddTobaccoModal'
 import { ScanButton } from '@/components/inventory/BarcodeScanner'
+import { ImportModal } from '@/components/dashboard/ImportModal'
+import { InvoiceScanModal } from '@/components/dashboard/InvoiceScanModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
-import { IconExport, IconChart, IconLock } from '@/components/Icons'
+import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
+import type { ImportRow } from '@/lib/utils/importParser'
 
 export default function InventoryPage() {
   const t = useTranslation('hookah')
@@ -23,6 +26,7 @@ export default function InventoryPage() {
     loading,
     error,
     addTobacco,
+    bulkAddTobacco,
     updateTobacco,
     deleteTobacco,
     adjustQuantity,
@@ -30,6 +34,8 @@ export default function InventoryPage() {
     itemsLimit,
   } = useInventory()
   const { isFreeTier, canExport } = useSubscription()
+  const [importModalOpen, setImportModalOpen] = useState(false)
+  const [scanModalOpen, setScanModalOpen] = useState(false)
   const { settings: notificationSettings } = useNotificationSettings()
   const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
   const { statistics } = useStatistics({ lowStockThreshold })
@@ -188,6 +194,24 @@ export default function InventoryPage() {
             />
           )}
 
+          {!isFreeTier && (
+            <>
+              <button
+                onClick={() => setScanModalOpen(true)}
+                className="btn btn-ghost flex items-center gap-2"
+              >
+                <IconScan size={16} />
+                {t.ocrBtn}
+              </button>
+              <button
+                onClick={() => setImportModalOpen(true)}
+                className="btn btn-ghost flex items-center gap-2"
+              >
+                <IconExport size={16} />
+                {t.importBtn}
+              </button>
+            </>
+          )}
           <button
             onClick={() => {
               setScannedTobacco(null)
@@ -284,6 +308,44 @@ export default function InventoryPage() {
         editingItem={editingItem}
         canAddMore={canAddMore}
         scannedTobacco={scannedTobacco}
+      />
+
+      <ImportModal
+        isOpen={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        onImport={async (rows: ImportRow[]) => {
+          const items = rows.map(row => ({
+            tobacco_id: `import-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            brand: row.brand,
+            flavor: row.flavor,
+            quantity_grams: row.quantity_grams,
+            purchase_price: row.purchase_price,
+            package_grams: row.package_grams,
+            purchase_date: null,
+            expiry_date: null,
+            notes: null,
+          }))
+          await bulkAddTobacco(items)
+        }}
+      />
+
+      <InvoiceScanModal
+        isOpen={scanModalOpen}
+        onClose={() => setScanModalOpen(false)}
+        onImport={async (extractedItems) => {
+          const items = extractedItems.map(item => ({
+            tobacco_id: item.matchedTobaccoId || `ocr-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            brand: item.brand,
+            flavor: item.flavor,
+            quantity_grams: item.packageGrams * item.quantity,
+            purchase_price: item.price,
+            package_grams: item.packageGrams,
+            purchase_date: null,
+            expiry_date: null,
+            notes: null,
+          }))
+          await bulkAddTobacco(items)
+        }}
       />
     </div>
   )

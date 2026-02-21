@@ -44,7 +44,10 @@ export interface PnLBarData {
 }
 
 export interface PnLHookahData {
+  revenue: number
   cost: number
+  profit: number
+  margin: number | null
   gramsUsed: number
   sessionsCount: number
   costPerSession: number
@@ -179,10 +182,14 @@ export function usePnL(): UsePnLReturn {
       : []
 
     let hookahCost = 0
+    let hookahRevenue = 0
     let hookahGrams = 0
     const hookahBrandCosts: Record<string, number> = {}
 
     for (const session of periodSessions) {
+      if (session.selling_price) {
+        hookahRevenue += session.selling_price
+      }
       for (const item of session.session_items || []) {
         const ppg = pricePerGram[item.tobacco_id] || 0
         const itemCost = item.grams_used * ppg
@@ -200,19 +207,23 @@ export function usePnL(): UsePnLReturn {
         })
       : []
     let prevHookahCost = 0
+    let prevHookahRevenue = 0
     for (const session of prevSessions) {
+      if (session.selling_price) {
+        prevHookahRevenue += session.selling_price
+      }
       for (const item of session.session_items || []) {
         prevHookahCost += item.grams_used * (pricePerGram[item.tobacco_id] || 0)
       }
     }
 
     // --- TOTALS ---
-    const totalRevenue = barRevenue
+    const totalRevenue = barRevenue + hookahRevenue
     const totalCost = barCost + hookahCost
     const grossProfit = totalRevenue - totalCost
     const marginPercent = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : null
 
-    const prevRevenue = prevBarRevenue
+    const prevRevenue = prevBarRevenue + prevHookahRevenue
     const prevCost = prevBarCost + prevHookahCost
     const prevProfit = prevRevenue - prevCost
 
@@ -246,9 +257,21 @@ export function usePnL(): UsePnLReturn {
     for (const session of periodSessions) {
       const key = dateKey(session.session_date)
       if (dayMap[key]) {
+        if (session.selling_price) {
+          dayMap[key].barRevenue += 0 // hookah revenue handled below
+        }
         for (const item of session.session_items || []) {
           dayMap[key].hookahCost += item.grams_used * (pricePerGram[item.tobacco_id] || 0)
         }
+      }
+    }
+
+    // Accumulate hookah revenue per day
+    const hookahRevenueByDay: Record<string, number> = {}
+    for (const session of periodSessions) {
+      const key = dateKey(session.session_date)
+      if (session.selling_price) {
+        hookahRevenueByDay[key] = (hookahRevenueByDay[key] || 0) + session.selling_price
       }
     }
 
@@ -256,9 +279,9 @@ export function usePnL(): UsePnLReturn {
       .sort((a, b) => a.date.localeCompare(b.date))
       .map(d => ({
         ...d,
-        totalRevenue: d.barRevenue,
+        totalRevenue: d.barRevenue + (hookahRevenueByDay[d.date] || 0),
         totalCost: d.barCost + d.hookahCost,
-        profit: d.barRevenue - d.barCost - d.hookahCost,
+        profit: d.barRevenue + (hookahRevenueByDay[d.date] || 0) - d.barCost - d.hookahCost,
       }))
 
     // --- COST BY CATEGORY ---
@@ -365,7 +388,10 @@ export function usePnL(): UsePnLReturn {
         avgMargin: barAvgMargin,
       } : null,
       hookah: isHookahActive ? {
+        revenue: hookahRevenue,
         cost: hookahCost,
+        profit: hookahRevenue - hookahCost,
+        margin: hookahRevenue > 0 ? ((hookahRevenue - hookahCost) / hookahRevenue) * 100 : null,
         gramsUsed: hookahGrams,
         sessionsCount: periodSessions.length,
         costPerSession: periodSessions.length > 0 ? hookahCost / periodSessions.length : 0,

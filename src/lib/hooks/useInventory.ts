@@ -22,6 +22,7 @@ interface UseInventoryReturn {
   loading: boolean
   error: string | null
   addTobacco: (tobacco: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>) => Promise<TobaccoInventory | null>
+  bulkAddTobacco: (items: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>[]) => Promise<number>
   updateTobacco: (id: string, updates: Partial<TobaccoInventory>) => Promise<boolean>
   deleteTobacco: (id: string) => Promise<boolean>
   adjustQuantity: (id: string, quantityChange: number, type: TransactionType, notes?: string, sessionId?: string) => Promise<boolean>
@@ -279,11 +280,23 @@ export function useInventory(): UseInventoryReturn {
     return data || []
   }
 
+  const bulkAddTobacco = async (
+    items: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>[]
+  ): Promise<number> => {
+    let added = 0
+    for (const item of items) {
+      const result = await addTobacco(item)
+      if (result) added++
+    }
+    return added
+  }
+
   return {
     inventory,
     loading,
     error,
     addTobacco,
+    bulkAddTobacco,
     updateTobacco,
     deleteTobacco,
     adjustQuantity,

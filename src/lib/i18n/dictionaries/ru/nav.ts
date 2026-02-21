@@ -12,6 +12,7 @@ export const nav = {
 
   // Items
   overview: 'Обзор',
+  bossDashboard: 'Boss',
   inventory: 'Инвентарь',
   bowls: 'Чаши',
   sessions: 'Сессии',
@@ -26,6 +27,8 @@ export const nav = {
   shifts: 'Смены',
   statistics: 'Статистика',
   pnlReports: 'Отчеты P&L',
+  guestsCRM: 'Гости CRM',
+  promotions: 'Акции',
   reviews: 'Отзывы',
   marketplace: 'Маркетплейс',
   team: 'Команда',

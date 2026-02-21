@@ -11,6 +11,7 @@ export const nav: typeof NavType = {
   otherGroup: 'SONSTIGES',
 
   overview: 'Übersicht',
+  bossDashboard: 'Boss',
   inventory: 'Inventar',
   bowls: 'Köpfe',
   sessions: 'Sitzungen',
@@ -25,6 +26,8 @@ export const nav: typeof NavType = {
   shifts: 'Schichten',
   statistics: 'Statistiken',
   pnlReports: 'GuV-Berichte',
+  guestsCRM: 'Gäste CRM',
+  promotions: 'Aktionen',
   reviews: 'Bewertungen',
   marketplace: 'Marktplatz',
   team: 'Team',

@@ -43,6 +43,8 @@ const DEMO_MEMBERSHIP: OrgMember = {
   role: 'owner',
   display_name: 'Demo User',
   is_active: true,
+  hourly_rate: 0,
+  sales_commission_percent: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 }

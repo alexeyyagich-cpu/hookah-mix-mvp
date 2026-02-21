@@ -31,6 +31,8 @@ import {
   IconCoin,
   IconTrendUp,
   IconTimer,
+  IconPercent,
+  IconCrown,
 } from '@/components/Icons'
 
 interface NavItem {
@@ -39,6 +41,7 @@ interface NavItem {
   Icon: React.ComponentType<{ size?: number }>
   permission: Permission
   proOnly?: boolean
+  ownerOnly?: boolean
   module?: AppModule
 }
 
@@ -65,6 +68,7 @@ export function Sidebar() {
       label: null,
       items: [
         { name: t.overview, href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
+        { name: t.bossDashboard, href: '/boss', Icon: IconCrown, permission: 'dashboard.view', ownerOnly: true, proOnly: true },
       ],
     },
     {
@@ -94,6 +98,8 @@ export function Sidebar() {
         { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
         { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
         { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },
+        { name: t.guestsCRM, href: '/guests', Icon: IconUsers, permission: 'sessions.view', proOnly: true },
+        { name: t.promotions, href: '/promotions', Icon: IconPercent, permission: 'sessions.view', proOnly: true },
         { name: t.statistics, href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
         { name: t.pnlReports, href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
       ],
@@ -102,7 +108,6 @@ export function Sidebar() {
       label: t.otherGroup,
       items: [
         { name: t.reviews, href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
-        { name: t.marketplace, href: '/marketplace', Icon: IconShop, permission: 'marketplace.view', proOnly: true },
         { name: t.team, href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
         { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view' },
       ],
@@ -124,6 +129,7 @@ export function Sidebar() {
       items: group.items.filter(item => {
         if (!hasPermission(item.permission)) return false
         if (item.module && !modules.includes(item.module)) return false
+        if (item.ownerOnly && !isOwner) return false
         if (item.href === '/settings/team' && !isOwner) return false
         if (item.href === '/settings' && isStaff) return false
         return true

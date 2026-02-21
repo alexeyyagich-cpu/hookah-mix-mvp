@@ -287,10 +287,30 @@ export default function ReportsPage() {
 
           {/* Mini stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            {data.hookah.revenue > 0 && (
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahRevenueLabel}</div>
+                <div className="text-lg font-bold text-[var(--color-success)]">{data.hookah.revenue.toFixed(0)}€</div>
+              </div>
+            )}
             <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
               <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahCostLabel}</div>
               <div className="text-lg font-bold">{data.hookah.cost.toFixed(0)}€</div>
             </div>
+            {data.hookah.revenue > 0 && (
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahProfitLabel}</div>
+                <div className={`text-lg font-bold ${data.hookah.profit >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
+                  {data.hookah.profit.toFixed(0)}€
+                </div>
+              </div>
+            )}
+            {data.hookah.margin !== null && (
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
+                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahMarginLabel}</div>
+                <div className="text-lg font-bold">{data.hookah.margin.toFixed(0)}%</div>
+              </div>
+            )}
             <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
               <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahUsedLabel}</div>
               <div className="text-lg font-bold">{data.hookah.gramsUsed.toFixed(0)}{tc.grams}</div>

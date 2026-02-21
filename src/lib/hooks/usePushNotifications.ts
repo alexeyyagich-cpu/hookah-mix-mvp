@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '@/lib/AuthContext'
+
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
 
 interface PushNotificationState {
   isSupported: boolean
@@ -20,6 +23,7 @@ interface UsePushNotificationsReturn extends PushNotificationState {
 const PUSH_SUBSCRIBED_KEY = 'hookah-torus-push-subscribed'
 
 export function usePushNotifications(): UsePushNotificationsReturn {
+  const { user } = useAuth()
   const [state, setState] = useState<PushNotificationState>({
     isSupported: false,
     isSubscribed: false,
@@ -98,18 +102,33 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       // Get service worker registration
       const registration = await navigator.serviceWorker.ready
 
-      // Subscribe to push (using a placeholder VAPID key for local notifications)
-      // In production, you'd use real VAPID keys from your push service
-      try {
-        await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          // This is a placeholder - in production use real VAPID public key
-          applicationServerKey: urlBase64ToUint8Array(
-            'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
-          ),
-        })
-      } catch (e) {
-        // If VAPID fails, we'll use local notifications only
+      // Subscribe to push with VAPID key
+      let subscription: PushSubscription | null = null
+      if (VAPID_PUBLIC_KEY) {
+        try {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+          })
+        } catch (e) {
+          // If VAPID fails, we'll use local notifications only
+        }
+      }
+
+      // Send subscription to server
+      if (subscription && user) {
+        try {
+          await fetch('/api/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              subscription: subscription.toJSON(),
+              profileId: user.id,
+            }),
+          })
+        } catch {
+          // Non-critical: subscription saved locally
+        }
       }
 
       localStorage.setItem(PUSH_SUBSCRIBED_KEY, 'true')
@@ -147,6 +166,21 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       const subscription = await registration.pushManager.getSubscription()
 
       if (subscription) {
+        // Remove from server
+        if (user) {
+          try {
+            await fetch('/api/push/subscribe', {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                endpoint: subscription.endpoint,
+                profileId: user.id,
+              }),
+            })
+          } catch {
+            // Non-critical
+          }
+        }
         await subscription.unsubscribe()
       }
 

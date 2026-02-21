@@ -110,7 +110,7 @@ self.addEventListener('push', (event) => {
 
   let data = {
     title: 'Hookah Torus',
-    body: 'Новое уведомление',
+    body: 'New notification',
     icon: '/images/icon-192.png',
     badge: '/images/badge-72.png',
     tag: 'default',

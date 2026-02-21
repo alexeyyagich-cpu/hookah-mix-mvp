@@ -96,6 +96,8 @@ export interface OrgMember {
   role: OrgRole
   display_name: string | null
   is_active: boolean
+  hourly_rate: number
+  sales_commission_percent: number
   created_at: string
   updated_at: string
 }
@@ -151,6 +153,7 @@ export interface Session {
   notes: string | null
   rating: number | null
   duration_minutes: number | null
+  selling_price: number | null
   created_at?: string
 }
 
@@ -234,6 +237,8 @@ export interface MixSnapshot {
   created_at: string
 }
 
+export type LoyaltyTier = 'bronze' | 'silver' | 'gold'
+
 export interface Guest {
   id: string
   profile_id: string
@@ -246,8 +251,95 @@ export interface Guest {
   last_mix_snapshot: MixSnapshot | null
   visit_count: number
   last_visit_at: string | null
+  bonus_balance: number
+  discount_percent: number
+  total_spent: number
+  loyalty_tier: LoyaltyTier
   created_at: string
   updated_at: string
+}
+
+export interface LoyaltySettings {
+  id: string
+  profile_id: string
+  bonus_accrual_percent: number
+  bonus_max_redemption_percent: number
+  tier_silver_threshold: number
+  tier_gold_threshold: number
+  tier_silver_discount: number
+  tier_gold_discount: number
+  is_enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface BonusTransaction {
+  id: string
+  guest_id: string
+  profile_id: string
+  type: 'accrual' | 'redemption' | 'manual'
+  amount: number
+  balance_after: number
+  related_session_id: string | null
+  description: string | null
+  created_at: string
+}
+
+// ============================================================================
+// PROMOTIONS TYPES
+// ============================================================================
+
+export type PromoType = 'happy_hour' | 'nth_free' | 'birthday' | 'custom_discount'
+
+export interface PromoRules {
+  discount_percent?: number
+  start_hour?: number
+  end_hour?: number
+  nth_visit?: number
+  days_of_week?: number[]
+}
+
+export interface Promotion {
+  id: string
+  profile_id: string
+  name: string
+  type: PromoType
+  rules: PromoRules
+  is_active: boolean
+  valid_from: string | null
+  valid_until: string | null
+  usage_count: number
+  max_uses: number | null
+  created_at: string
+  updated_at: string
+}
+
+// ============================================================================
+// QR TIPS TYPES
+// ============================================================================
+
+export interface StaffProfile {
+  id: string
+  profile_id: string
+  org_member_id: string
+  display_name: string
+  photo_url: string | null
+  tip_slug: string
+  is_tip_enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface Tip {
+  id: string
+  staff_profile_id: string
+  amount: number
+  currency: string
+  stripe_payment_intent_id: string | null
+  status: 'pending' | 'completed' | 'failed'
+  payer_name: string | null
+  message: string | null
+  created_at: string
 }
 
 // ============================================================================
@@ -519,6 +611,8 @@ export interface ShiftReconciliation {
     avgCompatibility: number | null
     topTobaccos: { brand: string; flavor: string; grams: number }[]
     tobaccoCost: number
+    revenue: number
+    profit: number
   }
   bar: {
     salesCount: number
@@ -536,9 +630,23 @@ export interface ShiftReconciliation {
   cash: {
     startingCash: number
     barRevenue: number
+    hookahRevenue: number
     expectedCash: number
     actualCash: number | null
     difference: number | null
+  }
+  payroll: {
+    staffName: string | null
+    hoursWorked: number
+    hourlyRate: number
+    basePay: number
+    commissionPercent: number
+    commissionPay: number
+    totalPay: number
+  } | null
+  tips: {
+    count: number
+    total: number
   }
 }
 
@@ -891,7 +999,7 @@ export const SUBSCRIPTION_LIMITS = {
     session_history_days: Infinity,
     export: true,
     api_access: true,
-    marketplace: true,
+    marketplace: false,
     auto_reorder: false,
     pos_integration: true,
     guest_qr_ordering: true,
@@ -904,8 +1012,8 @@ export const SUBSCRIPTION_LIMITS = {
     session_history_days: Infinity,
     export: true,
     api_access: true,
-    marketplace: true,
-    auto_reorder: true,
+    marketplace: false,
+    auto_reorder: false,
     pos_integration: true,
     guest_qr_ordering: true,
     bar_module: true,

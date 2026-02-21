@@ -322,6 +322,10 @@ async function main() {
       visit_count: 8,
       last_visit_at: daysAgo(1),
       notes: 'Постоянный гость. Любит фруктовые миксы.',
+      bonus_balance: 15,
+      discount_percent: 5,
+      total_spent: 320,
+      loyalty_tier: 'silver',
     },
     {
       name: 'Мария Сидорова',
@@ -331,6 +335,10 @@ async function main() {
       visit_count: 5,
       last_visit_at: daysAgo(4),
       notes: 'Предпочитает лёгкие сладкие миксы.',
+      bonus_balance: 5,
+      discount_percent: 0,
+      total_spent: 150,
+      loyalty_tier: 'bronze',
     },
     {
       name: 'Дмитрий Козлов',
@@ -340,6 +348,10 @@ async function main() {
       visit_count: 12,
       last_visit_at: daysAgo(2),
       notes: 'Опытный курильщик. Любит крепкие миксы с мятой.',
+      bonus_balance: 40,
+      discount_percent: 10,
+      total_spent: 680,
+      loyalty_tier: 'gold',
     },
     {
       name: 'Анна Волкова',
@@ -349,6 +361,10 @@ async function main() {
       visit_count: 3,
       last_visit_at: daysAgo(8),
       notes: null,
+      bonus_balance: 0,
+      discount_percent: 0,
+      total_spent: 45,
+      loyalty_tier: 'bronze',
     },
     {
       name: 'Сергей Морозов',
@@ -358,6 +374,10 @@ async function main() {
       visit_count: 6,
       last_visit_at: daysAgo(6),
       notes: 'Часто приходит с компанией 3-4 человека.',
+      bonus_balance: 10,
+      discount_percent: 5,
+      total_spent: 250,
+      loyalty_tier: 'silver',
     },
   ]
 

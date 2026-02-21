@@ -38,6 +38,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
   const [mixItems, setMixItems] = useState<MixItem[]>([])
   const [saving, setSaving] = useState(false)
   const [compatibilityScore, setCompatibilityScore] = useState<number | null>(null)
+  const [sellingPrice, setSellingPrice] = useState<string>('')
   const [durationMinutes, setDurationMinutes] = useState<number>(0)
   const [showTimer, setShowTimer] = useState(false)
 
@@ -93,6 +94,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
       notes: notes || null,
       rating: null,
       duration_minutes: durationMinutes > 0 ? durationMinutes : null,
+      selling_price: sellingPrice ? parseFloat(sellingPrice) : null,
     }
 
     const sessionItems: Omit<SessionItem, 'id' | 'session_id'>[] = mixItems.map(item => ({
@@ -224,6 +226,36 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
               min="1"
               max="100"
             />
+          </div>
+
+          {/* Selling Price */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">{t.sellingPrice} (€)</label>
+            <input
+              type="number"
+              value={sellingPrice}
+              onChange={(e) => setSellingPrice(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              placeholder={t.sellingPricePlaceholder}
+              min="0"
+              step="0.5"
+            />
+            <div className="flex flex-wrap gap-1.5">
+              {[10, 15, 20, 25, 30].map(price => (
+                <button
+                  key={price}
+                  type="button"
+                  onClick={() => setSellingPrice(String(price))}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    sellingPrice === String(price)
+                      ? 'bg-[var(--color-primary)] text-white'
+                      : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                  }`}
+                >
+                  {price}€
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Deduct Inventory */}

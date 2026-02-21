@@ -17,6 +17,8 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'owner',
     display_name: 'Demo User',
     is_active: true,
+    hourly_rate: 0,
+    sales_commission_percent: 0,
     created_at: new Date(Date.now() - 90 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -28,6 +30,8 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'hookah_master',
     display_name: 'Marek Zielinski',
     is_active: true,
+    hourly_rate: 12,
+    sales_commission_percent: 5,
     created_at: new Date(Date.now() - 45 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -39,6 +43,8 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'bartender',
     display_name: 'Laura Fischer',
     is_active: true,
+    hourly_rate: 11,
+    sales_commission_percent: 3,
     created_at: new Date(Date.now() - 30 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -50,6 +56,8 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'manager',
     display_name: 'Oksana Koval',
     is_active: true,
+    hourly_rate: 15,
+    sales_commission_percent: 2,
     created_at: new Date(Date.now() - 14 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -61,6 +69,8 @@ const DEMO_MEMBERS: OrgMember[] = [
     role: 'cook',
     display_name: 'Tomasz Nowak',
     is_active: true,
+    hourly_rate: 10,
+    sales_commission_percent: 0,
     created_at: new Date(Date.now() - 5 * D).toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -92,6 +102,7 @@ export interface UseTeamReturn {
   inviteMember: (email: string, role: OrgRole, locationId?: string | null) => Promise<{ success: boolean; error?: string }>
   removeMember: (memberId: string) => Promise<{ success: boolean; error?: string }>
   updateMemberRole: (memberId: string, newRole: OrgRole) => Promise<{ success: boolean; error?: string }>
+  updateMemberPayroll: (memberId: string, hourlyRate: number, commissionPercent: number) => Promise<{ success: boolean; error?: string }>
   cancelInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string }>
   resendInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string }>
   refresh: () => Promise<void>
@@ -353,6 +364,36 @@ export function useTeam(): UseTeamReturn {
     }
   }
 
+  const updateMemberPayroll = async (
+    memberId: string,
+    hourlyRate: number,
+    commissionPercent: number
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!user || !organizationId) return { success: false, error: 'Not authenticated' }
+
+    if (isDemoMode) {
+      setMembers(prev => prev.map(m =>
+        m.id === memberId ? { ...m, hourly_rate: hourlyRate, sales_commission_percent: commissionPercent } : m
+      ))
+      return { success: true }
+    }
+
+    try {
+      const { error } = await supabase
+        .from('org_members')
+        .update({ hourly_rate: hourlyRate, sales_commission_percent: commissionPercent })
+        .eq('id', memberId)
+        .eq('organization_id', organizationId)
+
+      if (error) throw error
+
+      await loadTeam()
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to update payroll' }
+    }
+  }
+
   return {
     members,
     invitations,
@@ -361,6 +402,7 @@ export function useTeam(): UseTeamReturn {
     inviteMember,
     removeMember,
     updateMemberRole,
+    updateMemberPayroll,
     cancelInvitation,
     resendInvitation,
     refresh: loadTeam,
