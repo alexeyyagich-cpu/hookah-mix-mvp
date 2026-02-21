@@ -69,7 +69,7 @@ export async function grantAccessToken(
       'Authorization': `Bearer ${developerToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ redirectUri }),
+    body: JSON.stringify({ authorizationCallbackUri: redirectUri }),
   })
 
   if (!response.ok) {
@@ -128,17 +128,23 @@ export async function updateProduct(
 // ============================================================================
 
 export async function getProductGroups(accountToken: string): Promise<R2OProductGroup[]> {
-  return r2oFetch<R2OProductGroup[]>('/productGroups', accountToken)
+  return r2oFetch<R2OProductGroup[]>('/productgroups', accountToken)
 }
 
 export async function createProductGroup(
   accountToken: string,
   name: string
 ): Promise<R2OProductGroup> {
-  return r2oFetch<R2OProductGroup>('/productGroups', accountToken, {
-    method: 'POST',
-    body: JSON.stringify({ productGroup_name: name }),
-  })
+  const data = await r2oFetch<{ productgroup_id: number; productgroup_name: string }>(
+    '/productgroups',
+    accountToken,
+    {
+      method: 'POST',
+      body: JSON.stringify({ productgroup_name: name }),
+    }
+  )
+  // Map lowercase R2O response to our interface
+  return { productGroup_id: data.productgroup_id, productGroup_name: data.productgroup_name, productGroup_sortIndex: 0 }
 }
 
 // ============================================================================
@@ -150,12 +156,12 @@ export async function getInvoices(
   params?: { from?: string; to?: string; limit?: number }
 ): Promise<R2OInvoice[]> {
   const searchParams = new URLSearchParams()
-  if (params?.from) searchParams.set('from', params.from)
-  if (params?.to) searchParams.set('to', params.to)
+  if (params?.from) searchParams.set('dateFrom', params.from)
+  if (params?.to) searchParams.set('dateTo', params.to)
   if (params?.limit) searchParams.set('limit', String(params.limit))
 
   const query = searchParams.toString()
-  return r2oFetch<R2OInvoice[]>(`/invoices${query ? `?${query}` : ''}`, accountToken)
+  return r2oFetch<R2OInvoice[]>(`/document/invoice${query ? `?${query}` : ''}`, accountToken)
 }
 
 // ============================================================================
@@ -170,14 +176,16 @@ export async function registerWebhook(
   // Step 1: Set the webhook URL
   await r2oFetch<unknown>('/webhook', accountToken, {
     method: 'PUT',
-    body: JSON.stringify({ url }),
+    body: JSON.stringify({ webhookUrl: url }),
   })
 
-  // Step 2: Subscribe to events
-  await r2oFetch<unknown>('/webhook/events', accountToken, {
-    method: 'PUT',
-    body: JSON.stringify({ events }),
-  })
+  // Step 2: Subscribe to events (one at a time, R2O expects a string not array)
+  for (const event of events) {
+    await r2oFetch<unknown>('/webhook/events', accountToken, {
+      method: 'PUT',
+      body: JSON.stringify({ addEvent: event }),
+    })
+  }
 }
 
 export async function getWebhookInfo(
@@ -192,7 +200,7 @@ export async function deleteWebhook(
   // Clear webhook URL by setting it to empty
   await r2oFetch<unknown>('/webhook', accountToken, {
     method: 'PUT',
-    body: JSON.stringify({ url: '' }),
+    body: JSON.stringify({ webhookUrl: '' }),
   })
 }
 
@@ -200,14 +208,18 @@ export async function deleteWebhook(
 // Company / Account Info
 // ============================================================================
 
-export async function getCompanyInfo(
+export async function getAccountId(
   accountToken: string
-): Promise<{ companyId: string; companyName: string }> {
-  const data = await r2oFetch<{ company_id: string; company_name: string }>(
-    '/company',
-    accountToken
-  )
-  return { companyId: data.company_id, companyName: data.company_name }
+): Promise<string | null> {
+  // Extract company_id from the JWT token payload
+  try {
+    const parts = accountToken.split('.')
+    if (parts.length !== 3) return null
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString())
+    return payload.data?.company_id?.toString() || null
+  } catch {
+    return null
+  }
 }
 
 // ============================================================================

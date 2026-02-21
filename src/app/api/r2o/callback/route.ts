@@ -3,12 +3,18 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { encrypt } from '@/lib/ready2order/crypto'
-import { registerWebhook, createProductGroup, getCompanyInfo } from '@/lib/ready2order/client'
+import { registerWebhook, createProductGroup, getAccountId } from '@/lib/ready2order/client'
 
 export async function GET(request: NextRequest) {
   try {
-    const accountToken = request.nextUrl.searchParams.get('accountToken')
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
+    const status = request.nextUrl.searchParams.get('status')
+    const accountToken = request.nextUrl.searchParams.get('accountToken')
+
+    // R2O sends status=approved or status=denied
+    if (status === 'denied' || status === 'abgelehnt') {
+      return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=denied`)
+    }
 
     if (!accountToken) {
       return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=no_token`)
@@ -42,14 +48,8 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Fetch R2O account ID for direct webhook matching
-    let r2oAccountId: string | null = null
-    try {
-      const company = await getCompanyInfo(accountToken)
-      r2oAccountId = company.companyId
-    } catch {
-      // Non-critical — webhook handler falls back to brute-force matching
-    }
+    // Extract R2O account ID from the JWT token for direct webhook matching
+    const r2oAccountId = await getAccountId(accountToken)
 
     // Create a product group in r2o for hookah products
     let productGroupId: number | null = null
