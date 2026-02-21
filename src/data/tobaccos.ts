@@ -132,6 +132,12 @@ export const TOBACCOS: Tobacco[] = [
   { id: "mh22", brand: "Musthave", flavor: "Watermelon Holls", strength: 8, heatResistance: 8, color: "#F87171", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
   { id: "mh23", brand: "Musthave", flavor: "Orange Team", strength: 8, heatResistance: 7, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
   { id: "mh24", brand: "Musthave", flavor: "Mad Yam", strength: 8, heatResistance: 7, color: "#C084FC", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "mh25", brand: "Musthave", flavor: "Banana Mama", strength: 8, heatResistance: 7, color: "#FDE047", category: "fruit", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "mh26", brand: "Musthave", flavor: "Coconut Shake", strength: 8, heatResistance: 7, color: "#F5F5F4", category: "tropical", pairsWith: ["fruit", "mint", "dessert"] },
+  { id: "mh27", brand: "Musthave", flavor: "Ice Cream", strength: 8, heatResistance: 7, color: "#FEF3C7", category: "dessert", pairsWith: ["fruit", "berry", "mint"] },
+  { id: "mh28", brand: "Musthave", flavor: "Mango Sling", strength: 8, heatResistance: 7, color: "#F59E0B", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "mh29", brand: "Musthave", flavor: "Grape", strength: 8, heatResistance: 8, color: "#A855F7", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "mh30", brand: "Musthave", flavor: "Choco-Mint", strength: 8, heatResistance: 7, color: "#78350F", category: "dessert", pairsWith: ["mint", "fruit", "berry"] },
 
   // === DARKSIDE (Premium Burley, strong) ===
   { id: "ds1", brand: "Darkside", flavor: "Supernova", strength: 8, heatResistance: 9, color: "#06B6D4", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit", "soda", "dessert"] },
@@ -221,6 +227,12 @@ export const TOBACCOS: Tobacco[] = [
   { id: "tg16", brand: "Tangiers", flavor: "Schnozzberry", strength: 9, heatResistance: 9, color: "#EC4899", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
   { id: "tg17", brand: "Tangiers", flavor: "Its Like That One Breakfast Cereal", strength: 9, heatResistance: 9, color: "#FDE68A", category: "dessert", pairsWith: ["fruit", "berry", "mint"] },
   { id: "tg18", brand: "Tangiers", flavor: "Sevilla Orange", strength: 9, heatResistance: 9, color: "#F97316", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "tg19", brand: "Tangiers", flavor: "New Lime", strength: 9, heatResistance: 9, color: "#A3E635", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "tg20", brand: "Tangiers", flavor: "Strawberry", strength: 9, heatResistance: 9, color: "#F43F5E", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "tg21", brand: "Tangiers", flavor: "Iced Tea", strength: 9, heatResistance: 9, color: "#D4A574", category: "herbal", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "tg22", brand: "Tangiers", flavor: "Jackfruit", strength: 9, heatResistance: 9, color: "#FBBF24", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tg23", brand: "Tangiers", flavor: "Melon Blend", strength: 9, heatResistance: 9, color: "#86EFAC", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tg24", brand: "Tangiers", flavor: "Wintergreen", strength: 9, heatResistance: 9, color: "#059669", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
 
   // === BLACK BURN (High-glycerin Burley, medium-strong) ===
   { id: "bb1", brand: "Black Burn", flavor: "Overdose", strength: 8, heatResistance: 8, color: "#FBBF24", category: "citrus", pairsWith: ["berry", "mint", "tropical"] },
@@ -240,6 +252,12 @@ export const TOBACCOS: Tobacco[] = [
   { id: "bb14", brand: "Black Burn", flavor: "Cheesecake", strength: 8, heatResistance: 7, color: "#FEF3C7", category: "dessert", pairsWith: ["fruit", "berry", "citrus"] },
   { id: "bb15", brand: "Black Burn", flavor: "Grapefruit", strength: 8, heatResistance: 8, color: "#FB7185", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
   { id: "bb16", brand: "Black Burn", flavor: "Apple Shock", strength: 8, heatResistance: 8, color: "#84CC16", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "bb17", brand: "Black Burn", flavor: "Mango Juice", strength: 8, heatResistance: 7, color: "#F59E0B", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "bb18", brand: "Black Burn", flavor: "Watermelon Shock", strength: 8, heatResistance: 8, color: "#F87171", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
+  { id: "bb19", brand: "Black Burn", flavor: "Grape Mint", strength: 8, heatResistance: 8, color: "#A78BFA", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "bb20", brand: "Black Burn", flavor: "Cappuccino", strength: 8, heatResistance: 7, color: "#92400E", category: "dessert", pairsWith: ["mint", "fruit", "spice"] },
+  { id: "bb21", brand: "Black Burn", flavor: "Lemon Shock", strength: 8, heatResistance: 8, color: "#FDE047", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "bb22", brand: "Black Burn", flavor: "Melon Shock", strength: 8, heatResistance: 8, color: "#A3E635", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
 
   // === AL FAKHER (Light, lounge staple) ===
   { id: "af1", brand: "Al Fakher", flavor: "Lemon Mint", strength: 3, heatResistance: 5, color: "#BEF264", category: "citrus", pairsWith: ["berry", "fruit", "tropical"] },
@@ -257,6 +275,13 @@ export const TOBACCOS: Tobacco[] = [
   { id: "af13", brand: "Al Fakher", flavor: "Mango", strength: 3, heatResistance: 5, color: "#FBBF24", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
   { id: "af14", brand: "Al Fakher", flavor: "Cherry", strength: 3, heatResistance: 5, color: "#DC2626", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
   { id: "af15", brand: "Al Fakher", flavor: "Guava", strength: 3, heatResistance: 5, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "af16", brand: "Al Fakher", flavor: "Grape", strength: 3, heatResistance: 5, color: "#A855F7", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "af17", brand: "Al Fakher", flavor: "Banana", strength: 3, heatResistance: 5, color: "#FDE047", category: "fruit", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "af18", brand: "Al Fakher", flavor: "Kiwi", strength: 3, heatResistance: 5, color: "#84CC16", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "af19", brand: "Al Fakher", flavor: "Rose", strength: 3, heatResistance: 5, color: "#F9A8D4", category: "herbal", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "af20", brand: "Al Fakher", flavor: "Gum Mint", strength: 3, heatResistance: 5, color: "#34D399", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "af21", brand: "Al Fakher", flavor: "Pineapple", strength: 3, heatResistance: 5, color: "#FBBF24", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "af22", brand: "Al Fakher", flavor: "Coconut", strength: 3, heatResistance: 5, color: "#F5F5F4", category: "tropical", pairsWith: ["fruit", "mint", "dessert"] },
 
   // === FUMARI (Light, beginner-friendly) ===
   { id: "fm1", brand: "Fumari", flavor: "White Gummi Bear", strength: 3, heatResistance: 4, color: "#FEF3C7", category: "candy", pairsWith: ["fruit", "citrus", "berry"] },
@@ -274,6 +299,11 @@ export const TOBACCOS: Tobacco[] = [
   { id: "fm13", brand: "Fumari", flavor: "Watermelon", strength: 3, heatResistance: 4, color: "#FB7185", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
   { id: "fm14", brand: "Fumari", flavor: "Mandarin Zest", strength: 3, heatResistance: 4, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
   { id: "fm15", brand: "Fumari", flavor: "Lemon Loaf", strength: 3, heatResistance: 4, color: "#FCD34D", category: "dessert", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "fm16", brand: "Fumari", flavor: "Tangelo", strength: 3, heatResistance: 4, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "fm17", brand: "Fumari", flavor: "Passion Fruit", strength: 3, heatResistance: 4, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "fm18", brand: "Fumari", flavor: "Prickly Pear", strength: 3, heatResistance: 4, color: "#A3E635", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "fm19", brand: "Fumari", flavor: "Guava", strength: 3, heatResistance: 4, color: "#F9A8D4", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "fm20", brand: "Fumari", flavor: "Kashmir Peach", strength: 3, heatResistance: 4, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "spice", "citrus"] },
 
   // === STARBUZZ (Light-medium, consistent clouds) ===
   { id: "sb1", brand: "Starbuzz", flavor: "Blue Mist", strength: 4, heatResistance: 5, color: "#60A5FA", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
@@ -288,6 +318,97 @@ export const TOBACCOS: Tobacco[] = [
   { id: "sb10", brand: "Starbuzz", flavor: "Tangerine Dream", strength: 4, heatResistance: 5, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
   { id: "sb11", brand: "Starbuzz", flavor: "Peach Mist", strength: 4, heatResistance: 5, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
   { id: "sb12", brand: "Starbuzz", flavor: "Apple Americano", strength: 4, heatResistance: 5, color: "#84CC16", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "sb13", brand: "Starbuzz", flavor: "Irish Peach", strength: 4, heatResistance: 5, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "sb14", brand: "Starbuzz", flavor: "Mint Colossus", strength: 4, heatResistance: 5, color: "#10B981", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "sb15", brand: "Starbuzz", flavor: "Grape Berry", strength: 4, heatResistance: 5, color: "#7C3AED", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "sb16", brand: "Starbuzz", flavor: "Coconut", strength: 4, heatResistance: 5, color: "#F5F5F4", category: "tropical", pairsWith: ["fruit", "mint", "dessert"] },
+
+  // === ADALYA (Turkish, light-medium, popular in DE/EU) ===
+  { id: "ad1", brand: "Adalya", flavor: "Love 66", strength: 4, heatResistance: 5, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ad2", brand: "Adalya", flavor: "Lady Killer", strength: 4, heatResistance: 5, color: "#EC4899", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ad3", brand: "Adalya", flavor: "Hawaii", strength: 4, heatResistance: 5, color: "#F97316", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ad4", brand: "Adalya", flavor: "Blue Ice", strength: 4, heatResistance: 5, color: "#60A5FA", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "ad5", brand: "Adalya", flavor: "Mango Tango", strength: 4, heatResistance: 5, color: "#F59E0B", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ad6", brand: "Adalya", flavor: "Watermelon", strength: 4, heatResistance: 5, color: "#FB7185", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
+  { id: "ad7", brand: "Adalya", flavor: "Double Melon", strength: 4, heatResistance: 5, color: "#A3E635", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ad8", brand: "Adalya", flavor: "Ice Bonbon", strength: 4, heatResistance: 5, color: "#67E8F9", category: "candy", pairsWith: ["fruit", "citrus", "berry"] },
+  { id: "ad9", brand: "Adalya", flavor: "Grape Mint", strength: 4, heatResistance: 5, color: "#A78BFA", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "ad10", brand: "Adalya", flavor: "Cherry", strength: 4, heatResistance: 5, color: "#DC2626", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
+  { id: "ad11", brand: "Adalya", flavor: "Tony's Destiny", strength: 4, heatResistance: 5, color: "#D97706", category: "dessert", pairsWith: ["fruit", "mint", "spice"] },
+  { id: "ad12", brand: "Adalya", flavor: "Milk", strength: 4, heatResistance: 5, color: "#F5F5F4", category: "dessert", pairsWith: ["fruit", "berry", "mint"] },
+  { id: "ad13", brand: "Adalya", flavor: "Wind", strength: 4, heatResistance: 5, color: "#22D3EE", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "ad14", brand: "Adalya", flavor: "The Two", strength: 4, heatResistance: 5, color: "#EF4444", category: "fruit", pairsWith: ["mint", "spice", "citrus"] },
+  { id: "ad15", brand: "Adalya", flavor: "Cactus", strength: 4, heatResistance: 5, color: "#4ADE80", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+
+  // === HOLSTER (German, medium, popular in DE) ===
+  { id: "hl1", brand: "Holster", flavor: "Ice Kaktus", strength: 5, heatResistance: 6, color: "#4ADE80", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hl2", brand: "Holster", flavor: "Grp Mnts", strength: 5, heatResistance: 6, color: "#A78BFA", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hl3", brand: "Holster", flavor: "Qnta SunRise", strength: 5, heatResistance: 6, color: "#FB923C", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hl4", brand: "Holster", flavor: "Bono Ache", strength: 5, heatResistance: 6, color: "#FDE047", category: "fruit", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "hl5", brand: "Holster", flavor: "Water Haze", strength: 5, heatResistance: 6, color: "#38BDF8", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hl6", brand: "Holster", flavor: "Pnk Pnch", strength: 5, heatResistance: 6, color: "#F472B6", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "hl7", brand: "Holster", flavor: "Grn Grp", strength: 5, heatResistance: 6, color: "#86EFAC", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hl8", brand: "Holster", flavor: "Yellow Punsh", strength: 5, heatResistance: 6, color: "#FDE047", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "hl9", brand: "Holster", flavor: "Blck Chrry", strength: 5, heatResistance: 6, color: "#991B1B", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
+  { id: "hl10", brand: "Holster", flavor: "Wtrmlne", strength: 5, heatResistance: 6, color: "#FB7185", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
+
+  // === KISMET (German, premium Virginia, medium) ===
+  { id: "km1", brand: "Kismet", flavor: "Blck Crrnt", strength: 5, heatResistance: 6, color: "#581C87", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "km2", brand: "Kismet", flavor: "Blck Mnt", strength: 5, heatResistance: 6, color: "#059669", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "km3", brand: "Kismet", flavor: "Blck Mng", strength: 5, heatResistance: 6, color: "#F59E0B", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "km4", brand: "Kismet", flavor: "Blck Grp", strength: 5, heatResistance: 6, color: "#A855F7", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "km5", brand: "Kismet", flavor: "Blck Pch", strength: 5, heatResistance: 6, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "km6", brand: "Kismet", flavor: "Blck Ap", strength: 5, heatResistance: 6, color: "#84CC16", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "km7", brand: "Kismet", flavor: "Blck Bry", strength: 5, heatResistance: 6, color: "#C026D3", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "km8", brand: "Kismet", flavor: "Blck Lmn", strength: 5, heatResistance: 6, color: "#FDE047", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+
+  // === SERBETLI (Turkish, light, big EU presence) ===
+  { id: "sr1", brand: "Serbetli", flavor: "Lemon Cake", strength: 3, heatResistance: 5, color: "#FDE047", category: "dessert", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "sr2", brand: "Serbetli", flavor: "Ice Watermelon", strength: 3, heatResistance: 5, color: "#FB7185", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
+  { id: "sr3", brand: "Serbetli", flavor: "Mint", strength: 3, heatResistance: 5, color: "#10B981", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "sr4", brand: "Serbetli", flavor: "Strawberry", strength: 3, heatResistance: 5, color: "#F43F5E", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "sr5", brand: "Serbetli", flavor: "Ice Mix Fruit", strength: 3, heatResistance: 5, color: "#F97316", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "sr6", brand: "Serbetli", flavor: "Lemon Mint", strength: 3, heatResistance: 5, color: "#BEF264", category: "citrus", pairsWith: ["berry", "fruit", "tropical"] },
+  { id: "sr7", brand: "Serbetli", flavor: "Grape with Mint", strength: 3, heatResistance: 5, color: "#A78BFA", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "sr8", brand: "Serbetli", flavor: "Orange with Mint", strength: 3, heatResistance: 5, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "sr9", brand: "Serbetli", flavor: "Blueberry", strength: 3, heatResistance: 5, color: "#818CF8", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
+  { id: "sr10", brand: "Serbetli", flavor: "Mango", strength: 3, heatResistance: 5, color: "#FBBF24", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "sr11", brand: "Serbetli", flavor: "Peach", strength: 3, heatResistance: 5, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "sr12", brand: "Serbetli", flavor: "Ice Lemon", strength: 3, heatResistance: 5, color: "#FCD34D", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+
+  // === HOOKAIN (German, medium, bold flavors) ===
+  { id: "hk1", brand: "Hookain", flavor: "Punani", strength: 5, heatResistance: 6, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hk2", brand: "Hookain", flavor: "Green Lean", strength: 5, heatResistance: 6, color: "#A3E635", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "hk3", brand: "Hookain", flavor: "Fellatio", strength: 5, heatResistance: 6, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hk4", brand: "Hookain", flavor: "Bluenana", strength: 5, heatResistance: 6, color: "#818CF8", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "hk5", brand: "Hookain", flavor: "Crème de la Crème", strength: 5, heatResistance: 6, color: "#FEF3C7", category: "dessert", pairsWith: ["fruit", "berry", "mint"] },
+  { id: "hk6", brand: "Hookain", flavor: "White Tiger", strength: 5, heatResistance: 6, color: "#F5F5F4", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "hk7", brand: "Hookain", flavor: "Daim Good", strength: 5, heatResistance: 6, color: "#D97706", category: "dessert", pairsWith: ["fruit", "mint", "spice"] },
+  { id: "hk8", brand: "Hookain", flavor: "Brbr Ice", strength: 5, heatResistance: 6, color: "#F43F5E", category: "candy", pairsWith: ["citrus", "berry", "mint"] },
+
+  // === AQUA MENTHA (German, mint-blend specialist, medium) ===
+  { id: "am1", brand: "Aqua Mentha", flavor: "#1 Watermelon", strength: 5, heatResistance: 6, color: "#FB7185", category: "fruit", pairsWith: ["mint", "berry", "citrus"] },
+  { id: "am2", brand: "Aqua Mentha", flavor: "#2 Grape", strength: 5, heatResistance: 6, color: "#A855F7", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "am3", brand: "Aqua Mentha", flavor: "#5 Double Apple", strength: 5, heatResistance: 6, color: "#EF4444", category: "fruit", pairsWith: ["mint", "spice", "citrus"] },
+  { id: "am4", brand: "Aqua Mentha", flavor: "#8 Pineapple", strength: 5, heatResistance: 6, color: "#FBBF24", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "am5", brand: "Aqua Mentha", flavor: "#10 Lemon", strength: 5, heatResistance: 6, color: "#FDE047", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "am6", brand: "Aqua Mentha", flavor: "#11 Melon", strength: 5, heatResistance: 6, color: "#86EFAC", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "am7", brand: "Aqua Mentha", flavor: "#15 Peach", strength: 5, heatResistance: 6, color: "#FDBA74", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "am8", brand: "Aqua Mentha", flavor: "#20 Cherry", strength: 5, heatResistance: 6, color: "#DC2626", category: "berry", pairsWith: ["mint", "citrus", "fruit"] },
+  { id: "am9", brand: "Aqua Mentha", flavor: "#25 Blueberry", strength: 5, heatResistance: 6, color: "#6366F1", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "am10", brand: "Aqua Mentha", flavor: "#30 Mango", strength: 5, heatResistance: 6, color: "#F59E0B", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+
+  // === TRUE PASSION (German, medium, creative blends) ===
+  { id: "tp1", brand: "True Passion", flavor: "Okolom", strength: 5, heatResistance: 5, color: "#7C2D12", category: "soda", pairsWith: ["citrus", "fruit", "mint"] },
+  { id: "tp2", brand: "True Passion", flavor: "WaMe", strength: 5, heatResistance: 5, color: "#A3E635", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tp3", brand: "True Passion", flavor: "Django", strength: 5, heatResistance: 5, color: "#A78BFA", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tp4", brand: "True Passion", flavor: "Melo Melo", strength: 5, heatResistance: 5, color: "#86EFAC", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tp5", brand: "True Passion", flavor: "PriPri", strength: 5, heatResistance: 5, color: "#F472B6", category: "tropical", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tp6", brand: "True Passion", flavor: "Rng Rng", strength: 5, heatResistance: 5, color: "#FB923C", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
+  { id: "tp7", brand: "True Passion", flavor: "Miss Blueberry", strength: 5, heatResistance: 5, color: "#6366F1", category: "berry", pairsWith: ["mint", "citrus", "tropical"] },
+  { id: "tp8", brand: "True Passion", flavor: "Arctic Line", strength: 5, heatResistance: 5, color: "#22D3EE", category: "mint", pairsWith: ["berry", "citrus", "tropical", "fruit"] },
+  { id: "tp9", brand: "True Passion", flavor: "Eva", strength: 5, heatResistance: 5, color: "#4ADE80", category: "fruit", pairsWith: ["mint", "citrus", "berry"] },
+  { id: "tp10", brand: "True Passion", flavor: "Cinderella", strength: 5, heatResistance: 5, color: "#FCD34D", category: "citrus", pairsWith: ["mint", "berry", "tropical"] },
 ];
 
 // Helper to filter by brand
@@ -408,6 +529,8 @@ export const getCategories = (): Category[] => [...new Set(TOBACCOS.map(t => t.c
    ID Convention:
    • mh = Musthave, ds = Darkside, tg = Tangiers
    • bb = Black Burn, af = Al Fakher, fm = Fumari, sb = Starbuzz
+   • ad = Adalya, hl = Holster, km = Kismet, sr = Serbetli
+   • hk = Hookain, am = Aqua Mentha, tp = True Passion
 
    Adding new tobaccos:
    1. Verify mixing popularity from 2+ independent sources
@@ -419,6 +542,6 @@ export const getCategories = (): Category[] => [...new Set(TOBACCOS.map(t => t.c
    ─────────────────────────────────────────────────────────────────────────────
    Dataset version: 2.0.0
    Last updated: February 2026
-   Tobaccos: ~167 | Darkside: 67 | Brands: 7 | Categories: 10
+   Tobaccos: ~270 | Darkside: 67 | Brands: 14 | Categories: 10
    ─────────────────────────────────────────────────────────────────────────────
 */
