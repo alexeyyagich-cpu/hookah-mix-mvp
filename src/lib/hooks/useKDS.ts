@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
+import { enqueueOfflineMutation, generateTempId } from '@/lib/offline/offlineMutation'
 import type { KdsOrder, KdsOrderStatus, KdsOrderType, KdsOrderItem } from '@/types/database'
 
 // Demo KDS orders
@@ -275,7 +276,15 @@ export function useKDS(): UseKDSReturn {
       if (typeof navigator !== 'undefined' && !navigator.onLine) return
       fetchOrders()
     }, 10000)
-    return () => clearInterval(interval)
+
+    // Refetch after reconnect to replace offline temp data with real data
+    const handleOnline = () => setTimeout(fetchOrders, 3000)
+    window.addEventListener('online', handleOnline)
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('online', handleOnline)
+    }
   }, [fetchOrders, isDemoMode])
 
   const createOrder = useCallback(async (input: CreateKdsOrderInput): Promise<KdsOrder | null> => {
@@ -306,6 +315,32 @@ export function useKDS(): UseKDSReturn {
       setOrders(prev => [...prev, newOrder])
       lastNewCountRef.current += 1
       return newOrder
+    }
+
+    // Offline: enqueue + optimistic update
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const now = new Date().toISOString()
+      const tempOrder: KdsOrder = {
+        ...orderData,
+        id: generateTempId(),
+        status: 'new',
+        created_at: now,
+        updated_at: now,
+        completed_at: null,
+      }
+      setOrders(prev => [...prev, tempOrder])
+      lastNewCountRef.current += 1
+
+      await enqueueOfflineMutation<KdsOrder>({
+        storeName: 'kds_orders',
+        userId: effectiveProfileId,
+        table: 'kds_orders',
+        operation: 'insert',
+        payload: tempOrder as unknown as Record<string, unknown>,
+        optimisticUpdate: (cached) => [...cached, tempOrder],
+      })
+
+      return tempOrder
     }
 
     const { data, error: insertError } = await supabase
@@ -342,6 +377,40 @@ export function useKDS(): UseKDSReturn {
       if (newStatus === 'served' || newStatus === 'cancelled') {
         lastNewCountRef.current = orders.filter(o => o.status === 'new' && o.id !== orderId).length
       }
+      return true
+    }
+
+    // Offline: enqueue + optimistic update
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setOrders(prev => {
+        if (isCompleted) return prev.filter(o => o.id !== orderId)
+        return prev.map(o =>
+          o.id === orderId ? { ...o, status: newStatus, updated_at: now } : o
+        )
+      })
+
+      const updatePayload: Record<string, unknown> = {
+        id: orderId,
+        status: newStatus,
+        updated_at: now,
+      }
+      if (isCompleted) updatePayload.completed_at = now
+
+      await enqueueOfflineMutation<KdsOrder>({
+        storeName: 'kds_orders',
+        userId: effectiveProfileId!,
+        table: 'kds_orders',
+        operation: 'update',
+        payload: updatePayload,
+        matchColumn: 'id',
+        optimisticUpdate: (cached) => {
+          if (isCompleted) return cached.filter(o => o.id !== orderId)
+          return cached.map(o =>
+            o.id === orderId ? { ...o, status: newStatus, updated_at: now } : o
+          )
+        },
+      })
+
       return true
     }
 

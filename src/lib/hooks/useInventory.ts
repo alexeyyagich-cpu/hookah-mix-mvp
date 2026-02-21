@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
+import { enqueueOfflineMutation } from '@/lib/offline/offlineMutation'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
 
 // Demo data for testing (prices in EUR, package_grams = 100g default)
@@ -103,6 +104,13 @@ export function useInventory(): UseInventoryReturn {
   useEffect(() => {
     if (!isDemoMode) fetchInventory()
   }, [fetchInventory, isDemoMode])
+
+  // Refetch after reconnect to replace offline temp data with real data
+  useEffect(() => {
+    const handleOnline = () => setTimeout(fetchInventory, 3000)
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [fetchInventory])
 
   const addTobacco = async (
     tobacco: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>
@@ -245,6 +253,44 @@ export function useInventory(): UseInventoryReturn {
           ? { ...item, quantity_grams: newQuantity, updated_at: new Date().toISOString() }
           : item
       ))
+      return true
+    }
+
+    // Offline: compound mutation (update quantity + insert transaction)
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setInventory(prev => prev.map(item =>
+        item.id === id
+          ? { ...item, quantity_grams: newQuantity, updated_at: new Date().toISOString() }
+          : item
+      ))
+
+      await enqueueOfflineMutation<TobaccoInventory>({
+        storeName: 'inventory',
+        userId: user.id,
+        table: 'tobacco_inventory',
+        operation: 'compound',
+        payload: { id },
+        meta: {
+          inventoryId: id,
+          delta: quantityChange,
+          organizationId,
+          locationId,
+          transactionData: {
+            tobacco_inventory_id: id,
+            type,
+            quantity_grams: quantityChange,
+            session_id: sessionId || null,
+            notes: notes || null,
+            ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+          },
+        },
+        optimisticUpdate: (cached) => cached.map(item =>
+          item.id === id
+            ? { ...item, quantity_grams: newQuantity, updated_at: new Date().toISOString() }
+            : item
+        ),
+      })
+
       return true
     }
 

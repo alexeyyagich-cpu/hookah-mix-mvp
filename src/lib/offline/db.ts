@@ -10,7 +10,7 @@ interface CacheEntry {
 export interface SyncQueueEntry {
   id?: number
   table: string
-  operation: 'insert' | 'update' | 'delete' | 'upsert'
+  operation: 'insert' | 'update' | 'delete' | 'upsert' | 'compound'
   payload: Record<string, unknown>
   matchColumn?: string // for update/delete: which column to match (default 'id')
   userId: string
@@ -18,6 +18,8 @@ export interface SyncQueueEntry {
   status: 'pending' | 'syncing' | 'failed'
   retryCount: number
   error: string | null
+  idempotencyKey?: string
+  meta?: Record<string, unknown> // compound mutation data (related entities, adjustments)
 }
 
 interface OfflineDBSchema {

@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
+import { enqueueOfflineMutation, generateTempId } from '@/lib/offline/offlineMutation'
 import type { Session, SessionItem, SessionWithItems } from '@/types/database'
 
 // Demo bowl for sessions
@@ -163,6 +164,13 @@ export function useSessions(): UseSessionsReturn {
     if (!isDemoMode) fetchSessions()
   }, [fetchSessions, isDemoMode])
 
+  // Refetch after reconnect to replace offline temp data with real data
+  useEffect(() => {
+    const handleOnline = () => setTimeout(fetchSessions, 3000)
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [fetchSessions])
+
   const createSession = async (
     sessionData: Omit<Session, 'id' | 'profile_id'>,
     items: Omit<SessionItem, 'id' | 'session_id'>[],
@@ -183,6 +191,70 @@ export function useSessions(): UseSessionsReturn {
         session_id: newSession.id,
       }))
       setSessions(prev => [{ ...newSession, session_items: newItems, bowl_type: null } as SessionWithItems, ...prev])
+      return newSession
+    }
+
+    // Offline: compound mutation (session + items + inventory adjustments)
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      const tempId = generateTempId()
+      const newSession: Session = {
+        ...sessionData,
+        id: tempId,
+        profile_id: user.id,
+        created_by: user.id,
+      }
+      const newItems = items.map((item) => ({
+        ...item,
+        id: generateTempId(),
+        session_id: tempId,
+      }))
+      const sessionWithItems: SessionWithItems = {
+        ...newSession,
+        session_items: newItems,
+        bowl_type: null,
+      }
+
+      setSessions(prev => [sessionWithItems, ...prev])
+
+      const inventoryAdjustments = deductFromInventory
+        ? items
+            .filter(item => item.tobacco_inventory_id)
+            .map(item => ({
+              tobacco_inventory_id: item.tobacco_inventory_id,
+              grams_used: item.grams_used,
+              brand: item.brand,
+              flavor: item.flavor,
+              organizationId,
+              locationId,
+            }))
+        : []
+
+      await enqueueOfflineMutation<SessionWithItems>({
+        storeName: 'sessions',
+        userId: user.id,
+        table: 'sessions',
+        operation: 'compound',
+        payload: {
+          ...sessionData,
+          id: tempId,
+          profile_id: user.id,
+          created_by: user.id,
+          ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+        },
+        meta: {
+          items: newItems.map(item => ({
+            tobacco_inventory_id: item.tobacco_inventory_id,
+            tobacco_id: item.tobacco_id,
+            brand: item.brand,
+            flavor: item.flavor,
+            grams_used: item.grams_used,
+            percentage: item.percentage,
+          })),
+          inventoryAdjustments,
+        },
+        optimisticUpdate: (cached) => [sessionWithItems, ...cached],
+      })
+
       return newSession
     }
 

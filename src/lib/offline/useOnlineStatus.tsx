@@ -53,7 +53,13 @@ export function OnlineStatusProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     refreshCounts()
     const interval = setInterval(refreshCounts, 10_000)
-    return () => clearInterval(interval)
+    // Refresh counts immediately when a mutation is enqueued offline
+    const handleEnqueue = () => refreshCounts()
+    window.addEventListener('offline-mutation-enqueued', handleEnqueue)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('offline-mutation-enqueued', handleEnqueue)
+    }
   }, [refreshCounts])
 
   // Sync when coming back online
