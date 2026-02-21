@@ -140,8 +140,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(session)
           setUser(session?.user ?? null)
           if (session?.user) {
-            const profileData = await fetchProfile(session.user.id)
-            setProfile(profileData)
+            // Don't await — prevents deadlock with Supabase session lock
+            fetchProfile(session.user.id).then(profileData => setProfile(profileData))
           }
           setLoading(false)
         } else if (event === 'SIGNED_OUT') {

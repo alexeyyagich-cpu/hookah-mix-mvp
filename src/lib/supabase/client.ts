@@ -1,8 +1,11 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { supabaseUrl, supabaseAnonKey } from '@/lib/config'
 
-// Simple mutex to prevent concurrent token refreshes
+// Re-entrant mutex to prevent concurrent token refreshes
+// without deadlocking when Supabase calls lock from within lock
+// (e.g. onAuthStateChange → fetchProfile → getSession → lock)
 let lockPromise: Promise<void> = Promise.resolve()
+let lockDepth = 0
 
 export function createClient() {
   return createBrowserClient(
@@ -10,16 +13,26 @@ export function createClient() {
     supabaseAnonKey,
     {
       auth: {
-        // Use a simple mutex instead of navigator.locks (which can hang
-        // when a stale lock is held by a previous tab or service worker)
         lock: async <R>(_name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> => {
+          // Re-entrant: if already inside the lock, run fn directly
+          if (lockDepth > 0) {
+            lockDepth++
+            try {
+              return await fn()
+            } finally {
+              lockDepth--
+            }
+          }
+
           let release: () => void
           const prev = lockPromise
           lockPromise = new Promise<void>(resolve => { release = resolve })
           await prev
+          lockDepth++
           try {
             return await fn()
           } finally {
+            lockDepth--
             release!()
           }
         },
