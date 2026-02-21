@@ -19,38 +19,51 @@ export function verifyWebhookSecret(secretHeader: string | null): boolean {
   return secretHeader === TELEGRAM_WEBHOOK_SECRET
 }
 
-// Generate HMAC signature for connection tokens
-function generateTokenSignature(data: string): string {
+// Compact binary token: 16-byte UUID + 4-byte timestamp (seconds) + 8-byte HMAC = 28 bytes → 38 chars base64url
+// Telegram deep link start param is limited to 64 chars
+
+function signTokenData(data: Buffer): Buffer {
   const secret = TELEGRAM_WEBHOOK_SECRET || TELEGRAM_BOT_TOKEN || 'default-secret'
-  return createHmac('sha256', secret).update(data).digest('hex').slice(0, 16)
+  return createHmac('sha256', secret).update(data).digest().subarray(0, 8)
+}
+
+function uuidToBytes(uuid: string): Buffer {
+  return Buffer.from(uuid.replace(/-/g, ''), 'hex')
+}
+
+function bytesToUuid(buf: Buffer): string {
+  const hex = buf.toString('hex')
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`
 }
 
 // Verify connection token signature
 export function verifyConnectionToken(token: string): { valid: boolean; profileId: string | null } {
   try {
-    const decoded = Buffer.from(token, 'base64url').toString()
-    const parts = decoded.split(':')
+    const buf = Buffer.from(token, 'base64url')
 
-    if (parts.length !== 3) {
+    if (buf.length !== 28) {
       return { valid: false, profileId: null }
     }
 
-    const [profileId, timestamp, signature] = parts
+    const uuidBuf = buf.subarray(0, 16)
+    const tsBuf = buf.subarray(16, 20)
+    const sigBuf = buf.subarray(20, 28)
 
     // Check timestamp - token valid for 1 hour
-    const tokenTime = parseInt(timestamp, 10)
-    const now = Date.now()
-    if (isNaN(tokenTime) || now - tokenTime > 3600000) {
+    const tokenTimeSec = tsBuf.readUInt32BE(0)
+    const nowSec = Math.floor(Date.now() / 1000)
+    if (nowSec - tokenTimeSec > 3600) {
       return { valid: false, profileId: null }
     }
 
-    // Verify signature
-    const expectedSignature = generateTokenSignature(`${profileId}:${timestamp}`)
-    if (signature !== expectedSignature) {
+    // Verify HMAC
+    const dataBuf = buf.subarray(0, 20)
+    const expectedSig = signTokenData(dataBuf)
+    if (!sigBuf.equals(expectedSig)) {
       return { valid: false, profileId: null }
     }
 
-    return { valid: true, profileId }
+    return { valid: true, profileId: bytesToUuid(uuidBuf) }
   } catch {
     return { valid: false, profileId: null }
   }
@@ -268,11 +281,13 @@ export function generateConnectLink(profileId: string): string {
 
   const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'hookah_torus_bot'
 
-  // Create a signed connection token (profileId:timestamp:signature)
-  const timestamp = Date.now().toString()
-  const signature = generateTokenSignature(`${profileId}:${timestamp}`)
-  const tokenData = `${profileId}:${timestamp}:${signature}`
-  const token = Buffer.from(tokenData).toString('base64url')
+  // Compact binary token: UUID (16) + timestamp_sec (4) + HMAC (8) = 28 bytes → 38 chars base64url
+  const uuidBuf = uuidToBytes(profileId)
+  const tsBuf = Buffer.alloc(4)
+  tsBuf.writeUInt32BE(Math.floor(Date.now() / 1000), 0)
+  const dataBuf = Buffer.concat([uuidBuf, tsBuf])
+  const sigBuf = signTokenData(dataBuf)
+  const token = Buffer.concat([dataBuf, sigBuf]).toString('base64url')
 
   return `https://t.me/${botUsername}?start=${token}`
 }

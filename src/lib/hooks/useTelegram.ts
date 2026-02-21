@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
-import { generateConnectLink, isTelegramConfigured } from '@/lib/telegram/bot'
 import type { TelegramConnection } from '@/lib/telegram/types'
 
 // Demo Telegram connection
@@ -42,10 +41,20 @@ export function useTelegram(): UseTelegramReturn {
   const { user, isDemoMode } = useAuth()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
-  const connectLink = useMemo(() => {
-    if (!user) return ''
-    return generateConnectLink(user.id)
-  }, [user])
+  const [connectLink, setConnectLink] = useState('')
+  const [isConfigured, setIsConfigured] = useState(false)
+
+  // Fetch connect link from server (token generation needs server-side secrets)
+  useEffect(() => {
+    if (!user || isDemoMode) return
+    fetch('/api/telegram/connect-link')
+      .then(r => r.json())
+      .then(data => {
+        setIsConfigured(data.configured)
+        setConnectLink(data.link || '')
+      })
+      .catch(() => {})
+  }, [user, isDemoMode])
 
   // Return demo data if in demo mode
   useEffect(() => {
@@ -143,7 +152,7 @@ export function useTelegram(): UseTelegramReturn {
     connection,
     loading,
     error,
-    isConfigured: isTelegramConfigured,
+    isConfigured,
     connectLink,
     updateSettings,
     disconnect,
