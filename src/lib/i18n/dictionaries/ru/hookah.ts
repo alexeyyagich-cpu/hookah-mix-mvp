@@ -748,4 +748,14 @@ export const hookah = {
   ocrItemsFound: 'позиций найдено',
   ocrAddToInventory: 'Добавить в инвентарь',
   ocrDone: 'Добавлено в инвентарь',
+
+  // Loyalty in QuickSession
+  loyaltyLinkGuest: 'Привязать гостя',
+  loyaltySearchGuest: 'Поиск по имени...',
+  loyaltyBonusBalance: 'Баланс бонусов',
+  loyaltyUseBonus: 'Использовать бонусы',
+  loyaltyBonusAccrued: (amount: string) => `+${amount}€ бонус начислен`,
+  loyaltyDiscountApplied: (percent: number) => `Скидка гостя ${percent}%`,
+  loyaltyRemoveGuest: 'Отвязать гостя',
+  loyaltyMaxRedemption: 'Макс. списание',
 }

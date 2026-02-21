@@ -23,6 +23,7 @@ export const nav: typeof NavType = {
   floorPlan: 'Floor Plan',
   reservations: 'Reservations',
   kdsOrders: 'KDS Orders',
+  waiter: 'Waiter',
   shifts: 'Shifts',
   statistics: 'Statistics',
   pnlReports: 'P&L Reports',

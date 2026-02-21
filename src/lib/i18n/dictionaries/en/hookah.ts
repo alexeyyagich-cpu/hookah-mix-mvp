@@ -742,4 +742,14 @@ export const hookah: typeof HookahType = {
   ocrItemsFound: 'items found',
   ocrAddToInventory: 'Add to inventory',
   ocrDone: 'Added to inventory',
+
+  // Loyalty in QuickSession
+  loyaltyLinkGuest: 'Link guest',
+  loyaltySearchGuest: 'Search by name...',
+  loyaltyBonusBalance: 'Bonus balance',
+  loyaltyUseBonus: 'Use bonus',
+  loyaltyBonusAccrued: (amount: string) => `+${amount}€ bonus accrued`,
+  loyaltyDiscountApplied: (percent: number) => `${percent}% guest discount`,
+  loyaltyRemoveGuest: 'Remove guest',
+  loyaltyMaxRedemption: 'Max redemption',
 }

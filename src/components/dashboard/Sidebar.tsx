@@ -33,6 +33,7 @@ import {
   IconTimer,
   IconPercent,
   IconCrown,
+  IconWaiter,
 } from '@/components/Icons'
 
 interface NavItem {
@@ -97,6 +98,7 @@ export function Sidebar() {
         { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
         { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
         { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
+        { name: t.waiter, href: '/waiter', Icon: IconWaiter, permission: 'sessions.create', proOnly: true },
         { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },
         { name: t.guestsCRM, href: '/guests', Icon: IconUsers, permission: 'sessions.view', proOnly: true },
         { name: t.promotions, href: '/promotions', Icon: IconPercent, permission: 'sessions.view', proOnly: true },

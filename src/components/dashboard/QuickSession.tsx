@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
-import { IconSmoke, IconTimer } from '@/components/Icons'
+import { useGuests } from '@/lib/hooks/useGuests'
+import { useLoyalty } from '@/lib/hooks/useLoyalty'
+import { IconSmoke, IconTimer, IconUsers, IconClose } from '@/components/Icons'
 import { SessionTimer } from '@/components/session/SessionTimer'
-import type { Session, SessionItem } from '@/types/database'
+import type { Session, SessionItem, Guest } from '@/types/database'
 
 interface MixItem {
   tobacco: typeof TOBACCOS[0]
@@ -31,6 +33,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
   const tc = useTranslation('common')
   const { bowls, defaultBowl } = useBowls()
   const { inventory } = useInventory()
+  const { guests, searchGuests, recordVisit } = useGuests()
+  const { settings: loyaltySettings, accrueBonus, redeemBonus } = useLoyalty()
   const [selectedBowl, setSelectedBowl] = useState<string>('')
   const [totalGrams, setTotalGrams] = useState<string>('20')
   const [notes, setNotes] = useState('')
@@ -41,6 +45,25 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
   const [sellingPrice, setSellingPrice] = useState<string>('')
   const [durationMinutes, setDurationMinutes] = useState<number>(0)
   const [showTimer, setShowTimer] = useState(false)
+
+  // Guest & loyalty state
+  const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
+  const [guestSearch, setGuestSearch] = useState('')
+  const [showGuestPicker, setShowGuestPicker] = useState(false)
+  const [useBonus, setUseBonus] = useState(false)
+  const [bonusAmount, setBonusAmount] = useState('')
+
+  const guestResults = useMemo(() => {
+    if (!guestSearch.trim()) return guests.slice(0, 8)
+    return searchGuests(guestSearch)
+  }, [guestSearch, guests, searchGuests])
+
+  const maxBonusRedemption = selectedGuest && sellingPrice
+    ? Math.min(
+        selectedGuest.bonus_balance,
+        parseFloat(sellingPrice) * (loyaltySettings.bonus_max_redemption_percent / 100)
+      )
+    : 0
 
   useEffect(() => {
     if (defaultBowl) {
@@ -86,7 +109,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
     const sessionData: Omit<Session, 'id' | 'profile_id'> = {
       created_by: null,
-      guest_id: null,
+      guest_id: selectedGuest?.id || null,
       bowl_type_id: selectedBowl || null,
       session_date: new Date().toISOString(),
       total_grams: total,
@@ -107,6 +130,20 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
     }))
 
     await onSave(sessionData, sessionItems, deductInventory)
+
+    // Loyalty: accrue bonus, redeem if used, record visit
+    if (selectedGuest) {
+      const price = sellingPrice ? parseFloat(sellingPrice) : 0
+      if (price > 0 && loyaltySettings.is_enabled) {
+        await accrueBonus(selectedGuest.id, price)
+      }
+      if (useBonus && bonusAmount) {
+        const redeem = parseFloat(bonusAmount)
+        if (redeem > 0) await redeemBonus(selectedGuest.id, redeem)
+      }
+      await recordVisit(selectedGuest.id)
+    }
+
     setSaving(false)
     onClose()
   }
@@ -190,6 +227,123 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                 }`}>
                   {compatibilityScore}%
                 </span>
+              </div>
+            )}
+          </div>
+
+          {/* Guest & Loyalty */}
+          <div className="space-y-2">
+            {!selectedGuest ? (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowGuestPicker(!showGuestPicker)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors w-full"
+                >
+                  <IconUsers size={16} />
+                  {t.loyaltyLinkGuest}
+                </button>
+                {showGuestPicker && (
+                  <div className="mt-2 space-y-2">
+                    <input
+                      type="text"
+                      value={guestSearch}
+                      onChange={(e) => setGuestSearch(e.target.value)}
+                      placeholder={t.loyaltySearchGuest}
+                      className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
+                      autoFocus
+                    />
+                    <div className="max-h-32 overflow-y-auto rounded-xl border border-[var(--color-border)]">
+                      {guestResults.map(guest => (
+                        <button
+                          key={guest.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedGuest(guest)
+                            setShowGuestPicker(false)
+                            setGuestSearch('')
+                          }}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center justify-between"
+                        >
+                          <span className="font-medium">{guest.name}</span>
+                          <span className="text-xs text-[var(--color-textMuted)]">
+                            {guest.loyalty_tier && <span className="mr-2 px-1.5 py-0.5 rounded bg-[var(--color-primary)]/10 text-[var(--color-primary)]">{guest.loyalty_tier}</span>}
+                            {guest.bonus_balance > 0 && `${guest.bonus_balance}€`}
+                          </span>
+                        </button>
+                      ))}
+                      {guestResults.length === 0 && (
+                        <div className="px-3 py-2 text-sm text-[var(--color-textMuted)] text-center">—</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)] space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <IconUsers size={16} className="text-[var(--color-primary)]" />
+                    <span className="font-medium text-sm">{selectedGuest.name}</span>
+                    {selectedGuest.loyalty_tier && (
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--color-primary)]/10 text-[var(--color-primary)]">{selectedGuest.loyalty_tier}</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedGuest(null); setUseBonus(false); setBonusAmount('') }}
+                    className="p-1 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors text-[var(--color-textMuted)]"
+                    title={t.loyaltyRemoveGuest}
+                  >
+                    <IconClose size={14} />
+                  </button>
+                </div>
+
+                {selectedGuest.discount_percent > 0 && (
+                  <div className="text-xs text-[var(--color-success)] font-medium">
+                    {t.loyaltyDiscountApplied(selectedGuest.discount_percent)}
+                  </div>
+                )}
+
+                {selectedGuest.bonus_balance > 0 && loyaltySettings.is_enabled && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs text-[var(--color-textMuted)]">
+                      <span>{t.loyaltyBonusBalance}: {selectedGuest.bonus_balance}€</span>
+                      {maxBonusRedemption > 0 && <span>{t.loyaltyMaxRedemption}: {maxBonusRedemption.toFixed(1)}€</span>}
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useBonus}
+                        onChange={(e) => {
+                          setUseBonus(e.target.checked)
+                          if (!e.target.checked) setBonusAmount('')
+                        }}
+                        className="w-4 h-4 rounded border-[var(--color-border)] text-[var(--color-primary)]"
+                      />
+                      <span className="text-sm">{t.loyaltyUseBonus}</span>
+                    </label>
+                    {useBonus && (
+                      <input
+                        type="number"
+                        value={bonusAmount}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value)
+                          if (!isNaN(val) && val > maxBonusRedemption) {
+                            setBonusAmount(String(maxBonusRedemption))
+                          } else {
+                            setBonusAmount(e.target.value)
+                          }
+                        }}
+                        placeholder={`max ${maxBonusRedemption.toFixed(1)}€`}
+                        className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
+                        min="0"
+                        max={maxBonusRedemption}
+                        step="0.5"
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

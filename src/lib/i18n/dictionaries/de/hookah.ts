@@ -742,4 +742,14 @@ export const hookah: typeof HookahType = {
   ocrItemsFound: 'Positionen gefunden',
   ocrAddToInventory: 'Zum Inventar hinzufügen',
   ocrDone: 'Zum Inventar hinzugefügt',
+
+  // Loyalty in QuickSession
+  loyaltyLinkGuest: 'Gast verknüpfen',
+  loyaltySearchGuest: 'Nach Name suchen...',
+  loyaltyBonusBalance: 'Bonusguthaben',
+  loyaltyUseBonus: 'Bonus einlösen',
+  loyaltyBonusAccrued: (amount: string) => `+${amount}€ Bonus gutgeschrieben`,
+  loyaltyDiscountApplied: (percent: number) => `${percent}% Gastrabatt`,
+  loyaltyRemoveGuest: 'Gast entfernen',
+  loyaltyMaxRedemption: 'Max. Einlösung',
 }

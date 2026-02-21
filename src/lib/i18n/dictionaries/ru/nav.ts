@@ -24,6 +24,7 @@ export const nav = {
   floorPlan: 'План зала',
   reservations: 'Бронирования',
   kdsOrders: 'KDS Заказы',
+  waiter: 'Официант',
   shifts: 'Смены',
   statistics: 'Статистика',
   pnlReports: 'Отчеты P&L',
