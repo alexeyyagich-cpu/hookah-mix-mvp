@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { encrypt } from '@/lib/ready2order/crypto'
-import { registerWebhook, createProductGroup } from '@/lib/ready2order/client'
+import { registerWebhook, createProductGroup, getCompanyInfo } from '@/lib/ready2order/client'
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,6 +42,15 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    // Fetch R2O account ID for direct webhook matching
+    let r2oAccountId: string | null = null
+    try {
+      const company = await getCompanyInfo(accountToken)
+      r2oAccountId = company.companyId
+    } catch {
+      // Non-critical — webhook handler falls back to brute-force matching
+    }
+
     // Create a product group in r2o for hookah products
     let productGroupId: number | null = null
     try {
@@ -74,6 +83,7 @@ export async function GET(request: NextRequest) {
         status: 'connected',
         webhook_registered: webhookRegistered,
         product_group_id: productGroupId,
+        r2o_account_id: r2oAccountId,
       }, {
         onConflict: 'profile_id',
       })

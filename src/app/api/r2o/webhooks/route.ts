@@ -27,18 +27,19 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Find the profile associated with this r2o account
-    // We match by checking which connection has a valid token
-    // Since r2o doesn't send profile_id, we look up all connections
-    // In practice, accountId from webhook should be verified against stored connections
-    const { data: connections } = await supabaseAdmin
+    // Find the profile associated with this r2o account by accountId (direct lookup)
+    const { data: connection } = await supabaseAdmin
       .from('r2o_connections')
       .select('profile_id')
+      .eq('r2o_account_id', body.accountId)
       .eq('status', 'connected')
+      .single()
 
-    if (!connections || connections.length === 0) {
+    if (!connection) {
       return NextResponse.json({ received: true })
     }
+
+    const profileId = connection.profile_id
 
     // Handle invoice.created event
     if (body.event === 'invoice.created') {
@@ -54,58 +55,53 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true })
       }
 
-      // Try to match to a specific profile by checking product mappings
-      for (const conn of connections) {
-        const { data: mappings } = await supabaseAdmin
-          .from('r2o_product_mappings')
-          .select('r2o_product_id')
-          .eq('profile_id', conn.profile_id)
+      const { data: mappings } = await supabaseAdmin
+        .from('r2o_product_mappings')
+        .select('r2o_product_id, tobacco_inventory_id')
+        .eq('profile_id', profileId)
 
-        if (!mappings || mappings.length === 0) continue
+      if (!mappings || mappings.length === 0) {
+        return NextResponse.json({ received: true })
+      }
 
-        const mappedProductIds = new Set(mappings.map(m => m.r2o_product_id))
-        const invoiceItems = (invoiceData.invoice_items || []) as Array<{ product_id?: number }>
-        const hasMatchingProducts = invoiceItems.some(
-          item => item.product_id && mappedProductIds.has(item.product_id)
-        )
+      const mappingsByProductId = new Map(
+        mappings.map(m => [m.r2o_product_id, m.tobacco_inventory_id])
+      )
 
-        if (hasMatchingProducts) {
-          // Log the sale
-          await supabaseAdmin
-            .from('r2o_sales_log')
-            .insert({
-              profile_id: conn.profile_id,
-              r2o_invoice_id: invoiceData.invoice_id,
-              invoice_number: invoiceData.invoice_number || '',
-              invoice_timestamp: invoiceData.invoice_timestamp || new Date().toISOString(),
-              total_price: invoiceData.invoice_totalPrice || 0,
-              items: invoiceData.invoice_items || [],
-              processed: false,
-            })
+      const invoiceItems = (invoiceData.invoice_items || []) as Array<{
+        product_id?: number
+        item_quantity?: number
+      }>
 
-          // Decrement stock for matching products
-          for (const item of invoiceItems) {
-            if (!item.product_id || !mappedProductIds.has(item.product_id)) continue
+      const hasMatchingProducts = invoiceItems.some(
+        item => item.product_id && mappingsByProductId.has(item.product_id)
+      )
 
-            const invoiceItem = item as { product_id: number; item_quantity?: number }
-            const { data: mapping } = await supabaseAdmin
-              .from('r2o_product_mappings')
-              .select('tobacco_inventory_id')
-              .eq('profile_id', conn.profile_id)
-              .eq('r2o_product_id', invoiceItem.product_id)
-              .single()
+      if (hasMatchingProducts) {
+        // Log the sale
+        await supabaseAdmin
+          .from('r2o_sales_log')
+          .insert({
+            profile_id: profileId,
+            r2o_invoice_id: invoiceData.invoice_id,
+            invoice_number: invoiceData.invoice_number || '',
+            invoice_timestamp: invoiceData.invoice_timestamp || new Date().toISOString(),
+            total_price: invoiceData.invoice_totalPrice || 0,
+            items: invoiceData.invoice_items || [],
+            processed: false,
+          })
 
-            if (mapping) {
-              const gramsUsed = invoiceItem.item_quantity || 1
-              // Atomic decrement via RPC (prevents race conditions)
-              await supabaseAdmin.rpc('decrement_tobacco_inventory', {
-                p_inventory_id: mapping.tobacco_inventory_id,
-                p_grams_used: gramsUsed,
-              })
-            }
-          }
+        // Decrement stock for matching products
+        for (const item of invoiceItems) {
+          if (!item.product_id || !mappingsByProductId.has(item.product_id)) continue
 
-          break
+          const inventoryId = mappingsByProductId.get(item.product_id)!
+          const gramsUsed = item.item_quantity || 1
+          // Atomic decrement via RPC (prevents race conditions)
+          await supabaseAdmin.rpc('decrement_tobacco_inventory', {
+            p_inventory_id: inventoryId,
+            p_grams_used: gramsUsed,
+          })
         }
       }
     }

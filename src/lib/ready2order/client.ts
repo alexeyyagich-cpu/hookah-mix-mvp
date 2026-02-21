@@ -159,27 +159,55 @@ export async function getInvoices(
 }
 
 // ============================================================================
-// Webhooks
+// Webhooks (R2O uses PUT /webhook to set URL, PUT /webhook/events to subscribe)
 // ============================================================================
 
 export async function registerWebhook(
   accountToken: string,
   url: string,
   events: string[]
-): Promise<{ webhook_id: number }> {
-  return r2oFetch<{ webhook_id: number }>('/webhooks', accountToken, {
-    method: 'POST',
-    body: JSON.stringify({ url, events }),
+): Promise<void> {
+  // Step 1: Set the webhook URL
+  await r2oFetch<unknown>('/webhook', accountToken, {
+    method: 'PUT',
+    body: JSON.stringify({ url }),
+  })
+
+  // Step 2: Subscribe to events
+  await r2oFetch<unknown>('/webhook/events', accountToken, {
+    method: 'PUT',
+    body: JSON.stringify({ events }),
   })
 }
 
+export async function getWebhookInfo(
+  accountToken: string
+): Promise<{ url: string; events: string[] }> {
+  return r2oFetch<{ url: string; events: string[] }>('/webhook', accountToken)
+}
+
 export async function deleteWebhook(
-  accountToken: string,
-  webhookId: number
+  accountToken: string
 ): Promise<void> {
-  await r2oFetch<void>(`/webhooks/${webhookId}`, accountToken, {
-    method: 'DELETE',
+  // Clear webhook URL by setting it to empty
+  await r2oFetch<unknown>('/webhook', accountToken, {
+    method: 'PUT',
+    body: JSON.stringify({ url: '' }),
   })
+}
+
+// ============================================================================
+// Company / Account Info
+// ============================================================================
+
+export async function getCompanyInfo(
+  accountToken: string
+): Promise<{ companyId: string; companyName: string }> {
+  const data = await r2oFetch<{ company_id: string; company_name: string }>(
+    '/company',
+    accountToken
+  )
+  return { companyId: data.company_id, companyName: data.company_name }
 }
 
 // ============================================================================

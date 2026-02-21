@@ -742,6 +742,8 @@ export interface R2OConnection {
   status: R2OConnectionStatus
   webhook_registered: boolean
   product_group_id: number | null
+  r2o_account_id: string | null
+  webhook_id: number | null
   last_sync_at: string | null
   created_at: string
   updated_at: string
