@@ -84,10 +84,11 @@ export async function POST() {
 
       try {
         if (existingMapping) {
-          // Update existing product stock
+          // Update existing product stock + group
           await updateProduct(accountToken, existingMapping.r2o_product_id, {
             product_stock: Math.round(item.quantity_grams),
             product_name: productName,
+            ...(connection.product_group_id ? { product_group_id: connection.product_group_id } : {}),
           })
 
           await supabaseAdmin

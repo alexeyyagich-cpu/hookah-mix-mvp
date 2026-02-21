@@ -100,9 +100,15 @@ export async function createProduct(
     product_barcode?: string
   }
 ): Promise<R2OProduct> {
+  // R2O expects nested productgroup object, not flat product_group_id
+  const { product_group_id, ...rest } = product
+  const body = product_group_id
+    ? { ...rest, productgroup: { productgroup_id: product_group_id } }
+    : rest
+
   return r2oFetch<R2OProduct>('/products', accountToken, {
     method: 'POST',
-    body: JSON.stringify(product),
+    body: JSON.stringify(body),
   })
 }
 
@@ -117,9 +123,15 @@ export async function updateProduct(
     product_group_id: number
   }>
 ): Promise<R2OProduct> {
+  // R2O expects nested productgroup object, not flat product_group_id
+  const { product_group_id, ...rest } = updates
+  const body = product_group_id
+    ? { ...rest, productgroup: { productgroup_id: product_group_id } }
+    : rest
+
   return r2oFetch<R2OProduct>(`/products/${productId}`, accountToken, {
     method: 'PUT',
-    body: JSON.stringify(updates),
+    body: JSON.stringify(body),
   })
 }
 
