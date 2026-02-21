@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useOnlineStatus } from '@/lib/offline/useOnlineStatus'
 import { useTranslation } from '@/lib/i18n'
-import { getFailedMutations, retryFailedMutation, removeMutation, type SyncQueueEntry } from '@/lib/offline/db'
+import { getFailedMutations, retryFailedMutation, removeMutation, clearAllCache, type SyncQueueEntry } from '@/lib/offline/db'
 
 export function OfflineIndicator() {
   const { isOnline, pendingSyncCount, failedSyncCount, isSyncing, triggerSync } = useOnlineStatus()
@@ -52,6 +52,10 @@ export function OfflineIndicator() {
   const handleDiscard = async (id: number) => {
     await removeMutation(id)
     setFailedItems(prev => prev.filter(i => i.id !== id))
+    // Reconcile: clear stale cache and trigger hooks to refetch from server
+    await clearAllCache()
+    window.dispatchEvent(new Event('offline-mutation-enqueued'))
+    window.dispatchEvent(new Event('offline-discard-reconcile'))
   }
 
   const handleRetryAll = async () => {
@@ -67,6 +71,11 @@ export function OfflineIndicator() {
       if (item.id) await removeMutation(item.id)
     }
     setFailedItems([])
+    setShowFailed(false)
+    // Reconcile: clear stale cache and trigger hooks to refetch from server
+    await clearAllCache()
+    window.dispatchEvent(new Event('offline-mutation-enqueued'))
+    window.dispatchEvent(new Event('offline-discard-reconcile'))
   }
 
   const LABELS: Record<string, string> = {

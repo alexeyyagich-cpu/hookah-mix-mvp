@@ -106,10 +106,16 @@ export function useInventory(): UseInventoryReturn {
   }, [fetchInventory, isDemoMode])
 
   // Refetch after reconnect to replace offline temp data with real data
+  // Also refetch when a mutation is discarded to reconcile local state
   useEffect(() => {
     const handleOnline = () => setTimeout(fetchInventory, 3000)
+    const handleReconcile = () => fetchInventory()
     window.addEventListener('online', handleOnline)
-    return () => window.removeEventListener('online', handleOnline)
+    window.addEventListener('offline-discard-reconcile', handleReconcile)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline-discard-reconcile', handleReconcile)
+    }
   }, [fetchInventory])
 
   const addTobacco = async (
@@ -294,22 +300,7 @@ export function useInventory(): UseInventoryReturn {
       return true
     }
 
-    // Update quantity
-    const { error: updateError } = await supabase
-      .from('tobacco_inventory')
-      .update({
-        quantity_grams: newQuantity,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-
-    if (updateError) {
-      setError(updateError.message)
-      return false
-    }
-
-    // Add transaction record
+    // Add transaction record first (source of truth)
     await supabase.from('inventory_transactions').insert({
       profile_id: user.id,
       ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
@@ -319,6 +310,17 @@ export function useInventory(): UseInventoryReturn {
       session_id: sessionId,
       notes,
     })
+
+    // Atomic quantity adjustment via RPC — no read-then-write race
+    const { error: rpcError } = await supabase.rpc('decrement_tobacco_inventory', {
+      p_inventory_id: id,
+      p_grams_used: -quantityChange, // negative change = decrement; positive = increment (negative grams_used)
+    })
+
+    if (rpcError) {
+      setError(rpcError.message)
+      return false
+    }
 
     await fetchInventory()
     return true

@@ -278,12 +278,16 @@ export function useKDS(): UseKDSReturn {
     }, 10000)
 
     // Refetch after reconnect to replace offline temp data with real data
+    // Also refetch when a mutation is discarded to reconcile local state
     const handleOnline = () => setTimeout(fetchOrders, 3000)
+    const handleReconcile = () => fetchOrders()
     window.addEventListener('online', handleOnline)
+    window.addEventListener('offline-discard-reconcile', handleReconcile)
 
     return () => {
       clearInterval(interval)
       window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline-discard-reconcile', handleReconcile)
     }
   }, [fetchOrders, isDemoMode])
 

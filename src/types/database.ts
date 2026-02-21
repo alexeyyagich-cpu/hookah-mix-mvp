@@ -178,6 +178,7 @@ export interface InventoryTransaction {
   quantity_grams: number
   session_id: string | null
   notes: string | null
+  idempotency_key: string | null
   created_at: string
 }
 

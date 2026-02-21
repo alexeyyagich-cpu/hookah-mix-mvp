@@ -139,25 +139,25 @@ const DEMO_INVENTORY: TobaccoInventory[] = [
 
 const DEMO_TRANSACTIONS: InventoryTransaction[] = [
   // Today
-  { id: '1', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Pinkman', created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-  { id: '2', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Supernova', created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-  { id: '3', profile_id: 'demo', tobacco_inventory_id: '5', type: 'session', quantity_grams: -12, session_id: '2', notes: 'Cane Mint', created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() },
+  { id: '1', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Pinkman', idempotency_key: null, created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+  { id: '2', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '1', notes: 'Supernova', idempotency_key: null, created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+  { id: '3', profile_id: 'demo', tobacco_inventory_id: '5', type: 'session', quantity_grams: -12, session_id: '2', notes: 'Cane Mint', idempotency_key: null, created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() },
   // Yesterday
-  { id: '4', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -14, session_id: '3', notes: 'Pinkman', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '5', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -18, session_id: '4', notes: 'Supernova', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '6', profile_id: 'demo', tobacco_inventory_id: '4', type: 'session', quantity_grams: -15, session_id: '5', notes: 'Bananapapa', created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '4', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -14, session_id: '3', notes: 'Pinkman', idempotency_key: null, created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '5', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -18, session_id: '4', notes: 'Supernova', idempotency_key: null, created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '6', profile_id: 'demo', tobacco_inventory_id: '4', type: 'session', quantity_grams: -15, session_id: '5', notes: 'Bananapapa', idempotency_key: null, created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
   // 2 days ago
-  { id: '7', profile_id: 'demo', tobacco_inventory_id: '2', type: 'session', quantity_grams: -10, session_id: '6', notes: 'Lemon-Lime', created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '7', profile_id: 'demo', tobacco_inventory_id: '2', type: 'session', quantity_grams: -10, session_id: '6', notes: 'Lemon-Lime', idempotency_key: null, created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
   // 3 days ago
-  { id: '8', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -12, session_id: '7', notes: 'Pinkman', created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '9', profile_id: 'demo', tobacco_inventory_id: '4', type: 'session', quantity_grams: -9, session_id: '8', notes: 'Bananapapa', created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '8', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -12, session_id: '7', notes: 'Pinkman', idempotency_key: null, created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '9', profile_id: 'demo', tobacco_inventory_id: '4', type: 'session', quantity_grams: -9, session_id: '8', notes: 'Bananapapa', idempotency_key: null, created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
   // 5 days ago
-  { id: '10', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -14, session_id: '9', notes: 'Pinkman', created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '10', profile_id: 'demo', tobacco_inventory_id: '1', type: 'session', quantity_grams: -14, session_id: '9', notes: 'Pinkman', idempotency_key: null, created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
   // 6 days ago
-  { id: '11', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '10', notes: 'Supernova', created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '11', profile_id: 'demo', tobacco_inventory_id: '3', type: 'session', quantity_grams: -10, session_id: '10', notes: 'Supernova', idempotency_key: null, created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString() },
   // Initial purchases
-  { id: '12', profile_id: 'demo', tobacco_inventory_id: '1', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Purchase', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
-  { id: '13', profile_id: 'demo', tobacco_inventory_id: '3', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Purchase', created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '12', profile_id: 'demo', tobacco_inventory_id: '1', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Purchase', idempotency_key: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: '13', profile_id: 'demo', tobacco_inventory_id: '3', type: 'purchase', quantity_grams: 200, session_id: null, notes: 'Purchase', idempotency_key: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
 ]
 
 interface ConsumptionByBrand {

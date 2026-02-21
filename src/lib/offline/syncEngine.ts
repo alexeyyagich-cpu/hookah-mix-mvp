@@ -34,7 +34,7 @@ export async function processSyncQueue(
 
       if (entry.retryCount + 1 >= MAX_RETRIES) {
         await updateMutationStatus(entry.id, 'failed', errorMsg)
-        console.warn(`Sync: permanently failed after ${MAX_RETRIES} retries:`, entry)
+        console.warn(`[sync] Permanently failed after ${MAX_RETRIES} retries:`, entry.table, entry.operation, errorMsg)
       } else {
         await updateMutationStatus(entry.id, 'pending', errorMsg)
       }
@@ -42,6 +42,7 @@ export async function processSyncQueue(
     }
   }
 
+  console.log(`[sync] Complete: ${synced} synced, ${failed} failed`)
   return { synced, failed }
 }
 
@@ -152,7 +153,11 @@ async function executeCompoundMutation(
  *   Step 2: insert session_items (skip if meta._itemsInserted)
  *   Step 3: per-item inventory adjustments (skip already-done via meta._adj_N)
  *
- * On partial failure, progress is persisted. Retry resumes from last checkpoint.
+ * Idempotency:
+ *   - Session insert: no natural key, but checkpoint prevents re-insert
+ *   - Items insert: checked via SELECT count before inserting
+ *   - Inventory adj: UNIQUE(tobacco_inventory_id, session_id, type) prevents duplicates
+ *   - Grams update: atomic RPC (decrement_tobacco_inventory) — safe for concurrent access
  */
 async function syncSessionCompound(
   supabase: SupabaseClient,
@@ -183,27 +188,35 @@ async function syncSessionCompound(
 
     // Track temp → real ID
     if (tempSessionId && typeof tempSessionId === 'string' && (tempSessionId as string).startsWith('offline-')) {
-      idMap.set(tempSessionId as string, sessionId!)
+      idMap.set(tempSessionId as string, sessionId)
     }
 
     // Checkpoint: session created
     await updateMutationMeta(entryId, { _sessionId: sessionId })
   }
 
-  // --- Step 2: Insert session items ---
+  // --- Step 2: Insert session items (with idempotency check) ---
   if (!meta._itemsInserted) {
     const items = (meta.items as Record<string, unknown>[]) || []
     if (items.length > 0) {
-      const sessionItems = items.map(item => {
-        const resolved: Record<string, unknown> = { ...item, session_id: sessionId }
-        if (typeof resolved.id === 'string' && (resolved.id as string).startsWith('offline-')) {
-          delete resolved.id
-        }
-        return resolved
-      })
+      // Idempotency: check if items already exist for this session (partial success + retry)
+      const { count } = await supabase
+        .from('session_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('session_id', sessionId)
 
-      const { error: itemsError } = await supabase.from('session_items').insert(sessionItems)
-      if (itemsError) throw new Error(itemsError.message)
+      if (!count || count === 0) {
+        const sessionItems = items.map(item => {
+          const resolved: Record<string, unknown> = { ...item, session_id: sessionId }
+          if (typeof resolved.id === 'string' && (resolved.id as string).startsWith('offline-')) {
+            delete resolved.id
+          }
+          return resolved
+        })
+
+        const { error: itemsError } = await supabase.from('session_items').insert(sessionItems)
+        if (itemsError) throw new Error(itemsError.message)
+      }
     }
 
     // Checkpoint: items inserted
@@ -223,45 +236,33 @@ async function syncSessionCompound(
       continue
     }
 
-    // Transaction-first: insert transaction, then recalculate grams
-    // Idempotency: check if this session's deduction already exists
-    const { data: existingTx } = await supabase
-      .from('inventory_transactions')
-      .select('id')
-      .eq('tobacco_inventory_id', tobaccoInventoryId)
-      .eq('session_id', sessionId!)
-      .eq('type', 'session')
-      .limit(1)
-
-    if (!existingTx?.length) {
-      // Insert transaction first (source of truth)
-      const { error: txError } = await supabase.from('inventory_transactions').insert({
-        profile_id: entry.userId,
-        tobacco_inventory_id: tobaccoInventoryId,
-        type: 'session',
-        quantity_grams: -(adj.grams_used as number),
-        session_id: sessionId,
-        notes: `Session: ${adj.brand} ${adj.flavor}`,
-        ...(adj.organizationId ? { organization_id: adj.organizationId, location_id: adj.locationId } : {}),
-      })
-      if (txError) throw new Error(txError.message)
+    // Insert transaction — UNIQUE(tobacco_inventory_id, session_id, type) prevents duplicates
+    let txAlreadyExists = false
+    const { error: txError } = await supabase.from('inventory_transactions').insert({
+      profile_id: entry.userId,
+      tobacco_inventory_id: tobaccoInventoryId,
+      type: 'session',
+      quantity_grams: -(adj.grams_used as number),
+      session_id: sessionId,
+      notes: `Session: ${adj.brand} ${adj.flavor}`,
+      ...(adj.organizationId ? { organization_id: adj.organizationId, location_id: adj.locationId } : {}),
+    })
+    if (txError) {
+      // Unique constraint violation = already processed, skip grams decrement
+      if (txError.code === '23505' || txError.message.includes('duplicate key') || txError.message.includes('unique constraint')) {
+        txAlreadyExists = true
+      } else {
+        throw new Error(txError.message)
+      }
     }
 
-    // Recalculate grams from current value + delta (safe even on retry)
-    const { data: inv } = await supabase
-      .from('tobacco_inventory')
-      .select('quantity_grams')
-      .eq('id', tobaccoInventoryId)
-      .single()
-
-    if (inv && !existingTx?.length) {
-      await supabase
-        .from('tobacco_inventory')
-        .update({
-          quantity_grams: Math.max(0, inv.quantity_grams - (adj.grams_used as number)),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', tobaccoInventoryId)
+    // Atomic grams decrement via RPC — only if transaction was newly inserted
+    if (!txAlreadyExists) {
+      const { error: rpcError } = await supabase.rpc('decrement_tobacco_inventory', {
+        p_inventory_id: tobaccoInventoryId,
+        p_grams_used: adj.grams_used as number,
+      })
+      if (rpcError) throw new Error(rpcError.message)
     }
 
     // Checkpoint: this adjustment done
@@ -271,9 +272,11 @@ async function syncSessionCompound(
 
 /**
  * Inventory adjustment compound — transaction-first with idempotency:
- *   1. Check if transaction with same idempotencyKey already exists
- *   2. Insert transaction (source of truth)
- *   3. Recalculate grams from current value + delta
+ *   1. INSERT transaction with idempotency_key (UNIQUE constraint prevents duplicates)
+ *   2. Atomic RPC to adjust grams
+ *
+ * The UNIQUE index on idempotency_key ensures at-most-once transaction insert.
+ * The atomic RPC ensures no read-then-write race on quantity_grams.
  */
 async function syncInventoryAdjustment(
   supabase: SupabaseClient,
@@ -283,55 +286,53 @@ async function syncInventoryAdjustment(
   const inventoryId = meta.inventoryId as string
   const delta = meta.delta as number
   const transactionData = meta.transactionData as Record<string, unknown>
-  const orgId = meta.organizationId as string | undefined
   const idempotencyKey = entry.idempotencyKey || ''
 
-  // Step 1: Check for existing transaction (idempotency via notes suffix)
-  const idempotencyTag = `[idem:${idempotencyKey}]`
+  if (!transactionData || !inventoryId) return
+
+  // Step 1: Insert transaction with idempotency_key
+  // UNIQUE index on idempotency_key prevents duplicates atomically
   let alreadyProcessed = false
 
   if (idempotencyKey) {
-    const { data: existing } = await supabase
-      .from('inventory_transactions')
-      .select('id')
-      .eq('tobacco_inventory_id', inventoryId)
-      .like('notes', `%${idempotencyTag}%`)
-      .limit(1)
-
-    alreadyProcessed = !!(existing?.length)
-  }
-
-  if (!alreadyProcessed && transactionData) {
-    // Step 2: Insert transaction first (source of truth)
-    const txNotes = transactionData.notes
-      ? `${transactionData.notes} ${idempotencyTag}`
-      : idempotencyTag
-
     const { error: txError } = await supabase.from('inventory_transactions').insert({
       ...transactionData,
       profile_id: entry.userId,
-      notes: txNotes,
+      idempotency_key: idempotencyKey,
+    })
+
+    if (txError) {
+      // Check if it's a unique constraint violation (already processed)
+      if (txError.code === '23505' || txError.message.includes('duplicate key') || txError.message.includes('unique constraint')) {
+        alreadyProcessed = true
+      } else {
+        throw new Error(txError.message)
+      }
+    }
+  } else {
+    // No idempotency key — insert without protection (legacy path)
+    const { error: txError } = await supabase.from('inventory_transactions').insert({
+      ...transactionData,
+      profile_id: entry.userId,
     })
     if (txError) throw new Error(txError.message)
+  }
 
-    // Step 3: Update grams (only if transaction was newly inserted)
-    const { data: inv } = await supabase
-      .from('tobacco_inventory')
-      .select('quantity_grams')
-      .eq('id', inventoryId)
-      .single()
-
-    if (inv) {
-      const newQuantity = Math.max(0, inv.quantity_grams + delta)
-      const { error: updateError } = await supabase
-        .from('tobacco_inventory')
-        .update({ quantity_grams: newQuantity, updated_at: new Date().toISOString() })
-        .eq('id', inventoryId)
-        .eq(
-          orgId ? 'organization_id' : 'profile_id',
-          orgId || entry.userId,
-        )
-
+  // Step 2: Atomic grams adjustment via RPC (only if transaction was newly inserted)
+  if (!alreadyProcessed) {
+    if (delta < 0) {
+      // Deduction — use decrement RPC
+      const { error: rpcError } = await supabase.rpc('decrement_tobacco_inventory', {
+        p_inventory_id: inventoryId,
+        p_grams_used: Math.abs(delta),
+      })
+      if (rpcError) throw new Error(rpcError.message)
+    } else {
+      // Addition (purchase, adjustment +) — use increment RPC or direct atomic update
+      const { error: updateError } = await supabase.rpc('decrement_tobacco_inventory', {
+        p_inventory_id: inventoryId,
+        p_grams_used: -delta, // negative grams_used = increment
+      })
       if (updateError) throw new Error(updateError.message)
     }
   }

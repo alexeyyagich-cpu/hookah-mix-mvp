@@ -165,10 +165,16 @@ export function useSessions(): UseSessionsReturn {
   }, [fetchSessions, isDemoMode])
 
   // Refetch after reconnect to replace offline temp data with real data
+  // Also refetch when a mutation is discarded to reconcile local state
   useEffect(() => {
     const handleOnline = () => setTimeout(fetchSessions, 3000)
+    const handleReconcile = () => fetchSessions()
     window.addEventListener('online', handleOnline)
-    return () => window.removeEventListener('online', handleOnline)
+    window.addEventListener('offline-discard-reconcile', handleReconcile)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline-discard-reconcile', handleReconcile)
+    }
   }, [fetchSessions])
 
   const createSession = async (
@@ -296,34 +302,22 @@ export function useSessions(): UseSessionsReturn {
     if (deductFromInventory) {
       for (const item of items) {
         if (item.tobacco_inventory_id) {
-          // Get current inventory
-          const { data: inv } = await supabase
-            .from('tobacco_inventory')
-            .select('quantity_grams')
-            .eq('id', item.tobacco_inventory_id)
-            .single()
+          // Record transaction (UNIQUE constraint prevents duplicates on retry)
+          await supabase.from('inventory_transactions').insert({
+            profile_id: user.id,
+            ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+            tobacco_inventory_id: item.tobacco_inventory_id,
+            type: 'session',
+            quantity_grams: -item.grams_used,
+            session_id: session.id,
+            notes: `Session: ${item.brand} ${item.flavor}`,
+          })
 
-          if (inv) {
-            // Update inventory
-            await supabase
-              .from('tobacco_inventory')
-              .update({
-                quantity_grams: Math.max(0, inv.quantity_grams - item.grams_used),
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', item.tobacco_inventory_id)
-
-            // Record transaction
-            await supabase.from('inventory_transactions').insert({
-              profile_id: user.id,
-              ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-              tobacco_inventory_id: item.tobacco_inventory_id,
-              type: 'session',
-              quantity_grams: -item.grams_used,
-              session_id: session.id,
-              notes: `Session: ${item.brand} ${item.flavor}`,
-            })
-          }
+          // Atomic decrement via RPC — no read-then-write race
+          await supabase.rpc('decrement_tobacco_inventory', {
+            p_inventory_id: item.tobacco_inventory_id,
+            p_grams_used: item.grams_used,
+          })
         }
       }
     }
