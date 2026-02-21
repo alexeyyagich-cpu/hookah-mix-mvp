@@ -418,6 +418,8 @@ export const hookah: typeof HookahType = {
   guestCopied: 'Mix copied!',
   mixFlavorFilter: 'Filter by flavors',
   mixAllFlavors: 'All flavors',
+  mixInStockOnly: 'In stock only',
+  mixInStockCount: 'items',
   mixMixRecipes: 'Mix recipes',
   mixMySaved: 'My saved',
   mixQuickRepeat: 'Quick repeat',

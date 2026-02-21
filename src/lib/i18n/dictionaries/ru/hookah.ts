@@ -424,6 +424,8 @@ export const hookah = {
   guestCopied: 'Микс скопирован!',
   mixFlavorFilter: 'Фильтр по вкусам',
   mixAllFlavors: 'Все вкусы',
+  mixInStockOnly: 'Только в наличии',
+  mixInStockCount: 'шт.',
   mixMixRecipes: 'Рецепты миксов',
   mixMySaved: 'Мои сохранённые',
   mixQuickRepeat: 'Быстрый повтор',

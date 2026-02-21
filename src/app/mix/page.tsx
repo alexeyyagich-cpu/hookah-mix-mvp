@@ -119,6 +119,7 @@ function MixPageInner() {
   const [targetCompatibility, setTargetCompatibility] = useState<number | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [isSlotMachineOpen, setIsSlotMachineOpen] = useState(false);
   const [isQuickSessionOpen, setIsQuickSessionOpen] = useState(false);
   const [isTimerVisible, setIsTimerVisible] = useState(false);
@@ -224,6 +225,16 @@ function MixPageInner() {
     }
   }, [applyMixRecipe, isGuestMode]);
 
+  const inventoryIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const inv of inventory) {
+      if (inv.quantity_grams > 0) {
+        if (inv.tobacco_id) ids.add(inv.tobacco_id);
+      }
+    }
+    return ids;
+  }, [inventory]);
+
   const filteredTobaccos = useMemo(() => {
     let result = TOBACCOS;
     if (selectedBrand) {
@@ -232,8 +243,11 @@ function MixPageInner() {
     if (selectedCategory) {
       result = result.filter(t => t.category === selectedCategory);
     }
+    if (showInStockOnly) {
+      result = result.filter(t => inventoryIds.has(t.id));
+    }
     return result;
-  }, [selectedBrand, selectedCategory]);
+  }, [selectedBrand, selectedCategory, showInStockOnly, inventoryIds]);
 
   const selectedTobaccos = useMemo(
     () => TOBACCOS.filter(t => selectedIds.includes(t.id)),
@@ -764,6 +778,32 @@ function MixPageInner() {
                   </div>
                 )}
               </div>
+
+              {/* In-stock toggle - only for business users with inventory */}
+              {isBusinessUser && inventory.length > 0 && (
+                <div className="mb-5 flex items-center justify-between">
+                  <label className="flex items-center gap-3 cursor-pointer select-none">
+                    <div
+                      className="relative w-11 h-6 rounded-full transition-colors"
+                      style={{ background: showInStockOnly ? 'var(--color-primary)' : 'var(--color-bgAccent)' }}
+                      onClick={() => setShowInStockOnly(prev => !prev)}
+                    >
+                      <div
+                        className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+                        style={{ transform: showInStockOnly ? 'translateX(22px)' : 'translateX(2px)' }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
+                      {t.mixInStockOnly}
+                    </span>
+                  </label>
+                  {showInStockOnly && (
+                    <span className="text-xs tabular-nums" style={{ color: 'var(--color-textMuted)' }}>
+                      {filteredTobaccos.length} {t.mixInStockCount}
+                    </span>
+                  )}
+                </div>
+              )}
 
               {/* Tobacco grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1">
