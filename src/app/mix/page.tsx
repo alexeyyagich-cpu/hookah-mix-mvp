@@ -291,13 +291,11 @@ function MixPageInner() {
     setSelectedIds(prev => {
       const exists = prev.includes(id);
       if (exists) {
-        // In guest mode allow removing down to 0; otherwise minimum 2
-        const minCount = isGuestMode ? 0 : 2;
-        return prev.length > minCount ? prev.filter(x => x !== id) : prev;
+        return prev.filter(x => x !== id);
       }
       return prev.length < 3 ? [...prev, id] : prev;
     });
-  }, [isGuestMode]);
+  }, []);
 
   const normalizePercents = useCallback((changedId: string, nextValue: number) => {
     const ids = selectedIds;
@@ -655,14 +653,11 @@ function MixPageInner() {
               {t.guestHintMore}
             </span>
           )}
-          {selectedTobaccos.map((t, i) => {
-            const minCount = isGuestMode ? 0 : 2;
-            const canRemove = selectedTobaccos.length > minCount;
-            return (
+          {selectedTobaccos.map((t, i) => (
             <button
               key={t.id}
-              onClick={() => canRemove && toggleTobacco(t.id)}
-              className={`pill animate-scaleIn ${canRemove ? 'group cursor-pointer' : 'cursor-default'}`}
+              onClick={() => toggleTobacco(t.id)}
+              className="pill animate-scaleIn group cursor-pointer"
               style={{
                 borderColor: t.color,
                 borderWidth: "2px",
@@ -671,10 +666,9 @@ function MixPageInner() {
             >
               <span className="w-3 h-3 rounded-full" style={{ background: t.color }} />
               <span style={{ color: "var(--color-text)" }}>{t.flavor}</span>
-              {canRemove && <span className="opacity-40 group-hover:opacity-100 transition-opacity ml-1">×</span>}
+              <span className="opacity-40 group-hover:opacity-100 transition-opacity ml-1">×</span>
             </button>
-            );
-          })}
+          ))}
           {isAtLimit && (
             <span className="badge badge-warning animate-fadeInUp">Max 3</span>
           )}
