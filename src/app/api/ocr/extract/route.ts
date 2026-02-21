@@ -1,13 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 import Anthropic from '@anthropic-ai/sdk'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 req/min per IP (paid API calls)
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`ocr:${ip}`, rateLimits.webhook)
+  const rateCheck = checkRateLimit(`ocr:${ip}`, rateLimits.strict)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
+  // Auth: require logged-in user
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll() { return cookieStore.getAll() } } }
+  )
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   if (!ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'OCR not configured' }, { status: 500 })
