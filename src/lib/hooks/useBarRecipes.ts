@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
 import type {
   BarRecipe,
@@ -217,40 +218,48 @@ export function useBarRecipes(): UseBarRecipesReturn {
       return
     }
 
-    setLoading(true)
+    const cached = await getCachedData<BarRecipeWithIngredients>('bar_recipes', user.id)
+    if (cached) { setRecipes(cached.data); setLoading(false) }
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+    if (!cached) setLoading(true)
     setError(null)
 
-    const { data: recipesData, error: fetchError } = await supabase
-      .from('bar_recipes')
-      .select('*')
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('name', { ascending: true })
-
-    if (fetchError) {
-      setError(fetchError.message)
-      setRecipes([])
-      setLoading(false)
-      return
-    }
-
-    // Fetch ingredients for all recipes
-    const recipeIds = (recipesData || []).map(r => r.id)
-    let ingredientsData: BarRecipeIngredient[] = []
-    if (recipeIds.length > 0) {
-      const { data: ings } = await supabase
-        .from('bar_recipe_ingredients')
+    try {
+      const { data: recipesData, error: fetchError } = await supabase
+        .from('bar_recipes')
         .select('*')
-        .in('recipe_id', recipeIds)
-        .order('sort_order', { ascending: true })
-      ingredientsData = ings || []
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('name', { ascending: true })
+
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setRecipes([]) }
+        setLoading(false)
+        return
+      }
+
+      const recipeIds = (recipesData || []).map(r => r.id)
+      let ingredientsData: BarRecipeIngredient[] = []
+      if (recipeIds.length > 0) {
+        const { data: ings } = await supabase
+          .from('bar_recipe_ingredients')
+          .select('*')
+          .in('recipe_id', recipeIds)
+          .order('sort_order', { ascending: true })
+        ingredientsData = ings || []
+      }
+
+      const recipesWithIngredients: BarRecipeWithIngredients[] = (recipesData || []).map(r => ({
+        ...r,
+        ingredients: ingredientsData.filter(i => i.recipe_id === r.id),
+      }))
+
+      setRecipes(recipesWithIngredients)
+      await setCachedData('bar_recipes', user.id, recipesWithIngredients)
+    } catch {
+      // Network error — keep cache
     }
 
-    const recipesWithIngredients: BarRecipeWithIngredients[] = (recipesData || []).map(r => ({
-      ...r,
-      ingredients: ingredientsData.filter(i => i.recipe_id === r.id),
-    }))
-
-    setRecipes(recipesWithIngredients)
     setLoading(false)
   }, [user, supabase, organizationId])
 

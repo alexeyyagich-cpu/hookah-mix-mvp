@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BowlType } from '@/types/database'
 
 // Demo data for testing
@@ -63,24 +64,32 @@ export function useBowls(): UseBowlsReturn {
       return
     }
 
-    setLoading(true)
+    const cached = await getCachedData<BowlType>('bowls', user.id)
+    if (cached) { setBowls(cached.data); setLoading(false) }
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+    if (!cached) setLoading(true)
     setError(null)
 
-    const { data, error: fetchError } = await supabase
-      .from('bowl_types')
-      .select('*')
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('name', { ascending: true })
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('bowl_types')
+        .select('*')
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('name', { ascending: true })
 
-    if (fetchError) {
-      setError(fetchError.message)
-      setBowls([])
-    } else {
-      setBowls(data || [])
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setBowls([]) }
+      } else {
+        setBowls(data || [])
+        await setCachedData('bowls', user.id, data || [])
+      }
+    } catch {
+      // Network error — keep cache
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) fetchBowls()

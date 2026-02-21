@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { Guest, MixSnapshot, StrengthPreference, FlavorProfile } from '@/types/database'
 import {
   cacheGuestsLocally,
@@ -205,17 +206,26 @@ export function useGuests(): UseGuestsReturn {
       return
     }
 
-    // If offline, use cached data
-    if (isOffline) {
-      const cached = getCachedGuests()
-      if (cached) {
-        setGuests(cached)
-        setLoading(false)
-        return
-      }
+    // Try IndexedDB cache first for instant display
+    const cached = await getCachedData<Guest>('guests', user.id)
+    if (cached) {
+      setGuests(cached.data)
+      setLoading(false)
     }
 
-    setLoading(true)
+    // If offline, stop here (also try localStorage fallback)
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      if (!cached) {
+        const lsCached = getCachedGuests()
+        if (lsCached) {
+          setGuests(lsCached)
+          setLoading(false)
+        }
+      }
+      return
+    }
+
+    if (!cached) setLoading(true)
     setError(null)
 
     try {
@@ -227,29 +237,34 @@ export function useGuests(): UseGuestsReturn {
         .order('name', { ascending: true })
 
       if (fetchError) {
-        // Try cached data on error
-        const cached = getCachedGuests()
-        if (cached) {
-          setGuests(cached)
-          setIsOffline(true)
-        } else {
-          setError(fetchError.message)
-          setGuests([])
+        if (!cached) {
+          // Try localStorage fallback
+          const lsCached = getCachedGuests()
+          if (lsCached) {
+            setGuests(lsCached)
+            setIsOffline(true)
+          } else {
+            setError(fetchError.message)
+            setGuests([])
+          }
         }
       } else {
         setGuests(data || [])
+        await setCachedData('guests', user.id, data || [])
       }
     } catch {
-      // Network error - use cached
-      const cached = getCachedGuests()
-      if (cached) {
-        setGuests(cached)
-        setIsOffline(true)
+      // Network error — keep cache if available
+      if (!cached) {
+        const lsCached = getCachedGuests()
+        if (lsCached) {
+          setGuests(lsCached)
+          setIsOffline(true)
+        }
       }
     }
 
     setLoading(false)
-  }, [user, supabase, isOffline, organizationId])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) {

@@ -13,6 +13,8 @@ import { useOnboarding } from '@/lib/hooks/useOnboarding'
 import { useTranslation } from '@/lib/i18n'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { InstallBanner } from '@/components/InstallBanner'
+import { OnlineStatusProvider } from '@/lib/offline/useOnlineStatus'
+import { OfflineIndicator } from '@/components/OfflineIndicator'
 
 function PageTransition() {
   const pathname = usePathname()
@@ -126,6 +128,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </main>
       <PageTransition />
       {!isOnboarding && <LowStockNotifier />}
+      <OfflineIndicator />
       <ServiceWorkerRegistration />
       <Toaster
         position="top-right"
@@ -149,9 +152,11 @@ export default function DashboardLayout({
   return (
     <AuthGuard>
       <OrganizationProvider>
-        <OnboardingCheck>
-          <DashboardContent>{children}</DashboardContent>
-        </OnboardingCheck>
+        <OnlineStatusProvider>
+          <OnboardingCheck>
+            <DashboardContent>{children}</DashboardContent>
+          </OnboardingCheck>
+        </OnlineStatusProvider>
       </OrganizationProvider>
     </AuthGuard>
   )

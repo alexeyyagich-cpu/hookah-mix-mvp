@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { Session, SessionItem, SessionWithItems } from '@/types/database'
 
 // Demo bowl for sessions
@@ -112,37 +113,51 @@ export function useSessions(): UseSessionsReturn {
       return
     }
 
-    setLoading(true)
-    setError(null)
-
-    let query = supabase
-      .from('sessions')
-      .select(`
-        *,
-        session_items (*),
-        bowl_type:bowl_types (*)
-      `)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('session_date', { ascending: false })
-
-    // Apply date filter for free tier
-    if (historyDays) {
-      const cutoffDate = new Date()
-      cutoffDate.setDate(cutoffDate.getDate() - historyDays)
-      query = query.gte('session_date', cutoffDate.toISOString())
+    // Try cache first for instant display
+    const cached = await getCachedData<SessionWithItems>('sessions', user.id)
+    if (cached) {
+      setSessions(cached.data)
+      setLoading(false)
     }
 
-    const { data, error: fetchError } = await query
+    // If offline, stop here
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
 
-    if (fetchError) {
-      setError(fetchError.message)
-      setSessions([])
-    } else {
-      setSessions(data || [])
+    if (!cached) setLoading(true)
+    setError(null)
+
+    try {
+      let query = supabase
+        .from('sessions')
+        .select(`
+          *,
+          session_items (*),
+          bowl_type:bowl_types (*)
+        `)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('session_date', { ascending: false })
+
+      // Apply date filter for free tier
+      if (historyDays) {
+        const cutoffDate = new Date()
+        cutoffDate.setDate(cutoffDate.getDate() - historyDays)
+        query = query.gte('session_date', cutoffDate.toISOString())
+      }
+
+      const { data, error: fetchError } = await query
+
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setSessions([]) }
+      } else {
+        setSessions(data || [])
+        await setCachedData('sessions', user.id, data || [])
+      }
+    } catch {
+      // Network error — keep cache if available
     }
 
     setLoading(false)
-  }, [user, supabase, historyDays])
+  }, [user, supabase, historyDays, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) fetchSessions()

@@ -78,6 +78,13 @@ export const common: typeof CommonType = {
   offline: {
     title: 'No internet connection',
     description: 'Check your connection and try again later.',
+    indicator: 'Offline',
+    syncing: 'Syncing...',
+    syncPending: (count: string) => `${count} changes pending`,
+    syncComplete: 'All synced',
+    syncFailed: (count: string) => `${count} changes failed to sync`,
+    cachedData: 'Showing cached data',
+    queuedOffline: 'Saved offline',
   },
 
   errorPage: {

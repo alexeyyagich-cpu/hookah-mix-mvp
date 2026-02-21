@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { FloorTable, TableStatus } from '@/types/database'
 
 // Demo floor tables
@@ -138,7 +139,17 @@ export function useFloorPlan(): UseFloorPlanReturn {
       return
     }
 
-    setLoading(true)
+    // Try cache first for instant display
+    const cached = await getCachedData<FloorTable>('floor_tables', user.id)
+    if (cached) {
+      setTables(cached.data)
+      setLoading(false)
+    }
+
+    // If offline, stop here
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+    if (!cached) setLoading(true)
     setError(null)
 
     try {
@@ -148,10 +159,14 @@ export function useFloorPlan(): UseFloorPlanReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('created_at', { ascending: true })
 
-      if (fetchError) throw fetchError
-      setTables(data || [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load floor plan')
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setTables([]) }
+      } else {
+        setTables(data || [])
+        await setCachedData('floor_tables', user.id, data || [])
+      }
+    } catch {
+      // Network error — keep cache if available
     }
 
     setLoading(false)

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { KdsOrder, KdsOrderStatus, KdsOrderType, KdsOrderItem } from '@/types/database'
 
 // Demo KDS orders
@@ -221,42 +222,59 @@ export function useKDS(): UseKDSReturn {
       return
     }
 
+    // Try cache first for instant display
+    const cached = await getCachedData<KdsOrder>('kds_orders', effectiveProfileId)
+    if (cached) {
+      setOrders(cached.data)
+      lastNewCountRef.current = cached.data.filter(o => o.status === 'new').length
+      setLoading(false)
+    }
+
+    // If offline, stop here
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
     setError(null)
 
-    const { data, error: fetchError } = await supabase
-      .from('kds_orders')
-      .select('*')
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || effectiveProfileId)
-      .not('status', 'in', '("served","cancelled")')
-      .order('created_at', { ascending: true })
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('kds_orders')
+        .select('*')
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || effectiveProfileId)
+        .not('status', 'in', '("served","cancelled")')
+        .order('created_at', { ascending: true })
 
-    if (fetchError) {
-      setError(fetchError.message)
-      setOrders([])
-      setLoading(false)
-      return
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setOrders([]) }
+      } else {
+        const newOrders = data || []
+        const newCount = newOrders.filter(o => o.status === 'new').length
+
+        // Play beep if new orders arrived
+        if (newCount > lastNewCountRef.current && audioUnlockedRef.current) {
+          playBeep()
+        }
+        lastNewCountRef.current = newCount
+
+        setOrders(newOrders)
+        await setCachedData('kds_orders', effectiveProfileId, newOrders)
+      }
+    } catch {
+      // Network error — keep cache if available
     }
 
-    const newOrders = data || []
-    const newCount = newOrders.filter(o => o.status === 'new').length
-
-    // Play beep if new orders arrived
-    if (newCount > lastNewCountRef.current && audioUnlockedRef.current) {
-      playBeep()
-    }
-    lastNewCountRef.current = newCount
-
-    setOrders(newOrders)
     setLoading(false)
   }, [effectiveProfileId, supabase, playBeep, organizationId])
 
-  // Initial fetch + polling
+  // Initial fetch + polling (skip polling when offline)
   useEffect(() => {
     if (isDemoMode) return
 
     fetchOrders()
 
-    const interval = setInterval(fetchOrders, 10000)
+    const interval = setInterval(() => {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) return
+      fetchOrders()
+    }, 10000)
     return () => clearInterval(interval)
   }, [fetchOrders, isDemoMode])
 

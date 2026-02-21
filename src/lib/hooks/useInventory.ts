@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
 
 // Demo data for testing (prices in EUR, package_grams = 100g default)
@@ -65,25 +66,39 @@ export function useInventory(): UseInventoryReturn {
       return
     }
 
-    setLoading(true)
+    // Try cache first for instant display
+    const cached = await getCachedData<TobaccoInventory>('inventory', user.id)
+    if (cached) {
+      setInventory(cached.data)
+      setLoading(false)
+    }
+
+    // If offline, stop here
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+    if (!cached) setLoading(true)
     setError(null)
 
-    const { data, error: fetchError } = await supabase
-      .from('tobacco_inventory')
-      .select('*')
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('brand', { ascending: true })
-      .order('flavor', { ascending: true })
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('tobacco_inventory')
+        .select('*')
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('brand', { ascending: true })
+        .order('flavor', { ascending: true })
 
-    if (fetchError) {
-      setError(fetchError.message)
-      setInventory([])
-    } else {
-      setInventory(data || [])
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setInventory([]) }
+      } else {
+        setInventory(data || [])
+        await setCachedData('inventory', user.id, data || [])
+      }
+    } catch {
+      // Network error — keep cache if available
     }
 
     setLoading(false)
-  }, [user, supabase])
+  }, [user, supabase, organizationId])
 
   useEffect(() => {
     if (!isDemoMode) fetchInventory()

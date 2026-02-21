@@ -86,6 +86,13 @@ export const common = {
   offline: {
     title: 'Нет подключения к интернету',
     description: 'Проверьте подключение и попробуйте позже.',
+    indicator: 'Оффлайн',
+    syncing: 'Синхронизация...',
+    syncPending: (count: string) => `${count} изм. ожидают синхр.`,
+    syncComplete: 'Всё синхронизировано',
+    syncFailed: (count: string) => `${count} изм. не удалось синхронизировать`,
+    cachedData: 'Показаны сохранённые данные',
+    queuedOffline: 'Сохранено оффлайн',
   },
 
   // Error page

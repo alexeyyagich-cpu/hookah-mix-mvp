@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
@@ -94,24 +95,37 @@ export function useBarSales(): UseBarSalesReturn {
       return
     }
 
-    setLoading(true)
-    setError(null)
-
-    const { data, error: fetchError } = await supabase
-      .from('bar_sales')
-      .select('*')
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('sold_at', { ascending: false })
-      .limit(500)
-
-    if (fetchError) {
-      setError(fetchError.message)
-      setSales([])
+    // Try cache first for instant display
+    const cached = await getCachedData<BarSale>('bar_sales', user.id)
+    if (cached) {
+      setSales(cached.data)
       setLoading(false)
-      return
     }
 
-    setSales(data || [])
+    // If offline, stop here
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+    if (!cached) setLoading(true)
+    setError(null)
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('bar_sales')
+        .select('*')
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('sold_at', { ascending: false })
+        .limit(500)
+
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setSales([]) }
+      } else {
+        setSales(data || [])
+        await setCachedData('bar_sales', user.id, data || [])
+      }
+    } catch {
+      // Network error — keep cache if available
+    }
+
     setLoading(false)
   }, [user, supabase, organizationId])
 

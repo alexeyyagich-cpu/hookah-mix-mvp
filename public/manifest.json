@@ -2,7 +2,7 @@
   "id": "/dashboard",
   "name": "Hookah Torus",
   "short_name": "Torus",
-  "description": "Управление кальянной — инвентарь, миксы, заказы, статистика",
+  "description": "Hookah lounge management — inventory, mixes, orders, analytics",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
@@ -16,8 +16,8 @@
     { "src": "/images/torus-logo.png", "sizes": "1024x1024", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Калькулятор миксов", "short_name": "Миксы", "url": "/mix", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] },
-    { "name": "KDS Заказы", "short_name": "KDS", "url": "/kds", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Инвентарь", "short_name": "Склад", "url": "/inventory", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Mix Calculator", "short_name": "Mixes", "url": "/mix", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] },
+    { "name": "KDS Orders", "short_name": "KDS", "url": "/kds", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Inventory", "short_name": "Stock", "url": "/inventory", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] }
   ]
 }
