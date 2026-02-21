@@ -564,8 +564,9 @@ function MixPageInner() {
                 onClick={() => setIsGuestsDrawerOpen(true)}
                 className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
                 style={{
-                  background: "var(--color-success)",
-                  color: "white",
+                  background: "var(--color-bgHover)",
+                  border: "1px solid var(--color-border)",
+                  color: "var(--color-text)",
                 }}
               >
                 <span>👥</span>
@@ -576,7 +577,12 @@ function MixPageInner() {
             {/* Рандом */}
             <button
               onClick={() => setIsSlotMachineOpen(true)}
-              className="btn btn-neon text-sm flex items-center gap-1.5 px-2 sm:px-3"
+              className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
+              style={{
+                background: "var(--color-bgHover)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text)",
+              }}
             >
               <span>🎰</span>
               <span className="hidden md:inline">{t.mixNavRandom}</span>
