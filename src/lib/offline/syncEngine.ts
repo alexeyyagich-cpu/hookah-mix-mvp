@@ -1,5 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { getPendingMutations, updateMutationStatus, removeMutation, type SyncQueueEntry } from './db'
+import {
+  getPendingMutations,
+  updateMutationStatus,
+  updateMutationMeta,
+  removeMutation,
+  type SyncQueueEntry,
+} from './db'
 
 const MAX_RETRIES = 3
 
@@ -117,23 +123,23 @@ async function executeMutation(
 }
 
 // ---------------------------------------------------------------------------
-// Compound mutations — multi-step operations replayed as a unit
+// Compound mutations — resumable multi-step operations
+// Each step saves progress to entry.meta so retries skip completed steps.
 // ---------------------------------------------------------------------------
 
 async function executeCompoundMutation(
   supabase: SupabaseClient,
   entry: SyncQueueEntry
 ): Promise<void> {
-  const { table, meta, userId } = entry
-  const payload = resolvePayloadIds(entry.payload)
+  const { table } = entry
 
   if (table === 'sessions') {
-    await syncSessionCompound(supabase, payload, meta || {}, userId)
+    await syncSessionCompound(supabase, entry)
     return
   }
 
   if (table === 'tobacco_inventory') {
-    await syncInventoryAdjustment(supabase, meta || {}, userId)
+    await syncInventoryAdjustment(supabase, entry)
     return
   }
 
@@ -141,65 +147,114 @@ async function executeCompoundMutation(
 }
 
 /**
- * Session compound: insert session → insert session_items → deduct inventory
+ * Session compound — resumable:
+ *   Step 1: insert session (skip if meta._sessionId exists)
+ *   Step 2: insert session_items (skip if meta._itemsInserted)
+ *   Step 3: per-item inventory adjustments (skip already-done via meta._adj_N)
+ *
+ * On partial failure, progress is persisted. Retry resumes from last checkpoint.
  */
 async function syncSessionCompound(
   supabase: SupabaseClient,
-  payload: Record<string, unknown>,
-  meta: Record<string, unknown>,
-  userId: string
+  entry: SyncQueueEntry
 ): Promise<void> {
-  // 1. Insert session
-  const sessionData = { ...payload }
-  const tempSessionId = sessionData.id
-  if (typeof sessionData.id === 'string' && (sessionData.id as string).startsWith('offline-')) {
-    delete sessionData.id
-  }
+  const meta = entry.meta || {}
+  const payload = resolvePayloadIds(entry.payload)
+  const entryId = entry.id!
 
-  const { data: session, error: sessionError } = await supabase
-    .from('sessions')
-    .insert(sessionData)
-    .select()
-    .single()
-  if (sessionError) throw new Error(sessionError.message)
+  // --- Step 1: Insert session ---
+  let sessionId = meta._sessionId as string | undefined
 
-  // Track temp → real ID
-  if (tempSessionId && typeof tempSessionId === 'string' && (tempSessionId as string).startsWith('offline-')) {
-    idMap.set(tempSessionId as string, session.id)
-  }
-
-  // 2. Insert session items
-  const items = (meta.items as Record<string, unknown>[]) || []
-  if (items.length > 0) {
-    const sessionItems = items.map(item => {
-      const resolved: Record<string, unknown> = { ...item, session_id: session.id }
-      if (typeof resolved.id === 'string' && (resolved.id as string).startsWith('offline-')) {
-        delete resolved.id
-      }
-      return resolved
-    })
-
-    const { error: itemsError } = await supabase.from('session_items').insert(sessionItems)
-    if (itemsError) {
-      // Rollback session
-      await supabase.from('sessions').delete().eq('id', session.id)
-      throw new Error(itemsError.message)
+  if (!sessionId) {
+    const sessionData = { ...payload }
+    const tempSessionId = sessionData.id
+    if (typeof sessionData.id === 'string' && (sessionData.id as string).startsWith('offline-')) {
+      delete sessionData.id
     }
+
+    const { data: session, error: sessionError } = await supabase
+      .from('sessions')
+      .insert(sessionData)
+      .select()
+      .single()
+    if (sessionError) throw new Error(sessionError.message)
+
+    sessionId = session.id as string
+
+    // Track temp → real ID
+    if (tempSessionId && typeof tempSessionId === 'string' && (tempSessionId as string).startsWith('offline-')) {
+      idMap.set(tempSessionId as string, sessionId!)
+    }
+
+    // Checkpoint: session created
+    await updateMutationMeta(entryId, { _sessionId: sessionId })
   }
 
-  // 3. Inventory adjustments
-  const adjustments = (meta.inventoryAdjustments as Record<string, unknown>[]) || []
-  for (const adj of adjustments) {
-    const tobaccoInventoryId = adj.tobacco_inventory_id as string
-    if (!tobaccoInventoryId) continue
+  // --- Step 2: Insert session items ---
+  if (!meta._itemsInserted) {
+    const items = (meta.items as Record<string, unknown>[]) || []
+    if (items.length > 0) {
+      const sessionItems = items.map(item => {
+        const resolved: Record<string, unknown> = { ...item, session_id: sessionId }
+        if (typeof resolved.id === 'string' && (resolved.id as string).startsWith('offline-')) {
+          delete resolved.id
+        }
+        return resolved
+      })
 
+      const { error: itemsError } = await supabase.from('session_items').insert(sessionItems)
+      if (itemsError) throw new Error(itemsError.message)
+    }
+
+    // Checkpoint: items inserted
+    await updateMutationMeta(entryId, { _itemsInserted: true })
+  }
+
+  // --- Step 3: Inventory adjustments (per-item checkpoint) ---
+  const adjustments = (meta.inventoryAdjustments as Record<string, unknown>[]) || []
+  for (let i = 0; i < adjustments.length; i++) {
+    const adjKey = `_adj_${i}`
+    if (meta[adjKey]) continue // already processed
+
+    const adj = adjustments[i]
+    const tobaccoInventoryId = adj.tobacco_inventory_id as string
+    if (!tobaccoInventoryId) {
+      await updateMutationMeta(entryId, { [adjKey]: true })
+      continue
+    }
+
+    // Transaction-first: insert transaction, then recalculate grams
+    // Idempotency: check if this session's deduction already exists
+    const { data: existingTx } = await supabase
+      .from('inventory_transactions')
+      .select('id')
+      .eq('tobacco_inventory_id', tobaccoInventoryId)
+      .eq('session_id', sessionId!)
+      .eq('type', 'session')
+      .limit(1)
+
+    if (!existingTx?.length) {
+      // Insert transaction first (source of truth)
+      const { error: txError } = await supabase.from('inventory_transactions').insert({
+        profile_id: entry.userId,
+        tobacco_inventory_id: tobaccoInventoryId,
+        type: 'session',
+        quantity_grams: -(adj.grams_used as number),
+        session_id: sessionId,
+        notes: `Session: ${adj.brand} ${adj.flavor}`,
+        ...(adj.organizationId ? { organization_id: adj.organizationId, location_id: adj.locationId } : {}),
+      })
+      if (txError) throw new Error(txError.message)
+    }
+
+    // Recalculate grams from current value + delta (safe even on retry)
     const { data: inv } = await supabase
       .from('tobacco_inventory')
       .select('quantity_grams')
       .eq('id', tobaccoInventoryId)
       .single()
 
-    if (inv) {
+    if (inv && !existingTx?.length) {
       await supabase
         .from('tobacco_inventory')
         .update({
@@ -207,57 +262,77 @@ async function syncSessionCompound(
           updated_at: new Date().toISOString(),
         })
         .eq('id', tobaccoInventoryId)
-
-      await supabase.from('inventory_transactions').insert({
-        profile_id: userId,
-        tobacco_inventory_id: tobaccoInventoryId,
-        type: 'session',
-        quantity_grams: -(adj.grams_used as number),
-        session_id: session.id,
-        notes: `Session: ${adj.brand} ${adj.flavor}`,
-        ...(adj.organizationId ? { organization_id: adj.organizationId, location_id: adj.locationId } : {}),
-      })
     }
+
+    // Checkpoint: this adjustment done
+    await updateMutationMeta(entryId, { [adjKey]: true })
   }
 }
 
 /**
- * Inventory adjustment compound: read current → apply delta → insert transaction
+ * Inventory adjustment compound — transaction-first with idempotency:
+ *   1. Check if transaction with same idempotencyKey already exists
+ *   2. Insert transaction (source of truth)
+ *   3. Recalculate grams from current value + delta
  */
 async function syncInventoryAdjustment(
   supabase: SupabaseClient,
-  meta: Record<string, unknown>,
-  userId: string
+  entry: SyncQueueEntry
 ): Promise<void> {
+  const meta = entry.meta || {}
   const inventoryId = meta.inventoryId as string
   const delta = meta.delta as number
   const transactionData = meta.transactionData as Record<string, unknown>
   const orgId = meta.organizationId as string | undefined
+  const idempotencyKey = entry.idempotencyKey || ''
 
-  const { data: inv } = await supabase
-    .from('tobacco_inventory')
-    .select('quantity_grams')
-    .eq('id', inventoryId)
-    .single()
+  // Step 1: Check for existing transaction (idempotency via notes suffix)
+  const idempotencyTag = `[idem:${idempotencyKey}]`
+  let alreadyProcessed = false
 
-  if (!inv) throw new Error('Inventory item not found')
+  if (idempotencyKey) {
+    const { data: existing } = await supabase
+      .from('inventory_transactions')
+      .select('id')
+      .eq('tobacco_inventory_id', inventoryId)
+      .like('notes', `%${idempotencyTag}%`)
+      .limit(1)
 
-  const newQuantity = Math.max(0, inv.quantity_grams + delta)
-  const { error: updateError } = await supabase
-    .from('tobacco_inventory')
-    .update({ quantity_grams: newQuantity, updated_at: new Date().toISOString() })
-    .eq('id', inventoryId)
-    .eq(
-      orgId ? 'organization_id' : 'profile_id',
-      orgId || userId,
-    )
+    alreadyProcessed = !!(existing?.length)
+  }
 
-  if (updateError) throw new Error(updateError.message)
+  if (!alreadyProcessed && transactionData) {
+    // Step 2: Insert transaction first (source of truth)
+    const txNotes = transactionData.notes
+      ? `${transactionData.notes} ${idempotencyTag}`
+      : idempotencyTag
 
-  if (transactionData) {
-    await supabase.from('inventory_transactions').insert({
+    const { error: txError } = await supabase.from('inventory_transactions').insert({
       ...transactionData,
-      profile_id: userId,
+      profile_id: entry.userId,
+      notes: txNotes,
     })
+    if (txError) throw new Error(txError.message)
+
+    // Step 3: Update grams (only if transaction was newly inserted)
+    const { data: inv } = await supabase
+      .from('tobacco_inventory')
+      .select('quantity_grams')
+      .eq('id', inventoryId)
+      .single()
+
+    if (inv) {
+      const newQuantity = Math.max(0, inv.quantity_grams + delta)
+      const { error: updateError } = await supabase
+        .from('tobacco_inventory')
+        .update({ quantity_grams: newQuantity, updated_at: new Date().toISOString() })
+        .eq('id', inventoryId)
+        .eq(
+          orgId ? 'organization_id' : 'profile_id',
+          orgId || entry.userId,
+        )
+
+      if (updateError) throw new Error(updateError.message)
+    }
   }
 }

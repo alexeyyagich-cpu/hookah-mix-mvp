@@ -168,3 +168,35 @@ export async function clearSyncQueue(): Promise<void> {
     // ignore
   }
 }
+
+// --- Failed mutation recovery ---
+
+export async function getFailedMutations(): Promise<SyncQueueEntry[]> {
+  try {
+    const db = await getDb()
+    return db.getAllFromIndex('syncQueue', 'byStatus', 'failed')
+  } catch {
+    return []
+  }
+}
+
+export async function retryFailedMutation(id: number): Promise<void> {
+  const db = await getDb()
+  const entry = await db.get('syncQueue', id)
+  if (!entry || entry.status !== 'failed') return
+  entry.status = 'pending'
+  entry.retryCount = 0
+  entry.error = null
+  await db.put('syncQueue', entry)
+}
+
+export async function updateMutationMeta(
+  id: number,
+  metaPatch: Record<string, unknown>
+): Promise<void> {
+  const db = await getDb()
+  const entry = await db.get('syncQueue', id)
+  if (!entry) return
+  entry.meta = { ...(entry.meta || {}), ...metaPatch }
+  await db.put('syncQueue', entry)
+}
