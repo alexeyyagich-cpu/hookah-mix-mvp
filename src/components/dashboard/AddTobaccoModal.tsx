@@ -28,6 +28,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showCatalog, setShowCatalog] = useState(true)
+  const [brandFilter, setBrandFilter] = useState<string | null>(null)
 
   const isEditing = !!editingItem
 
@@ -72,13 +73,18 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     setPackageGrams('100')
     setNotes('')
     setSearchQuery('')
+    setBrandFilter(null)
     setShowCatalog(true)
   }
 
-  const filteredTobaccos = TOBACCOS.filter(t =>
-    t.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.flavor.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredTobaccos = TOBACCOS.filter(t => {
+    if (brandFilter && t.brand !== brandFilter) return false
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      return t.brand.toLowerCase().includes(q) || t.flavor.toLowerCase().includes(q)
+    }
+    return true
+  })
 
   const brands = Array.from(new Set(TOBACCOS.map(t => t.brand)))
 
@@ -160,8 +166,38 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                     />
                   </div>
 
-                  <div className="max-h-60 overflow-y-auto space-y-2">
-                    {filteredTobaccos.slice(0, 20).map((tobacco) => (
+                  {/* Brand filter pills */}
+                  <div className="flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setBrandFilter(null)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        brandFilter === null
+                          ? 'bg-[var(--color-primary)] text-white'
+                          : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                      }`}
+                    >
+                      {t.allBrands}
+                    </button>
+                    {brands.map(b => (
+                      <button
+                        key={b}
+                        type="button"
+                        onClick={() => setBrandFilter(prev => prev === b ? null : b)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          brandFilter === b
+                            ? 'bg-[var(--color-primary)] text-white'
+                            : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                        }`}
+                      >
+                        {b}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Tobacco list */}
+                  <div className="max-h-60 overflow-y-auto space-y-1.5">
+                    {filteredTobaccos.slice(0, brandFilter ? 50 : 30).map((tobacco) => (
                       <button
                         key={tobacco.id}
                         type="button"
@@ -172,12 +208,17 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                           className="w-4 h-4 rounded-full flex-shrink-0"
                           style={{ backgroundColor: tobacco.color }}
                         />
-                        <div>
-                          <div className="font-medium">{tobacco.flavor}</div>
-                          <div className="text-xs text-[var(--color-textMuted)]">{tobacco.brand}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm">{tobacco.flavor}</div>
+                          {!brandFilter && <div className="text-xs text-[var(--color-textMuted)]">{tobacco.brand}</div>}
                         </div>
                       </button>
                     ))}
+                    {filteredTobaccos.length === 0 && (
+                      <div className="text-center py-4 text-sm text-[var(--color-textMuted)]">
+                        {t.noResults}
+                      </div>
+                    )}
                   </div>
 
                   <div className="text-center">
