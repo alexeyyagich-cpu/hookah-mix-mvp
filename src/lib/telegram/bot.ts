@@ -1,7 +1,7 @@
 // Telegram Bot Client
 
 import { createHmac } from 'crypto'
-import type { TelegramNotification } from './types'
+import type { TelegramNotification, InlineKeyboardMarkup, InlineKeyboardButton } from './types'
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TELEGRAM_WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET
@@ -103,7 +103,7 @@ export async function sendMessage(
   text: string,
   options: {
     parseMode?: 'HTML' | 'Markdown' | 'MarkdownV2'
-    replyMarkup?: unknown
+    replyMarkup?: InlineKeyboardMarkup
   } = {}
 ) {
   return callTelegramApi<{ message_id: number }>('sendMessage', {
@@ -112,6 +112,53 @@ export async function sendMessage(
     parse_mode: options.parseMode,
     reply_markup: options.replyMarkup,
   })
+}
+
+export async function editMessageText(
+  chatId: number,
+  messageId: number,
+  text: string,
+  options: {
+    parseMode?: 'HTML' | 'Markdown' | 'MarkdownV2'
+    replyMarkup?: InlineKeyboardMarkup
+  } = {}
+) {
+  return callTelegramApi<{ message_id: number }>('editMessageText', {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: options.parseMode,
+    reply_markup: options.replyMarkup,
+  })
+}
+
+export async function answerCallbackQuery(
+  callbackQueryId: string,
+  text?: string,
+  showAlert = false
+) {
+  return callTelegramApi<boolean>('answerCallbackQuery', {
+    callback_query_id: callbackQueryId,
+    text,
+    show_alert: showAlert,
+  })
+}
+
+export async function setMyCommands(commands: { command: string; description: string }[]) {
+  return callTelegramApi<boolean>('setMyCommands', { commands })
+}
+
+// Helper to build inline keyboards concisely
+export function kbd(...rows: InlineKeyboardButton[][]): InlineKeyboardMarkup {
+  return { inline_keyboard: rows }
+}
+
+export function btn(text: string, callbackData: string): InlineKeyboardButton {
+  return { text, callback_data: callbackData }
+}
+
+export function urlBtn(text: string, url: string): InlineKeyboardButton {
+  return { text, url }
 }
 
 export async function sendNotification(notification: TelegramNotification) {

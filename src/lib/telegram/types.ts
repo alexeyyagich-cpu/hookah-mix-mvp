@@ -26,18 +26,17 @@ export interface TelegramMessage {
   text?: string
 }
 
-export interface TelegramUpdate {
-  update_id: number
-  message?: TelegramMessage
-  callback_query?: {
-    id: string
-    from: TelegramUser
-    message?: TelegramMessage
-    data?: string
-  }
+export interface InlineKeyboardButton {
+  text: string
+  callback_data?: string
+  url?: string
 }
 
-export interface TelegramWebhookPayload {
+export interface InlineKeyboardMarkup {
+  inline_keyboard: InlineKeyboardButton[][]
+}
+
+export interface TelegramUpdate {
   update_id: number
   message?: TelegramMessage
   callback_query?: {
