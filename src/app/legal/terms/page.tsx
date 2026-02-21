@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import TermsContent from './TermsContent'
 
 export const metadata: Metadata = {
-  title: 'Условия использования — Hookah Torus',
+  title: 'Terms of Service — Hookah Torus',
 }
 
 export default function TermsPage() {
