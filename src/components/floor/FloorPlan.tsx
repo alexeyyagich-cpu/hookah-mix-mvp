@@ -247,6 +247,7 @@ export function FloorPlan({
                 background: `color-mix(in srgb, ${colors.bg} 85%, transparent)`,
                 border: `2px solid ${colors.border}`,
                 borderRadius: table.shape === 'circle' ? '50%' : '12px',
+                transition: draggedTable === table.id ? 'none' : undefined,
               }}
             >
               <span

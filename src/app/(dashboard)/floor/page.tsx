@@ -322,26 +322,11 @@ export default function FloorPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">{tm.floorTitle}</h1>
-          <p className="text-[var(--color-textMuted)]">
-            {tm.floorAvailableOfTotal(stats.available, stats.total)}
-          </p>
-        </div>
-        <button
-          onClick={() => setIsEditMode(!isEditMode)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            isEditMode ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''
-          }`}
-          style={{
-            background: isEditMode ? 'var(--color-primary)' : 'var(--color-bgHover)',
-            color: isEditMode ? 'var(--color-bg)' : 'var(--color-text)',
-          }}
-        >
-          <IconSettings size={18} />
-          {isEditMode ? tm.ready : tc.edit}
-        </button>
+      <div>
+        <h1 className="text-2xl font-bold">{tm.floorTitle}</h1>
+        <p className="text-[var(--color-textMuted)]">
+          {tm.floorAvailableOfTotal(stats.available, stats.total)}
+        </p>
       </div>
 
       {/* Stats Cards */}
@@ -411,6 +396,21 @@ export default function FloorPage() {
       </div>
 
       {/* Floor Plan */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => setIsEditMode(!isEditMode)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            isEditMode ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''
+          }`}
+          style={{
+            background: isEditMode ? 'var(--color-primary)' : 'var(--color-bgHover)',
+            color: isEditMode ? 'var(--color-bg)' : 'var(--color-text)',
+          }}
+        >
+          <IconSettings size={18} />
+          {isEditMode ? tm.ready : tc.edit}
+        </button>
+      </div>
       <div className="card p-6">
         <FloorPlan
           tables={tables}
