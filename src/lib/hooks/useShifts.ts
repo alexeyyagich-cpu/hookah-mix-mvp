@@ -155,12 +155,9 @@ export function useShifts(): UseShiftsReturn {
   const { inventory: tobaccoInventory } = useInventory()
   const { members: teamMembers } = useTeam()
 
-  // Effective profile ID: staff uses owner's ID
+  // Effective profile ID: staff uses owner's ID (legacy fallback)
   const effectiveProfileId = useMemo(() => {
-    if (profile?.role === 'staff' && profile.owner_profile_id) {
-      return profile.owner_profile_id
-    }
-    return user?.id || null
+    return profile?.owner_profile_id || user?.id || null
   }, [user, profile])
 
   // Demo mode

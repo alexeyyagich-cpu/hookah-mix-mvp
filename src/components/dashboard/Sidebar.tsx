@@ -61,7 +61,7 @@ export function Sidebar() {
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
-  const { orgRole, hasPermission, isOwner, isStaff } = useRole(contextOrgRole)
+  const { orgRole, hasPermission, isOwner } = useRole(contextOrgRole)
   const { modules } = useModules()
 
   const navigationGroups: NavGroup[] = [
@@ -133,7 +133,7 @@ export function Sidebar() {
         if (item.module && !modules.includes(item.module)) return false
         if (item.ownerOnly && !isOwner) return false
         if (item.href === '/settings/team' && !isOwner) return false
-        if (item.href === '/settings' && isStaff) return false
+        if (item.href === '/settings' && !hasPermission('settings.view')) return false
         return true
       }),
     }))

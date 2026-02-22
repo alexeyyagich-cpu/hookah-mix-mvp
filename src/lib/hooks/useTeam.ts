@@ -106,10 +106,6 @@ export interface UseTeamReturn {
   cancelInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string }>
   resendInvitation: (invitationId: string) => Promise<{ success: boolean; error?: string }>
   refresh: () => Promise<void>
-  // Legacy compat aliases
-  staff: OrgMember[]
-  inviteStaff: (email: string) => Promise<{ success: boolean; error?: string }>
-  removeStaff: (staffId: string) => Promise<{ success: boolean; error?: string }>
 }
 
 export function useTeam(): UseTeamReturn {
@@ -406,9 +402,5 @@ export function useTeam(): UseTeamReturn {
     cancelInvitation,
     resendInvitation,
     refresh: loadTeam,
-    // Legacy compat aliases
-    staff: members,
-    inviteStaff: (email: string) => inviteMember(email, 'hookah_master'),
-    removeStaff: removeMember,
   }
 }

@@ -1,9 +1,6 @@
 export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
 
-// User roles for access control (legacy — kept for backward compat)
-export type UserRole = 'owner' | 'staff' | 'guest'
-
-// Organization roles (new multi-tenant system)
+// Organization roles (multi-tenant system)
 export type OrgRole = 'owner' | 'manager' | 'hookah_master' | 'bartender' | 'cook'
 
 // Module system - switchable feature areas
@@ -23,7 +20,7 @@ export interface Profile {
   logo_url: string | null
   subscription_tier: SubscriptionTier
   subscription_expires_at: string | null
-  role: UserRole
+  role: string
   // For staff: reference to the owner's profile they belong to
   owner_profile_id: string | null
   // For guests: venue slug they registered through
@@ -41,18 +38,6 @@ export interface Profile {
   active_modules: AppModule[]
   // UI locale preference
   locale: string | null
-  created_at: string
-}
-
-// Staff invitation for team management (legacy — kept for backward compat)
-export interface StaffInvitation {
-  id: string
-  owner_profile_id: string
-  email: string
-  token: string
-  role: 'staff'
-  expires_at: string
-  accepted_at: string | null
   created_at: string
 }
 

@@ -165,12 +165,9 @@ export function useKDS(): UseKDSReturn {
   const lastNewCountRef = useRef(0)
   const audioUnlockedRef = useRef(false)
 
-  // Effective profile ID: staff uses owner's ID for venue grouping
+  // Effective profile ID: staff uses owner's ID for venue grouping (legacy fallback)
   const effectiveProfileId = useMemo(() => {
-    if (profile?.role === 'staff' && profile.owner_profile_id) {
-      return profile.owner_profile_id
-    }
-    return user?.id || null
+    return profile?.owner_profile_id || user?.id || null
   }, [user, profile])
 
   const playBeep = useCallback(() => {
