@@ -51,6 +51,14 @@ export async function enqueueOfflineMutation<T>({
   // Notify OnlineStatusProvider to refresh pending count
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('offline-mutation-enqueued'))
+
+    // Register background sync tag (Chrome/Edge; no-op on Safari)
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then((reg) => {
+        // @ts-expect-error -- SyncManager not in all TS lib types
+        reg.sync?.register('sync-mutations').catch(() => {})
+      })
+    }
   }
 
   return id

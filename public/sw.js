@@ -1,17 +1,21 @@
 // Service Worker for Push Notifications + PWA Offline Caching
-const CACHE_NAME = 'hookah-torus-v13'
+const CACHE_NAME = 'hookah-torus-v14'
 
-// App shell URLs to precache
-const APP_SHELL_URLS = [
+// Critical routes — SW install MUST succeed for these
+const CRITICAL_URLS = [
   '/dashboard',
   '/mix',
+  '/offline',
   '/inventory',
-  '/bowls',
   '/sessions',
   '/kds',
-  '/statistics',
-  '/offline',
   '/settings',
+]
+
+// Non-critical routes — precache attempt, but OK to fail individually
+const NON_CRITICAL_URLS = [
+  '/bowls',
+  '/statistics',
   '/bar/inventory',
   '/bar/recipes',
   '/bar/sales',
@@ -27,34 +31,63 @@ const APP_SHELL_URLS = [
   '/marketplace',
 ]
 
-// Install event — precache app shell
+// Install event — precache app shell (critical fail-hard, non-critical fail-soft)
 self.addEventListener('install', (event) => {
-  console.log('Service Worker installed')
+  console.log('[SW] Installing', CACHE_NAME)
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(APP_SHELL_URLS)
-    }).catch((err) => {
-      console.log('Precache failed (non-critical):', err)
+    caches.open(CACHE_NAME).then(async (cache) => {
+      // Critical routes MUST succeed — reject install if they fail
+      await cache.addAll(CRITICAL_URLS)
+      console.log('[SW] Critical routes cached:', CRITICAL_URLS.length)
+
+      // Non-critical routes — best-effort, each individually
+      const results = await Promise.allSettled(
+        NON_CRITICAL_URLS.map((url) =>
+          cache.add(url).catch((err) => {
+            console.warn('[SW] Non-critical precache skipped:', url, err.message)
+          })
+        )
+      )
+      const cached = results.filter((r) => r.status === 'fulfilled').length
+      console.log(`[SW] Non-critical routes cached: ${cached}/${NON_CRITICAL_URLS.length}`)
     })
+    // No outer .catch() — if critical routes fail, install rejects and old SW stays active
   )
   // Do NOT call self.skipWaiting() here — controlled via SKIP_WAITING message
 })
 
-// Activate event — clean up old caches
+// Activate event — clean up old caches + verify critical routes
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker activated')
+  console.log('[SW] Activating', CACHE_NAME)
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    caches.keys().then(async (cacheNames) => {
+      // Delete old caches
+      await Promise.all(
         cacheNames
           .filter((name) => name !== CACHE_NAME)
           .map((name) => caches.delete(name))
       )
-    }).then(() => clients.claim())
+
+      // Health check: verify critical routes are cached
+      const cache = await caches.open(CACHE_NAME)
+      for (const url of CRITICAL_URLS) {
+        const cached = await cache.match(url)
+        if (!cached) {
+          console.warn('[SW] Health check: re-caching missing critical route:', url)
+          try {
+            await cache.add(url)
+          } catch (err) {
+            console.error('[SW] Health check failed for', url, err)
+          }
+        }
+      }
+
+      return clients.claim()
+    })
   )
 })
 
-// Handle SKIP_WAITING message from client
+// Handle messages from client
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
@@ -120,7 +153,7 @@ self.addEventListener('fetch', (event) => {
 
 // Push event - handle incoming push notifications
 self.addEventListener('push', (event) => {
-  console.log('Push received:', event)
+  console.log('[SW] Push received')
 
   let data = {
     title: 'Hookah Torus',
@@ -157,7 +190,6 @@ self.addEventListener('push', (event) => {
 
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event)
   event.notification.close()
 
   const urlToOpen = event.notification.data?.url || '/dashboard'
@@ -165,14 +197,12 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((windowClients) => {
-        // Check if there's already a window open
         for (const client of windowClients) {
           if (client.url.includes(self.location.origin) && 'focus' in client) {
             client.navigate(urlToOpen)
             return client.focus()
           }
         }
-        // Open new window if none found
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen)
         }
@@ -182,5 +212,20 @@ self.addEventListener('notificationclick', (event) => {
 
 // Handle notification close
 self.addEventListener('notificationclose', (event) => {
-  console.log('Notification closed:', event)
+  console.log('[SW] Notification closed')
+})
+
+// Background Sync — triggered by OS when connectivity is restored
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-mutations') {
+    console.log('[SW] Background sync triggered: sync-mutations')
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((windowClients) => {
+          if (windowClients.length > 0) {
+            windowClients[0].postMessage({ type: 'TRIGGER_SYNC' })
+          }
+        })
+    )
+  }
 })

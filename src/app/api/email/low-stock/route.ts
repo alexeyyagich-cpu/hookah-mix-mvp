@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { sendEmail, generateLowStockEmailHtml, isEmailConfigured } from '@/lib/email/resend'
+import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -98,6 +99,27 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 })
+    }
+
+    // Also send push notification (best-effort)
+    if (isPushConfigured) {
+      try {
+        const count = items.length
+        const pushBody = items
+          .slice(0, 3)
+          .map((i: { brand: string; flavor: string; quantity: number }) => `${i.brand} ${i.flavor}: ${i.quantity}g`)
+          .join('\n') + (count > 3 ? `\n...and ${count - 3} more` : '')
+
+        await sendPushToUser(profileId, {
+          title: `Low stock: ${count} ${count === 1 ? 'item' : 'items'}`,
+          body: pushBody,
+          tag: 'low-stock',
+          url: '/inventory',
+          requireInteraction: true,
+        })
+      } catch (pushError) {
+        console.error('Push notification failed:', pushError)
+      }
     }
 
     return NextResponse.json({ success: true })

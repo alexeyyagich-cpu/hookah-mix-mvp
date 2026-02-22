@@ -19,5 +19,28 @@
     { "name": "Mix Calculator", "short_name": "Mixes", "url": "/mix", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] },
     { "name": "KDS Orders", "short_name": "KDS", "url": "/kds", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] },
     { "name": "Inventory", "short_name": "Stock", "url": "/inventory", "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard-narrow.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dashboard — inventory overview, sessions, low stock alerts"
+    },
+    {
+      "src": "/screenshots/mix-narrow.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mix Calculator — create and save custom tobacco mixes"
+    },
+    {
+      "src": "/screenshots/dashboard-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard — full analytics and management view"
+    }
   ]
 }

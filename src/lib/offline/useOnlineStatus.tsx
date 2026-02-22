@@ -86,6 +86,20 @@ export function OnlineStatusProvider({ children }: { children: React.ReactNode }
     }
   }, [isOnline, triggerSync])
 
+  // Listen for Background Sync trigger from SW
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'TRIGGER_SYNC') {
+        triggerSync()
+      }
+    }
+
+    navigator.serviceWorker.addEventListener('message', handleMessage)
+    return () => navigator.serviceWorker.removeEventListener('message', handleMessage)
+  }, [triggerSync])
+
   // Periodic sync while online (every 30s)
   useEffect(() => {
     if (!isOnline) return
