@@ -262,4 +262,146 @@ test.describe('Floor Plan — Demo Mode', () => {
     await dismissOverlays(page)
     await page.screenshot({ path: 'test-results/floor-plan-final.png', fullPage: true })
   })
+
+  test('9. Edit button is above the floor plan canvas', async () => {
+    await page.goto(`${BASE_URL}/floor`)
+    await page.waitForLoadState('networkidle')
+    await dismissOverlays(page)
+
+    // Edit button should exist and be visible
+    const editBtn = page.locator('button').filter({ hasText: /edit/i }).first()
+    await expect(editBtn).toBeVisible()
+
+    // Floor plan canvas (the container with 400px height)
+    const canvas = page.locator('.relative.rounded-2xl.border-2.border-dashed')
+    await expect(canvas).toBeVisible()
+
+    // Edit button should be vertically above the canvas
+    const editBox = await editBtn.boundingBox()
+    const canvasBox = await canvas.boundingBox()
+    expect(editBox).toBeTruthy()
+    expect(canvasBox).toBeTruthy()
+    expect(editBox!.y + editBox!.height).toBeLessThanOrEqual(canvasBox!.y + 50) // small tolerance for card padding
+
+    // Click edit — text should change to "Done"/"Ready"
+    await editBtn.click()
+    await page.waitForTimeout(300)
+    const readyBtn = page.locator('button').filter({ hasText: /ready|done|готово/i }).first()
+    await expect(readyBtn).toBeVisible()
+
+    // Click again — should toggle back to "Edit"
+    await readyBtn.click()
+    await page.waitForTimeout(300)
+    const editBtnBack = page.locator('button').filter({ hasText: /edit/i }).first()
+    await expect(editBtnBack).toBeVisible()
+  })
+
+  test('10. Transition is disabled during drag', async () => {
+    await page.goto(`${BASE_URL}/floor`)
+    await page.waitForLoadState('networkidle')
+    await dismissOverlays(page)
+
+    // Enter edit mode
+    const editBtn = page.locator('button').filter({ hasText: /edit/i }).first()
+    await editBtn.click()
+    await page.waitForTimeout(500)
+
+    const table1 = page.locator('[id="table-1"]')
+    const box = await table1.boundingBox()
+    expect(box).toBeTruthy()
+
+    const startX = box!.x + box!.width / 2
+    const startY = box!.y + box!.height / 2
+
+    // Start drag
+    await page.mouse.move(startX, startY)
+    await page.mouse.down()
+    await page.mouse.move(startX + 30, startY + 20, { steps: 5 })
+
+    // During drag: transition should be 'none'
+    const transitionDuring = await table1.evaluate(el => el.style.transition)
+    expect(transitionDuring).toBe('none')
+
+    // Release
+    await page.mouse.up()
+    await page.waitForTimeout(500)
+
+    // After drag: transition inline style should be removed
+    const transitionAfter = await table1.evaluate(el => el.style.transition)
+    expect(transitionAfter).toBe('')
+  })
+
+  test('11. Modal is rendered as portal (direct child of body)', async () => {
+    await page.goto(`${BASE_URL}/floor`)
+    await page.waitForLoadState('networkidle')
+    await dismissOverlays(page)
+
+    // Enter edit mode
+    const editBtn = page.locator('button').filter({ hasText: /edit/i }).first()
+    await editBtn.click()
+    await page.waitForTimeout(500)
+
+    // Click Table 2 to open edit modal
+    await page.locator('[id="table-2"]').click()
+    await page.waitForTimeout(500)
+
+    // Modal should be visible
+    const modal = page.locator('.fixed.inset-0.z-50')
+    await expect(modal).toBeVisible()
+
+    // Modal should be a direct child of document.body (portal)
+    const isDirectChildOfBody = await page.evaluate(() => {
+      const modal = document.querySelector('.fixed.inset-0.z-50')
+      return modal?.parentElement === document.body
+    })
+    expect(isDirectChildOfBody).toBe(true)
+  })
+
+  test('12. Drag clamping — table stays within canvas bounds', async () => {
+    await page.goto(`${BASE_URL}/floor`)
+    await page.waitForLoadState('networkidle')
+    await dismissOverlays(page)
+
+    // Enter edit mode
+    const editBtn = page.locator('button').filter({ hasText: /edit/i }).first()
+    await editBtn.click()
+    await page.waitForTimeout(500)
+
+    // Get canvas dimensions
+    const canvas = page.locator('.relative.rounded-2xl.border-2.border-dashed')
+    const canvasBox = await canvas.boundingBox()
+    expect(canvasBox).toBeTruthy()
+
+    // Get Table 2 position
+    const table2 = page.locator('[id="table-2"]')
+    const tableBox = await table2.boundingBox()
+    expect(tableBox).toBeTruthy()
+
+    const startX = tableBox!.x + tableBox!.width / 2
+    const startY = tableBox!.y + tableBox!.height / 2
+
+    // Drag far beyond canvas bounds (500px right, 500px down)
+    await page.mouse.move(startX, startY)
+    await page.mouse.down()
+    for (let i = 1; i <= 20; i++) {
+      await page.mouse.move(startX + i * 25, startY + i * 25, { steps: 2 })
+    }
+    await page.mouse.up()
+    await page.waitForTimeout(1000)
+
+    // Get final position from inline style
+    const finalLeft = await table2.evaluate(el => parseInt(el.style.left))
+    const finalTop = await table2.evaluate(el => parseInt(el.style.top))
+
+    // Canvas internal dimensions (canvas width/height minus 60px margin)
+    const canvasWidth = await canvas.evaluate(el => el.clientWidth)
+    const canvasHeight = await canvas.evaluate(el => el.clientHeight)
+
+    expect(finalLeft).toBeLessThanOrEqual(canvasWidth - 60)
+    expect(finalTop).toBeLessThanOrEqual(canvasHeight - 60)
+    expect(finalLeft).toBeGreaterThanOrEqual(0)
+    expect(finalTop).toBeGreaterThanOrEqual(0)
+
+    await page.screenshot({ path: 'test-results/floor-drag-clamped.png', fullPage: false })
+  })
 })
