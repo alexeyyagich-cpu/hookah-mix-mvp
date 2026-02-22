@@ -49,6 +49,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    // Managers cannot invite owners (privilege escalation prevention)
+    if (membership.role === 'manager' && role === 'owner') {
+      return NextResponse.json({ error: 'Managers cannot invite owners' }, { status: 403 })
+    }
+
     // Load org name and invite token
     const { data: org } = await supabase
       .from('organizations')
@@ -71,7 +76,11 @@ export async function POST(req: NextRequest) {
     }
 
     const joinUrl = `${baseUrl}/join/${invite.token}`
-    const orgName = org?.name || 'a venue'
+    const rawOrgName = org?.name || 'a venue'
+
+    // HTML-escape user-controlled strings to prevent injection in email
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    const orgName = esc(rawOrgName)
 
     // Send email via Resend
     if (resendApiKey) {
@@ -81,8 +90,9 @@ export async function POST(req: NextRequest) {
         bartender: 'Bartender',
         cook: 'Cook',
       }
+      const safeRoleLabel = esc(roleLabels[role] || role)
 
-      await fetch('https://api.resend.com/emails', {
+      const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -91,11 +101,11 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           from: 'Hookah Torus <noreply@hookahtorus.com>',
           to: email,
-          subject: `You're invited to join ${orgName} on Hookah Torus`,
+          subject: `You're invited to join ${rawOrgName} on Hookah Torus`,
           html: `
             <div style="font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
               <h2>You've been invited!</h2>
-              <p><strong>${orgName}</strong> has invited you to join their team as <strong>${roleLabels[role] || role}</strong>.</p>
+              <p><strong>${orgName}</strong> has invited you to join their team as <strong>${safeRoleLabel}</strong>.</p>
               <p style="margin: 24px 0;">
                 <a href="${joinUrl}" style="display: inline-block; padding: 12px 24px; background: #6366f1; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
                   Accept Invitation
@@ -108,6 +118,11 @@ export async function POST(req: NextRequest) {
           `,
         }),
       })
+
+      if (!res.ok) {
+        console.error('Resend API error:', res.status, await res.text().catch(() => ''))
+        return NextResponse.json({ error: 'Failed to send email' }, { status: 502 })
+      }
     }
 
     return NextResponse.json({ success: true })

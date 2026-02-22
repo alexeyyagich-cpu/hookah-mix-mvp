@@ -46,10 +46,31 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
   }
 
+  if (items.length > 50) {
+    return NextResponse.json({ error: 'Too many items (max 50)' }, { status: 400 })
+  }
+
+  // Validate and sanitize string lengths
+  if (guest_name && String(guest_name).length > 100) {
+    return NextResponse.json({ error: 'Guest name too long (max 100)' }, { status: 400 })
+  }
+  if (notes && String(notes).length > 500) {
+    return NextResponse.json({ error: 'Notes too long (max 500)' }, { status: 400 })
+  }
+
   // Validate items
   for (const item of items) {
     if (!item.name || typeof item.quantity !== 'number' || item.quantity < 1) {
       return NextResponse.json({ error: 'Invalid item: name and quantity required' }, { status: 400 })
+    }
+    if (item.quantity > 100) {
+      return NextResponse.json({ error: 'Item quantity too large (max 100)' }, { status: 400 })
+    }
+    if (String(item.name).length > 200) {
+      return NextResponse.json({ error: 'Item name too long (max 200)' }, { status: 400 })
+    }
+    if (item.details && String(item.details).length > 500) {
+      return NextResponse.json({ error: 'Item details too long (max 500)' }, { status: 400 })
     }
   }
 

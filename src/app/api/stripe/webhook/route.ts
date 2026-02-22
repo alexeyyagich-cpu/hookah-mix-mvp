@@ -59,13 +59,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify webhook signature
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+    if (!webhookSecret) {
+      console.error('STRIPE_WEBHOOK_SECRET is not configured')
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 500 }
+      )
+    }
+
     let event: Stripe.Event
 
     try {
       event = stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET!
+        webhookSecret
       )
     } catch (err) {
       console.error('Webhook signature verification failed:', err)
@@ -262,25 +271,11 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  // Mark subscription as expired when payment fails
+  // Log payment failure — do NOT immediately downgrade.
+  // Stripe retries failed payments multiple times over days.
+  // Actual downgrade happens via handleSubscriptionUpdate when the
+  // subscription status transitions to past_due/unpaid/canceled.
   const invoiceAny = invoice as unknown as Record<string, unknown>
   const customerId = (invoiceAny.customer || invoiceAny.customer_id) as string
-  if (!customerId) return
-
-  const supabase = getSupabaseAdmin()
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('stripe_customer_id', customerId)
-    .single()
-
-  if (profile) {
-    await supabase
-      .from('profiles')
-      .update({
-        subscription_tier: 'free',
-        subscription_expires_at: null,
-      })
-      .eq('id', profile.id)
-  }
+  console.warn('Payment failed for customer:', customerId, 'invoice:', invoice.id)
 }

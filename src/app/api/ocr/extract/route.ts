@@ -36,6 +36,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 })
     }
 
+    // Reject files larger than 10 MB
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Image too large (max 10 MB)' }, { status: 400 })
+    }
+
     // Convert to base64
     const buffer = await file.arrayBuffer()
     const base64 = Buffer.from(buffer).toString('base64')

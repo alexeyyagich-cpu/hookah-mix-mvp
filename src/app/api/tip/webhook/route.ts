@@ -94,16 +94,36 @@ export async function POST(request: NextRequest) {
       }
 
       const supabase = getSupabaseAdmin()
+      const paymentIntentId = session.payment_intent as string
 
-      await supabase.from('tips').insert({
+      // Idempotency: skip if this payment intent was already recorded
+      if (paymentIntentId) {
+        const { data: existing } = await supabase
+          .from('tips')
+          .select('id')
+          .eq('stripe_payment_intent_id', paymentIntentId)
+          .limit(1)
+          .maybeSingle()
+
+        if (existing) {
+          return NextResponse.json({ received: true })
+        }
+      }
+
+      const { error: insertError } = await supabase.from('tips').insert({
         staff_profile_id: staffProfileId,
         amount: amountTotal / 100,
         currency: (session.currency || 'eur').toUpperCase(),
-        stripe_payment_intent_id: session.payment_intent as string,
+        stripe_payment_intent_id: paymentIntentId,
         status: 'completed',
         payer_name: payerName,
         message,
       })
+
+      if (insertError) {
+        console.error('Failed to insert tip:', insertError)
+        return NextResponse.json({ error: 'Insert failed' }, { status: 500 })
+      }
     }
 
     return NextResponse.json({ received: true })

@@ -93,9 +93,9 @@ export async function POST(request: NextRequest) {
     if (profile?.stripe_customer_id) {
       customerId = profile.stripe_customer_id
     } else {
-      // Create new Stripe customer
+      // Create new Stripe customer (use auth email, not client-supplied)
       const customer = await stripe.customers.create({
-        email,
+        email: user.email || email,
         metadata: {
           supabase_user_id: userId,
         },
@@ -121,6 +121,9 @@ export async function POST(request: NextRequest) {
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
+      metadata: {
+        supabase_user_id: userId,
+      },
       subscription_data: {
         metadata: {
           supabase_user_id: userId,

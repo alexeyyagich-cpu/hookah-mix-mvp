@@ -26,8 +26,13 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get r2o connection
-    const { data: connection } = await supabase
+    // Get r2o connection using admin client (encrypted token should not traverse RLS)
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    const { data: connection } = await supabaseAdmin
       .from('r2o_connections')
       .select('*')
       .eq('profile_id', user.id)
@@ -38,6 +43,13 @@ export async function POST() {
       return NextResponse.json(
         { error: 'No active POS connection' },
         { status: 404 }
+      )
+    }
+
+    if (!connection.encrypted_token || !connection.token_iv) {
+      return NextResponse.json(
+        { error: 'Connection credentials missing' },
+        { status: 500 }
       )
     }
 
@@ -68,11 +80,6 @@ export async function POST() {
     const r2oProducts = await getProducts(accountToken)
     const r2oProductsByName = new Map(
       r2oProducts.map(p => [p.product_name, p])
-    )
-
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
     let synced = 0

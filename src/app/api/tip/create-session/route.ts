@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 let supabaseAdmin: SupabaseClient | null = null
 
@@ -16,7 +17,15 @@ function getSupabaseAdmin(): SupabaseClient {
   return supabaseAdmin
 }
 
+const ALLOWED_CURRENCIES = ['eur', 'usd', 'gbp', 'chf', 'pln', 'czk']
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function POST(request: NextRequest) {
+  // Rate limit: strict (10/min per IP) for payment session creation
+  const ip = getClientIp(request)
+  const rateCheck = checkRateLimit(`tip-create:${ip}`, rateLimits.strict)
+  if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
   try {
     const body = await request.json()
     const { staffProfileId, amount, currency, payerName, message, slug } = body
@@ -28,12 +37,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!UUID_REGEX.test(staffProfileId)) {
+      return NextResponse.json(
+        { error: 'Invalid staff profile ID' },
+        { status: 400 }
+      )
+    }
+
     if (amount > 500) {
       return NextResponse.json(
         { error: 'Amount too large' },
         { status: 400 }
       )
     }
+
+    if (currency && !ALLOWED_CURRENCIES.includes(currency.toLowerCase())) {
+      return NextResponse.json(
+        { error: 'Unsupported currency' },
+        { status: 400 }
+      )
+    }
+
+    // Truncate user-supplied strings
+    const safeName = payerName ? String(payerName).slice(0, 100) : ''
+    const safeMessage = message ? String(message).slice(0, 500) : ''
 
     const supabase = getSupabaseAdmin()
 
@@ -59,7 +86,7 @@ export async function POST(request: NextRequest) {
         line_items: [
           {
             price_data: {
-              currency: currency || 'eur',
+              currency: (currency || 'eur').toLowerCase(),
               product_data: {
                 name: `Tip for ${staffProfile.display_name}`,
               },
@@ -70,8 +97,8 @@ export async function POST(request: NextRequest) {
         ],
         metadata: {
           staff_profile_id: staffProfileId,
-          payer_name: payerName || '',
-          message: message || '',
+          payer_name: safeName,
+          message: safeMessage,
           type: 'tip',
         },
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/tip/${slug}?success=true`,
@@ -87,10 +114,10 @@ export async function POST(request: NextRequest) {
       .insert({
         staff_profile_id: staffProfileId,
         amount,
-        currency: currency || 'EUR',
+        currency: (currency || 'EUR').toUpperCase(),
         status: 'completed',
-        payer_name: payerName || null,
-        message: message || null,
+        payer_name: safeName || null,
+        message: safeMessage || null,
       })
 
     if (insertError) {

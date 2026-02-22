@@ -22,11 +22,16 @@ export async function GET(request: NextRequest) {
   const supabase = createClient(supabaseUrl, supabaseKey)
 
   // Find all profiles with low stock items (< 50g)
-  const { data: lowStockItems } = await supabase
+  const { data: lowStockItems, error: queryError } = await supabase
     .from('tobacco_inventory')
     .select('profile_id, brand, flavor, quantity_grams')
     .lt('quantity_grams', 50)
     .gt('quantity_grams', 0)
+
+  if (queryError) {
+    console.error('Cron low-stock query failed:', queryError)
+    return NextResponse.json({ error: 'Database query failed' }, { status: 500 })
+  }
 
   if (!lowStockItems || lowStockItems.length === 0) {
     return NextResponse.json({ message: 'No low stock items', sent: 0 })
@@ -48,13 +53,17 @@ export async function GET(request: NextRequest) {
       .map((i) => `${i.brand} ${i.flavor}: ${i.quantity_grams}g`)
       .join('\n') + (count > 3 ? `\n...and ${count - 3} more` : '')
 
-    const sent = await sendPushToUser(profileId, {
-      title: `Low stock: ${count} ${count === 1 ? 'item' : 'items'}`,
-      body,
-      tag: 'low-stock-daily',
-      url: '/inventory',
-    })
-    totalSent += sent
+    try {
+      const sent = await sendPushToUser(profileId, {
+        title: `Low stock: ${count} ${count === 1 ? 'item' : 'items'}`,
+        body,
+        tag: 'low-stock-daily',
+        url: '/inventory',
+      })
+      totalSent += sent
+    } catch (err) {
+      console.error(`Push failed for profile ${profileId}:`, err)
+    }
   }
 
   return NextResponse.json({ sent: totalSent, profiles: byProfile.size })

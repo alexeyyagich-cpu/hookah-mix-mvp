@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { timingSafeEqual } from 'crypto'
 import type { R2OWebhookEvent } from '@/lib/ready2order/types'
 
 export const runtime = 'nodejs'
@@ -11,8 +12,11 @@ export async function POST(request: NextRequest) {
     if (!webhookSecret) {
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
     }
-    const urlSecret = request.nextUrl.searchParams.get('secret')
-    if (urlSecret !== webhookSecret) {
+    const urlSecret = request.nextUrl.searchParams.get('secret') || ''
+    if (
+      urlSecret.length !== webhookSecret.length ||
+      !timingSafeEqual(Buffer.from(urlSecret), Buffer.from(webhookSecret))
+    ) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -96,7 +100,7 @@ export async function POST(request: NextRequest) {
           if (!item.product_id || !mappingsByProductId.has(item.product_id)) continue
 
           const inventoryId = mappingsByProductId.get(item.product_id)!
-          const gramsUsed = item.item_quantity || 1
+          const gramsUsed = item.item_quantity ?? 1
           // Atomic decrement via RPC (prevents race conditions)
           await supabaseAdmin.rpc('decrement_tobacco_inventory', {
             p_inventory_id: inventoryId,
