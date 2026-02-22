@@ -23,6 +23,12 @@ function getSupabase(): any {
 
 // --- Keyboards ---
 
+const mainMenu = kbd(
+  [btn('📊 Today\'s Report', 'cmd:report'), btn('📦 Stock Check', 'cmd:stock')],
+  [btn('🕐 Shift Summary', 'cmd:shift'), btn('⚙️ Settings', 'cmd:status')],
+  [urlBtn('🌐 Open App', appUrl)],
+)
+
 function statusKeyboard(conn: { low_stock_alerts: boolean; session_reminders: boolean; daily_summary: boolean }) {
   return kbd(
     [
@@ -31,31 +37,31 @@ function statusKeyboard(conn: { low_stock_alerts: boolean; session_reminders: bo
     ],
     [
       btn(`Daily Report: ${conn.daily_summary ? '✅' : '❌'}`, 'toggle:daily_summary'),
-      btn('🔄 Refresh', 'cmd:status'),
     ],
+    [btn('🔄 Refresh', 'cmd:status'), btn('← Menu', 'cmd:menu')],
   )
 }
 
 const reportKeyboard = kbd(
   [btn('🔄 Refresh', 'cmd:report'), urlBtn('📊 Open in App', `${appUrl}/reports`)],
+  [btn('← Menu', 'cmd:menu')],
 )
 
 const stockKeyboard = kbd(
   [btn('🔄 Refresh', 'cmd:stock'), urlBtn('📦 Open Inventory', `${appUrl}/inventory`)],
+  [btn('← Menu', 'cmd:menu')],
 )
 
 const shiftKeyboard = kbd(
   [btn('🔄 Refresh', 'cmd:shift'), urlBtn('🕐 Open Shifts', `${appUrl}/shifts`)],
+  [btn('← Menu', 'cmd:menu')],
 )
 
-const helpKeyboard = kbd(
-  [btn('📊 Report', 'cmd:report'), btn('📦 Stock', 'cmd:stock')],
-  [btn('🕐 Shift', 'cmd:shift'), btn('📋 Status', 'cmd:status')],
-)
+// --- Main menu text ---
 
-const connectedKeyboard = kbd(
-  [btn('📋 Status', 'cmd:status'), btn('❓ Help', 'cmd:help')],
-)
+function mainMenuText(businessName: string) {
+  return `🏠 <b>${businessName || 'Hookah Torus'}</b>\n\nChoose an action:`
+}
 
 // --- Data fetchers ---
 
@@ -69,20 +75,19 @@ async function getConnection(supabase: any, chatId: number): Promise<any> {
   return data
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchStatusText(supabase: any, chatId: number) {
   const connection = await getConnection(supabase, chatId)
   if (!connection) return { text: '❌ Not connected. Use the link from app settings.', keyboard: undefined, connection: null }
 
-  const text = `📊 <b>Connection Status</b>\n\n` +
-    `Business: ${connection.profiles?.business_name || 'Not set'}\n` +
-    `Notifications: ${connection.notifications_enabled ? '✅' : '❌'}\n` +
-    `Low stock: ${connection.low_stock_alerts ? '✅' : '❌'}\n` +
-    `Reminders: ${connection.session_reminders ? '✅' : '❌'}\n` +
-    `Daily report: ${connection.daily_summary ? '✅' : '❌'}`
+  const text = `⚙️ <b>Notification Settings</b>\n\n` +
+    `Business: ${connection.profiles?.business_name || 'Not set'}\n\n` +
+    `Toggle notifications with the buttons below:`
 
   return { text, keyboard: statusKeyboard(connection), connection }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchReportText(supabase: any, profileId: string) {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -113,6 +118,7 @@ async function fetchReportText(supabase: any, profileId: string) {
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchStockText(supabase: any, profileId: string) {
   const settingsRes = await supabase
     .from('notification_settings').select('low_stock_threshold')
@@ -132,6 +138,7 @@ async function fetchStockText(supabase: any, profileId: string) {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function fetchShiftText(supabase: any, profileId: string) {
   const shiftsRes = await supabase
     .from('shifts').select('*')
@@ -168,6 +175,23 @@ async function fetchShiftText(supabase: any, profileId: string) {
     barRevenue,
     totalRevenue: hookahRevenue + barRevenue,
   })
+}
+
+// --- Send main menu ---
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function sendMainMenu(supabase: any, chatId: number) {
+  const connection = await getConnection(supabase, chatId)
+  if (connection) {
+    await sendMessage(chatId, mainMenuText(connection.profiles?.business_name), {
+      parseMode: 'HTML', replyMarkup: mainMenu,
+    })
+  } else {
+    await sendMessage(chatId,
+      '👋 <b>Welcome to Hookah Torus Bot!</b>\n\nTo connect, use the link from <b>Settings</b> in the app.',
+      { parseMode: 'HTML' }
+    )
+  }
 }
 
 // --- Webhook handler ---
@@ -228,12 +252,9 @@ export async function POST(request: NextRequest) {
 
         // Refresh the status message with updated keyboard
         const updated = { ...connection, [field]: newValue }
-        const statusText = `📊 <b>Connection Status</b>\n\n` +
-          `Business: ${updated.profiles?.business_name || 'Not set'}\n` +
-          `Notifications: ${updated.notifications_enabled ? '✅' : '❌'}\n` +
-          `Low stock: ${updated.low_stock_alerts ? '✅' : '❌'}\n` +
-          `Reminders: ${updated.session_reminders ? '✅' : '❌'}\n` +
-          `Daily report: ${updated.daily_summary ? '✅' : '❌'}`
+        const statusText = `⚙️ <b>Notification Settings</b>\n\n` +
+          `Business: ${updated.profiles?.business_name || 'Not set'}\n\n` +
+          `Toggle notifications with the buttons below:`
 
         await editMessageText(chatId, messageId, statusText, {
           parseMode: 'HTML',
@@ -243,25 +264,18 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true })
       }
 
-      // Command buttons (refresh / quick action)
+      // Command buttons
       if (data.startsWith('cmd:')) {
         const cmd = data.slice(4)
-        const connection = await getConnection(supabase, chatId)
 
-        if (cmd === 'help') {
-          await editMessageText(chatId, messageId,
-            '📖 <b>Available commands:</b>\n\n' +
-            '/start - Start or connect your account\n' +
-            '/status - Connection status & settings\n' +
-            '/report - Today\'s revenue report\n' +
-            '/stock - Low stock alert\n' +
-            '/shift - Current shift summary\n' +
-            '/help - Show help',
-            { parseMode: 'HTML', replyMarkup: helpKeyboard }
-          )
+        // Menu — send new message (not edit) so it's always at the bottom
+        if (cmd === 'menu') {
           await answerCallbackQuery(cq.id)
+          await sendMainMenu(supabase, chatId)
           return NextResponse.json({ ok: true })
         }
+
+        const connection = await getConnection(supabase, chatId)
 
         if (!connection) {
           await answerCallbackQuery(cq.id, 'Not connected')
@@ -269,24 +283,21 @@ export async function POST(request: NextRequest) {
         }
 
         if (cmd === 'status') {
-          const { text } = await fetchStatusText(supabase, chatId)
-          await editMessageText(chatId, messageId, text, {
-            parseMode: 'HTML',
-            replyMarkup: statusKeyboard(connection),
-          })
-          await answerCallbackQuery(cq.id, 'Updated')
+          const { text, keyboard } = await fetchStatusText(supabase, chatId)
+          await editMessageText(chatId, messageId, text, { parseMode: 'HTML', replyMarkup: keyboard })
+          await answerCallbackQuery(cq.id)
         } else if (cmd === 'report') {
           const text = await fetchReportText(supabase, connection.profile_id)
           await editMessageText(chatId, messageId, text, { parseMode: 'HTML', replyMarkup: reportKeyboard })
-          await answerCallbackQuery(cq.id, 'Updated')
+          await answerCallbackQuery(cq.id)
         } else if (cmd === 'stock') {
           const text = await fetchStockText(supabase, connection.profile_id)
           await editMessageText(chatId, messageId, text, { parseMode: 'HTML', replyMarkup: stockKeyboard })
-          await answerCallbackQuery(cq.id, 'Updated')
+          await answerCallbackQuery(cq.id)
         } else if (cmd === 'shift') {
           const text = await fetchShiftText(supabase, connection.profile_id)
           await editMessageText(chatId, messageId, text, { parseMode: 'HTML', replyMarkup: shiftKeyboard })
-          await answerCallbackQuery(cq.id, 'Updated')
+          await answerCallbackQuery(cq.id)
         } else {
           await answerCallbackQuery(cq.id)
         }
@@ -308,6 +319,7 @@ export async function POST(request: NextRequest) {
     }
 
     const chatId = message.chat.id
+    const supabase = getSupabase()
 
     // /start with connection token
     if (messageText?.startsWith('/start')) {
@@ -318,21 +330,20 @@ export async function POST(request: NextRequest) {
 
         if (!valid || !profileId) {
           await sendMessage(chatId,
-            '❌ <b>Link expired or invalid</b>\n\nGet a new link in the <b>Settings</b> section of the app.',
+            '❌ <b>Link expired or invalid</b>\n\nGet a new link in <b>Settings</b>.',
             { parseMode: 'HTML' }
           )
           return NextResponse.json({ ok: true })
         }
 
-        const supabase = getSupabase()
         if (!supabase) return NextResponse.json({ ok: true })
 
         const { data: profile } = await supabase
-          .from('profiles').select('id').eq('id', profileId).single()
+          .from('profiles').select('id, business_name').eq('id', profileId).single()
 
         if (!profile) {
           await sendMessage(chatId,
-            '❌ <b>Profile not found</b>\n\nGet a new link in the <b>Settings</b> section of the app.',
+            '❌ <b>Profile not found</b>\n\nGet a new link in <b>Settings</b>.',
             { parseMode: 'HTML' }
           )
           return NextResponse.json({ ok: true })
@@ -349,11 +360,6 @@ export async function POST(request: NextRequest) {
             is_active: true,
             updated_at: new Date().toISOString(),
           }).eq('id', existing.id)
-
-          await sendMessage(chatId,
-            '✅ <b>Connection updated!</b>\n\nYour Hookah Torus account is linked to this chat.',
-            { parseMode: 'HTML', replyMarkup: connectedKeyboard }
-          )
         } else {
           await supabase.from('telegram_connections').insert({
             profile_id: profileId,
@@ -366,80 +372,50 @@ export async function POST(request: NextRequest) {
             session_reminders: false,
             daily_summary: false,
           })
-
-          await sendMessage(chatId,
-            '🎉 <b>Connected!</b>\n\nYour Hookah Torus account is now linked to Telegram.\n\nYou will receive notifications about:\n• Low tobacco stock\n• Order updates\n\nConfigure notifications in <b>Settings</b>.',
-            { parseMode: 'HTML', replyMarkup: connectedKeyboard }
-          )
         }
-      } else {
+
+        // Connected — show welcome + main menu
         await sendMessage(chatId,
-          '👋 <b>Welcome to Hookah Torus Bot!</b>\n\nTo connect, use the link from <b>Settings</b> in the app.',
-          { parseMode: 'HTML', replyMarkup: kbd([btn('❓ Help', 'cmd:help')]) }
+          `🎉 <b>Connected to ${profile.business_name || 'Hookah Torus'}!</b>\n\nYou will receive notifications about low stock and order updates.\nConfigure in ⚙️ Settings below.`,
+          { parseMode: 'HTML', replyMarkup: mainMenu }
         )
+      } else {
+        // /start without token — show menu if connected, welcome if not
+        if (supabase) {
+          await sendMainMenu(supabase, chatId)
+        }
       }
     }
 
-    // /status
-    else if (messageText === '/status') {
-      const supabase = getSupabase()
-      if (!supabase) return NextResponse.json({ ok: true })
-
-      const { text, keyboard } = await fetchStatusText(supabase, chatId)
-      await sendMessage(chatId, text, { parseMode: 'HTML', replyMarkup: keyboard })
-    }
-
-    // /help
-    else if (messageText === '/help') {
-      await sendMessage(chatId,
-        '📖 <b>Available commands:</b>\n\n' +
-        '/start - Start or connect your account\n' +
-        '/status - Connection status & settings\n' +
-        '/report - Today\'s revenue report\n' +
-        '/stock - Low stock alert\n' +
-        '/shift - Current shift summary\n' +
-        '/help - Show help',
-        { parseMode: 'HTML', replyMarkup: helpKeyboard }
-      )
-    }
-
-    // /report
-    else if (messageText === '/report') {
-      const supabase = getSupabase()
+    // Slash commands → show main menu (commands still work via / autocomplete)
+    else if (messageText === '/status' || messageText === '/report' || messageText === '/stock' || messageText === '/shift' || messageText === '/help') {
       if (!supabase) return NextResponse.json({ ok: true })
       const connection = await getConnection(supabase, chatId)
       if (!connection) {
         await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
-      } else {
+        return NextResponse.json({ ok: true })
+      }
+
+      if (messageText === '/status') {
+        const { text, keyboard } = await fetchStatusText(supabase, chatId)
+        await sendMessage(chatId, text, { parseMode: 'HTML', replyMarkup: keyboard })
+      } else if (messageText === '/report') {
         const text = await fetchReportText(supabase, connection.profile_id)
         await sendMessage(chatId, text, { parseMode: 'HTML', replyMarkup: reportKeyboard })
-      }
-    }
-
-    // /stock
-    else if (messageText === '/stock') {
-      const supabase = getSupabase()
-      if (!supabase) return NextResponse.json({ ok: true })
-      const connection = await getConnection(supabase, chatId)
-      if (!connection) {
-        await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
-      } else {
+      } else if (messageText === '/stock') {
         const text = await fetchStockText(supabase, connection.profile_id)
         await sendMessage(chatId, text, { parseMode: 'HTML', replyMarkup: stockKeyboard })
+      } else if (messageText === '/shift') {
+        const text = await fetchShiftText(supabase, connection.profile_id)
+        await sendMessage(chatId, text, { parseMode: 'HTML', replyMarkup: shiftKeyboard })
+      } else if (messageText === '/help') {
+        await sendMainMenu(supabase, chatId)
       }
     }
 
-    // /shift
-    else if (messageText === '/shift') {
-      const supabase = getSupabase()
-      if (!supabase) return NextResponse.json({ ok: true })
-      const connection = await getConnection(supabase, chatId)
-      if (!connection) {
-        await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
-      } else {
-        const text = await fetchShiftText(supabase, connection.profile_id)
-        await sendMessage(chatId, text, { parseMode: 'HTML', replyMarkup: shiftKeyboard })
-      }
+    // Any other text → show main menu
+    else if (messageText && supabase) {
+      await sendMainMenu(supabase, chatId)
     }
 
     return NextResponse.json({ ok: true })
@@ -454,11 +430,11 @@ let commandsRegistered = false
 export async function GET() {
   if (!commandsRegistered) {
     await setMyCommands([
-      { command: 'status', description: 'Connection status & settings' },
+      { command: 'start', description: 'Main menu' },
+      { command: 'status', description: 'Notification settings' },
       { command: 'report', description: "Today's revenue report" },
       { command: 'stock', description: 'Low stock alert' },
       { command: 'shift', description: 'Current shift summary' },
-      { command: 'help', description: 'Available commands' },
     ])
     commandsRegistered = true
   }
