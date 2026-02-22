@@ -192,7 +192,7 @@ export default function LandingPage() {
 
       {/* Demo Preview */}
       <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto grid gap-8">
           <div className="relative rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-2xl">
             <div className="absolute top-0 left-0 right-0 h-8 bg-[var(--color-surface)] flex items-center gap-2 px-4">
               <div className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -206,6 +206,22 @@ export default function LandingPage() {
                 width={1920}
                 height={1080}
                 priority
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
+          <div className="relative rounded-2xl overflow-hidden border border-[var(--color-border)] shadow-2xl">
+            <div className="absolute top-0 left-0 right-0 h-8 bg-[var(--color-surface)] flex items-center gap-2 px-4">
+              <div className="w-3 h-3 rounded-full bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+            </div>
+            <div className="pt-8 bg-[var(--color-bg)]">
+              <Image
+                src="/images/bar-preview.jpg"
+                alt="Hookah Torus Bar Management"
+                width={1920}
+                height={1080}
                 className="w-full h-auto"
               />
             </div>
