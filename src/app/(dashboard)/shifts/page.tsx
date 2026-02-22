@@ -142,7 +142,7 @@ export default function ShiftsPage() {
           {/* Active Shift Card */}
           {activeShift ? (
             <div className="card border-2 border-[var(--color-success)] p-6">
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between flex-wrap gap-3 mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <div className="w-2.5 h-2.5 rounded-full bg-[var(--color-success)] animate-pulse" />

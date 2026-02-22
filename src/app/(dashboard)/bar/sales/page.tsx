@@ -196,14 +196,14 @@ export default function BarSalesPage() {
 
           {/* Sales Log Tab */}
           {tab === 'log' && (
-            <div className="card overflow-hidden">
+            <div className="card overflow-x-auto">
               {periodSales.length === 0 ? (
                 <div className="p-12 text-center">
                   <div className="text-4xl mb-3">📝</div>
                   <p className="text-[var(--color-textMuted)]">{tb.noSalesForPeriod}</p>
                 </div>
               ) : (
-                <table className="w-full">
+                <table className="w-full min-w-[600px]">
                   <thead>
                     <tr className="border-b border-[var(--color-border)]">
                       <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thTime}</th>
@@ -345,7 +345,7 @@ export default function BarSalesPage() {
               </div>
 
               {/* Summary */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="card p-5">
                   <h3 className="font-semibold mb-3">{tb.summaryFor(period)}</h3>
                   <div className="space-y-2 text-sm">

@@ -118,7 +118,7 @@ export default function TeamPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <IconUsers size={28} />
@@ -164,8 +164,8 @@ export default function TeamPage() {
         ) : (
           <div className="divide-y divide-[var(--color-border)]">
             {members.map((member) => (
-              <div key={member.id} className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
+              <div key={member.id} className="p-4 flex items-start justify-between gap-2">
+                <div className="flex items-start gap-4 min-w-0 flex-1">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white font-bold text-lg">
                     {(member.display_name || 'S')[0].toUpperCase()}
                   </div>
@@ -186,7 +186,7 @@ export default function TeamPage() {
                     <div className="text-xs text-[var(--color-textMuted)] mt-1">
                       {tm.memberSince(formatDate(member.created_at))}
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
                       <div className="flex items-center gap-1">
                         <label className="text-xs text-[var(--color-textMuted)]">{tm.hourlyRate}:</label>
                         <input
@@ -228,7 +228,7 @@ export default function TeamPage() {
                 <button
                   onClick={() => handleRemoveMember(member.id, member.display_name || tm.removeStaffFallback)}
                   disabled={actionLoading === member.id}
-                  className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
+                  className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50 shrink-0"
                   title={tm.removeFromTeamTooltip}
                 >
                   {actionLoading === member.id ? (
@@ -255,8 +255,8 @@ export default function TeamPage() {
               const daysLeft = getDaysUntilExpiry(invitation.expires_at)
 
               return (
-                <div key={invitation.id} className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                <div key={invitation.id} className="p-4 flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-4 min-w-0 flex-1">
                     <div className="w-12 h-12 rounded-full bg-[var(--color-bgHover)] flex items-center justify-center">
                       <IconMail size={24} className="text-[var(--color-textMuted)]" />
                     </div>
@@ -273,7 +273,7 @@ export default function TeamPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleResendInvitation(invitation.id)}
                       disabled={actionLoading === `resend-${invitation.id}`}
@@ -361,7 +361,7 @@ export default function TeamPage() {
                       <TipQRCode slug={profile.tip_slug} displayName={profile.display_name} />
                       {stats && stats.count > 0 && (
                         <div className="flex-1 space-y-2 mt-2">
-                          <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
                             <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
                               <div className="text-xs text-[var(--color-textMuted)]">{ts.tipTotal}</div>
                               <div className="font-semibold">{stats.total}€</div>

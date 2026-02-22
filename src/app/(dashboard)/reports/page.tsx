@@ -252,8 +252,8 @@ export default function ReportsPage() {
                   key={item.name}
                   className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)]"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <span className="w-6 h-6 shrink-0 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">
                       {i + 1}
                     </span>
                     <div>
@@ -261,7 +261,7 @@ export default function ReportsPage() {
                       <span className="text-xs text-[var(--color-textMuted)] ml-2">{item.count} {tm.pcsShort}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2 sm:gap-4 text-sm shrink-0">
                     <span className="text-[var(--color-success)]">{item.revenue.toFixed(0)}€</span>
                     <span className="text-[var(--color-textMuted)]">{tm.costShort} {item.cost.toFixed(0)}€</span>
                     <span className={`font-medium ${item.margin >= 60 ? 'text-[var(--color-success)]' : item.margin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'}`}>

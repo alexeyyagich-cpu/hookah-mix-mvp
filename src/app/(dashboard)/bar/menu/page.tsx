@@ -167,8 +167,8 @@ export default function BarMenuPage() {
                 </h2>
               )}
 
-              <div className="card overflow-hidden">
-                <table className="w-full">
+              <div className="card overflow-x-auto">
+                <table className="w-full min-w-[600px]">
                   <thead>
                     <tr className="border-b border-[var(--color-border)]">
                       <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thName}</th>

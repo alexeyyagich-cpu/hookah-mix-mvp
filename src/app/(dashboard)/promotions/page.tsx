@@ -245,7 +245,7 @@ export default function PromotionsPage() {
           {promotions.map(promo => (
             <div
               key={promo.id}
-              className={`card p-4 flex items-center justify-between ${
+              className={`card p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
                 !promo.is_active ? 'opacity-60' : ''
               }`}
             >
@@ -267,12 +267,12 @@ export default function PromotionsPage() {
                 </span>
                 <button
                   onClick={() => toggleActive(promo.id)}
-                  className={`w-10 h-6 rounded-full transition-colors relative ${
+                  className={`shrink-0 w-10 h-6 rounded-full transition-colors relative ${
                     promo.is_active ? 'bg-[var(--color-success)]' : 'bg-[var(--color-bgHover)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                    promo.is_active ? 'left-[18px]' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                    promo.is_active ? 'translate-x-4' : ''
                   }`} />
                 </button>
                 <button onClick={() => openEdit(promo)} className="btn btn-ghost p-2">
