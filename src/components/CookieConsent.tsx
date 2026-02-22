@@ -47,7 +47,7 @@ export default function CookieConsent() {
           </button>
           <button
             onClick={accept}
-            className="px-4 py-2 text-sm rounded-xl bg-[var(--color-primary)] text-white font-medium hover:opacity-90 transition-opacity"
+            className="px-4 py-2 text-sm rounded-xl bg-[var(--color-primary)] text-black font-medium hover:opacity-90 transition-opacity"
           >
             {tc.accept}
           </button>

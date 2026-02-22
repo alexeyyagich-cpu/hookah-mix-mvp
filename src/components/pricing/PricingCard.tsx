@@ -67,7 +67,7 @@ export function PricingCard({
           <span className="text-4xl font-bold">{price}</span>
           {monthlyPrice && (
             <span className="text-sm text-[var(--color-textMuted)] mt-1">
-              ≈ {monthlyPrice}
+              {monthlyPrice}
             </span>
           )}
         </div>

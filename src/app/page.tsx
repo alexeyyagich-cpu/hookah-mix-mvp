@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/lib/AuthContext'
 import { useTranslation } from '@/lib/i18n'
 import {
@@ -92,7 +93,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl overflow-hidden">
-              <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+              <video autoPlay loop muted playsInline preload="metadata" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                 <source src="/images/logo-animated.mp4" type="video/mp4" />
               </video>
             </div>
@@ -133,6 +134,7 @@ export default function LandingPage() {
         </div>
       </header>
 
+      <main>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/10 via-transparent to-[var(--color-warning)]/10" />
@@ -178,23 +180,13 @@ export default function LandingPage() {
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
             <div className="pt-8 bg-[var(--color-bg)]">
-              <img
-                src="/images/dashboard-preview.png"
+              <Image
+                src="/images/dashboard-preview.jpg"
                 alt="Hookah Torus Dashboard"
-                className="w-full"
-                onError={(e) => {
-                  // Fallback gradient if image doesn't exist
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                  target.parentElement!.innerHTML += `
-                    <div class="aspect-video bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-surface)] flex items-center justify-center">
-                      <div class="text-center">
-                        <div class="text-6xl mb-4">📊</div>
-                        <p class="text-[var(--color-textMuted)]">Dashboard Preview</p>
-                      </div>
-                    </div>
-                  `
-                }}
+                width={1920}
+                height={1080}
+                priority
+                className="w-full h-auto"
               />
             </div>
           </div>
@@ -268,7 +260,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {howItWorks.map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-2xl font-bold text-white">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-2xl font-bold text-black">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
@@ -312,6 +304,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      </main>
+
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-[var(--color-border)]">
         <div className="max-w-7xl mx-auto">
@@ -319,7 +313,7 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
-                  <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+                  <video autoPlay loop muted playsInline preload="none" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                     <source src="/images/logo-animated.mp4" type="video/mp4" />
                   </video>
                 </div>
@@ -331,7 +325,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">{t.footerProduct}</h4>
+              <h3 className="font-semibold mb-4 text-base">{t.footerProduct}</h3>
               <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
                 <li><Link href="/mix" className="hover:text-[var(--color-text)]">{t.footerMixCalculator}</Link></li>
                 <li><Link href="/recommend" className="hover:text-[var(--color-text)]">{t.footerAiRecommendations}</Link></li>
@@ -340,7 +334,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">{t.footerLegal}</h4>
+              <h3 className="font-semibold mb-4 text-base">{t.footerLegal}</h3>
               <ul className="space-y-2 text-sm text-[var(--color-textMuted)]">
                 <li><Link href="/legal/terms" className="hover:text-[var(--color-text)]">{t.footerTerms}</Link></li>
                 <li><Link href="/legal/privacy" className="hover:text-[var(--color-text)]">{t.footerPrivacy}</Link></li>

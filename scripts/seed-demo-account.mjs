@@ -39,7 +39,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 const DEMO_EMAIL = 'demo@hookahtorus.com'
 const DEMO_PASSWORD = 'demo2026!'
 const BUSINESS_NAME = 'Torus Demo Lounge'
-const OWNER_NAME = 'Алексей Демо'
+const OWNER_NAME = 'Alex Torres'
 
 // ── Helpers ─────────────────────────────────────────────
 function daysAgo(n) {
