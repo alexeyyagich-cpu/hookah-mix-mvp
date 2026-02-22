@@ -5,6 +5,11 @@ import { cookies } from 'next/headers'
 import { encrypt } from '@/lib/ready2order/crypto'
 import { registerWebhook, createProductGroup, getAccountId } from '@/lib/ready2order/client'
 
+function clearStateCookie(response: NextResponse): NextResponse {
+  response.cookies.delete('r2o_state')
+  return response
+}
+
 export async function GET(request: NextRequest) {
   try {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
@@ -13,15 +18,24 @@ export async function GET(request: NextRequest) {
 
     // R2O sends status=approved or status=denied
     if (status === 'denied' || status === 'abgelehnt') {
-      return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=denied`)
+      return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=denied`))
     }
 
     if (!accountToken) {
-      return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=no_token`)
+      return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=no_token`))
+    }
+
+    // CSRF: Verify state parameter matches the cookie set during /api/r2o/connect
+    const state = request.nextUrl.searchParams.get('state')
+    const cookieStore = await cookies()
+    const storedState = cookieStore.get('r2o_state')?.value
+
+    if (!state || !storedState || state !== storedState) {
+      return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=csrf`))
     }
 
     // Verify authentication
-    const cookieStore = await cookies()
+    // (cookieStore already available from above)
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -36,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=auth`)
+      return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=auth`))
     }
 
     // Encrypt the account token
@@ -90,13 +104,13 @@ export async function GET(request: NextRequest) {
 
     if (upsertError) {
       console.error('r2o connection upsert error:', upsertError)
-      return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=db`)
+      return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=db`))
     }
 
-    return NextResponse.redirect(`${appUrl}/settings?r2o=connected`)
+    return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=connected`))
   } catch (error) {
     console.error('r2o callback error:', error)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
-    return NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=unknown`)
+    return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=unknown`))
   }
 }

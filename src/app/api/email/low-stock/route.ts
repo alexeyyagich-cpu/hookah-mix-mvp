@@ -13,7 +13,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 export async function POST(request: NextRequest) {
   // Rate limiting - strict for email endpoints
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`${ip}:/api/email/low-stock`, rateLimits.strict)
+  const rateCheck = await checkRateLimit(`${ip}:/api/email/low-stock`, rateLimits.strict)
   if (!rateCheck.success) {
     return rateLimitExceeded(rateCheck.resetIn)
   }

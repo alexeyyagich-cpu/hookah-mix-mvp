@@ -23,7 +23,7 @@ async function authenticateUser() {
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`push-sub:${ip}`, rateLimits.webhook)
+  const rateCheck = await checkRateLimit(`push-sub:${ip}`, rateLimits.webhook)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {

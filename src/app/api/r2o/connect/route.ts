@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
@@ -72,14 +73,26 @@ export async function POST(request: NextRequest) {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
-    const redirectUri = `${appUrl}/api/r2o/callback`
+
+    // Generate CSRF state parameter
+    const state = randomBytes(32).toString('hex')
+    const redirectUri = `${appUrl}/api/r2o/callback?state=${state}`
 
     // Request grant access from r2o
     const grant = await grantAccessToken(developerToken, redirectUri)
 
-    return NextResponse.json({
+    // Set state in httpOnly cookie for CSRF verification on callback
+    const response = NextResponse.json({
       grantAccessUri: grant.grantAccessUri,
     })
+    response.cookies.set('r2o_state', state, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/api/r2o/callback',
+      maxAge: 600, // 10 minutes
+    })
+    return response
   } catch (error) {
     console.error('r2o connect error:', error)
     return NextResponse.json(

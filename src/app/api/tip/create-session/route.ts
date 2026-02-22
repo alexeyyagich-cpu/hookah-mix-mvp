@@ -23,7 +23,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 export async function POST(request: NextRequest) {
   // Rate limit: strict (10/min per IP) for payment session creation
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`tip-create:${ip}`, rateLimits.strict)
+  const rateCheck = await checkRateLimit(`tip-create:${ip}`, rateLimits.strict)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   try {
@@ -108,26 +108,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ url: session.url })
     }
 
-    // Fallback: save tip directly without payment (for dev/demo)
-    const { error: insertError } = await supabase
-      .from('tips')
-      .insert({
-        staff_profile_id: staffProfileId,
-        amount,
-        currency: (currency || 'EUR').toUpperCase(),
-        status: 'completed',
-        payer_name: safeName || null,
-        message: safeMessage || null,
-      })
-
-    if (insertError) {
-      return NextResponse.json(
-        { error: 'Failed to record tip' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({ success: true })
+    // Stripe not configured — reject the request
+    return NextResponse.json(
+      { error: 'Payment processing is not configured. Tips cannot be created without Stripe.' },
+      { status: 503 }
+    )
   } catch (error) {
     console.error('Tip session error:', error)
     return NextResponse.json(

@@ -9,7 +9,7 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 export async function POST(request: NextRequest) {
   // Rate limit: 10 req/min per IP (paid API calls)
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`ocr:${ip}`, rateLimits.strict)
+  const rateCheck = await checkRateLimit(`ocr:${ip}`, rateLimits.strict)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   // Auth: require logged-in user

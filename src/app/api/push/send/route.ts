@@ -4,7 +4,7 @@ import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/li
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`push-send:${ip}`, rateLimits.webhook)
+  const rateCheck = await checkRateLimit(`push-send:${ip}`, rateLimits.webhook)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   // Verify internal API key

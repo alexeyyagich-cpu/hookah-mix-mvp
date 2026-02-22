@@ -41,9 +41,22 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Protected routes - redirect to login if not authenticated
-  const protectedPaths = ['/dashboard', '/inventory', '/bowls', '/sessions', '/statistics', '/settings', '/onboarding']
-  const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
+  // Public paths that do NOT require authentication
+  const publicPaths = [
+    '/', '/login', '/register', '/forgot-password', '/update-password',
+    '/join', '/tip', '/lounge', '/menu', '/mix', '/pricing',
+    '/legal', '/recommend', '/offline', '/setup', '/api',
+  ]
+  const isPublicPath = publicPaths.some(path =>
+    request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
+  )
+  const isStaticPath = request.nextUrl.pathname.startsWith('/_next') ||
+    request.nextUrl.pathname === '/manifest.json' ||
+    request.nextUrl.pathname === '/sw.js' ||
+    request.nextUrl.pathname === '/sitemap.xml' ||
+    request.nextUrl.pathname === '/robots.txt' ||
+    request.nextUrl.pathname.startsWith('/images')
+  const isProtectedPath = !isPublicPath && !isStaticPath
 
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()

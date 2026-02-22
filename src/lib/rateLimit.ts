@@ -1,27 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Redis } from '@upstash/redis'
+import { Ratelimit } from '@upstash/ratelimit'
 
 interface RateLimitConfig {
   interval: number // Time window in milliseconds
   maxRequests: number // Max requests per interval
 }
 
-interface RateLimitEntry {
-  count: number
-  resetTime: number
+// Lazy-initialized Redis client (null if env vars not set)
+let redis: Redis | null = null
+function getRedis(): Redis | null {
+  if (redis) return redis
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  if (!url || !token) return null
+  redis = new Redis({ url, token })
+  return redis
 }
 
-// In-memory store for rate limiting (use Redis in production for multi-instance)
-const rateLimitStore = new Map<string, RateLimitEntry>()
+// Cache of Ratelimit instances keyed by config fingerprint
+const limiters = new Map<string, Ratelimit>()
 
-// Clean up expired entries periodically
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, entry] of rateLimitStore.entries()) {
-    if (entry.resetTime < now) {
-      rateLimitStore.delete(key)
-    }
+function getRateLimiter(config: RateLimitConfig): Ratelimit | null {
+  const r = getRedis()
+  if (!r) return null
+
+  const key = `${config.maxRequests}:${config.interval}`
+  let limiter = limiters.get(key)
+  if (!limiter) {
+    limiter = new Ratelimit({
+      redis: r,
+      limiter: Ratelimit.fixedWindow(config.maxRequests, `${config.interval} ms`),
+      prefix: 'rl',
+    })
+    limiters.set(key, limiter)
   }
-}, 60000) // Clean up every minute
+  return limiter
+}
 
 export function getClientIp(request: NextRequest): string {
   // Try various headers for client IP
@@ -39,46 +54,27 @@ export function getClientIp(request: NextRequest): string {
   return 'unknown'
 }
 
-export function checkRateLimit(
+export async function checkRateLimit(
   identifier: string,
   config: RateLimitConfig
-): { success: boolean; remaining: number; resetIn: number } {
-  const now = Date.now()
-  const key = identifier
+): Promise<{ success: boolean; remaining: number; resetIn: number }> {
+  const limiter = getRateLimiter(config)
 
-  let entry = rateLimitStore.get(key)
-
-  // If no entry or expired, create new one
-  if (!entry || entry.resetTime < now) {
-    entry = {
-      count: 1,
-      resetTime: now + config.interval,
-    }
-    rateLimitStore.set(key, entry)
-    return {
-      success: true,
-      remaining: config.maxRequests - 1,
-      resetIn: config.interval,
-    }
+  // If Redis not configured, fail open
+  if (!limiter) {
+    return { success: true, remaining: config.maxRequests, resetIn: 0 }
   }
 
-  // Check if limit exceeded
-  if (entry.count >= config.maxRequests) {
+  try {
+    const result = await limiter.limit(identifier)
     return {
-      success: false,
-      remaining: 0,
-      resetIn: entry.resetTime - now,
+      success: result.success,
+      remaining: result.remaining,
+      resetIn: Math.max(0, result.reset - Date.now()),
     }
-  }
-
-  // Increment counter
-  entry.count++
-  rateLimitStore.set(key, entry)
-
-  return {
-    success: true,
-    remaining: config.maxRequests - entry.count,
-    resetIn: entry.resetTime - now,
+  } catch {
+    // Redis error: fail open
+    return { success: true, remaining: config.maxRequests, resetIn: 0 }
   }
 }
 
@@ -118,7 +114,7 @@ export function withRateLimit(
     const path = request.nextUrl.pathname
     const identifier = `${ip}:${path}`
 
-    const result = checkRateLimit(identifier, config)
+    const result = await checkRateLimit(identifier, config)
 
     if (!result.success) {
       return rateLimitExceeded(result.resetIn)

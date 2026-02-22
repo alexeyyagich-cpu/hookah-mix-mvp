@@ -198,7 +198,7 @@ async function sendMainMenu(supabase: any, chatId: number) {
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`telegram:${ip}`, rateLimits.webhook)
+  const rateCheck = await checkRateLimit(`telegram:${ip}`, rateLimits.webhook)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   const secretHeader = request.headers.get('x-telegram-bot-api-secret-token')
@@ -425,9 +425,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Health check + register commands
+// Health check + register commands (requires webhook secret)
 let commandsRegistered = false
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const secretHeader = request.headers.get('x-telegram-bot-api-secret-token')
+  if (!verifyWebhookSecret(secretHeader)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   if (!commandsRegistered) {
     await setMyCommands([
       { command: 'start', description: 'Main menu' },

@@ -20,7 +20,7 @@ const STATUS_TEXT: Record<string, string> = {
 export async function POST(request: NextRequest) {
   // Rate limiting - strict for email endpoints
   const ip = getClientIp(request)
-  const rateCheck = checkRateLimit(`${ip}:/api/email/order-status`, rateLimits.strict)
+  const rateCheck = await checkRateLimit(`${ip}:/api/email/order-status`, rateLimits.strict)
   if (!rateCheck.success) {
     return rateLimitExceeded(rateCheck.resetIn)
   }
