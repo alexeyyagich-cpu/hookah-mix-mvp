@@ -39,6 +39,7 @@ import { useInventory } from "@/lib/hooks/useInventory";
 import { SessionTimer } from "@/components/session/SessionTimer";
 import type { MixSnapshot } from "@/types/database";
 import { useTranslation } from "@/lib/i18n";
+import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import Link from "next/link";
 
 const BRANDS = getBrandNames();
@@ -591,6 +592,7 @@ function MixPageInner() {
             {/* Divider */}
             <div className="hidden sm:block w-px h-6 mx-1" style={{ background: "var(--color-border)" }} />
 
+            <LocaleSwitcher />
             <ThemeSwitcher />
             {isGuestMode && venueSlug ? (
               <Link href={`/menu/${venueSlug}`} className="btn btn-primary text-sm px-2 sm:px-3">

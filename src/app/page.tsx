@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/lib/AuthContext'
-import { useTranslation, useLocale } from '@/lib/i18n'
-import { LOCALES, LOCALE_LABELS } from '@/lib/i18n/types'
+import { useTranslation } from '@/lib/i18n'
+import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 import {
   IconSmoke,
   IconStar,
@@ -20,7 +20,6 @@ import {
 export default function LandingPage() {
   const { user } = useAuth()
   const t = useTranslation('auth')
-  const { locale, setLocale } = useLocale()
 
   const features = [
     {
@@ -136,18 +135,7 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-lg">
-              {LOCALES.map((loc) => (
-                <button
-                  key={loc}
-                  onClick={() => setLocale(loc)}
-                  className={`transition-opacity ${locale === loc ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
-                  aria-label={LOCALE_LABELS[loc].name}
-                >
-                  {LOCALE_LABELS[loc].flag}
-                </button>
-              ))}
-            </div>
+            <LocaleSwitcher />
             {user ? (
               <Link href="/dashboard" className="btn btn-primary text-sm px-3 py-2 whitespace-nowrap">
                 {t.dashboard}

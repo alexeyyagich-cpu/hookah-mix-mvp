@@ -7,6 +7,7 @@ import { PricingCard } from '@/components/pricing/PricingCard'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n'
+import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 
 // Stripe price IDs (from environment)
 const STRIPE_PRICES = {
@@ -172,6 +173,7 @@ function PricingPageContent() {
             Hookah Torus
           </Link>
           <div className="flex items-center gap-4">
+            <LocaleSwitcher />
             <Link href="/mix" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
               {ta.navCalculator}
             </Link>

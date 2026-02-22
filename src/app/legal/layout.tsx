@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
+import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 
 export default function LegalLayout({
   children,
@@ -24,6 +25,7 @@ export default function LegalLayout({
           </Link>
 
           <nav className="flex items-center gap-4 text-sm">
+            <LocaleSwitcher />
             <Link href="/legal/terms" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
               {tc.legalTerms}
             </Link>
