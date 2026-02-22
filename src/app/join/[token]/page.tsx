@@ -40,35 +40,24 @@ export default function JoinPage() {
     const loadInvite = async () => {
       const supabase = createClient()
 
-      const { data, error } = await supabase
-        .from('invite_tokens')
-        .select('id, organization_id, location_id, email, role, expires_at')
-        .eq('token', token)
-        .is('accepted_at', null)
-        .single()
+      // Use secure RPC instead of direct table query
+      // (invite_tokens SELECT is restricted to org admins only)
+      const { data, error } = await supabase.rpc('lookup_invite', { p_token: token })
 
       if (error || !data) {
         setState('expired')
         return
       }
 
-      // Check if expired
+      // Check if expired (server already filters, but double-check client-side)
       if (new Date(data.expires_at) < new Date()) {
         setState('expired')
         return
       }
 
-      // Load org name
-      const { data: orgData } = await supabase
-        .from('organizations')
-        .select('name')
-        .eq('id', data.organization_id)
-        .single()
-
       setInvite({
         ...data,
         role: data.role as OrgRole,
-        org_name: orgData?.name || 'Unknown',
       })
 
       if (!user) {
@@ -90,7 +79,7 @@ export default function JoinPage() {
   const handleAccept = async () => {
     if (!user || !invite) return
 
-    // Verify email matches the invite
+    // Client-side email check (server also validates)
     if (user.email?.toLowerCase() !== invite.email.toLowerCase()) {
       setState('error')
       setErrorMsg(`This invite was sent to ${invite.email}. Please log in with that email address.`)
@@ -101,36 +90,11 @@ export default function JoinPage() {
     const supabase = createClient()
 
     try {
-      // Create org_members row
-      const { error: memberErr } = await supabase
-        .from('org_members')
-        .insert({
-          organization_id: invite.organization_id,
-          location_id: invite.location_id,
-          user_id: user.id,
-          role: invite.role,
-          display_name: user.user_metadata?.owner_name || user.email?.split('@')[0] || null,
-        })
+      // Use secure RPC: validates email, creates membership, marks accepted — atomically
+      const { data, error } = await supabase.rpc('accept_invite', { p_token: token })
 
-      if (memberErr) {
-        // If unique constraint violation, member already exists
-        if (memberErr.code === '23505') {
-          // Already a member — just mark invite as accepted
-        } else {
-          throw memberErr
-        }
-      }
-
-      // Mark invite as accepted
-      const { error: acceptErr } = await supabase
-        .from('invite_tokens')
-        .update({
-          accepted_at: new Date().toISOString(),
-          accepted_by: user.id,
-        })
-        .eq('id', invite.id)
-
-      if (acceptErr) throw acceptErr
+      if (error) throw error
+      if (!data?.success) throw new Error('Failed to accept invite')
 
       setState('success')
 
