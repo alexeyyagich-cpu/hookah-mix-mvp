@@ -62,7 +62,7 @@ export const auth: typeof AuthType = {
   heroBadge: 'Kostenloser Start — ohne Karte',
   heroTitle1: 'Verwalten Sie Ihre Shisha-Lounge',
   heroTitle2: ' wie ein Profi',
-  heroSubtitle: 'Tabak-Inventar, KI-gestützte Mix-Erstellung, Analytik und Gästedatenbank — alles in einer App für Ihr Lokal',
+  heroSubtitle: 'Tabak- & Bar-Inventar, KI-gestützte Mixes, Cocktailrezepte, Analytik und Gästedatenbank — alles in einer App für Ihr Lokal',
   heroCta: 'Kostenlos testen',
   heroCtaCalculator: 'Rechner öffnen',
   heroNote: 'Kostenloser Start in 2 Minuten',
@@ -83,6 +83,12 @@ export const auth: typeof AuthType = {
   feature5Desc: 'Merken Sie sich Gästepräferenzen. Personalisierter Service ohne zusätzliche Fragen.',
   feature6Title: 'Öffentliches Menü',
   feature6Desc: 'QR-Code für Gäste mit Ihrem Tabakmenü und Signature-Mixes.',
+  feature7Title: 'Bar-Verwaltung',
+  feature7Desc: 'Cocktailrezepte, Kostenkalkulator, Zutatenbestand und Verkaufsanalysen.',
+  feature8Title: 'Küchendisplay',
+  feature8Desc: 'Bestelltafel für Küche und Bar. Status: neu → in Zubereitung → fertig.',
+  feature9Title: 'Kellner-Tablet',
+  feature9Desc: 'Tischbestellungen mit Grundriss-Anbindung. Shisha und Bar in einem Warenkorb.',
 
   // Landing page — Benefits
   benefitsTitle: 'Was Sie bekommen',
@@ -92,7 +98,7 @@ export const auth: typeof AuthType = {
   benefit1Desc: 'Präzise Verfolgung eliminiert Verluste und Überverbrauch',
   benefit2Stat: '2x',
   benefit2Label: 'schnellerer Service',
-  benefit2Desc: 'Fertige Mixes und Gästepräferenzen-Verlauf',
+  benefit2Desc: 'Fertige Mixes, schnelle Cocktailbestellungen und Gästepräferenzen-Verlauf',
   benefit3Stat: '100%',
   benefit3Label: 'Lagerkontrolle',
   benefit3Desc: 'Wissen Sie immer, was ausgeht und wann Sie bestellen müssen',
@@ -105,7 +111,7 @@ export const auth: typeof AuthType = {
   step2Title: 'Tabake hinzufügen',
   step2Desc: 'Inventar manuell eingeben oder Barcode scannen. Bestände und Einkaufspreise festlegen.',
   step3Title: 'Effizienter arbeiten',
-  step3Desc: 'Mixes erstellen, Sitzungen führen, Statistiken verfolgen. Das System berechnet den Verbrauch und erinnert an Bestellungen.',
+  step3Desc: 'Mixes erstellen, Cocktails zubereiten, Sitzungen führen und Statistiken verfolgen. Das System berechnet den Verbrauch und erinnert an Bestellungen.',
 
   // Landing page — CTA
   ctaTitle: 'Bereit zu starten?',

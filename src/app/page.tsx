@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/lib/AuthContext'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
+import { LOCALES, LOCALE_LABELS } from '@/lib/i18n/types'
 import {
   IconSmoke,
   IconStar,
@@ -11,11 +12,15 @@ import {
   IconCalendar,
   IconTrendUp,
   IconInventory,
+  IconBar,
+  IconCocktail,
+  IconWaiter,
 } from '@/components/Icons'
 
 export default function LandingPage() {
   const { user } = useAuth()
   const t = useTranslation('auth')
+  const { locale, setLocale } = useLocale()
 
   const features = [
     {
@@ -47,6 +52,21 @@ export default function LandingPage() {
       icon: IconTarget,
       title: t.feature6Title,
       description: t.feature6Desc,
+    },
+    {
+      icon: IconBar,
+      title: t.feature7Title,
+      description: t.feature7Desc,
+    },
+    {
+      icon: IconCocktail,
+      title: t.feature8Title,
+      description: t.feature8Desc,
+    },
+    {
+      icon: IconWaiter,
+      title: t.feature9Title,
+      description: t.feature9Desc,
     },
   ]
 
@@ -115,7 +135,19 @@ export default function LandingPage() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 text-lg">
+              {LOCALES.map((loc) => (
+                <button
+                  key={loc}
+                  onClick={() => setLocale(loc)}
+                  className={`transition-opacity ${locale === loc ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                  aria-label={LOCALE_LABELS[loc].name}
+                >
+                  {LOCALE_LABELS[loc].flag}
+                </button>
+              ))}
+            </div>
             {user ? (
               <Link href="/dashboard" className="btn btn-primary text-sm px-3 py-2 whitespace-nowrap">
                 {t.dashboard}

@@ -62,7 +62,7 @@ export const auth: typeof AuthType = {
   heroBadge: 'Free start — no card required',
   heroTitle1: 'Manage your hookah lounge',
   heroTitle2: ' like a pro',
-  heroSubtitle: 'Tobacco inventory, AI-powered mix creation, analytics and guest database — all in one app for your venue',
+  heroSubtitle: 'Tobacco & bar inventory, AI-powered mixes, cocktail recipes, analytics and guest database — all in one app for your venue',
   heroCta: 'Try for free',
   heroCtaCalculator: 'Open calculator',
   heroNote: 'Free start in 2 minutes',
@@ -83,6 +83,12 @@ export const auth: typeof AuthType = {
   feature5Desc: 'Remember guest preferences. Personalized service without extra questions.',
   feature6Title: 'Public menu',
   feature6Desc: 'QR code for guests with your tobacco menu and signature mixes.',
+  feature7Title: 'Bar management',
+  feature7Desc: 'Cocktail recipes, cost calculator, ingredient inventory and sales analytics.',
+  feature8Title: 'Kitchen display',
+  feature8Desc: 'Order board for kitchen and bar. Statuses: new → preparing → ready.',
+  feature9Title: 'Waiter tablet',
+  feature9Desc: 'Table orders linked to your floor plan. Hookah and bar in one cart.',
 
   // Landing page — Benefits
   benefitsTitle: 'What you get',
@@ -92,7 +98,7 @@ export const auth: typeof AuthType = {
   benefit1Desc: 'Precise tracking eliminates losses and overconsumption',
   benefit2Stat: '2x',
   benefit2Label: 'faster service',
-  benefit2Desc: 'Ready mixes and guest preference history',
+  benefit2Desc: 'Ready mixes, quick cocktail orders and guest preference history',
   benefit3Stat: '100%',
   benefit3Label: 'stock control',
   benefit3Desc: 'Always know what is running out and when to order',
@@ -105,7 +111,7 @@ export const auth: typeof AuthType = {
   step2Title: 'Add tobaccos',
   step2Desc: 'Enter inventory manually or scan a barcode. Set stock levels and purchase prices.',
   step3Title: 'Work more efficiently',
-  step3Desc: 'Create mixes, run sessions, track statistics. The system calculates consumption and reminds you to order.',
+  step3Desc: 'Create mixes, prepare cocktails, run sessions and track statistics. The system calculates consumption and reminds you to order.',
 
   // Landing page — CTA
   ctaTitle: 'Ready to start?',
