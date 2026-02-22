@@ -237,7 +237,7 @@ function MenuPageInner({ slug }: { slug: string }) {
           <div className="text-6xl mb-4">{'\u{1F50D}'}</div>
           <h1 className="text-2xl font-bold mb-2">{t.menuNotFound}</h1>
           <p className="text-[var(--color-textMuted)] mb-6">{t.menuNotFoundHint}</p>
-          <Link href="/mix" className="btn btn-primary">{t.loungeGoHome}</Link>
+          <Link href="/" className="btn btn-primary">{t.loungeGoHome}</Link>
         </div>
       </div>
     )
@@ -313,7 +313,7 @@ function MenuPageInner({ slug }: { slug: string }) {
             </div>
           </Link>
           <Link
-            href="/mix"
+            href="/"
             className="flex items-center gap-2 text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
           >
             <div className="w-8 h-8 rounded-lg overflow-hidden">
@@ -722,7 +722,7 @@ function MenuPageInner({ slug }: { slug: string }) {
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-[var(--color-textMuted)]">
           <p>
             {t.menuFooter}{' '}
-            <Link href="/mix" className="text-[var(--color-primary)] hover:underline">Hookah Torus</Link>
+            <Link href="/" className="text-[var(--color-primary)] hover:underline">Hookah Torus</Link>
           </p>
         </div>
       </footer>

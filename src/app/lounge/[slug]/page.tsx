@@ -133,7 +133,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--color-bg)]/80 border-b border-[var(--color-border)]">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/mix" className="flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
+          <Link href="/" className="flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
               <video autoPlay loop muted playsInline preload="metadata" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                 <source src="/images/logo-animated.mp4" type="video/mp4" />
