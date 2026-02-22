@@ -93,9 +93,8 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <div className="card overflow-x-auto p-0">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-[var(--color-border)]">
                 <th
@@ -242,7 +241,6 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
               )}
             </tbody>
           </table>
-        </div>
       </div>
     </div>
   )

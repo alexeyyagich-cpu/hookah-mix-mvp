@@ -211,7 +211,7 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold">{ts.language}</h2>
           <p className="text-sm text-[var(--color-textMuted)]">{ts.languageDescription}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {LOCALES.map((loc) => {
             const info = LOCALE_LABELS[loc]
             return (
@@ -300,12 +300,12 @@ export default function SettingsPage() {
               onClick={() => toggleModule('hookah')}
               disabled={modulesLoading || (isHookahActive && !isBarActive)}
               title={isHookahActive && !isBarActive ? ts.cannotDisableSingle : undefined}
-              className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
+              className={`relative shrink-0 w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                 isHookahActive ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
               }`}
             >
-              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                isHookahActive ? 'left-7' : 'left-1'
+              <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                isHookahActive ? 'translate-x-6' : ''
               }`} />
             </button>
           </div>
@@ -323,12 +323,12 @@ export default function SettingsPage() {
               onClick={() => toggleModule('bar')}
               disabled={modulesLoading || (isBarActive && !isHookahActive)}
               title={isBarActive && !isHookahActive ? ts.cannotDisableSingle : undefined}
-              className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
+              className={`relative shrink-0 w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                 isBarActive ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
               }`}
             >
-              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                isBarActive ? 'left-7' : 'left-1'
+              <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                isBarActive ? 'translate-x-6' : ''
               }`} />
             </button>
           </div>
@@ -536,15 +536,15 @@ export default function SettingsPage() {
               onClick={() => updateNotificationSettings({
                 low_stock_enabled: !notificationSettings?.low_stock_enabled
               })}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
                 notificationSettings?.low_stock_enabled
                   ? 'bg-[var(--color-primary)]'
                   : 'bg-[var(--color-border)]'
               }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                  notificationSettings?.low_stock_enabled ? 'left-7' : 'left-1'
+                className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                  notificationSettings?.low_stock_enabled ? 'translate-x-6' : ''
                 }`}
               />
             </button>
@@ -591,15 +591,15 @@ export default function SettingsPage() {
                 <button
                   onClick={() => pushSubscribed ? unsubscribePush() : subscribePush()}
                   disabled={pushLoading || pushPermission === 'denied'}
-                  className={`relative w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
+                  className={`relative shrink-0 w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                     pushSubscribed
                       ? 'bg-[var(--color-primary)]'
                       : 'bg-[var(--color-border)]'
                   }`}
                 >
                   <span
-                    className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                      pushSubscribed ? 'left-7' : 'left-1'
+                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                      pushSubscribed ? 'translate-x-6' : ''
                     }`}
                   />
                 </button>
@@ -652,15 +652,15 @@ export default function SettingsPage() {
                 onClick={() => updateEmailSettings({
                   email_notifications_enabled: !emailSettings?.email_notifications_enabled
                 })}
-                className={`relative w-12 h-6 rounded-full transition-colors ${
+                className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
                   emailSettings?.email_notifications_enabled
                     ? 'bg-[var(--color-primary)]'
                     : 'bg-[var(--color-border)]'
                 }`}
               >
                 <span
-                  className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                    emailSettings?.email_notifications_enabled ? 'left-7' : 'left-1'
+                  className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.email_notifications_enabled ? 'translate-x-6' : ''
                   }`}
                 />
               </button>
@@ -674,12 +674,12 @@ export default function SettingsPage() {
                   onClick={() => updateEmailSettings({
                     low_stock_email: !emailSettings?.low_stock_email
                   })}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                  className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     emailSettings?.low_stock_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    emailSettings?.low_stock_email ? 'left-5' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.low_stock_email ? 'translate-x-5' : ''
                   }`} />
                 </button>
               </div>
@@ -690,12 +690,12 @@ export default function SettingsPage() {
                   onClick={() => updateEmailSettings({
                     order_updates_email: !emailSettings?.order_updates_email
                   })}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                  className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     emailSettings?.order_updates_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    emailSettings?.order_updates_email ? 'left-5' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.order_updates_email ? 'translate-x-5' : ''
                   }`} />
                 </button>
               </div>
@@ -706,12 +706,12 @@ export default function SettingsPage() {
                   onClick={() => updateEmailSettings({
                     daily_summary_email: !emailSettings?.daily_summary_email
                   })}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                  className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     emailSettings?.daily_summary_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    emailSettings?.daily_summary_email ? 'left-5' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    emailSettings?.daily_summary_email ? 'translate-x-5' : ''
                   }`} />
                 </button>
               </div>
@@ -868,12 +868,12 @@ export default function SettingsPage() {
                   onClick={() => updateTelegramSettings({
                     low_stock_alerts: !telegramConnection.low_stock_alerts
                   })}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                  className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     telegramConnection.low_stock_alerts ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    telegramConnection.low_stock_alerts ? 'left-5' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    telegramConnection.low_stock_alerts ? 'translate-x-5' : ''
                   }`} />
                 </button>
               </div>
@@ -884,12 +884,12 @@ export default function SettingsPage() {
                   onClick={() => updateTelegramSettings({
                     session_reminders: !telegramConnection.session_reminders
                   })}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                  className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     telegramConnection.session_reminders ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    telegramConnection.session_reminders ? 'left-5' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    telegramConnection.session_reminders ? 'translate-x-5' : ''
                   }`} />
                 </button>
               </div>
@@ -900,12 +900,12 @@ export default function SettingsPage() {
                   onClick={() => updateTelegramSettings({
                     daily_summary: !telegramConnection.daily_summary
                   })}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${
+                  className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     telegramConnection.daily_summary ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    telegramConnection.daily_summary ? 'left-5' : 'left-0.5'
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    telegramConnection.daily_summary ? 'translate-x-5' : ''
                   }`} />
                 </button>
               </div>

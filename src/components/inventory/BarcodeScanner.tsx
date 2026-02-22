@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
-import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode'
 import { findTobaccoByBarcode, TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 import { IconClose, IconScan } from '@/components/Icons'
 
@@ -15,11 +14,13 @@ interface BarcodeScannerProps {
 export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScannerProps) {
   const t = useTranslation('hookah')
   const [error, setError] = useState<string | null>(null)
-  const [scanning, setScanning] = useState(false)
-  const [lastScanned, setLastScanned] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
-  const scannerRef = useRef<Html5Qrcode | null>(null)
+  const scannerRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const onScanRef = useRef(onScan)
+  const lastScannedRef = useRef<string | null>(null)
+
+  useEffect(() => { onScanRef.current = onScan })
 
   useEffect(() => {
     let mounted = true
@@ -28,6 +29,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
       if (!containerRef.current) return
 
       try {
+        const { Html5Qrcode } = await import('html5-qrcode')
         const scanner = new Html5Qrcode('barcode-scanner')
         scannerRef.current = scanner
 
@@ -38,12 +40,12 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
             qrbox: { width: 250, height: 100 },
             aspectRatio: 1.777,
           },
-          (decodedText) => {
+          (decodedText: string) => {
             if (!mounted) return
 
             // Avoid duplicate scans
-            if (decodedText === lastScanned) return
-            setLastScanned(decodedText)
+            if (decodedText === lastScannedRef.current) return
+            lastScannedRef.current = decodedText
 
             // Look up in database
             const tobacco = findTobaccoByBarcode(decodedText)
@@ -51,7 +53,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
             if (tobacco) {
               // Found! Stop scanning and return result
               scanner.stop().then(() => {
-                onScan(tobacco)
+                onScanRef.current(tobacco)
               }).catch(console.error)
             } else {
               // Not found in database
@@ -59,13 +61,12 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
               setTimeout(() => setNotFound(false), 2000)
             }
           },
-          (errorMessage) => {
+          () => {
             // Ignore scan errors (happens when no barcode is visible)
           }
         )
 
         if (mounted) {
-          setScanning(true)
           setError(null)
         }
       } catch (err) {
@@ -84,16 +85,19 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
 
     return () => {
       mounted = false
-      if (scannerRef.current) {
-        scannerRef.current.stop().catch(() => {})
-        scannerRef.current.clear()
+      const scanner = scannerRef.current
+      scannerRef.current = null
+      if (scanner) {
+        scanner.stop().then(() => scanner.clear()).catch(() => {})
       }
     }
-  }, [lastScanned, onScan])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleClose = () => {
-    if (scannerRef.current) {
-      scannerRef.current.stop().catch(() => {})
+    const scanner = scannerRef.current
+    if (scanner) {
+      scanner.stop().catch(() => {})
     }
     onClose()
   }
