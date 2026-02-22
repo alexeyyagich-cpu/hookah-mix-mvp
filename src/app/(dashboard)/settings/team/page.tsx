@@ -5,6 +5,7 @@ import { useTeam } from '@/lib/hooks/useTeam'
 import { useTips } from '@/lib/hooks/useTips'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
 import { TipQRCode } from '@/components/dashboard/TipQRCode'
 import { useTranslation, useLocale } from '@/lib/i18n'
@@ -21,7 +22,8 @@ export default function TeamPage() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const router = useRouter()
-  const { isOwner } = useRole()
+  const { orgRole } = useOrganizationContext()
+  const { isOwner } = useRole(orgRole)
   const { members, invitations, loading, error, inviteMember, removeMember, updateMemberRole, updateMemberPayroll, cancelInvitation, resendInvitation } = useTeam()
   const { staffProfiles, createStaffProfile, toggleTipEnabled, getTipStats } = useTips()
   const { isFreeTier } = useSubscription()

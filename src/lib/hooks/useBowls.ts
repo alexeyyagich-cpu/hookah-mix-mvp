@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BowlType } from '@/types/database'
+import { SUBSCRIPTION_LIMITS } from '@/types/database'
 
 // Demo data for testing
 const DEMO_BOWLS: BowlType[] = [
@@ -47,12 +48,7 @@ export function useBowls(): UseBowlsReturn {
 
   // Determine limits based on subscription
   const tier = profile?.subscription_tier || 'free'
-  const limits = {
-    free: { bowl_types: 1 },
-    pro: { bowl_types: Infinity },
-    enterprise: { bowl_types: Infinity },
-  }
-  const bowlsLimit = limits[tier].bowl_types
+  const bowlsLimit = SUBSCRIPTION_LIMITS[tier].bowl_types
   const canAddMore = bowls.length < bowlsLimit
 
   const defaultBowl = bowls.find(b => b.is_default) || bowls[0] || null

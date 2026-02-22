@@ -8,6 +8,7 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { enqueueOfflineMutation } from '@/lib/offline/offlineMutation'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
+import { SUBSCRIPTION_LIMITS } from '@/types/database'
 
 // Demo data for testing (prices in EUR, package_grams = 100g default)
 const DEMO_INVENTORY: TobaccoInventory[] = [
@@ -52,12 +53,7 @@ export function useInventory(): UseInventoryReturn {
 
   // Determine limits based on subscription
   const tier = profile?.subscription_tier || 'free'
-  const limits = {
-    free: { inventory_items: 10 },
-    pro: { inventory_items: Infinity },
-    enterprise: { inventory_items: Infinity },
-  }
-  const itemsLimit = limits[tier].inventory_items
+  const itemsLimit = SUBSCRIPTION_LIMITS[tier].inventory_items
   const canAddMore = inventory.length < itemsLimit
 
   const fetchInventory = useCallback(async () => {

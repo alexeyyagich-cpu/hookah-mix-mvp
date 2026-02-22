@@ -60,8 +60,8 @@ export function Sidebar() {
   const { locale } = useLocale()
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
-  const { organization } = useOrganizationContext()
-  const { orgRole, hasPermission, isOwner, isStaff } = useRole()
+  const { organization, orgRole: contextOrgRole } = useOrganizationContext()
+  const { orgRole, hasPermission, isOwner, isStaff } = useRole(contextOrgRole)
   const { modules } = useModules()
 
   const navigationGroups: NavGroup[] = [

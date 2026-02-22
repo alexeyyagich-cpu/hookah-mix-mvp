@@ -133,7 +133,7 @@ export async function updateMutationStatus(
   if (!entry) return
   entry.status = status
   if (error !== undefined) entry.error = error
-  if (status === 'failed') entry.retryCount += 1
+  if (status === 'failed' || status === 'pending') entry.retryCount += 1
   await db.put('syncQueue', entry)
 }
 

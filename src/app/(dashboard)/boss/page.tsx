@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useRole } from '@/lib/hooks/useRole'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useShifts } from '@/lib/hooks/useShifts'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
@@ -28,7 +29,8 @@ import { ActivityFeed } from '@/components/boss/ActivityFeed'
 export default function BossPage() {
   const tm = useTranslation('manage')
   const router = useRouter()
-  const { isOwner } = useRole()
+  const { orgRole } = useOrganizationContext()
+  const { isOwner } = useRole(orgRole)
   const { isFreeTier } = useSubscription()
 
   // Data hooks

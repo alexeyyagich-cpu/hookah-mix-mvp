@@ -149,22 +149,6 @@ export function useBarSales(): UseBarSalesReturn {
       ? ((totalRevenue - totalCost) / totalRevenue) * 100
       : null
 
-    // Auto write-off: deduct ingredients from inventory
-    for (const ing of recipe.ingredients) {
-      if (!ing.bar_inventory_id) continue
-
-      const conversion = PORTION_CONVERSIONS[ing.unit]
-      if (!conversion) continue
-
-      const deductAmount = ing.quantity * conversion.value * quantity
-      await adjustQuantity(
-        ing.bar_inventory_id,
-        -deductAmount,
-        'sale',
-        `Sale: ${recipe.name} x${quantity}`
-      )
-    }
-
     const saleData = {
       profile_id: user.id,
       ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
@@ -190,6 +174,7 @@ export function useBarSales(): UseBarSalesReturn {
       return newSale
     }
 
+    // Insert sale record FIRST — so failed insert doesn't leave orphaned deductions
     const { data, error: insertError } = await supabase
       .from('bar_sales')
       .insert(saleData)
@@ -199,6 +184,22 @@ export function useBarSales(): UseBarSalesReturn {
     if (insertError) {
       setError(insertError.message)
       return null
+    }
+
+    // Auto write-off: deduct ingredients from inventory AFTER sale is recorded
+    for (const ing of recipe.ingredients) {
+      if (!ing.bar_inventory_id) continue
+
+      const conversion = PORTION_CONVERSIONS[ing.unit]
+      if (!conversion) continue
+
+      const deductAmount = ing.quantity * conversion.value * quantity
+      await adjustQuantity(
+        ing.bar_inventory_id,
+        -deductAmount,
+        'sale',
+        `Sale: ${recipe.name} x${quantity}`
+      )
     }
 
     setSales(prev => [data, ...prev])

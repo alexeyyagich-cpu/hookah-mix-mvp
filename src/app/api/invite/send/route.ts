@@ -39,10 +39,10 @@ export async function POST(req: NextRequest) {
 
     // Verify the authenticated user owns this organization
     const { data: membership } = await supabase
-      .from('organization_members')
+      .from('org_members')
       .select('role')
       .eq('organization_id', organizationId)
-      .eq('profile_id', user.id)
+      .eq('user_id', user.id)
       .single()
 
     if (!membership || (membership.role !== 'owner' && membership.role !== 'manager')) {
