@@ -78,7 +78,7 @@ export function useBarSales(): UseBarSalesReturn {
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const { inventory, adjustQuantity } = useBarInventory()
-  const { calculateCost } = useBarRecipes()
+  const { calculateCost } = useBarRecipes(inventory)
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   useEffect(() => {
@@ -135,9 +135,10 @@ export function useBarSales(): UseBarSalesReturn {
 
   // Refetch after reconnect
   useEffect(() => {
-    const handleOnline = () => setTimeout(fetchSales, 3000)
+    let tid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { tid = setTimeout(fetchSales, 3000) }
     window.addEventListener('online', handleOnline)
-    return () => window.removeEventListener('online', handleOnline)
+    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
   }, [fetchSales])
 
   const recordSale = useCallback(async (

@@ -91,6 +91,14 @@ export function useBowls(): UseBowlsReturn {
     if (!isDemoMode) fetchBowls()
   }, [fetchBowls, isDemoMode])
 
+  // Refetch after reconnect
+  useEffect(() => {
+    let tid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { tid = setTimeout(fetchBowls, 3000) }
+    window.addEventListener('online', handleOnline)
+    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
+  }, [fetchBowls])
+
   const addBowl = async (
     bowl: Omit<BowlType, 'id' | 'profile_id' | 'created_at'>
   ): Promise<BowlType | null> => {

@@ -17,6 +17,7 @@ import { useTips } from '@/lib/hooks/useTips'
 import { useTranslation } from '@/lib/i18n'
 import { IconCrown, IconRefresh } from '@/components/Icons'
 import Link from 'next/link'
+import type { ShiftReconciliation } from '@/types/database'
 
 import { LiveStatusBar } from '@/components/boss/LiveStatusBar'
 import { RevenueCard } from '@/components/boss/RevenueCard'
@@ -55,10 +56,11 @@ export default function BossPage() {
     ? now - new Date(activeShift.opened_at).getTime()
     : 0
 
-  const activeReconciliation = useMemo(
-    () => activeShift ? getReconciliation(activeShift) : null,
-    [activeShift, getReconciliation, now]
-  )
+  const [activeReconciliation, setActiveRecon] = useState<ShiftReconciliation | null>(null)
+  useEffect(() => {
+    if (activeShift) { getReconciliation(activeShift).then(setActiveRecon) }
+    else { setActiveRecon(null) }
+  }, [activeShift, getReconciliation, now])
 
   // Today/yesterday strings for filtering
   const todayStr = new Date().toISOString().split('T')[0]

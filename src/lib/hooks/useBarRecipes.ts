@@ -9,6 +9,7 @@ import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
 import type {
+  BarInventoryItem,
   BarRecipe,
   BarRecipeIngredient,
   BarRecipeWithIngredients,
@@ -195,13 +196,14 @@ interface UseBarRecipesReturn {
   refresh: () => Promise<void>
 }
 
-export function useBarRecipes(): UseBarRecipesReturn {
+export function useBarRecipes(inventoryOverride?: BarInventoryItem[]): UseBarRecipesReturn {
   const [recipes, setRecipes] = useState<BarRecipeWithIngredients[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, isDemoMode } = useAuth()
   const { organizationId } = useOrganizationContext()
-  const { inventory: barInventory } = useBarInventory()
+  const { inventory: ownInventory } = useBarInventory()
+  const barInventory = inventoryOverride ?? ownInventory
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   useEffect(() => {

@@ -5,11 +5,6 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
-import { useSessions } from '@/lib/hooks/useSessions'
-import { useBarSales } from '@/lib/hooks/useBarSales'
-import { useKDS } from '@/lib/hooks/useKDS'
-import { useInventory } from '@/lib/hooks/useInventory'
-import { useTeam } from '@/lib/hooks/useTeam'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 
 // Demo shifts — realistic week of data
@@ -137,7 +132,7 @@ interface UseShiftsReturn {
   error: string | null
   openShift: (input?: OpenShiftInput) => Promise<Shift | null>
   closeShift: (shiftId: string, input?: CloseShiftInput) => Promise<boolean>
-  getReconciliation: (shift: Shift) => ShiftReconciliation
+  getReconciliation: (shift: Shift) => Promise<ShiftReconciliation>
   refresh: () => Promise<void>
 }
 
@@ -148,12 +143,6 @@ export function useShifts(): UseShiftsReturn {
   const { user, profile, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
-
-  const { sessions } = useSessions()
-  const { sales } = useBarSales()
-  const { orders: kdsOrders } = useKDS()
-  const { inventory: tobaccoInventory } = useInventory()
-  const { members: teamMembers } = useTeam()
 
   // Effective profile ID: staff uses owner's ID (legacy fallback)
   const effectiveProfileId = useMemo(() => {
@@ -294,23 +283,50 @@ export function useShifts(): UseShiftsReturn {
     return true
   }, [isDemoMode, supabase])
 
-  const getReconciliation = useCallback((shift: Shift): ShiftReconciliation => {
-    const start = new Date(shift.opened_at)
-    const end = shift.closed_at ? new Date(shift.closed_at) : new Date()
+  // Fetch reconciliation data on-demand instead of via heavy hooks
+  // This avoids mounting useSessions/useBarSales/useKDS/useInventory/useTeam unconditionally,
+  // and correctly queries ALL KDS orders (including served/cancelled) for the shift period.
+  const getReconciliation = useCallback(async (shift: Shift): Promise<ShiftReconciliation> => {
+    const start = shift.opened_at
+    const end = shift.closed_at || new Date().toISOString()
+    const ownerFilter = organizationId
+      ? { key: 'organization_id', value: organizationId }
+      : { key: 'profile_id', value: effectiveProfileId! }
+
+    const emptyResult: ShiftReconciliation = {
+      hookah: { sessionsCount: 0, totalGrams: 0, avgCompatibility: null, topTobaccos: [], tobaccoCost: 0, revenue: 0, profit: 0 },
+      bar: { salesCount: 0, totalRevenue: 0, totalCost: 0, profit: 0, marginPercent: null, topCocktails: [] },
+      kds: { totalOrders: 0, byStatus: {}, avgCompletionMinutes: null },
+      cash: { startingCash: shift.starting_cash || 0, barRevenue: 0, hookahRevenue: 0, expectedCash: shift.starting_cash || 0, actualCash: shift.closing_cash, difference: shift.closing_cash !== null ? shift.closing_cash - (shift.starting_cash || 0) : null },
+      payroll: null,
+      tips: { count: 0, total: 0 },
+    }
+
+    if (isDemoMode || !supabase || !effectiveProfileId) return emptyResult
+
+    // Fetch all needed data in parallel — includes ALL statuses for KDS
+    const [sessionsRes, salesRes, kdsRes, inventoryRes, teamRes] = await Promise.all([
+      supabase.from('sessions').select('*').eq(ownerFilter.key, ownerFilter.value).gte('session_date', start).lte('session_date', end),
+      supabase.from('bar_sales').select('*').eq(ownerFilter.key, ownerFilter.value).gte('sold_at', start).lte('sold_at', end),
+      supabase.from('kds_orders').select('*').eq(ownerFilter.key, ownerFilter.value).gte('created_at', start).lte('created_at', end),
+      supabase.from('tobacco_inventory').select('tobacco_id, purchase_price, package_grams').eq(ownerFilter.key, ownerFilter.value),
+      supabase.from('org_members').select('user_id, display_name, hourly_rate, sales_commission_percent').eq('organization_id', organizationId || ''),
+    ])
+
+    const sessions = sessionsRes.data || []
+    const sales = salesRes.data || []
+    const kdsOrders = kdsRes.data || []
+    const tobaccoInventory = inventoryRes.data || []
+    const teamMembers = teamRes.data || []
 
     // --- HOOKAH ---
-    const shiftSessions = sessions.filter(s => {
-      const d = new Date(s.session_date)
-      return d >= start && d <= end
-    })
-
     let totalGrams = 0
     let totalTobaccoCost = 0
     let hookahRevenue = 0
     const tobaccoUsage: Record<string, { brand: string; flavor: string; grams: number }> = {}
     const compatScores: number[] = []
 
-    for (const session of shiftSessions) {
+    for (const session of sessions) {
       if (session.compatibility_score !== null) {
         compatScores.push(session.compatibility_score)
       }
@@ -324,7 +340,7 @@ export function useShifts(): UseShiftsReturn {
           tobaccoUsage[key] = { brand: item.brand, flavor: item.flavor, grams: 0 }
         }
         tobaccoUsage[key].grams += item.grams_used
-        const inv = tobaccoInventory.find(i => i.tobacco_id === item.tobacco_id)
+        const inv = tobaccoInventory.find((i: { tobacco_id: string; purchase_price: number | null; package_grams: number | null }) => i.tobacco_id === item.tobacco_id)
         if (inv?.purchase_price && inv?.package_grams && inv.package_grams > 0) {
           totalTobaccoCost += item.grams_used * (inv.purchase_price / inv.package_grams)
         }
@@ -336,20 +352,15 @@ export function useShifts(): UseShiftsReturn {
       .slice(0, 5)
 
     // --- BAR ---
-    const shiftSales = sales.filter(s => {
-      const d = new Date(s.sold_at)
-      return d >= start && d <= end
-    })
-
-    const barRevenue = shiftSales.reduce((sum, s) => sum + s.total_revenue, 0)
-    const barCost = shiftSales.reduce((sum, s) => sum + s.total_cost, 0)
-    const barSalesCount = shiftSales.reduce((sum, s) => sum + s.quantity, 0)
+    const barRevenue = sales.reduce((sum: number, s: { total_revenue: number }) => sum + s.total_revenue, 0)
+    const barCost = sales.reduce((sum: number, s: { total_cost: number }) => sum + s.total_cost, 0)
+    const barSalesCount = sales.reduce((sum: number, s: { quantity: number }) => sum + s.quantity, 0)
     const barProfit = barRevenue - barCost
-    const margins = shiftSales.map(s => s.margin_percent).filter((m): m is number => m !== null)
-    const barAvgMargin = margins.length > 0 ? margins.reduce((a, b) => a + b, 0) / margins.length : null
+    const margins = sales.map((s: { margin_percent: number | null }) => s.margin_percent).filter((m: number | null): m is number => m !== null)
+    const barAvgMargin = margins.length > 0 ? margins.reduce((a: number, b: number) => a + b, 0) / margins.length : null
 
     const cocktailMap = new Map<string, { count: number; revenue: number }>()
-    for (const s of shiftSales) {
+    for (const s of sales) {
       const existing = cocktailMap.get(s.recipe_name) || { count: 0, revenue: 0 }
       cocktailMap.set(s.recipe_name, {
         count: existing.count + s.quantity,
@@ -361,16 +372,11 @@ export function useShifts(): UseShiftsReturn {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5)
 
-    // --- KDS ---
-    const shiftKdsOrders = kdsOrders.filter(o => {
-      const d = new Date(o.created_at)
-      return d >= start && d <= end
-    })
-
+    // --- KDS (all statuses including served/cancelled) ---
     const kdsByStatus: Record<string, number> = {}
     let totalCompletionMs = 0
     let completedCount = 0
-    for (const o of shiftKdsOrders) {
+    for (const o of kdsOrders) {
       kdsByStatus[o.status] = (kdsByStatus[o.status] || 0) + 1
       if (o.completed_at) {
         totalCompletionMs += new Date(o.completed_at).getTime() - new Date(o.created_at).getTime()
@@ -379,7 +385,7 @@ export function useShifts(): UseShiftsReturn {
     }
 
     // --- PAYROLL ---
-    const staffMember = teamMembers.find(m => m.user_id === shift.opened_by)
+    const staffMember = teamMembers.find((m: { user_id: string }) => m.user_id === shift.opened_by)
     let payrollData: ShiftReconciliation['payroll'] = null
     if (staffMember && (staffMember.hourly_rate > 0 || staffMember.sales_commission_percent > 0)) {
       const shiftDurationMs = (shift.closed_at ? new Date(shift.closed_at).getTime() : Date.now()) - new Date(shift.opened_at).getTime()
@@ -405,7 +411,7 @@ export function useShifts(): UseShiftsReturn {
 
     return {
       hookah: {
-        sessionsCount: shiftSessions.length,
+        sessionsCount: sessions.length,
         totalGrams,
         avgCompatibility: compatScores.length > 0
           ? Math.round(compatScores.reduce((a, b) => a + b, 0) / compatScores.length)
@@ -424,7 +430,7 @@ export function useShifts(): UseShiftsReturn {
         topCocktails,
       },
       kds: {
-        totalOrders: shiftKdsOrders.length,
+        totalOrders: kdsOrders.length,
         byStatus: kdsByStatus,
         avgCompletionMinutes: completedCount > 0
           ? Math.round((totalCompletionMs / completedCount) / 60000 * 10) / 10
@@ -443,7 +449,7 @@ export function useShifts(): UseShiftsReturn {
       payroll: payrollData,
       tips: { count: 0, total: 0 },
     }
-  }, [sessions, sales, kdsOrders, tobaccoInventory, teamMembers])
+  }, [isDemoMode, supabase, effectiveProfileId, organizationId])
 
   return {
     shifts,

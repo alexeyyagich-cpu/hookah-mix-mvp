@@ -115,15 +115,18 @@ export function usePnL(): UsePnLReturn {
 
   const [selectedPreset, setSelectedPreset] = useState<PnLPreset>('30d')
 
-  const days = getPresetDays(selectedPreset)
-  const now = new Date()
-  const periodEnd = new Date(now)
-  const periodStart = new Date(now)
-  periodStart.setDate(periodStart.getDate() - days)
-
-  const prevEnd = new Date(periodStart)
-  const prevStart = new Date(periodStart)
-  prevStart.setDate(prevStart.getDate() - days)
+  // Memoize date boundaries so useMemo deps stay stable
+  const { days, periodStart, periodEnd, prevStart, prevEnd } = useMemo(() => {
+    const d = getPresetDays(selectedPreset)
+    const now = new Date()
+    const pEnd = new Date(now)
+    const pStart = new Date(now)
+    pStart.setDate(pStart.getDate() - d)
+    const pvEnd = new Date(pStart)
+    const pvStart = new Date(pStart)
+    pvStart.setDate(pvStart.getDate() - d)
+    return { days: d, periodStart: pStart, periodEnd: pEnd, prevStart: pvStart, prevEnd: pvEnd }
+  }, [selectedPreset])
 
   const loading = barLoading || sessionsLoading
 
@@ -400,7 +403,7 @@ export function usePnL(): UsePnLReturn {
       costByCategory,
       topItems,
     }
-  }, [sales, sessions, tobaccoInventory, barInventory, pricePerGram, isBarActive, isHookahActive, selectedPreset, periodStart, periodEnd, prevStart, prevEnd, days])
+  }, [sales, sessions, tobaccoInventory, barInventory, pricePerGram, isBarActive, isHookahActive, periodStart, periodEnd, prevStart, prevEnd, days])
 
   return {
     data,

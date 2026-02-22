@@ -156,7 +156,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       }))
       return false
     }
-  }, [state.isSupported])
+  }, [state.isSupported, user])
 
   const unsubscribe = useCallback(async (): Promise<boolean> => {
     setState(prev => ({ ...prev, loading: true, error: null }))
@@ -202,7 +202,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       }))
       return false
     }
-  }, [])
+  }, [user])
 
   const sendLocalNotification = useCallback((title: string, options?: NotificationOptions) => {
     sendLocalNotificationInternal(title, options)

@@ -132,9 +132,10 @@ export function useBarInventory(): UseBarInventoryReturn {
 
   // Refetch after reconnect
   useEffect(() => {
-    const handleOnline = () => setTimeout(fetchInventory, 3000)
+    let tid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { tid = setTimeout(fetchInventory, 3000) }
     window.addEventListener('online', handleOnline)
-    return () => window.removeEventListener('online', handleOnline)
+    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
   }, [fetchInventory])
 
   const addIngredient = async (

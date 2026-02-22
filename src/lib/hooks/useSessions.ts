@@ -167,11 +167,13 @@ export function useSessions(): UseSessionsReturn {
   // Refetch after reconnect to replace offline temp data with real data
   // Also refetch when a mutation is discarded to reconcile local state
   useEffect(() => {
-    const handleOnline = () => setTimeout(fetchSessions, 3000)
+    let tid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { tid = setTimeout(fetchSessions, 3000) }
     const handleReconcile = () => fetchSessions()
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline-discard-reconcile', handleReconcile)
     return () => {
+      clearTimeout(tid)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline-discard-reconcile', handleReconcile)
     }

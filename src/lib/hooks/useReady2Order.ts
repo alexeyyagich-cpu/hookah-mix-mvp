@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
@@ -45,6 +45,16 @@ export function useReady2Order(): UseReady2OrderReturn {
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
+  const pollTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  // Cleanup popup polling timers on unmount
+  useEffect(() => {
+    return () => {
+      clearInterval(pollIntervalRef.current)
+      clearTimeout(pollTimeoutRef.current)
+    }
+  }, [])
 
   // Demo mode
   useEffect(() => {
@@ -123,11 +133,13 @@ export function useReady2Order(): UseReady2OrderReturn {
 
         // Poll for connection completion
         if (popup) {
-          const pollInterval = setInterval(async () => {
+          clearInterval(pollIntervalRef.current)
+          clearTimeout(pollTimeoutRef.current)
+
+          pollIntervalRef.current = setInterval(async () => {
             try {
               if (popup.closed) {
-                clearInterval(pollInterval)
-                // Refresh connection state
+                clearInterval(pollIntervalRef.current)
                 await fetchConnection()
               }
             } catch {
@@ -136,8 +148,8 @@ export function useReady2Order(): UseReady2OrderReturn {
           }, 1000)
 
           // Safety timeout
-          setTimeout(() => {
-            clearInterval(pollInterval)
+          pollTimeoutRef.current = setTimeout(() => {
+            clearInterval(pollIntervalRef.current)
             fetchConnection()
           }, 120_000)
         }

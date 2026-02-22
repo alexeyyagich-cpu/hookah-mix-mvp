@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { TobaccoInventory, KdsOrder, Shift, ShiftReconciliation } from '@/types/database'
 
@@ -13,7 +14,7 @@ interface AlertsPanelProps {
   kdsOrders: KdsOrder[]
   reviews: Review[]
   shifts: Shift[]
-  getReconciliation: (shift: Shift) => ShiftReconciliation
+  getReconciliation: (shift: Shift) => Promise<ShiftReconciliation>
   tm: Record<string, unknown>
 }
 
@@ -26,6 +27,31 @@ interface Alert {
 }
 
 export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, shifts, getReconciliation, tm }: AlertsPanelProps) {
+  const [cashShortageAlert, setCashShortageAlert] = useState<Alert | null>(null)
+
+  // Fetch cash shortage alert async
+  useEffect(() => {
+    const lastClosed = shifts.find(s => s.status === 'closed')
+    if (!lastClosed) { setCashShortageAlert(null); return }
+
+    let cancelled = false
+    getReconciliation(lastClosed).then(recon => {
+      if (cancelled) return
+      if (recon.cash.difference !== null && recon.cash.difference < 0) {
+        setCashShortageAlert({
+          id: 'cash-shortage',
+          text: (tm.bossCashShortage as (a: string) => string)(`${Math.abs(recon.cash.difference)}€`),
+          severity: 'warning',
+          href: '/shifts',
+          emoji: '💰',
+        })
+      } else {
+        setCashShortageAlert(null)
+      }
+    })
+    return () => { cancelled = true }
+  }, [shifts, getReconciliation, tm])
+
   const alerts: Alert[] = []
 
   // Out of stock
@@ -81,19 +107,9 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
     })
   }
 
-  // Cash shortage from last closed shift
-  const lastClosed = shifts.find(s => s.status === 'closed')
-  if (lastClosed) {
-    const recon = getReconciliation(lastClosed)
-    if (recon.cash.difference !== null && recon.cash.difference < 0) {
-      alerts.push({
-        id: 'cash-shortage',
-        text: (tm.bossCashShortage as (a: string) => string)(`${Math.abs(recon.cash.difference)}€`),
-        severity: 'warning',
-        href: '/shifts',
-        emoji: '💰',
-      })
-    }
+  // Add cash shortage from async result
+  if (cashShortageAlert) {
+    alerts.push(cashShortageAlert)
   }
 
   return (

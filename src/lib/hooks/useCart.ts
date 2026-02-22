@@ -14,6 +14,8 @@ interface UseCartReturn {
   cart: Cart | null
   cartItemCount: number
   loading: boolean
+  /** Stored cart IDs from localStorage, null once hydrated or empty */
+  storedCart: StoredCart | null
   addToCart: (product: SupplierProduct, supplier: Supplier, quantity?: number) => void
   updateQuantity: (productId: string, quantity: number) => void
   removeFromCart: (productId: string) => void
@@ -27,57 +29,48 @@ export function useCart(): UseCartReturn {
   const [products, setProducts] = useState<Map<string, SupplierProduct>>(new Map())
   const [supplier, setSupplier] = useState<Supplier | null>(null)
   const [loading, setLoading] = useState(true)
+  // Stored cart IDs preserved until hydrated via addToCart
+  const [storedCartRef, setStoredCartRef] = useState<StoredCart | null>(null)
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const loadCart = async () => {
-      try {
-        const stored = localStorage.getItem(CART_STORAGE_KEY)
-        if (!stored) {
-          setLoading(false)
-          return
-        }
-
+    try {
+      const stored = localStorage.getItem(CART_STORAGE_KEY)
+      if (stored) {
         const storedCart: StoredCart = JSON.parse(stored)
-        if (!storedCart.items || storedCart.items.length === 0) {
+        if (storedCart.items && storedCart.items.length > 0) {
+          // Preserve stored data; full Cart object will be hydrated
+          // when user visits the supplier page and addToCart is called
+          setStoredCartRef(storedCart)
+        } else {
           localStorage.removeItem(CART_STORAGE_KEY)
-          setLoading(false)
-          return
         }
-
-        // Note: Products and supplier need to be loaded from parent component
-        // Cart only stores IDs and quantities in localStorage
-        // Full data is hydrated when products are added
-        setLoading(false)
-      } catch (e) {
-        console.error('Failed to load cart:', e)
-        localStorage.removeItem(CART_STORAGE_KEY)
-        setLoading(false)
       }
+    } catch (e) {
+      console.error('Failed to load cart:', e)
+      localStorage.removeItem(CART_STORAGE_KEY)
     }
-
-    loadCart()
+    setLoading(false)
   }, [])
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (loading) return
 
-    if (!cart || cart.items.length === 0) {
+    if (cart && cart.items.length > 0) {
+      const toStore: StoredCart = {
+        supplierId: cart.supplier.id,
+        items: cart.items.map(item => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
+      }
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toStore))
+    } else if (!storedCartRef) {
+      // Only remove from localStorage if there's no pending stored cart to hydrate
       localStorage.removeItem(CART_STORAGE_KEY)
-      return
     }
-
-    const storedCart: StoredCart = {
-      supplierId: cart.supplier.id,
-      items: cart.items.map(item => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-      })),
-    }
-
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(storedCart))
-  }, [cart, loading])
+  }, [cart, loading, storedCartRef])
 
   // Calculate subtotal
   const calculateSubtotal = useCallback((items: CartItem[]): number => {
@@ -85,6 +78,9 @@ export function useCart(): UseCartReturn {
   }, [])
 
   const addToCart = useCallback((product: SupplierProduct, supplierData: Supplier, quantity: number = 1) => {
+    // Clear stored ref once a real addToCart hydrates the cart
+    setStoredCartRef(null)
+
     setCart(currentCart => {
       // If cart exists with different supplier, need to clear first
       if (currentCart && currentCart.supplier.id !== product.supplier_id) {
@@ -196,6 +192,7 @@ export function useCart(): UseCartReturn {
     setCart(null)
     setProducts(new Map())
     setSupplier(null)
+    setStoredCartRef(null)
     localStorage.removeItem(CART_STORAGE_KEY)
   }, [])
 
@@ -220,6 +217,7 @@ export function useCart(): UseCartReturn {
     cart,
     cartItemCount,
     loading,
+    storedCart: storedCartRef,
     addToCart,
     updateQuantity,
     removeFromCart,

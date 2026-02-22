@@ -180,9 +180,10 @@ export function useFloorPlan(): UseFloorPlanReturn {
 
   // Refetch after reconnect
   useEffect(() => {
-    const handleOnline = () => setTimeout(fetchTables, 3000)
+    let tid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { tid = setTimeout(fetchTables, 3000) }
     window.addEventListener('online', handleOnline)
-    return () => window.removeEventListener('online', handleOnline)
+    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
   }, [fetchTables])
 
   const addTable = useCallback(async (

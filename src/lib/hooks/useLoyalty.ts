@@ -175,7 +175,7 @@ export function useLoyalty(): UseLoyaltyReturn {
     const newBalance = (guest.bonus_balance || 0) + bonusAmount
     const newTotalSpent = (guest.total_spent || 0) + sessionAmount
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('guests')
       .update({
         bonus_balance: newBalance,
@@ -186,7 +186,12 @@ export function useLoyalty(): UseLoyaltyReturn {
       })
       .eq('id', guestId)
 
-    await supabase.from('bonus_transactions').insert({
+    if (updateError) {
+      console.error('Loyalty accrual update failed:', updateError)
+      return false
+    }
+
+    const { error: txError } = await supabase.from('bonus_transactions').insert({
       guest_id: guestId,
       profile_id: user.id,
       type: 'accrual',
@@ -195,6 +200,10 @@ export function useLoyalty(): UseLoyaltyReturn {
       related_session_id: sessionId || null,
       description: `Session bonus (${settings.bonus_accrual_percent}%)`,
     })
+
+    if (txError) {
+      console.error('Loyalty accrual transaction insert failed:', txError)
+    }
 
     return true
   }, [user, isDemoMode, supabase, settings])
@@ -228,12 +237,17 @@ export function useLoyalty(): UseLoyaltyReturn {
 
     const newBalance = guest.bonus_balance - amount
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('guests')
       .update({ bonus_balance: newBalance })
       .eq('id', guestId)
 
-    await supabase.from('bonus_transactions').insert({
+    if (updateError) {
+      console.error('Loyalty redemption update failed:', updateError)
+      return false
+    }
+
+    const { error: txError } = await supabase.from('bonus_transactions').insert({
       guest_id: guestId,
       profile_id: user.id,
       type: 'redemption',
@@ -242,6 +256,10 @@ export function useLoyalty(): UseLoyaltyReturn {
       related_session_id: sessionId || null,
       description: 'Bonus redeemed',
     })
+
+    if (txError) {
+      console.error('Loyalty redemption transaction insert failed:', txError)
+    }
 
     return true
   }, [user, isDemoMode, supabase, settings])

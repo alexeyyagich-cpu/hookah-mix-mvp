@@ -276,13 +276,15 @@ export function useKDS(): UseKDSReturn {
 
     // Refetch after reconnect to replace offline temp data with real data
     // Also refetch when a mutation is discarded to reconcile local state
-    const handleOnline = () => setTimeout(fetchOrders, 3000)
+    let onlineTid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { onlineTid = setTimeout(fetchOrders, 3000) }
     const handleReconcile = () => fetchOrders()
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline-discard-reconcile', handleReconcile)
 
     return () => {
       clearInterval(interval)
+      clearTimeout(onlineTid)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline-discard-reconcile', handleReconcile)
     }
@@ -366,18 +368,18 @@ export function useKDS(): UseKDSReturn {
 
     if (isDemoMode || !supabase) {
       setOrders(prev => {
+        const updated = isCompleted
+          ? prev.filter(o => o.id !== orderId)
+          : prev.map(o =>
+              o.id === orderId
+                ? { ...o, status: newStatus, updated_at: now }
+                : o
+            )
         if (isCompleted) {
-          return prev.filter(o => o.id !== orderId)
+          lastNewCountRef.current = updated.filter(o => o.status === 'new').length
         }
-        return prev.map(o =>
-          o.id === orderId
-            ? { ...o, status: newStatus, updated_at: now }
-            : o
-        )
+        return updated
       })
-      if (newStatus === 'served' || newStatus === 'cancelled') {
-        lastNewCountRef.current = orders.filter(o => o.status === 'new' && o.id !== orderId).length
-      }
       return true
     }
 
@@ -445,7 +447,7 @@ export function useKDS(): UseKDSReturn {
     })
 
     return true
-  }, [isDemoMode, supabase, orders])
+  }, [isDemoMode, supabase, effectiveProfileId])
 
   const cancelOrder = useCallback(async (orderId: string): Promise<boolean> => {
     return updateStatus(orderId, 'cancelled')

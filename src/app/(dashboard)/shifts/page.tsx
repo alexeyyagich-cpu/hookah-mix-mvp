@@ -58,20 +58,24 @@ export default function ShiftsPage() {
     [shifts]
   )
 
-  const activeReconciliation = useMemo(
-    () => activeShift ? getReconciliation(activeShift) : null,
-    [activeShift, getReconciliation, now]
-  )
+  const [activeReconciliation, setActiveReconciliation] = useState<ShiftReconciliation | null>(null)
+  const [selectedReconciliation, setSelectedReconciliation] = useState<ShiftReconciliation | null>(null)
+  const [closeReconciliation, setCloseReconciliation] = useState<ShiftReconciliation | null>(null)
 
-  const selectedReconciliation = useMemo(
-    () => selectedShift ? getReconciliation(selectedShift) : null,
-    [selectedShift, getReconciliation]
-  )
+  useEffect(() => {
+    if (activeShift) { getReconciliation(activeShift).then(setActiveReconciliation) }
+    else { setActiveReconciliation(null) }
+  }, [activeShift, getReconciliation, now])
 
-  const closeReconciliation = useMemo(
-    () => activeShift ? getReconciliation(activeShift) : null,
-    [activeShift, getReconciliation, showCloseModal]
-  )
+  useEffect(() => {
+    if (selectedShift) { getReconciliation(selectedShift).then(setSelectedReconciliation) }
+    else { setSelectedReconciliation(null) }
+  }, [selectedShift, getReconciliation])
+
+  useEffect(() => {
+    if (activeShift && showCloseModal) { getReconciliation(activeShift).then(setCloseReconciliation) }
+    else if (!showCloseModal) { setCloseReconciliation(null) }
+  }, [activeShift, getReconciliation, showCloseModal])
 
   const handleOpenShift = async () => {
     setSubmitting(true)
@@ -217,7 +221,6 @@ export default function ShiftsPage() {
               <h2 className="text-lg font-semibold mb-4">{tm.pastShifts}</h2>
               <div className="space-y-3">
                 {closedShifts.map(shift => {
-                  const recon = getReconciliation(shift)
                   const duration = shift.closed_at
                     ? new Date(shift.closed_at).getTime() - new Date(shift.opened_at).getTime()
                     : 0
@@ -237,8 +240,7 @@ export default function ShiftsPage() {
                         </div>
                         <div className="text-xs text-[var(--color-textMuted)]">
                           {shift.opened_by_name && <>{shift.opened_by_name} · </>}
-                          {tm.shiftSummary(recon.hookah.sessionsCount, recon.bar.salesCount)}
-                          {shift.closing_cash !== null && ` · ${shift.closing_cash}€`}
+                          {shift.closing_cash !== null && `${shift.closing_cash}€`}
                         </div>
                       </div>
                       <button

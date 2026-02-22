@@ -104,11 +104,13 @@ export function useInventory(): UseInventoryReturn {
   // Refetch after reconnect to replace offline temp data with real data
   // Also refetch when a mutation is discarded to reconcile local state
   useEffect(() => {
-    const handleOnline = () => setTimeout(fetchInventory, 3000)
+    let tid: ReturnType<typeof setTimeout>
+    const handleOnline = () => { tid = setTimeout(fetchInventory, 3000) }
     const handleReconcile = () => fetchInventory()
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline-discard-reconcile', handleReconcile)
     return () => {
+      clearTimeout(tid)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline-discard-reconcile', handleReconcile)
     }
