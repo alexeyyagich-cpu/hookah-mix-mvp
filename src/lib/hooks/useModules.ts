@@ -34,7 +34,7 @@ export function useModules(): UseModulesReturn {
 
   const modules: AppModule[] = isDemoMode
     ? demoModules
-    : (profile?.active_modules || defaultModules)
+    : (profile?.active_modules?.length ? profile.active_modules : defaultModules)
 
   const hasModule = useCallback((module: AppModule) => modules.includes(module), [modules])
 

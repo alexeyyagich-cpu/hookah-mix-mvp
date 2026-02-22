@@ -11,6 +11,7 @@ import { BarSection } from '@/components/dashboard/sections/BarSection'
 import { FloorStatusWidget } from '@/components/dashboard/sections/FloorStatusWidget'
 import {
   IconCalculator,
+  IconSettings,
 } from '@/components/Icons'
 import Link from 'next/link'
 
@@ -44,6 +45,22 @@ export default function DashboardPage() {
           }}
         />,
         bgContainer
+      )}
+
+      {/* Setup recovery banner for users who skipped onboarding */}
+      {profile?.onboarding_skipped && !profile.business_type && (
+        <Link
+          href="/settings"
+          className="block p-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 hover:border-amber-500 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <IconSettings size={20} className="text-amber-500 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-sm font-semibold">{th.setupBannerTitle}</div>
+              <div className="text-xs text-[var(--color-textMuted)]">{th.setupBannerDesc}</div>
+            </div>
+          </div>
+        </Link>
       )}
 
       {/* Header */}

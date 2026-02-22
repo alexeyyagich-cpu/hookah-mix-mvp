@@ -760,4 +760,9 @@ export const hookah = {
   loyaltyDiscountApplied: (percent: number) => `Скидка гостя ${percent}%`,
   loyaltyRemoveGuest: 'Отвязать гостя',
   loyaltyMaxRedemption: 'Макс. списание',
+
+  // Setup recovery banner
+  setupBannerTitle: 'Завершите настройку заведения',
+  setupBannerDesc: 'Укажите тип бизнеса и модули, чтобы разблокировать все функции.',
+  setupBannerBtn: 'Перейти в настройки',
 }

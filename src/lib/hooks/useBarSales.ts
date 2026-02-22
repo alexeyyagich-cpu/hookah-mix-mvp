@@ -133,6 +133,13 @@ export function useBarSales(): UseBarSalesReturn {
     if (!isDemoMode) fetchSales()
   }, [fetchSales, isDemoMode])
 
+  // Refetch after reconnect
+  useEffect(() => {
+    const handleOnline = () => setTimeout(fetchSales, 3000)
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [fetchSales])
+
   const recordSale = useCallback(async (
     recipe: BarRecipeWithIngredients,
     quantity: number = 1,

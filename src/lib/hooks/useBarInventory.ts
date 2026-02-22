@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BarInventoryItem, BarTransaction, BarTransactionType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
 
@@ -91,21 +92,35 @@ export function useBarInventory(): UseBarInventoryReturn {
       return
     }
 
-    setLoading(true)
+    // Try cache first for instant display
+    const cached = await getCachedData<BarInventoryItem>('bar_inventory', user.id)
+    if (cached) {
+      setInventory(cached.data)
+      setLoading(false)
+    }
+
+    // If offline, stop here
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+    if (!cached) setLoading(true)
     setError(null)
 
-    const { data, error: fetchError } = await supabase
-      .from('bar_inventory')
-      .select('*')
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('category', { ascending: true })
-      .order('name', { ascending: true })
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('bar_inventory')
+        .select('*')
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('category', { ascending: true })
+        .order('name', { ascending: true })
 
-    if (fetchError) {
-      setError(fetchError.message)
-      setInventory([])
-    } else {
-      setInventory(data || [])
+      if (fetchError) {
+        if (!cached) { setError(fetchError.message); setInventory([]) }
+      } else {
+        setInventory(data || [])
+        await setCachedData('bar_inventory', user.id, data || [])
+      }
+    } catch {
+      // Network error — keep cache if available
     }
 
     setLoading(false)
@@ -114,6 +129,13 @@ export function useBarInventory(): UseBarInventoryReturn {
   useEffect(() => {
     if (!isDemoMode) fetchInventory()
   }, [fetchInventory, isDemoMode])
+
+  // Refetch after reconnect
+  useEffect(() => {
+    const handleOnline = () => setTimeout(fetchInventory, 3000)
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [fetchInventory])
 
   const addIngredient = async (
     item: Omit<BarInventoryItem, 'id' | 'profile_id' | 'created_at' | 'updated_at'>
@@ -248,17 +270,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       return true
     }
 
-    const { error: updateError } = await supabase
-      .from('bar_inventory')
-      .update({ quantity: newQuantity, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-
-    if (updateError) {
-      setError(updateError.message)
-      return false
-    }
-
+    // Record transaction first (source of truth)
     await supabase.from('bar_transactions').insert({
       profile_id: user.id,
       ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
@@ -268,6 +280,17 @@ export function useBarInventory(): UseBarInventoryReturn {
       unit_type: item.unit_type,
       notes,
     })
+
+    // Atomic quantity adjustment via RPC — no read-then-write race
+    const { error: rpcError } = await supabase.rpc('adjust_bar_inventory', {
+      p_inventory_id: id,
+      p_quantity_change: quantityChange,
+    })
+
+    if (rpcError) {
+      setError(rpcError.message)
+      return false
+    }
 
     await fetchInventory()
     return true

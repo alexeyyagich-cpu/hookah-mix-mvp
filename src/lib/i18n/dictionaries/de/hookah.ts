@@ -754,4 +754,9 @@ export const hookah: typeof HookahType = {
   loyaltyDiscountApplied: (percent: number) => `${percent}% Gastrabatt`,
   loyaltyRemoveGuest: 'Gast entfernen',
   loyaltyMaxRedemption: 'Max. Einlösung',
+
+  // Setup recovery banner
+  setupBannerTitle: 'Einrichtung abschließen',
+  setupBannerDesc: 'Konfigurieren Sie Ihren Geschäftstyp und Module, um alle Funktionen freizuschalten.',
+  setupBannerBtn: 'Zu den Einstellungen',
 }

@@ -178,6 +178,13 @@ export function useFloorPlan(): UseFloorPlanReturn {
     }
   }, [fetchTables, isDemoMode])
 
+  // Refetch after reconnect
+  useEffect(() => {
+    const handleOnline = () => setTimeout(fetchTables, 3000)
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [fetchTables])
+
   const addTable = useCallback(async (
     table: Omit<FloorTable, 'id' | 'profile_id' | 'created_at' | 'updated_at'>
   ): Promise<FloorTable | null> => {

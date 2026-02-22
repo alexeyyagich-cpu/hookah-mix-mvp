@@ -357,7 +357,25 @@ export function useSessions(): UseSessionsReturn {
       return true
     }
 
-    // Delete session items first
+    // Reverse inventory deductions before deleting
+    const { data: transactions } = await supabase
+      .from('inventory_transactions')
+      .select('tobacco_inventory_id, quantity_grams')
+      .eq('session_id', id)
+      .eq('type', 'session')
+
+    if (transactions) {
+      for (const tx of transactions) {
+        if (tx.tobacco_inventory_id && tx.quantity_grams < 0) {
+          await supabase.rpc('decrement_tobacco_inventory', {
+            p_inventory_id: tx.tobacco_inventory_id,
+            p_grams_used: tx.quantity_grams, // negative value → increments stock back
+          })
+        }
+      }
+    }
+
+    // Delete session items
     await supabase
       .from('session_items')
       .delete()
