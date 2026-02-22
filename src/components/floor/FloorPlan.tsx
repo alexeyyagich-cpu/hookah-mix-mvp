@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus } from '@/components/Icons'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
@@ -191,6 +192,7 @@ export function FloorPlan({
           borderColor: 'var(--color-border)',
           height: '400px',
           minHeight: '400px',
+          touchAction: editable ? 'none' : undefined,
         }}
         onMouseMove={handlePointerMove}
         onMouseUp={handlePointerUp}
@@ -299,8 +301,8 @@ export function FloorPlan({
         )}
       </div>
 
-      {/* Add Table Modal */}
-      {isAddModalOpen && (
+      {/* Add Table Modal (portal to body to avoid stacking context issues) */}
+      {isAddModalOpen && createPortal(
         <TableModal
           onClose={() => setIsAddModalOpen(false)}
           onSave={async (data) => {
@@ -320,11 +322,12 @@ export function FloorPlan({
             })
             setIsAddModalOpen(false)
           }}
-        />
+        />,
+        document.body
       )}
 
       {/* Edit Table Modal */}
-      {isEditModalOpen && selectedTable && (
+      {isEditModalOpen && selectedTable && createPortal(
         <TableModal
           table={selectedTable}
           onClose={() => {
@@ -346,7 +349,8 @@ export function FloorPlan({
             setIsEditModalOpen(false)
             setSelectedTable(null)
           }}
-        />
+        />,
+        document.body
       )}
     </div>
   )
