@@ -643,7 +643,7 @@ export default function OnboardingPage() {
       {/* Logo */}
       <div className="mt-8 flex items-center gap-2 text-[var(--color-textMuted)]">
         <div className="w-6 h-6 rounded overflow-hidden">
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+          <video autoPlay loop muted playsInline preload="metadata" poster="/images/torus-logo.png" className="w-full h-full object-cover">
             <source src="/images/logo-animated.mp4" type="video/mp4" />
           </video>
         </div>

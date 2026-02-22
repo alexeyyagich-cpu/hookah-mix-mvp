@@ -22,6 +22,8 @@ export function BrandLoader({ size = 'md', text, fullScreen = false }: BrandLoad
           loop
           muted
           playsInline
+          preload="metadata"
+          poster="/images/torus-logo.png"
           className="w-full h-full object-cover"
         >
           <source src="/images/logo-animated.mp4" type="video/mp4" />

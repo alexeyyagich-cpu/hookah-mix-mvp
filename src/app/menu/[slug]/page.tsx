@@ -317,7 +317,7 @@ function MenuPageInner({ slug }: { slug: string }) {
             className="flex items-center gap-2 text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
           >
             <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+              <video autoPlay loop muted playsInline preload="metadata" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                 <source src="/images/logo-animated.mp4" type="video/mp4" />
               </video>
             </div>
