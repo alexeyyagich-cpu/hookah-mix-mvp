@@ -81,11 +81,12 @@ function Reel({
     animationRef.current = requestAnimationFrame(animate);
 
     // Schedule slowdown
+    let slowDownId: ReturnType<typeof setInterval>;
     const slowdownTimer = setTimeout(() => {
-      const slowDown = setInterval(() => {
+      slowDownId = setInterval(() => {
         speedRef.current *= 0.92;
         if (speedRef.current < 1) {
-          clearInterval(slowDown);
+          clearInterval(slowDownId);
         }
       }, 40);
     }, stopDelay);
@@ -96,6 +97,7 @@ function Reel({
         cancelAnimationFrame(animationRef.current);
       }
       clearTimeout(slowdownTimer);
+      clearInterval(slowDownId);
     };
   }, [isSpinning, stopDelay]);
 

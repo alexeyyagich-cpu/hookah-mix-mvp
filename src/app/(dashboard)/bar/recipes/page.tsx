@@ -96,9 +96,8 @@ export default function BarRecipesPage() {
     return margins.reduce((a, b) => a + b, 0) / margins.length
   }, [recipes, calculateCost])
 
-  const selectedCost = selectedRecipe
-    ? calculateCost(recipes.find(r => r.id === selectedRecipe)!)
-    : null
+  const selectedRecipeObj = selectedRecipe ? recipes.find(r => r.id === selectedRecipe) : null
+  const selectedCost = selectedRecipeObj ? calculateCost(selectedRecipeObj) : null
 
   return (
     <div className="space-y-6">

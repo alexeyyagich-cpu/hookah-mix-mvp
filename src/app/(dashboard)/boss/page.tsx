@@ -58,9 +58,11 @@ export default function BossPage() {
 
   const [activeReconciliation, setActiveRecon] = useState<ShiftReconciliation | null>(null)
   useEffect(() => {
-    if (activeShift) { getReconciliation(activeShift).then(setActiveRecon) }
-    else { setActiveRecon(null) }
-  }, [activeShift, getReconciliation, now])
+    if (!activeShift) { setActiveRecon(null); return }
+    let cancelled = false
+    getReconciliation(activeShift).then(r => { if (!cancelled) setActiveRecon(r) })
+    return () => { cancelled = true }
+  }, [activeShift, getReconciliation])
 
   // Today/yesterday strings for filtering
   const todayStr = new Date().toISOString().split('T')[0]

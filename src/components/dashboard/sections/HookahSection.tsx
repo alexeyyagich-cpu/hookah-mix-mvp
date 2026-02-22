@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useStatistics } from '@/lib/hooks/useStatistics'
@@ -35,9 +35,9 @@ export function HookahSection() {
   const { statistics, loading } = useStatistics({ lowStockThreshold })
   const { savedMixes } = useSavedMixes()
 
-  const lowStockItems = inventory.filter(item => item.quantity_grams < lowStockThreshold && item.quantity_grams > 0)
+  const lowStockItems = useMemo(() => inventory.filter(item => item.quantity_grams < lowStockThreshold && item.quantity_grams > 0), [inventory, lowStockThreshold])
   const lowStockCount = lowStockItems.length
-  const outOfStockCount = inventory.filter(item => item.quantity_grams <= 0).length
+  const outOfStockCount = useMemo(() => inventory.filter(item => item.quantity_grams <= 0).length, [inventory])
 
   // Trigger push notification for low stock (once per session)
   const notifiedRef = useRef(false)

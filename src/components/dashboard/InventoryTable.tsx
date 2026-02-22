@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
@@ -37,7 +37,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
     }
   }
 
-  const sortedInventory = [...inventory]
+  const sortedInventory = useMemo(() => [...inventory]
     .filter(item =>
       item.brand.toLowerCase().includes(filter.toLowerCase()) ||
       item.flavor.toLowerCase().includes(filter.toLowerCase())
@@ -50,7 +50,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
       return 0
-    })
+    }), [inventory, filter, sortField, sortDirection])
 
   const handleAdjust = (id: string) => {
     const amount = parseFloat(adjustAmount)

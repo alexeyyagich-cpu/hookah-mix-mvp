@@ -53,6 +53,8 @@ export default function InventoryPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<TobaccoInventory | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const deleteTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => { return () => clearTimeout(deleteTimerRef.current) }, [])
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [scannedTobacco, setScannedTobacco] = useState<TobaccoBarcode | null>(null)
   const exportMenuRef = useRef<HTMLDivElement>(null)
@@ -105,7 +107,8 @@ export default function InventoryPage() {
       setDeleteConfirm(null)
     } else {
       setDeleteConfirm(id)
-      setTimeout(() => setDeleteConfirm(null), 3000)
+      clearTimeout(deleteTimerRef.current)
+      deleteTimerRef.current = setTimeout(() => setDeleteConfirm(null), 3000)
     }
   }
 
@@ -116,7 +119,7 @@ export default function InventoryPage() {
 
 
 
-  const totalGrams = inventory.reduce((sum, item) => sum + item.quantity_grams, 0)
+  const totalGrams = useMemo(() => inventory.reduce((sum, item) => sum + item.quantity_grams, 0), [inventory])
 
   // Background portal
   const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)

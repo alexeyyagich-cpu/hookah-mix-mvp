@@ -50,7 +50,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
   const finalAmount = useCustom ? parseFloat(customAmount) || 0 : selectedAmount
 
   const handleSubmit = async () => {
-    if (finalAmount <= 0 || !staff) return
+    if (finalAmount <= 0 || finalAmount > 500 || !staff) return
 
     setSubmitting(true)
     try {
@@ -133,7 +133,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
         {/* Staff info */}
         <div className="text-center mb-6">
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl font-bold text-white mb-3">
-            {staff.display_name[0].toUpperCase()}
+            {(staff.display_name?.[0] || '?').toUpperCase()}
           </div>
           <h1 className="text-xl font-bold text-white">{staff.display_name}</h1>
           <p className="text-gray-400 text-sm mt-1">Leave a tip</p>

@@ -61,6 +61,8 @@ export default function ProgressRing({
     const startValue = prevValueRef.current;
     const targetVal = Math.min(100, Math.max(0, value));
 
+    let rafId: number;
+
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
@@ -72,13 +74,14 @@ export default function ProgressRing({
       setAnimatedValue(currentValue);
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        rafId = requestAnimationFrame(animate);
       } else {
         prevValueRef.current = targetVal;
       }
     };
 
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, [value, isVisible]);
 
   // Calculate angle from mouse/touch position

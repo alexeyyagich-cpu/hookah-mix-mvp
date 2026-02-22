@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { StatsCard } from '@/components/dashboard/StatsCard'
@@ -23,14 +24,14 @@ export function BarSection() {
   const { sales, loading, getAnalytics } = useBarSales()
   const { inventory } = useBarInventory()
 
-  const analytics = getAnalytics(30)
+  const analytics = useMemo(() => getAnalytics(30), [getAnalytics])
 
-  const lowStockItems = inventory.filter(
+  const lowStockItems = useMemo(() => inventory.filter(
     item => item.quantity > 0 && item.quantity <= item.min_quantity
-  )
-  const outOfStockItems = inventory.filter(item => item.quantity <= 0)
+  ), [inventory])
+  const outOfStockItems = useMemo(() => inventory.filter(item => item.quantity <= 0), [inventory])
 
-  const recentSales = sales.slice(0, 5)
+  const recentSales = useMemo(() => sales.slice(0, 5), [sales])
 
   return (
     <div className="space-y-6">

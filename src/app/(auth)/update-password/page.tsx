@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
@@ -11,6 +11,8 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => { return () => clearTimeout(redirectTimerRef.current) }, [])
   const [success, setSuccess] = useState(false)
   const { updatePassword } = useAuth()
   const router = useRouter()
@@ -42,7 +44,7 @@ export default function UpdatePasswordPage() {
 
     setSuccess(true)
     setLoading(false)
-    setTimeout(() => router.push('/dashboard'), 2000)
+    redirectTimerRef.current = setTimeout(() => router.push('/dashboard'), 2000)
   }
 
   return (

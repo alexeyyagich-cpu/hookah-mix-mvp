@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTeam } from '@/lib/hooks/useTeam'
 import { useTips } from '@/lib/hooks/useTips'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -36,10 +36,11 @@ export default function TeamPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   // Only owners can access this page
-  if (!isOwner) {
-    router.push('/dashboard')
-    return null
-  }
+  useEffect(() => {
+    if (!isOwner) router.push('/dashboard')
+  }, [isOwner, router])
+
+  if (!isOwner) return null
 
   const getRoleLabel = (role: OrgRole) => {
     const labels = ORG_ROLE_LABELS[role]

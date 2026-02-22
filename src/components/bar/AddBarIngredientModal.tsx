@@ -97,21 +97,24 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
     if (!name.trim()) return
 
     setSaving(true)
-    await onSave({
-      name: name.trim(),
-      brand: brand.trim() || null,
-      category,
-      unit_type: unitType,
-      quantity: parseFloat(quantity) || 0,
-      min_quantity: parseFloat(minQuantity) || 0,
-      purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
-      package_size: parseFloat(packageSize) || 1000,
-      supplier_name: null,
-      barcode: null,
-      notes: notes.trim() || null,
-    })
-    setSaving(false)
-    onClose()
+    try {
+      await onSave({
+        name: name.trim(),
+        brand: brand.trim() || null,
+        category,
+        unit_type: unitType,
+        quantity: parseFloat(quantity) || 0,
+        min_quantity: parseFloat(minQuantity) || 0,
+        purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
+        package_size: parseFloat(packageSize) || 1000,
+        supplier_name: null,
+        barcode: null,
+        notes: notes.trim() || null,
+      })
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (!isOpen) return null

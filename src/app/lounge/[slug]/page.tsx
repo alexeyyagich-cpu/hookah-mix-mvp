@@ -267,17 +267,17 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
                 </a>
               )}
               {lounge.instagram && (
-                <a href={`https://instagram.com/${lounge.instagram}`} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
+                <a href={`https://instagram.com/${lounge.instagram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
                   {'\u{1F4F8}'} @{lounge.instagram}
                 </a>
               )}
               {lounge.telegram && (
-                <a href={`https://t.me/${lounge.telegram}`} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
+                <a href={`https://t.me/${lounge.telegram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
                   {'\u2708\uFE0F'} @{lounge.telegram}
                 </a>
               )}
-              {lounge.website && (
-                <a href={lounge.website} target="_blank" rel="noopener" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
+              {lounge.website && /^https?:\/\//i.test(lounge.website) && (
+                <a href={lounge.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[var(--color-primary)] transition-colors">
                   {'\u{1F310}'} {lounge.website.replace(/^https?:\/\//, '')}
                 </a>
               )}

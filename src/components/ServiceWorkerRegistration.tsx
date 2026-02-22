@@ -1,18 +1,19 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 
 export function ServiceWorkerRegistration() {
   const tc = useTranslation('common')
+  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
 
     navigator.serviceWorker.register('/sw.js').then((registration) => {
       // Check for updates periodically (every 60s)
-      const interval = setInterval(() => registration.update(), 60_000)
+      intervalRef.current = setInterval(() => registration.update(), 60_000)
 
       // Listen for new SW waiting
       registration.addEventListener('updatefound', () => {
@@ -36,20 +37,24 @@ export function ServiceWorkerRegistration() {
           }
         })
       })
-
-      return () => clearInterval(interval)
     }).catch((err) => {
       console.error('SW registration failed:', err)
     })
 
     // Detect controller change (new SW activated) — reload
     let refreshing = false
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
+    const handleControllerChange = () => {
       if (!refreshing) {
         refreshing = true
         window.location.reload()
       }
-    })
+    }
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange)
+
+    return () => {
+      clearInterval(intervalRef.current)
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange)
+    }
   }, [tc])
 
   return null

@@ -200,9 +200,12 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
         sort_order: i,
       }))
 
-    await onSave(recipe, ingredientInputs)
-    setSaving(false)
-    onClose()
+    try {
+      await onSave(recipe, ingredientInputs)
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (!isOpen) return null

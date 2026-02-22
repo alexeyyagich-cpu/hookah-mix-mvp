@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, RecipeCost } from '@/types/database'
 
@@ -15,6 +15,8 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
   const { locale } = useLocale()
   const [sellingId, setSellingId] = useState<string | null>(null)
   const [soldId, setSoldId] = useState<string | null>(null)
+  const soldTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => { return () => clearTimeout(soldTimerRef.current) }, [])
 
   const menuRecipes = recipes.filter(r => r.is_on_menu)
 
@@ -23,7 +25,8 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
     try {
       await onSell(recipe)
       setSoldId(recipe.id)
-      setTimeout(() => setSoldId(null), 1500)
+      clearTimeout(soldTimerRef.current)
+      soldTimerRef.current = setTimeout(() => setSoldId(null), 1500)
     } finally {
       setSellingId(null)
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Guest, BonusTransaction, LoyaltyTier } from '@/types/database'
 import { useTranslation } from '@/lib/i18n'
 import { IconClose, IconEdit, IconTrash, IconCoin } from '@/components/Icons'
@@ -26,6 +26,15 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const [phone, setPhone] = useState(guest.phone || '')
   const [notes, setNotes] = useState(guest.notes || '')
   const [confirmDelete, setConfirmDelete] = useState(false)
+
+  // Sync state when guest changes (e.g. switching between guests while modal is open)
+  useEffect(() => {
+    setName(guest.name)
+    setPhone(guest.phone || '')
+    setNotes(guest.notes || '')
+    setEditing(false)
+    setConfirmDelete(false)
+  }, [guest.id])
 
   const handleSave = async () => {
     await onUpdate({

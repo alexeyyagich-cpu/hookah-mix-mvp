@@ -63,18 +63,24 @@ export default function ShiftsPage() {
   const [closeReconciliation, setCloseReconciliation] = useState<ShiftReconciliation | null>(null)
 
   useEffect(() => {
-    if (activeShift) { getReconciliation(activeShift).then(setActiveReconciliation) }
-    else { setActiveReconciliation(null) }
-  }, [activeShift, getReconciliation, now])
+    if (!activeShift) { setActiveReconciliation(null); return }
+    let cancelled = false
+    getReconciliation(activeShift).then(r => { if (!cancelled) setActiveReconciliation(r) })
+    return () => { cancelled = true }
+  }, [activeShift, getReconciliation])
 
   useEffect(() => {
-    if (selectedShift) { getReconciliation(selectedShift).then(setSelectedReconciliation) }
-    else { setSelectedReconciliation(null) }
+    if (!selectedShift) { setSelectedReconciliation(null); return }
+    let cancelled = false
+    getReconciliation(selectedShift).then(r => { if (!cancelled) setSelectedReconciliation(r) })
+    return () => { cancelled = true }
   }, [selectedShift, getReconciliation])
 
   useEffect(() => {
-    if (activeShift && showCloseModal) { getReconciliation(activeShift).then(setCloseReconciliation) }
-    else if (!showCloseModal) { setCloseReconciliation(null) }
+    if (!activeShift || !showCloseModal) { setCloseReconciliation(null); return }
+    let cancelled = false
+    getReconciliation(activeShift).then(r => { if (!cancelled) setCloseReconciliation(r) })
+    return () => { cancelled = true }
   }, [activeShift, getReconciliation, showCloseModal])
 
   const handleOpenShift = async () => {

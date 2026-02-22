@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
 import { BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
@@ -30,6 +30,8 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   const [adjustingId, setAdjustingId] = useState<string | null>(null)
   const [adjustAmount, setAdjustAmount] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const deleteTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => { return () => clearTimeout(deleteTimerRef.current) }, [])
 
   const handleSort = (field: keyof BarInventoryItem) => {
     if (sortField === field) {
@@ -40,7 +42,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
     }
   }
 
-  const sortedInventory = [...inventory]
+  const sortedInventory = useMemo(() => [...inventory]
     .filter(item =>
       item.name.toLowerCase().includes(filter.toLowerCase()) ||
       (item.brand || '').toLowerCase().includes(filter.toLowerCase()) ||
@@ -54,7 +56,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
       return 0
-    })
+    }), [inventory, filter, sortField, sortDirection, t])
 
   const handleAdjust = (id: string) => {
     const amount = parseFloat(adjustAmount)
@@ -71,7 +73,8 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
       setDeleteConfirm(null)
     } else {
       setDeleteConfirm(id)
-      setTimeout(() => setDeleteConfirm(null), 3000)
+      clearTimeout(deleteTimerRef.current)
+      deleteTimerRef.current = setTimeout(() => setDeleteConfirm(null), 3000)
     }
   }
 

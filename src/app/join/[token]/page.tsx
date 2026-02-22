@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/AuthContext'
@@ -81,8 +81,21 @@ export default function JoinPage() {
     loadInvite()
   }, [token, user])
 
+  // Clean up redirect timeout on unmount
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  useEffect(() => {
+    return () => clearTimeout(redirectTimerRef.current)
+  }, [])
+
   const handleAccept = async () => {
     if (!user || !invite) return
+
+    // Verify email matches the invite
+    if (user.email?.toLowerCase() !== invite.email.toLowerCase()) {
+      setState('error')
+      setErrorMsg(`This invite was sent to ${invite.email}. Please log in with that email address.`)
+      return
+    }
 
     setState('accepting')
     const supabase = createClient()
@@ -122,7 +135,7 @@ export default function JoinPage() {
       setState('success')
 
       // Redirect to dashboard after 2s
-      setTimeout(() => router.push('/dashboard'), 2000)
+      redirectTimerRef.current = setTimeout(() => router.push('/dashboard'), 2000)
     } catch (err) {
       setState('error')
       setErrorMsg(err instanceof Error ? err.message : 'Failed to accept invite')

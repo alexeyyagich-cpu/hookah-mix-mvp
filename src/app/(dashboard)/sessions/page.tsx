@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -43,12 +43,14 @@ export default function SessionsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const filteredSessions = sessions.filter(session =>
-    session.session_items?.some(item =>
-      item.brand.toLowerCase().includes(filter.toLowerCase()) ||
-      item.flavor.toLowerCase().includes(filter.toLowerCase())
-    )
-  )
+  const filteredSessions = useMemo(() => filter
+    ? sessions.filter(session =>
+        session.session_items?.some(item =>
+          item.brand.toLowerCase().includes(filter.toLowerCase()) ||
+          item.flavor.toLowerCase().includes(filter.toLowerCase())
+        )
+      )
+    : sessions, [sessions, filter])
 
   const handleExport = (format: 'csv' | 'pdf') => {
     if (!canExport || filteredSessions.length === 0) return

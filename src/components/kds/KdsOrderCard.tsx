@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconTimer, IconCocktail, IconBowl, IconClose } from '@/components/Icons'
 import type { KdsOrder, KdsOrderStatus, KdsHookahData } from '@/types/database'
@@ -54,15 +54,16 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
     ready: t.actionServed,
   }
 
-  const [elapsed, setElapsed] = useState(Date.now() - new Date(order.created_at).getTime())
+  const createdTs = useMemo(() => new Date(order.created_at).getTime(), [order.created_at])
+  const [elapsed, setElapsed] = useState(Date.now() - createdTs)
   const [acting, setActing] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setElapsed(Date.now() - new Date(order.created_at).getTime())
+      setElapsed(Date.now() - createdTs)
     }, 1000)
     return () => clearInterval(interval)
-  }, [order.created_at])
+  }, [createdTs])
 
   const handleAction = async () => {
     const next = NEXT_STATUS[order.status]
