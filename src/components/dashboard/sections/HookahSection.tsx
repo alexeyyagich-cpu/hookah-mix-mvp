@@ -189,14 +189,14 @@ export function HookahSection() {
             {sessions.slice(0, 5).map((session) => (
               <div
                 key={session.id}
-                className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between"
+                className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between gap-3"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)]">
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  <div className="w-10 h-10 shrink-0 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)]">
                     <IconSmoke size={20} />
                   </div>
-                  <div>
-                    <div className="font-medium">
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">
                       {session.session_items?.map(i => i.flavor).join(' + ') || t.mixFallback}
                     </div>
                     <div className="text-sm text-[var(--color-textMuted)]">
@@ -243,10 +243,10 @@ export function HookahSection() {
               return (
                 <div
                   key={item.id}
-                  className="p-4 rounded-xl bg-[var(--color-bgHover)]"
+                  className="p-4 rounded-xl bg-[var(--color-bgHover)] overflow-hidden"
                   style={{ borderLeft: `3px solid ${colorVar}` }}
                 >
-                  <div className="font-medium">{item.flavor}</div>
+                  <div className="font-medium truncate">{item.flavor}</div>
                   <div className="text-xs text-[var(--color-textMuted)]">{item.brand}</div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm text-[var(--color-textMuted)]">
@@ -282,8 +282,8 @@ export function HookahSection() {
                 href="/mix"
                 className="p-4 rounded-xl bg-[var(--color-bgHover)] hover:scale-[1.02] transition-transform"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium">{mix.name}</span>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="font-medium truncate min-w-0">{mix.name}</span>
                   {mix.is_favorite && <IconStar size={14} className="text-[var(--color-warning)]" />}
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">

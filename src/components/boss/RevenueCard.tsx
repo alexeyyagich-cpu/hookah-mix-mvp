@@ -43,7 +43,7 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
 
       {todayTotal > 0 ? (
         <>
-          <div className="flex items-baseline gap-3 mb-3">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
             <span className="text-3xl font-bold">{todayTotal}€</span>
             {change !== null && (
               <span className={`text-sm font-semibold ${change >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
@@ -52,7 +52,7 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
             )}
           </div>
 
-          <div className="flex gap-4 text-sm">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <div>
               <span className="text-[var(--color-textMuted)]">{String(tm.bossHookahRevenue)}: </span>
               <span className="font-semibold">{Math.round(todayHookah * 100) / 100}€</span>

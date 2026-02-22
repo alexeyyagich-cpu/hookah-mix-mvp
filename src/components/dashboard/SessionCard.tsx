@@ -51,12 +51,12 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
       {/* Mix Items */}
       <div className="space-y-2 mb-4">
         {session.session_items?.map((item, index) => (
-          <div key={index} className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{item.brand}</span>
-              <span className="text-[var(--color-textMuted)]">{item.flavor}</span>
+          <div key={index} className="flex items-center justify-between gap-2 text-sm">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <span className="font-medium truncate">{item.brand}</span>
+              <span className="text-[var(--color-textMuted)] truncate">{item.flavor}</span>
             </div>
-            <div className="text-[var(--color-textMuted)]">
+            <div className="text-[var(--color-textMuted)] shrink-0">
               {item.grams_used}g ({item.percentage}%)
             </div>
           </div>

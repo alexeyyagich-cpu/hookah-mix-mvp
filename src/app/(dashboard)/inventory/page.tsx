@@ -149,7 +149,7 @@ export default function InventoryPage() {
             {t.inventorySubtitle(inventory.length, isFreeTier ? itemsLimit : null, totalGrams.toFixed(0))}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Export Button with Dropdown */}
           <div className="relative" ref={exportMenuRef}>
             <button

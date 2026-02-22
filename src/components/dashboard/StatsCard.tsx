@@ -28,13 +28,13 @@ export function StatsCard({ icon, label, value, subtext, trend, color = 'primary
   }
 
   return (
-    <div className="card p-5 hover:border-[var(--color-borderAccent)] transition-colors">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg ${bgClasses[color]} ${colorClasses[color]} flex items-center justify-center`}>
+    <div className="card p-5 overflow-hidden hover:border-[var(--color-borderAccent)] transition-colors">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className={`w-10 h-10 shrink-0 rounded-lg ${bgClasses[color]} ${colorClasses[color]} flex items-center justify-center`}>
             {icon}
           </div>
-          <span className="text-sm text-[var(--color-textMuted)]">{label}</span>
+          <span className="text-sm text-[var(--color-textMuted)] truncate">{label}</span>
         </div>
         {trend && (
           <span className={`text-xs font-medium ${trend.isPositive ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>

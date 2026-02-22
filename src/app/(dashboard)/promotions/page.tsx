@@ -249,10 +249,10 @@ export default function PromotionsPage() {
                 !promo.is_active ? 'opacity-60' : ''
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{PROMO_ICONS[promo.type]}</span>
-                <div>
-                  <div className="font-semibold">{promo.name}</div>
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <span className="text-2xl shrink-0">{PROMO_ICONS[promo.type]}</span>
+                <div className="min-w-0">
+                  <div className="font-semibold truncate">{promo.name}</div>
                   <div className="text-sm text-[var(--color-textMuted)]">
                     {promoTypeLabel(promo.type)}
                     {promo.rules.discount_percent && ` · ${promo.rules.discount_percent}%`}
@@ -261,7 +261,7 @@ export default function PromotionsPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-[var(--color-textMuted)]">
                   {promo.usage_count}×
                 </span>

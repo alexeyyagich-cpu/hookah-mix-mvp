@@ -478,13 +478,13 @@ export default function StatisticsPage() {
                   {statistics.topMixes.map((mix, index) => (
                     <div
                       key={index}
-                      className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between"
+                      className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between gap-3"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl font-bold text-[var(--color-textMuted)]">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className="text-2xl font-bold text-[var(--color-textMuted)] shrink-0">
                           #{index + 1}
                         </span>
-                        <div>
+                        <div className="min-w-0 truncate">
                           {mix.items.map((item, i) => (
                             <span key={i}>
                               <span className="font-medium">{item.flavor}</span>
@@ -493,7 +493,7 @@ export default function StatisticsPage() {
                           ))}
                         </div>
                       </div>
-                      <span className="badge badge-primary">{mix.count}×</span>
+                      <span className="badge badge-primary shrink-0">{mix.count}×</span>
                     </div>
                   ))}
                 </div>

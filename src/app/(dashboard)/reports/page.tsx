@@ -256,9 +256,9 @@ export default function ReportsPage() {
                     <span className="w-6 h-6 shrink-0 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">
                       {i + 1}
                     </span>
-                    <div>
-                      <span className="font-medium">{item.name}</span>
-                      <span className="text-xs text-[var(--color-textMuted)] ml-2">{item.count} {tm.pcsShort}</span>
+                    <div className="min-w-0">
+                      <span className="font-medium truncate block">{item.name}</span>
+                      <span className="text-xs text-[var(--color-textMuted)]">{item.count} {tm.pcsShort}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 sm:gap-4 text-sm shrink-0">
@@ -288,39 +288,39 @@ export default function ReportsPage() {
           {/* Mini stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
             {data.hookah.revenue > 0 && (
-              <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahRevenueLabel}</div>
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+                <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahRevenueLabel}</div>
                 <div className="text-lg font-bold text-[var(--color-success)]">{data.hookah.revenue.toFixed(0)}€</div>
               </div>
             )}
-            <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahCostLabel}</div>
+            <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+              <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahCostLabel}</div>
               <div className="text-lg font-bold">{data.hookah.cost.toFixed(0)}€</div>
             </div>
             {data.hookah.revenue > 0 && (
-              <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahProfitLabel}</div>
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+                <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahProfitLabel}</div>
                 <div className={`text-lg font-bold ${data.hookah.profit >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
                   {data.hookah.profit.toFixed(0)}€
                 </div>
               </div>
             )}
             {data.hookah.margin !== null && (
-              <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-                <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahMarginLabel}</div>
+              <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+                <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahMarginLabel}</div>
                 <div className="text-lg font-bold">{data.hookah.margin.toFixed(0)}%</div>
               </div>
             )}
-            <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahUsedLabel}</div>
+            <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+              <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahUsedLabel}</div>
               <div className="text-lg font-bold">{data.hookah.gramsUsed.toFixed(0)}{tc.grams}</div>
             </div>
-            <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahSessionsLabel}</div>
+            <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+              <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahSessionsLabel}</div>
               <div className="text-lg font-bold">{data.hookah.sessionsCount}</div>
             </div>
-            <div className="p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahCostPerSession}</div>
+            <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
+              <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahCostPerSession}</div>
               <div className="text-lg font-bold">{data.hookah.costPerSession.toFixed(1)}€</div>
             </div>
           </div>
@@ -334,8 +334,8 @@ export default function ReportsPage() {
                   key={item.name}
                   className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)]"
                 >
-                  <span className="font-medium">{item.name}</span>
-                  <span className="text-sm text-[var(--color-textMuted)]">{item.cost.toFixed(0)}€</span>
+                  <span className="font-medium truncate min-w-0">{item.name}</span>
+                  <span className="text-sm text-[var(--color-textMuted)] shrink-0">{item.cost.toFixed(0)}€</span>
                 </div>
               ))}
             </div>

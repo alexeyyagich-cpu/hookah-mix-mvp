@@ -30,7 +30,7 @@ export function QuickStatsRow({ sessions, avgRating, tips, kdsOrders, todayStr, 
       {stats.map((s) => (
         <div key={s.label} className="card p-3 text-center">
           <div className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
-          <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold mt-1">{s.label}</div>
+          <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold mt-1 truncate">{s.label}</div>
         </div>
       ))}
     </div>
