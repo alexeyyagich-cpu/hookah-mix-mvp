@@ -13,10 +13,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Hookah Torus | Mix Calculator & Lounge Management",
+    default: "Hookah Torus — All-in-One Hookah Lounge Management Platform",
     template: "%s | Hookah Torus",
   },
-  description: "Create perfect tobacco mixes with AI recommendations. Manage inventory, track sessions, and delight your guests. The complete B2B platform for hookah lounges.",
+  description: "The complete B2B platform for hookah lounges. AI mix calculator, inventory & bar management, floor plans, shifts, KDS, guest loyalty, analytics, and team management — all in one app.",
   keywords: [
     "hookah mix calculator",
     "tobacco mix builder",
@@ -26,6 +26,8 @@ export const metadata: Metadata = {
     "hookah business software",
     "lounge management platform",
     "hookah session tracking",
+    "bar management software",
+    "hookah lounge POS",
   ],
   authors: [{ name: "Hookah Torus" }],
   creator: "Hookah Torus",
@@ -39,14 +41,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://hookahtorus.com",
     siteName: "Hookah Torus",
-    title: "Hookah Torus | Mix Calculator & Lounge Management",
-    description: "Create perfect tobacco mixes with AI recommendations. The complete B2B platform for hookah lounges.",
+    title: "Hookah Torus — All-in-One Hookah Lounge Management Platform",
+    description: "AI mix calculator, inventory & bar management, floor plans, shifts, KDS, guest loyalty, analytics, and team management — all in one app.",
     // images auto-generated from opengraph-image.tsx
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hookah Torus | Mix Calculator & Lounge Management",
-    description: "Create perfect tobacco mixes with AI recommendations",
+    title: "Hookah Torus — All-in-One Hookah Lounge Management Platform",
+    description: "AI mix calculator, inventory & bar management, floor plans, shifts, KDS, guest loyalty, analytics — all in one app.",
     // images auto-generated from twitter-image.tsx
   },
   robots: {
@@ -75,7 +77,7 @@ const jsonLd = {
       "@id": "https://hookahtorus.com/#website",
       url: "https://hookahtorus.com",
       name: "Hookah Torus",
-      description: "Mix calculator and hookah lounge management platform",
+      description: "All-in-one hookah lounge management platform with AI mix calculator, inventory, bar, shifts, KDS, and analytics",
       publisher: {
         "@id": "https://hookahtorus.com/#organization",
       },
@@ -101,7 +103,7 @@ const jsonLd = {
       "@type": "SoftwareApplication",
       "@id": "https://hookahtorus.com/#app",
       name: "Hookah Torus",
-      description: "AI-powered hookah mix calculator and lounge management platform",
+      description: "All-in-one hookah lounge management platform — AI mix calculator, inventory & bar management, floor plans, shifts, KDS, guest loyalty, and analytics",
       url: "https://hookahtorus.com",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
