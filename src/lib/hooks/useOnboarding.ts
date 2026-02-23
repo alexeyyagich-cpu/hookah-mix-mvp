@@ -183,8 +183,23 @@ export function useOnboarding(): UseOnboardingReturn {
       onboarding_completed: true,
       onboarding_skipped: true,
     })
+
+    // Still create org even when skipping, so multi-tenant features work
+    if (supabase && user && !isDemoMode) {
+      try {
+        const { error: rpcErr } = await supabase.rpc('setup_organization', {
+          p_name: profile?.business_name || 'My Lounge',
+          p_type: state.businessType || 'hookah_bar',
+          p_slug: profile?.venue_slug || null,
+        })
+        if (rpcErr) console.error('setup_organization:', rpcErr)
+      } catch (e) {
+        console.error('setup_organization failed:', e)
+      }
+    }
+
     await refreshProfile()
-  }, [saveState, refreshProfile])
+  }, [saveState, refreshProfile, supabase, user, isDemoMode, profile, state.businessType])
 
   const finishOnboarding = useCallback(async () => {
     setState(prev => ({
@@ -196,8 +211,23 @@ export function useOnboarding(): UseOnboardingReturn {
       onboarding_step: 'complete',
       onboarding_completed: true,
     })
+
+    // Auto-create org + location + lounge via idempotent RPC
+    if (supabase && user && !isDemoMode) {
+      try {
+        const { error: rpcErr } = await supabase.rpc('setup_organization', {
+          p_name: profile?.business_name || 'My Lounge',
+          p_type: state.businessType || 'hookah_bar',
+          p_slug: profile?.venue_slug || null,
+        })
+        if (rpcErr) console.error('setup_organization:', rpcErr)
+      } catch (e) {
+        console.error('setup_organization failed:', e)
+      }
+    }
+
     await refreshProfile()
-  }, [saveState, refreshProfile])
+  }, [saveState, refreshProfile, supabase, user, isDemoMode, profile, state.businessType])
 
   // Should show onboarding if not completed and not skipped
   const shouldShowOnboarding = !loading && !!user && !state.isComplete && !state.skipped
