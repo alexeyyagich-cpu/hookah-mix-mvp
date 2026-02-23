@@ -21,15 +21,15 @@ const STRIPE_PRICES = {
 const PLAN_CONFIG = {
   free: { priceMonthly: 0, priceYearly: 0 },
   pro: {
-    priceMonthly: 900,
-    priceYearly: 9900,
+    priceMonthly: 2900,
+    priceYearly: 27900,
     stripePriceMonthly: STRIPE_PRICES.pro_monthly,
     stripePriceYearly: STRIPE_PRICES.pro_yearly,
     isPopular: true,
   },
   enterprise: {
-    priceMonthly: 2900,
-    priceYearly: 29900,
+    priceMonthly: 8900,
+    priceYearly: 85900,
     stripePriceMonthly: STRIPE_PRICES.enterprise_monthly,
     stripePriceYearly: STRIPE_PRICES.enterprise_yearly,
   },
@@ -48,14 +48,11 @@ function PricingPageContent() {
       priceYearly: PLAN_CONFIG.free.priceYearly,
       description: ta.planDescFree,
       features: [
-        { name: ta.featureInventoryItems, value: '20', included: true },
-        { name: ta.featureSessionHistory, value: ta.featureSessionDays('30'), included: true },
+        { name: ta.featureInventoryItems, value: '10', included: true },
+        { name: ta.featureSessionHistory, value: ta.featureSessionDays('14'), included: true },
         { name: ta.featureBowlTypes, value: '3', included: true },
         { name: ta.featureBasicStats, included: true },
-        { name: ta.featureBarModule, included: false },
-        { name: ta.featureMarketplace, included: false },
-        { name: ta.featureTeamManagement, included: false },
-        { name: ta.featureApiAccess, included: false },
+        { name: ta.featureBarModule, included: true },
       ],
     },
     {
@@ -67,13 +64,14 @@ function PricingPageContent() {
       stripePriceYearly: PLAN_CONFIG.pro.stripePriceYearly,
       description: ta.planDescPro,
       features: [
-        { name: ta.featureInventoryItems, value: '∞', included: true },
-        { name: ta.featureSessionHistory, value: '∞', included: true },
-        { name: ta.featureBowlTypes, value: '∞', included: true },
+        { name: ta.featureInventoryItems, value: '\u221E', included: true },
+        { name: ta.featureSessionHistory, value: '\u221E', included: true },
+        { name: ta.featureBowlTypes, value: '\u221E', included: true },
         { name: ta.featureFullStats, included: true },
+        { name: ta.featureBarModule, included: true },
         { name: ta.featureCocktailRecipes, included: true },
         { name: ta.featureKds, included: true },
-        { name: ta.featureMarketplace, included: true },
+        { name: ta.featureTeamManagement, included: true },
         { name: ta.featureExportCsvPdf, included: true },
         { name: ta.featureEmailNotifications, included: true },
       ],
@@ -91,13 +89,8 @@ function PricingPageContent() {
         { name: ta.featureAllFromPro, value: '+', included: true },
         { name: ta.featureWaiterTablet, included: true },
         { name: ta.featureUnlimitedLocations, included: true },
-        { name: ta.featureTeamManagement, included: true },
-        { name: ta.featureAutoOrder, included: true },
         { name: ta.featureApiAccess, included: true },
-        { name: ta.featureCustomIntegrations, included: true },
-        { name: ta.featureWhiteLabel, included: true },
         { name: ta.featurePrioritySupport, included: true },
-        { name: ta.featurePersonalManager, included: true },
       ],
     },
   ]
@@ -161,7 +154,7 @@ function PricingPageContent() {
     }
   }
 
-  const yearlyDiscount = Math.round((1 - 9900 / (900 * 12)) * 100)
+  const yearlyDiscount = Math.round((1 - 27900 / (2900 * 12)) * 100)
 
   return (
     <div className="min-h-screen">

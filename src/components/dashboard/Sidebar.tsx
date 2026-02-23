@@ -19,7 +19,6 @@ import {
   IconSettings,
   IconCalculator,
   IconLogout,
-  IconShop,
   IconFloor,
   IconLock,
   IconUsers,
@@ -104,7 +103,6 @@ export function Sidebar() {
         { name: t.promotions, href: '/promotions', Icon: IconPercent, permission: 'sessions.view', proOnly: true },
         { name: t.statistics, href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
         { name: t.pnlReports, href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
-        { name: t.marketplace, href: '/marketplace', Icon: IconShop, permission: 'inventory.view' },
       ],
     },
     {
