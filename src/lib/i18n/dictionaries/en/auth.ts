@@ -85,9 +85,9 @@ export const auth: typeof AuthType = {
   feature6Desc: 'QR code for guests with your tobacco menu and signature mixes.',
   feature7Title: 'Bar management',
   feature7Desc: 'Cocktail recipes, cost calculator, ingredient inventory and sales analytics.',
-  feature8Title: 'Kitchen display',
-  feature8Desc: 'Order board for kitchen and bar. Statuses: new → preparing → ready.',
-  feature9Title: 'Waiter tablet',
+  feature8Title: 'Order board',
+  feature8Desc: 'Live order board for kitchen and bar. Statuses: new \u2192 preparing \u2192 ready.',
+  feature9Title: 'Waiter mode',
   feature9Desc: 'Table orders linked to your floor plan. Hookah and bar in one cart.',
 
   // Landing page — Benefits
@@ -166,8 +166,8 @@ export const auth: typeof AuthType = {
   featureEmailNotifications: 'Email notifications',
   featureBarModule: 'Bar module',
   featureCocktailRecipes: 'Cocktail recipes',
-  featureKds: 'Kitchen display (KDS)',
-  featureWaiterTablet: 'Waiter tablet',
+  featureKds: 'Order board (KDS)',
+  featureWaiterTablet: 'Waiter mode',
   featureAllFromPro: 'Everything from Pro',
   featureUnlimitedLocations: 'Unlimited locations',
   featureAutoOrder: 'Auto-order tobacco',

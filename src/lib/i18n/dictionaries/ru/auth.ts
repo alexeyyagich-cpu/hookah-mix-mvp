@@ -89,9 +89,9 @@ export const auth = {
   feature6Desc: 'QR-код для гостей с вашим меню табаков и фирменными миксами.',
   feature7Title: 'Управление баром',
   feature7Desc: 'Рецепты коктейлей, калькулятор себестоимости, склад ингредиентов и аналитика продаж.',
-  feature8Title: 'Кухонный дисплей',
-  feature8Desc: 'Доска заказов для кухни и бара. Статусы: новый → готовится → готов.',
-  feature9Title: 'Планшет официанта',
+  feature8Title: 'Доска заказов',
+  feature8Desc: 'Доска заказов для кухни и бара. Статусы: новый \u2192 готовится \u2192 готов.',
+  feature9Title: 'Режим официанта',
   feature9Desc: 'Приём заказов по столам с привязкой к плану зала. Кальян и бар в одной корзине.',
 
   // Landing page — Benefits
@@ -170,8 +170,8 @@ export const auth = {
   featureEmailNotifications: 'Email уведомления',
   featureBarModule: 'Модуль бара',
   featureCocktailRecipes: 'Рецепты коктейлей',
-  featureKds: 'Кухонный дисплей (KDS)',
-  featureWaiterTablet: 'Планшет официанта',
+  featureKds: 'Доска заказов (KDS)',
+  featureWaiterTablet: 'Режим официанта',
   featureAllFromPro: 'Всё из Pro',
   featureUnlimitedLocations: 'Неограниченные локации',
   featureAutoOrder: 'Авто-заказ табака',

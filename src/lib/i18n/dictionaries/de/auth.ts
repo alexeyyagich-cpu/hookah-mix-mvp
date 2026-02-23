@@ -85,9 +85,9 @@ export const auth: typeof AuthType = {
   feature6Desc: 'QR-Code für Gäste mit Ihrem Tabakmenü und Signature-Mixes.',
   feature7Title: 'Bar-Verwaltung',
   feature7Desc: 'Cocktailrezepte, Kostenkalkulator, Zutatenbestand und Verkaufsanalysen.',
-  feature8Title: 'Küchendisplay',
-  feature8Desc: 'Bestelltafel für Küche und Bar. Status: neu → in Zubereitung → fertig.',
-  feature9Title: 'Kellner-Tablet',
+  feature8Title: 'Bestelltafel',
+  feature8Desc: 'Bestelltafel für Küche und Bar. Status: neu \u2192 in Zubereitung \u2192 fertig.',
+  feature9Title: 'Kellner-Modus',
   feature9Desc: 'Tischbestellungen mit Grundriss-Anbindung. Shisha und Bar in einem Warenkorb.',
 
   // Landing page — Benefits
@@ -166,8 +166,8 @@ export const auth: typeof AuthType = {
   featureEmailNotifications: 'E-Mail-Benachrichtigungen',
   featureBarModule: 'Bar-Modul',
   featureCocktailRecipes: 'Cocktailrezepte',
-  featureKds: 'Küchendisplay (KDS)',
-  featureWaiterTablet: 'Kellner-Tablet',
+  featureKds: 'Bestelltafel (KDS)',
+  featureWaiterTablet: 'Kellner-Modus',
   featureAllFromPro: 'Alles aus Pro',
   featureUnlimitedLocations: 'Unbegrenzte Standorte',
   featureAutoOrder: 'Auto-Bestellung Tabak',
