@@ -175,6 +175,9 @@ export const auth: typeof AuthType = {
   featureWhiteLabel: 'White-label branding',
   featurePrioritySupport: 'Priority support 24/7',
   featurePersonalManager: 'Personal manager',
+  featureGuestCrm: 'Guest CRM & promotions',
+  featureFinancialReports: 'Financial reports (P&L)',
+  featureShiftManagement: 'Shift management',
 
   // Pricing page — FAQ
   faqTitle: 'Frequently asked questions',

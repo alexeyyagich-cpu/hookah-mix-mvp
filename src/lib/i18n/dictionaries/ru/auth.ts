@@ -179,6 +179,9 @@ export const auth = {
   featureWhiteLabel: 'White-label брендинг',
   featurePrioritySupport: 'Приоритетная поддержка 24/7',
   featurePersonalManager: 'Персональный менеджер',
+  featureGuestCrm: 'Гостевая CRM и промоакции',
+  featureFinancialReports: 'Финансовые отчёты (P&L)',
+  featureShiftManagement: 'Управление сменами',
 
   // Pricing page — FAQ
   faqTitle: 'Часто задаваемые вопросы',

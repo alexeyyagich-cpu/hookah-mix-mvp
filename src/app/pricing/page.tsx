@@ -88,6 +88,9 @@ function PricingPageContent() {
       features: [
         { name: ta.featureAllFromPro, value: '+', included: true },
         { name: ta.featureWaiterTablet, included: true },
+        { name: ta.featureGuestCrm, included: true },
+        { name: ta.featureFinancialReports, included: true },
+        { name: ta.featureShiftManagement, included: true },
         { name: ta.featureUnlimitedLocations, included: true },
         { name: ta.featureApiAccess, included: true },
         { name: ta.featurePrioritySupport, included: true },
