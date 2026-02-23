@@ -9,6 +9,7 @@ import { useTranslation } from '@/lib/i18n'
 import { HookahSection } from '@/components/dashboard/sections/HookahSection'
 import { BarSection } from '@/components/dashboard/sections/BarSection'
 import { FloorStatusWidget } from '@/components/dashboard/sections/FloorStatusWidget'
+import { ControlDashboard } from '@/components/dashboard/sections/ControlDashboard'
 import {
   IconCalculator,
   IconSettings,
@@ -83,6 +84,9 @@ export default function DashboardPage() {
 
       {/* Floor Status — always visible */}
       <FloorStatusWidget />
+
+      {/* Control Panel — financial overview */}
+      <ControlDashboard />
 
       {/* Hookah Section */}
       {isHookahActive && (
