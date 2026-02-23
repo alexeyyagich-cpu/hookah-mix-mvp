@@ -89,7 +89,7 @@ const jsonLd = {
       url: "https://hookahtorus.com",
       logo: {
         "@type": "ImageObject",
-        url: "https://hookahtorus.com/images/logo.png",
+        url: "https://hookahtorus.com/images/torus-logo.png",
         width: 512,
         height: 512,
       },

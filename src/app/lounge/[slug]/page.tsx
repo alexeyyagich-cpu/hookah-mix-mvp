@@ -123,9 +123,10 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
   }
 
   const signatureMixes = mixes.filter(m => m.is_signature)
+  const isDemo = slug === 'demo-lounge'
   const displayReviews = realReviews.length > 0
     ? realReviews.map(r => ({ id: r.id, author_name: r.author_name, rating: r.rating, text: r.text || '' }))
-    : DEMO_REVIEWS
+    : isDemo ? DEMO_REVIEWS : []
   const showReservationForm = lounge.features.includes('reservations')
 
   return (
@@ -331,7 +332,7 @@ export default function LoungePage({ params }: { params: Promise<{ slug: string 
         )}
 
         {/* Reviews Section */}
-        {lounge.reviews_count > 0 && (
+        {displayReviews.length > 0 && (
           <ReviewsCarousel reviews={displayReviews} reviewsCount={lounge.reviews_count} />
         )}
 
