@@ -14,6 +14,7 @@ import { useLocale, useTranslation, LOCALES, LOCALE_LABELS } from '@/lib/i18n'
 import type { Locale } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/client'
 import { QRCodeCanvas } from 'qrcode.react'
+import LoungeProfileSettings from '@/components/settings/LoungeProfileSettings'
 import Link from 'next/link'
 
 export default function SettingsPage() {
@@ -518,6 +519,9 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* Lounge Profile */}
+      <LoungeProfileSettings />
 
       {/* Notification Settings */}
       <div className="card p-6 space-y-5">

@@ -31,7 +31,7 @@ export interface LoungeProfile {
   features: LoungeFeature[]
 
   // Settings
-  is_public: boolean
+  is_published: boolean
   show_menu: boolean
   show_prices: boolean
   show_popular_mixes: boolean

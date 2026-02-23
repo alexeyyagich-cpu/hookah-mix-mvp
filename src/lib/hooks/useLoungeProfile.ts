@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from '@/lib/AuthContext'
+import { createClient } from '@/lib/supabase/client'
+import { isSupabaseConfigured } from '@/lib/config'
 import type { LoungeProfile, PublicMix, PublicBarRecipe } from '@/types/lounge'
 
 // Demo lounge profile
@@ -15,8 +17,8 @@ const DEMO_LOUNGE: LoungeProfile = {
   cover_image_url: '/images/dashboard-bg.jpg',
   city: 'Warsaw',
   address: 'ul. Nowy Swiat 42',
-  latitude: 52.2297,
-  longitude: 21.0122,
+  latitude: null,
+  longitude: null,
   phone: '+48 22 123 4567',
   email: 'hello@demo-lounge.com',
   website: 'https://demo-lounge.com',
@@ -32,7 +34,7 @@ const DEMO_LOUNGE: LoungeProfile = {
     sunday: { open: '16:00', close: '00:00' },
   },
   features: ['wifi', 'terrace', 'vip_rooms', 'food', 'alcohol', 'live_music', 'reservations'],
-  is_public: true,
+  is_published: true,
   show_menu: true,
   show_prices: true,
   show_popular_mixes: true,
@@ -117,30 +119,115 @@ interface UseLoungeProfileReturn {
 
 export function useLoungeProfile(): UseLoungeProfileReturn {
   const { user, isDemoMode } = useAuth()
+  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
   const [lounge, setLounge] = useState<LoungeProfile | null>(null)
   const [mixes, setMixes] = useState<PublicMix[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Fetch lounge profile from Supabase
   useEffect(() => {
     if (isDemoMode) {
       setLounge(DEMO_LOUNGE)
       setMixes(DEMO_MIXES)
       setLoading(false)
-    } else if (user) {
-      // TODO: Fetch from Supabase
+      return
+    }
+
+    if (!user || !supabase) {
       setLounge(null)
       setMixes([])
       setLoading(false)
-    } else {
+      return
+    }
+
+    const fetchLounge = async () => {
+      setLoading(true)
+      try {
+        const { data, error: fetchErr } = await supabase
+          .from('lounge_profiles')
+          .select('*')
+          .eq('profile_id', user.id)
+          .limit(1)
+          .maybeSingle()
+
+        if (fetchErr) {
+          setError(fetchErr.message)
+          setLoading(false)
+          return
+        }
+
+        if (data) {
+          // Map DB row to LoungeProfile type
+          setLounge({
+            ...data,
+            latitude: null,
+            longitude: null,
+            features: data.features || [],
+            working_hours: data.working_hours || null,
+            is_published: data.is_published ?? false,
+            show_menu: data.show_menu ?? true,
+            show_prices: data.show_prices ?? true,
+            show_popular_mixes: data.show_popular_mixes ?? true,
+          })
+        } else {
+          setLounge(null)
+        }
+
+        // Fetch favorite mixes as public mixes
+        const { data: savedMixes } = await supabase
+          .from('saved_mixes')
+          .select('*')
+          .eq('profile_id', user.id)
+          .eq('is_favorite', true)
+          .order('usage_count', { ascending: false })
+          .limit(20)
+
+        if (savedMixes && data) {
+          setMixes(savedMixes.map(m => ({
+            id: m.id,
+            lounge_id: data.id,
+            name: m.name,
+            description: m.notes || null,
+            tobaccos: m.tobaccos || [],
+            price: null,
+            is_signature: m.is_favorite ?? false,
+            popularity: m.usage_count ?? 0,
+            created_at: m.created_at,
+          })))
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load lounge profile')
+      }
       setLoading(false)
     }
-  }, [user, isDemoMode])
 
+    fetchLounge()
+  }, [user, isDemoMode, supabase])
+
+  // Update lounge profile with optimistic update
   const updateLounge = useCallback(async (updates: Partial<LoungeProfile>) => {
-    if (!lounge) return
+    if (!lounge || !supabase || isDemoMode) return
+
+    const prev = lounge
     setLounge({ ...lounge, ...updates, updated_at: new Date().toISOString() })
-  }, [lounge])
+
+    // Strip client-only fields before sending to DB
+    const { latitude, longitude, ...dbUpdates } = updates as Record<string, unknown>
+    delete dbUpdates.id
+    delete dbUpdates.profile_id
+    delete dbUpdates.created_at
+
+    const { error: updateErr } = await supabase
+      .from('lounge_profiles')
+      .update(dbUpdates)
+      .eq('id', lounge.id)
+
+    if (updateErr) {
+      setLounge(prev)
+      setError(updateErr.message)
+    }
+  }, [lounge, supabase, isDemoMode])
 
   const addMix = useCallback(async (mix: Omit<PublicMix, 'id' | 'lounge_id' | 'created_at' | 'popularity'>) => {
     if (!lounge) return
@@ -277,7 +364,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // For demo, return demo lounge if slug matches
+    // Demo slug returns demo data
     if (slug === 'demo-lounge') {
       setLounge(DEMO_LOUNGE)
       setMixes(DEMO_MIXES)
@@ -285,35 +372,64 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
       setTobaccoMenu(DEMO_TOBACCO_MENU)
       setTables(DEMO_TABLES)
       setLoading(false)
-    } else {
-      // Fetch from public menu API
-      fetch(`/api/public/menu/${slug}`)
-        .then(res => {
-          if (!res.ok) throw new Error('Venue not found')
-          return res.json()
-        })
-        .then(data => {
-          // Build a minimal lounge profile from API response
+      return
+    }
+
+    // Fetch real venue from public API
+    fetch(`/api/public/menu/${slug}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Venue not found')
+        return res.json()
+      })
+      .then(data => {
+        if (data.loungeProfile) {
+          // Real lounge_profiles data from DB
           setLounge({
-            ...DEMO_LOUNGE,
+            ...data.loungeProfile,
+            latitude: null,
+            longitude: null,
+            features: data.loungeProfile.features || [],
+          })
+        } else {
+          // Fallback: build minimal profile from venue data (transition period)
+          setLounge({
+            id: `venue-${slug}`,
+            profile_id: '',
             slug,
             name: data.venue.name || slug,
+            description: null,
             logo_url: data.venue.logo_url,
-            is_public: true,
+            cover_image_url: null,
+            city: null,
+            address: null,
+            latitude: null,
+            longitude: null,
+            phone: null,
+            email: null,
+            website: null,
+            instagram: null,
+            telegram: null,
+            working_hours: null,
+            features: [],
+            is_published: true,
             show_menu: true,
             show_prices: true,
             show_popular_mixes: true,
+            rating: null,
+            reviews_count: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           })
-          setBarRecipes(data.barRecipes || [])
-          setTobaccoMenu(data.tobaccoMenu || [])
-          setTables(data.tables || [])
-          setLoading(false)
-        })
-        .catch(() => {
-          setError('Venue not found')
-          setLoading(false)
-        })
-    }
+        }
+        setBarRecipes(data.barRecipes || [])
+        setTobaccoMenu(data.tobaccoMenu || [])
+        setTables(data.tables || [])
+        setLoading(false)
+      })
+      .catch(() => {
+        setError('Venue not found')
+        setLoading(false)
+      })
   }, [slug])
 
   return { lounge, mixes, barRecipes, tobaccoMenu, tables, loading, error }
