@@ -8,6 +8,23 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { FloorTable, TableStatus } from '@/types/database'
 
+// Strip fields that may not exist in the database yet (e.g. zone before migration)
+// This prevents Supabase from rejecting the entire update due to unknown columns
+const DB_KNOWN_COLUMNS = new Set([
+  'name', 'capacity', 'shape', 'position_x', 'position_y', 'width', 'height',
+  'status', 'current_session_id', 'current_guest_name', 'session_start_time',
+  'notes', 'profile_id', 'organization_id', 'location_id', 'zone',
+  'created_at', 'updated_at',
+])
+
+function stripUnknownForDb(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+  for (const key of Object.keys(obj)) {
+    if (DB_KNOWN_COLUMNS.has(key)) result[key] = obj[key]
+  }
+  return result
+}
+
 // Demo floor tables
 const DEMO_TABLES: FloorTable[] = [
   {
@@ -251,17 +268,32 @@ export function useFloorPlan(): UseFloorPlanReturn {
     if (!user || !supabase) return null
 
     try {
+      const payload = stripUnknownForDb({
+        ...table,
+        profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+      })
       const { data, error: insertError } = await supabase
         .from('floor_tables')
-        .insert({
-          ...table,
-          profile_id: user.id,
-          ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-        })
+        .insert(payload)
         .select()
         .single()
 
-      if (insertError) throw insertError
+      if (insertError) {
+        // If zone column doesn't exist yet, retry without it
+        if (insertError.message?.includes('zone')) {
+          const { zone: _z, ...payloadNoZone } = payload as Record<string, unknown> & { zone?: unknown }
+          const { data: d2, error: e2 } = await supabase
+            .from('floor_tables')
+            .insert(payloadNoZone)
+            .select()
+            .single()
+          if (e2) throw e2
+          setTables(prev => [...prev, d2])
+          return d2
+        }
+        throw insertError
+      }
       setTables(prev => [...prev, data])
       return data
     } catch (err) {
@@ -271,30 +303,44 @@ export function useFloorPlan(): UseFloorPlanReturn {
   }, [user, supabase, isDemoMode, organizationId, locationId])
 
   const updateTable = useCallback(async (id: string, updates: Partial<FloorTable>) => {
-    if (isDemoMode) {
-      setTables(prev => prev.map(t =>
-        t.id === id ? { ...t, ...updates, updated_at: new Date().toISOString() } : t
-      ))
-      return
-    }
+    const now = new Date().toISOString()
 
+    // Optimistic update — apply locally immediately
+    setTables(prev => prev.map(t =>
+      t.id === id ? { ...t, ...updates, updated_at: now } : t
+    ))
+
+    if (isDemoMode) return
     if (!user || !supabase) return
 
     try {
+      const payload = stripUnknownForDb({ ...updates, updated_at: now })
       const { error: updateError } = await supabase
         .from('floor_tables')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update(payload)
         .eq('id', id)
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
-      if (updateError) throw updateError
-      setTables(prev => prev.map(t =>
-        t.id === id ? { ...t, ...updates, updated_at: new Date().toISOString() } : t
-      ))
+      if (updateError) {
+        // If zone column doesn't exist yet, retry without it
+        if (updateError.message?.includes('zone')) {
+          const { zone: _z, ...payloadNoZone } = payload as Record<string, unknown> & { zone?: unknown }
+          const { error: e2 } = await supabase
+            .from('floor_tables')
+            .update(payloadNoZone)
+            .eq('id', id)
+            .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+          if (e2) throw e2
+          return // local state already updated optimistically
+        }
+        throw updateError
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update table')
+      // Revert optimistic update by refetching
+      fetchTables()
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, fetchTables])
 
   const deleteTable = useCallback(async (id: string) => {
     if (isDemoMode) {
