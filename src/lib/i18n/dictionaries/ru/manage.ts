@@ -676,4 +676,14 @@ export const manage = {
   controlLowStockTitle: 'Заканчивается',
   controlDaysLeft: (days: number) => `${days}д осталось`,
   controlNoUsageData: 'Нет данных',
+
+  // Floor plan — Zones
+  zoneLabel: 'Зона',
+  zonePlaceholder: 'Например: VIP, Терраса, Основной зал',
+  zoneFilterAll: 'Все зоны',
+  zoneOther: 'Без зоны',
+
+  // Floor plan — Timer alerts
+  floorLongSession: 'Длинная сессия',
+  floorSessionExceeds: (minutes: number) => `Сессия превышает ${minutes} мин`,
 }

@@ -24,6 +24,7 @@ const DEMO_TABLES: FloorTable[] = [
     current_session_id: '1',
     current_guest_name: 'Tomasz K.',
     session_start_time: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+    zone: 'Main hall',
     notes: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -42,6 +43,7 @@ const DEMO_TABLES: FloorTable[] = [
     current_session_id: null,
     current_guest_name: null,
     session_start_time: null,
+    zone: 'Main hall',
     notes: 'By the window',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -60,6 +62,7 @@ const DEMO_TABLES: FloorTable[] = [
     current_session_id: null,
     current_guest_name: 'Reserved: Max W.',
     session_start_time: null,
+    zone: 'VIP',
     notes: 'VIP zone',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -78,6 +81,7 @@ const DEMO_TABLES: FloorTable[] = [
     current_session_id: null,
     current_guest_name: null,
     session_start_time: null,
+    zone: 'Main hall',
     notes: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -96,6 +100,7 @@ const DEMO_TABLES: FloorTable[] = [
     current_session_id: '2',
     current_guest_name: 'Lena S.',
     session_start_time: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    zone: 'Bar',
     notes: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -185,6 +190,48 @@ export function useFloorPlan(): UseFloorPlanReturn {
     window.addEventListener('online', handleOnline)
     return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
   }, [fetchTables])
+
+  // Supabase Realtime subscription — live sync across devices
+  useEffect(() => {
+    if (!supabase || !user || isDemoMode) return
+
+    const channel = supabase
+      .channel('floor_tables_realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'floor_tables' },
+        (payload) => {
+          const record = (payload.new || payload.old) as FloorTable | undefined
+          if (!record) return
+
+          // Client-side filter: only process changes for our org/profile
+          const isOurs = organizationId
+            ? record.organization_id === organizationId
+            : record.profile_id === user.id
+          if (!isOurs) return
+
+          switch (payload.eventType) {
+            case 'INSERT':
+              setTables(prev => {
+                if (prev.some(t => t.id === (payload.new as FloorTable).id)) return prev
+                return [...prev, payload.new as FloorTable]
+              })
+              break
+            case 'UPDATE':
+              setTables(prev => prev.map(t =>
+                t.id === (payload.new as FloorTable).id ? payload.new as FloorTable : t
+              ))
+              break
+            case 'DELETE':
+              setTables(prev => prev.filter(t => t.id !== (payload.old as FloorTable).id))
+              break
+          }
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [supabase, user, isDemoMode, organizationId])
 
   const addTable = useCallback(async (
     table: Omit<FloorTable, 'id' | 'profile_id' | 'created_at' | 'updated_at'>

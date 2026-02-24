@@ -94,8 +94,8 @@ export function Sidebar() {
     {
       label: t.managementGroup,
       items: [
-        { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'sessions.view' },
-        { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'sessions.view' },
+        { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'floor.view' },
+        { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'reservations.view' },
         { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
         { name: t.waiter, href: '/waiter', Icon: IconWaiter, permission: 'sessions.create', proOnly: true },
         { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },

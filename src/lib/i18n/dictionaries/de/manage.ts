@@ -670,4 +670,14 @@ export const manage: typeof ManageType = {
   controlLowStockTitle: 'Niedriger Bestand',
   controlDaysLeft: (days: number) => `${days}T übrig`,
   controlNoUsageData: 'Keine Daten',
+
+  // Floor plan — Zones
+  zoneLabel: 'Zone',
+  zonePlaceholder: 'z.B. VIP, Terrasse, Haupthalle',
+  zoneFilterAll: 'Alle Zonen',
+  zoneOther: 'Ohne Zone',
+
+  // Floor plan — Timer alerts
+  floorLongSession: 'Lange Sitzung',
+  floorSessionExceeds: (minutes: number) => `Sitzung überschreitet ${minutes} Min`,
 }

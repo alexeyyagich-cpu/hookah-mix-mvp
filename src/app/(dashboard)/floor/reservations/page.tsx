@@ -6,6 +6,8 @@ import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconTrash } from '@/components/Icons'
 import { useTranslation, useLocale } from '@/lib/i18n'
+import { useRole } from '@/lib/hooks/useRole'
+import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { ReservationStatus } from '@/types/database'
 
 const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
@@ -22,6 +24,9 @@ type StatusFilter = 'all' | ReservationStatus
 export default function ReservationsPage() {
   const tm = useTranslation('manage')
   const { locale } = useLocale()
+  const { orgRole: contextOrgRole } = useOrganizationContext()
+  const { hasPermission } = useRole(contextOrgRole)
+  const canEdit = hasPermission('floor.edit')
   const { reservations, loading, updateStatus, assignTable, deleteReservation } = useReservations()
 
   const STATUS_LABELS: Record<ReservationStatus, string> = {
@@ -186,7 +191,7 @@ export default function ReservationsPage() {
                         <span className="px-3 py-1 rounded-lg text-xs bg-[var(--color-bgHover)]">
                           {assignedTable.name}
                         </span>
-                      ) : (
+                      ) : canEdit ? (
                         <select
                           value=""
                           onChange={(e) => {
@@ -199,10 +204,10 @@ export default function ReservationsPage() {
                             <option key={t.id} value={t.id}>{t.name} ({t.capacity} {tm.guestCountShort})</option>
                           ))}
                         </select>
-                      )}
+                      ) : null}
 
-                      {/* Actions */}
-                      {reservation.status === 'pending' && (
+                      {/* Actions — only for users with floor.edit permission */}
+                      {canEdit && reservation.status === 'pending' && (
                         <button
                           onClick={() => updateStatus(reservation.id, 'confirmed')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-success)]/20 text-[var(--color-success)] hover:bg-[var(--color-success)]/30 transition-colors"
@@ -210,7 +215,7 @@ export default function ReservationsPage() {
                           {tm.confirmReservation}
                         </button>
                       )}
-                      {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
+                      {canEdit && (reservation.status === 'pending' || reservation.status === 'confirmed') && (
                         <button
                           onClick={() => updateStatus(reservation.id, 'cancelled')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-danger)]/20 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/30 transition-colors"
@@ -218,14 +223,16 @@ export default function ReservationsPage() {
                           {tm.cancelAction}
                         </button>
                       )}
-                      <button
-                        onClick={() => handleDelete(reservation.id)}
-                        disabled={deletingId === reservation.id}
-                        className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"
-                        aria-label={tm.deleteReservation}
-                      >
-                        <IconTrash size={14} />
-                      </button>
+                      {canEdit && (
+                        <button
+                          onClick={() => handleDelete(reservation.id)}
+                          disabled={deletingId === reservation.id}
+                          className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"
+                          aria-label={tm.deleteReservation}
+                        >
+                          <IconTrash size={14} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

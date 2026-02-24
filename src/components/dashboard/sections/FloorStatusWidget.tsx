@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useTranslation } from '@/lib/i18n'
+import { STATUS_COLORS } from '@/components/floor/FloorPlan'
 
 export function FloorStatusWidget() {
   const t = useTranslation('manage')
@@ -16,10 +17,10 @@ export function FloorStatusWidget() {
   const cleaning = tables.filter(t => t.status === 'cleaning').length
 
   const statuses = [
-    { label: t.widgetAvailable, count: available, color: 'var(--color-success)' },
-    { label: t.widgetOccupied, count: occupied, color: 'var(--color-danger)' },
-    { label: t.widgetReserved, count: reserved, color: 'var(--color-primary)' },
-    { label: t.widgetCleaning, count: cleaning, color: 'var(--color-textMuted)' },
+    { label: t.widgetAvailable, count: available, color: STATUS_COLORS.available.bg },
+    { label: t.widgetOccupied, count: occupied, color: STATUS_COLORS.occupied.bg },
+    { label: t.widgetReserved, count: reserved, color: STATUS_COLORS.reserved.bg },
+    { label: t.widgetCleaning, count: cleaning, color: STATUS_COLORS.cleaning.bg },
   ]
 
   return (

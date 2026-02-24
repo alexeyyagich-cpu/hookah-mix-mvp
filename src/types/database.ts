@@ -371,6 +371,8 @@ export type TableShape = 'circle' | 'square' | 'rectangle'
 export interface FloorTable {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   name: string
   capacity: number
   shape: TableShape
@@ -382,6 +384,7 @@ export interface FloorTable {
   current_session_id: string | null
   current_guest_name: string | null
   session_start_time: string | null
+  zone: string | null
   notes: string | null
   created_at: string
   updated_at: string

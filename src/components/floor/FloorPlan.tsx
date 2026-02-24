@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus } from '@/components/Icons'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
+
+export const LONG_SESSION_MINUTES = 120
 
 export const STATUS_COLORS: Record<TableStatus, { bg: string; border: string; text: string }> = {
   available: {
@@ -13,8 +15,8 @@ export const STATUS_COLORS: Record<TableStatus, { bg: string; border: string; te
     text: 'white',
   },
   occupied: {
-    bg: 'var(--color-primary)',
-    border: 'var(--color-primary)',
+    bg: 'var(--color-danger)',
+    border: 'var(--color-danger)',
     text: 'white',
   },
   reserved: {
@@ -46,6 +48,12 @@ export function FloorPlan({
   addTable, updateTable, deleteTable, moveTable, setTableStatus,
 }: FloorPlanProps) {
   const t = useTranslation('manage')
+
+  // Extract unique zones for datalist suggestions
+  const existingZones = useMemo(() =>
+    [...new Set(tables.map(t => t.zone).filter((z): z is string => !!z))].sort(),
+    [tables]
+  )
 
   const STATUS_LABELS: Record<TableStatus, string> = {
     available: t.statusAvailable,
@@ -214,6 +222,10 @@ export function FloorPlan({
         {tables.map(table => {
           const colors = STATUS_COLORS[table.status]
           const isOccupied = table.status === 'occupied'
+          const elapsedMin = isOccupied && table.session_start_time
+            ? Math.floor((Date.now() - new Date(table.session_start_time).getTime()) / 60000)
+            : 0
+          const isLongSession = elapsedMin >= LONG_SESSION_MINUTES
 
           return (
             <div
@@ -238,6 +250,7 @@ export function FloorPlan({
                 ${editable ? 'cursor-move' : ''}
                 ${draggedTable === table.id ? 'shadow-xl z-10 scale-105' : 'shadow-lg'}
                 ${isOccupied ? 'animate-pulse-subtle' : ''}
+                ${isLongSession ? 'animate-long-session' : ''}
               `}
               style={{
                 left: table.position_x,
@@ -245,11 +258,15 @@ export function FloorPlan({
                 width: table.width,
                 height: table.height,
                 background: `color-mix(in srgb, ${colors.bg} 85%, transparent)`,
-                border: `2px solid ${colors.border}`,
+                border: isLongSession ? '3px solid var(--color-warning)' : `2px solid ${colors.border}`,
                 borderRadius: table.shape === 'circle' ? '50%' : '12px',
                 transition: draggedTable === table.id ? 'none' : undefined,
+                boxShadow: isLongSession ? '0 0 12px var(--color-warning)' : undefined,
               }}
             >
+              {isLongSession && (
+                <span className="absolute -top-1 -right-1 text-[10px]">&#9888;</span>
+              )}
               <span
                 className="font-bold text-sm"
                 style={{ color: colors.text }}
@@ -266,8 +283,8 @@ export function FloorPlan({
               )}
               {isOccupied && table.session_start_time && (
                 <span
-                  className="text-[10px] mt-0.5"
-                  style={{ color: colors.text, opacity: 0.8 }}
+                  className="text-[10px] mt-0.5 font-semibold"
+                  style={{ color: isLongSession ? 'var(--color-warning)' : colors.text, opacity: isLongSession ? 1 : 0.8 }}
                 >
                   {formatDuration(table.session_start_time)}
                 </span>
@@ -305,6 +322,7 @@ export function FloorPlan({
       {/* Add Table Modal (portal to body to avoid stacking context issues) */}
       {isAddModalOpen && createPortal(
         <TableModal
+          existingZones={existingZones}
           onClose={() => setIsAddModalOpen(false)}
           onSave={async (data) => {
             await addTable({
@@ -315,6 +333,7 @@ export function FloorPlan({
               position_y: data.position_y,
               width: data.width,
               height: data.height,
+              zone: data.zone,
               notes: data.notes,
               status: 'available',
               current_session_id: null,
@@ -331,6 +350,7 @@ export function FloorPlan({
       {isEditModalOpen && selectedTable && createPortal(
         <TableModal
           table={selectedTable}
+          existingZones={existingZones}
           onClose={() => {
             setIsEditModalOpen(false)
             setSelectedTable(null)
@@ -363,6 +383,7 @@ interface TableFormData {
   shape: TableShape
   width: number
   height: number
+  zone: string | null
   notes: string | null
   position_x: number
   position_y: number
@@ -370,13 +391,14 @@ interface TableFormData {
 
 interface TableModalProps {
   table?: FloorTable
+  existingZones?: string[]
   onClose: () => void
   onSave: (data: TableFormData) => Promise<void>
   onDelete?: () => Promise<void>
   onStatusChange?: (status: TableStatus) => Promise<void>
 }
 
-function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableModalProps) {
+function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onStatusChange }: TableModalProps) {
   const t = useTranslation('manage')
 
   const STATUS_LABELS: Record<TableStatus, string> = {
@@ -391,6 +413,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
   const [shape, setShape] = useState<TableShape>(table?.shape || 'circle')
   const [width, setWidth] = useState(table?.width?.toString() || '80')
   const [height, setHeight] = useState(table?.height?.toString() || '80')
+  const [zone, setZone] = useState(table?.zone || '')
   const [notes, setNotes] = useState(table?.notes || '')
   const [saving, setSaving] = useState(false)
 
@@ -403,6 +426,7 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
       shape,
       width: parseInt(width) || 80,
       height: parseInt(height) || 80,
+      zone: zone.trim() || null,
       notes: notes || null,
       position_x: table?.position_x || 100,
       position_y: table?.position_y || 100,
@@ -497,6 +521,23 @@ function TableModal({ table, onClose, onSave, onDelete, onStatusChange }: TableM
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1">{t.zoneLabel}</label>
+            <input
+              type="text"
+              value={zone}
+              onChange={(e) => setZone(e.target.value)}
+              placeholder={t.zonePlaceholder}
+              list="zone-suggestions"
+              className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+            />
+            {existingZones.length > 0 && (
+              <datalist id="zone-suggestions">
+                {existingZones.map(z => <option key={z} value={z} />)}
+              </datalist>
+            )}
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1">{t.labelNotes}</label>
             <textarea
               value={notes}
@@ -585,6 +626,13 @@ const styles = `
 }
 .animate-pulse-subtle {
   animation: pulse-subtle 2s ease-in-out infinite;
+}
+@keyframes long-session-glow {
+  0%, 100% { box-shadow: 0 0 8px var(--color-warning); }
+  50% { box-shadow: 0 0 18px var(--color-warning); }
+}
+.animate-long-session {
+  animation: long-session-glow 1.5s ease-in-out infinite;
 }
 `
 

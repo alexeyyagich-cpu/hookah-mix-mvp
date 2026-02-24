@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo, useCallback, useRef, } from 'react'
 import Link from 'next/link'
-import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS } from '@/components/floor/FloorPlan'
+import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useInventory } from '@/lib/hooks/useInventory'
@@ -16,6 +16,7 @@ import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { useRole } from '@/lib/hooks/useRole'
 import { QRCodeCanvas } from 'qrcode.react'
 import { toast } from 'sonner'
 
@@ -34,7 +35,8 @@ export default function FloorPage() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const { user, isDemoMode, profile } = useAuth()
-  const { organizationId, locationId } = useOrganizationContext()
+  const { organizationId, locationId, orgRole: contextOrgRole } = useOrganizationContext()
+  const { hasPermission } = useRole(contextOrgRole)
   const floorPlan = useFloorPlan()
   const { tables, setTableStatus, startSession, endSession, loading } = floorPlan
   const { reservations, assignTable, refresh: refreshReservations } = useReservations()
@@ -54,6 +56,7 @@ export default function FloorPage() {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null)
   const [qrTableId, setQrTableId] = useState<string | null>(null)
   const [quickReserving, setQuickReserving] = useState(false)
+  const [zoneFilter, setZoneFilter] = useState<string | null>(null)
   const [quickForm, setQuickForm] = useState({
     guest_name: '',
     guest_phone: '',
@@ -61,16 +64,33 @@ export default function FloorPage() {
     reservation_time: '',
   })
 
+  // Extract unique zones for filter pills
+  const zones = useMemo(() =>
+    [...new Set(tables.map(t => t.zone).filter((z): z is string => !!z))].sort(),
+    [tables]
+  )
+
+  // Filter tables by zone
+  const filteredTables = useMemo(() => {
+    if (!zoneFilter) return tables
+    return tables.filter(t => (t.zone || null) === zoneFilter)
+  }, [tables, zoneFilter])
+
   const today = new Date().toISOString().split('T')[0]
   const todayReservations = reservations
     .filter(r => r.reservation_date === today && r.status !== 'cancelled' && r.status !== 'completed')
     .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
 
+  const activeTables = zoneFilter ? filteredTables : tables
+  const longSessionCount = activeTables.filter(t =>
+    t.status === 'occupied' && t.session_start_time &&
+    (Date.now() - new Date(t.session_start_time).getTime()) / 60000 >= LONG_SESSION_MINUTES
+  ).length
   const stats = {
-    total: tables.length,
-    available: tables.filter(t => t.status === 'available').length,
-    occupied: tables.filter(t => t.status === 'occupied').length,
-    reserved: tables.filter(t => t.status === 'reserved').length,
+    total: activeTables.length,
+    available: activeTables.filter(t => t.status === 'available').length,
+    occupied: activeTables.filter(t => t.status === 'occupied').length,
+    reserved: activeTables.filter(t => t.status === 'reserved').length,
   }
 
   // Keep selectedTable in sync with tables array
@@ -330,7 +350,7 @@ export default function FloorPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-2 ${longSessionCount > 0 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4`}>
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tm.totalTables}</div>
           <div className="text-2xl font-bold mt-1">{stats.total}</div>
@@ -341,12 +361,18 @@ export default function FloorPage() {
         </div>
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tm.occupiedCount}</div>
-          <div className="text-2xl font-bold text-[var(--color-primary)] mt-1">{stats.occupied}</div>
+          <div className="text-2xl font-bold text-[var(--color-danger)] mt-1">{stats.occupied}</div>
         </div>
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tm.reservedCount}</div>
           <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">{stats.reserved}</div>
         </div>
+        {longSessionCount > 0 && (
+          <div className="card p-4 border-[var(--color-warning)] border-2">
+            <div className="text-sm text-[var(--color-warning)]">&#9888; {tm.floorLongSession}</div>
+            <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">{longSessionCount}</div>
+          </div>
+        )}
       </div>
 
       {/* Today's Reservations Widget */}
@@ -396,24 +422,55 @@ export default function FloorPage() {
       </div>
 
       {/* Floor Plan */}
-      <div className="flex justify-end">
-        <button
-          onClick={() => setIsEditMode(!isEditMode)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            isEditMode ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''
-          }`}
-          style={{
-            background: isEditMode ? 'var(--color-primary)' : 'var(--color-bgHover)',
-            color: isEditMode ? 'var(--color-bg)' : 'var(--color-text)',
-          }}
-        >
-          <IconSettings size={18} />
-          {isEditMode ? tm.ready : tc.edit}
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        {/* Zone filter pills */}
+        {zones.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setZoneFilter(null)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                !zoneFilter
+                  ? 'bg-[var(--color-primary)] text-white'
+                  : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+              }`}
+            >
+              {tm.zoneFilterAll}
+            </button>
+            {zones.map(z => (
+              <button
+                key={z}
+                onClick={() => setZoneFilter(zoneFilter === z ? null : z)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                  zoneFilter === z
+                    ? 'bg-[var(--color-primary)] text-white'
+                    : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                }`}
+              >
+                {z}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {hasPermission('floor.edit') && (
+          <button
+            onClick={() => setIsEditMode(!isEditMode)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors self-end ${
+              isEditMode ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''
+            }`}
+            style={{
+              background: isEditMode ? 'var(--color-primary)' : 'var(--color-bgHover)',
+              color: isEditMode ? 'var(--color-bg)' : 'var(--color-text)',
+            }}
+          >
+            <IconSettings size={18} />
+            {isEditMode ? tm.ready : tc.edit}
+          </button>
+        )}
       </div>
       <div className="card p-6">
         <FloorPlan
-          tables={tables}
+          tables={filteredTables}
           loading={loading}
           editable={isEditMode}
           onTableSelect={handleTableSelect}
@@ -483,6 +540,17 @@ export default function FloorPage() {
             </div>
           )}
 
+          {/* Long session warning */}
+          {activeSelectedTable.status === 'occupied' && activeSelectedTable.session_start_time &&
+            (Date.now() - new Date(activeSelectedTable.session_start_time).getTime()) / 60000 >= LONG_SESSION_MINUTES && (
+            <div className="mb-4 p-3 rounded-xl bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center gap-2">
+              <span className="text-lg">&#9888;</span>
+              <span className="text-sm font-medium text-[var(--color-warning)]">
+                {tm.floorSessionExceeds(Math.floor((Date.now() - new Date(activeSelectedTable.session_start_time).getTime()) / 60000))}
+              </span>
+            </div>
+          )}
+
           {activeSelectedTable.notes && (
             <div className="p-3 rounded-xl bg-[var(--color-bgHover)] mb-4">
               <p className="text-sm text-[var(--color-textMuted)]">{activeSelectedTable.notes}</p>
@@ -534,8 +602,8 @@ export default function FloorPage() {
           {activeSelectedTable.status === 'occupied' && activeSelectedTable.session_start_time && (
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                <span className="text-sm font-medium text-[var(--color-primary)]">{tm.sessionActive}</span>
+                <div className="w-2 h-2 rounded-full bg-[var(--color-danger)] animate-pulse" />
+                <span className="text-sm font-medium text-[var(--color-danger)]">{tm.sessionActive}</span>
               </div>
               <button
                 onClick={handleEndSession}
@@ -647,7 +715,7 @@ export default function FloorPage() {
           <div className="grid grid-cols-2 gap-2">
             {([
               { status: 'available' as const, label: tm.statusAvailable, color: 'var(--color-success)' },
-              { status: 'occupied' as const, label: tm.statusOccupied, color: 'var(--color-primary)' },
+              { status: 'occupied' as const, label: tm.statusOccupied, color: 'var(--color-danger)' },
               { status: 'reserved' as const, label: tm.statusReserved, color: 'var(--color-warning)' },
               { status: 'cleaning' as const, label: tm.statusCleaning, color: 'var(--color-textMuted)' },
             ] as const).map(({ status, label, color }) => (
