@@ -223,6 +223,7 @@ export default function SettingsPage() {
             const info = LOCALE_LABELS[loc]
             return (
               <button
+                type="button"
                 key={loc}
                 onClick={() => handleLocaleChange(loc)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
@@ -271,6 +272,7 @@ export default function SettingsPage() {
           <div className="flex gap-2">
             {hasActiveSubscription ? (
               <button
+                type="button"
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
                 className="btn btn-primary disabled:opacity-50"
@@ -304,6 +306,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              type="button"
               onClick={() => toggleModule('hookah')}
               disabled={modulesLoading || (isHookahActive && !isBarActive)}
               title={isHookahActive && !isBarActive ? ts.cannotDisableSingle : undefined}
@@ -327,6 +330,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <button
+              type="button"
               onClick={() => toggleModule('bar')}
               disabled={modulesLoading || (isBarActive && !isHookahActive)}
               title={isBarActive && !isHookahActive ? ts.cannotDisableSingle : undefined}
@@ -469,6 +473,7 @@ export default function SettingsPage() {
                 />
               </div>
               <button
+                type="button"
                 onClick={handleSaveSlug}
                 disabled={slugSaving}
                 className="btn btn-primary disabled:opacity-50 whitespace-nowrap"
@@ -510,10 +515,10 @@ export default function SettingsPage() {
               </p>
 
               <div className="flex gap-3">
-                <button onClick={handleCopyUrl} className="btn btn-ghost text-sm">
+                <button type="button" onClick={handleCopyUrl} className="btn btn-ghost text-sm">
                   {ts.copyUrl}
                 </button>
-                <button onClick={handleDownloadQR} className="btn btn-primary text-sm">
+                <button type="button" onClick={handleDownloadQR} className="btn btn-primary text-sm">
                   {ts.downloadQr}
                 </button>
               </div>
@@ -543,6 +548,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <button
+              type="button"
               onClick={() => updateNotificationSettings({
                 low_stock_enabled: !notificationSettings?.low_stock_enabled
               })}
@@ -599,6 +605,7 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={() => pushSubscribed ? unsubscribePush() : subscribePush()}
                   disabled={pushLoading || pushPermission === 'denied'}
                   className={`relative shrink-0 w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
@@ -659,6 +666,7 @@ export default function SettingsPage() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => updateEmailSettings({
                   email_notifications_enabled: !emailSettings?.email_notifications_enabled
                 })}
@@ -681,6 +689,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">{ts.lowStockEmail}</span>
                 <button
+                  type="button"
                   onClick={() => updateEmailSettings({
                     low_stock_email: !emailSettings?.low_stock_email
                   })}
@@ -697,6 +706,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">{ts.orderUpdatesEmail}</span>
                 <button
+                  type="button"
                   onClick={() => updateEmailSettings({
                     order_updates_email: !emailSettings?.order_updates_email
                   })}
@@ -713,6 +723,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">{ts.dailySummaryEmail}</span>
                 <button
+                  type="button"
                   onClick={() => updateEmailSettings({
                     daily_summary_email: !emailSettings?.daily_summary_email
                   })}
@@ -796,6 +807,7 @@ export default function SettingsPage() {
 
             <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={r2oSync}
                 disabled={r2oSyncing}
                 className="btn btn-primary disabled:opacity-50"
@@ -803,6 +815,7 @@ export default function SettingsPage() {
                 {r2oSyncing ? ts.syncing : ts.sync}
               </button>
               <button
+                type="button"
                 onClick={r2oDisconnect}
                 className="text-sm text-[var(--color-danger)] hover:underline"
               >
@@ -829,6 +842,7 @@ export default function SettingsPage() {
             )}
 
             <button
+              type="button"
               onClick={r2oConnect}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00b341] text-white font-medium hover:opacity-90 transition-opacity"
             >
@@ -875,6 +889,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">{ts.telegramLowStock}</span>
                 <button
+                  type="button"
                   onClick={() => updateTelegramSettings({
                     low_stock_alerts: !telegramConnection.low_stock_alerts
                   })}
@@ -891,6 +906,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">{ts.telegramSessions}</span>
                 <button
+                  type="button"
                   onClick={() => updateTelegramSettings({
                     session_reminders: !telegramConnection.session_reminders
                   })}
@@ -907,6 +923,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm">{ts.telegramDaily}</span>
                 <button
+                  type="button"
                   onClick={() => updateTelegramSettings({
                     daily_summary: !telegramConnection.daily_summary
                   })}
@@ -922,6 +939,7 @@ export default function SettingsPage() {
             </div>
 
             <button
+              type="button"
               onClick={disconnectTelegram}
               className="text-sm text-[var(--color-danger)] hover:underline"
             >
@@ -970,6 +988,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <button
+              type="button"
               onClick={() => signOut()}
               className="btn btn-ghost border-[var(--color-danger)] text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
             >
@@ -987,6 +1006,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <button
+              type="button"
               onClick={handleDeleteAccount}
               disabled={deleteLoading}
               className="btn bg-[var(--color-danger)] text-white hover:opacity-80 disabled:opacity-50"

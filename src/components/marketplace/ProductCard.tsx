@@ -66,7 +66,7 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
         <div className="mt-4 space-y-2">
           {/* Quantity selector */}
           <div className="flex items-center gap-2" role="group" aria-label={t.selectQuantity}>
-            <button
+            <button type="button"
               onClick={decrementQuantity}
               aria-label={t.decreaseQuantity}
               className="icon-btn icon-btn-sm"
@@ -74,7 +74,7 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
               <IconMinus size={18} aria-hidden="true" />
             </button>
             <span className="w-10 text-center font-medium" aria-live="polite">{quantity}</span>
-            <button
+            <button type="button"
               onClick={incrementQuantity}
               aria-label={t.increaseQuantity}
               className="icon-btn icon-btn-sm"
@@ -84,7 +84,7 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
           </div>
 
           {/* Add button */}
-          <button
+          <button type="button"
             onClick={handleAdd}
             disabled={!canAdd}
             aria-label={canAdd ? t.addToCartLabel(product.flavor) : t.otherSupplierLabel}

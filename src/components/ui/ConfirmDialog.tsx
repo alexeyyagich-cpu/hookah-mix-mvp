@@ -47,13 +47,13 @@ export function ConfirmDialog({
         <h3 className="text-lg font-bold mb-2">{title}</h3>
         <p className="text-sm text-[var(--color-textMuted)] mb-5">{message}</p>
         <div className="flex gap-3">
-          <button
+          <button type="button"
             onClick={onCancel}
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-[var(--color-bgHover)] hover:opacity-80 transition-opacity"
           >
             {cancelLabel}
           </button>
-          <button
+          <button type="button"
             ref={confirmRef}
             onClick={onConfirm}
             className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-80 ${

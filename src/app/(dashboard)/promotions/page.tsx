@@ -106,7 +106,7 @@ export default function PromotionsPage() {
           <h1 className="text-2xl font-bold">{tm.promosTitle}</h1>
           <p className="text-[var(--color-textMuted)]">{tm.promosSubtitle}</p>
         </div>
-        <button
+        <button type="button"
           onClick={() => { resetForm(); setShowForm(true) }}
           className="btn btn-primary flex items-center gap-2"
         >
@@ -120,7 +120,7 @@ export default function PromotionsPage() {
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">{editingPromo ? tm.editPromo : tm.createPromo}</h3>
-            <button onClick={resetForm} className="btn btn-ghost p-2"><IconClose size={18} /></button>
+            <button type="button" onClick={resetForm} className="btn btn-ghost p-2"><IconClose size={18} /></button>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -221,7 +221,7 @@ export default function PromotionsPage() {
             </div>
           </div>
 
-          <button onClick={handleSubmit} className="btn btn-primary">
+          <button type="button" onClick={handleSubmit} className="btn btn-primary">
             {editingPromo ? tm.save : tm.createPromo}
           </button>
         </div>
@@ -265,7 +265,7 @@ export default function PromotionsPage() {
                 <span className="text-sm text-[var(--color-textMuted)]">
                   {promo.usage_count}×
                 </span>
-                <button
+                <button type="button"
                   onClick={() => toggleActive(promo.id)}
                   className={`shrink-0 w-10 h-6 rounded-full transition-colors relative ${
                     promo.is_active ? 'bg-[var(--color-success)]' : 'bg-[var(--color-bgHover)]'
@@ -275,18 +275,18 @@ export default function PromotionsPage() {
                     promo.is_active ? 'translate-x-4' : ''
                   }`} />
                 </button>
-                <button onClick={() => openEdit(promo)} className="btn btn-ghost p-2">
+                <button type="button" onClick={() => openEdit(promo)} className="btn btn-ghost p-2">
                   <IconEdit size={16} />
                 </button>
                 {confirmDeleteId === promo.id ? (
                   <div className="flex gap-1">
-                    <button
+                    <button type="button"
                       onClick={async () => { await deletePromo(promo.id); setConfirmDeleteId(null) }}
                       className="btn btn-ghost text-[var(--color-danger)] text-xs"
                     >
                       {tm.delete}
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => setConfirmDeleteId(null)}
                       className="btn btn-ghost text-xs"
                     >
@@ -294,7 +294,7 @@ export default function PromotionsPage() {
                     </button>
                   </div>
                 ) : (
-                  <button onClick={() => setConfirmDeleteId(promo.id)} className="btn btn-ghost p-2 text-[var(--color-danger)]">
+                  <button type="button" onClick={() => setConfirmDeleteId(promo.id)} className="btn btn-ghost p-2 text-[var(--color-danger)]">
                     <IconTrash size={16} />
                   </button>
                 )}

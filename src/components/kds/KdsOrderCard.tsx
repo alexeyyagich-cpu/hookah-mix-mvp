@@ -114,7 +114,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
             {formatElapsed(elapsed)}
           </div>
           {canCancel && (
-            <button
+            <button type="button"
               onClick={handleCancel}
               disabled={acting}
               className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
@@ -198,7 +198,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
       )}
 
       {/* Action button */}
-      <button
+      <button type="button"
         onClick={handleAction}
         disabled={acting}
         className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${ACTION_STYLES[order.status]} ${acting ? 'opacity-50' : ''}`}

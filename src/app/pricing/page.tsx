@@ -212,6 +212,7 @@ function PricingPageContent() {
         {/* Billing toggle */}
         <div className="flex items-center justify-center gap-4 mb-12">
           <button
+            type="button"
             onClick={() => setIsYearly(false)}
             className={`px-4 py-2 rounded-xl font-medium transition-colors ${
               !isYearly
@@ -222,6 +223,7 @@ function PricingPageContent() {
             {ta.billingMonthly}
           </button>
           <button
+            type="button"
             onClick={() => setIsYearly(true)}
             className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center gap-2 ${
               isYearly

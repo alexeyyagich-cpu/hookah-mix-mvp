@@ -422,6 +422,7 @@ function ReviewForm({
         <h3 className="text-lg font-bold mb-1">{t.reviewThankYou}</h3>
         <p className="text-[var(--color-textMuted)] text-sm">{t.reviewAfterModeration}</p>
         <button
+          type="button"
           onClick={() => setSubmitted(false)}
           className="mt-4 text-sm text-[var(--color-primary)] hover:underline"
         >
@@ -557,6 +558,7 @@ function ReservationForm({ profileId }: { profileId: string }) {
         <h3 className="text-lg font-bold mb-1">{t.reservationSent}</h3>
         <p className="text-[var(--color-textMuted)] text-sm">{t.reservationAwaitConfirm}</p>
         <button
+          type="button"
           onClick={() => setSubmitted(false)}
           className="mt-4 text-sm text-[var(--color-primary)] hover:underline"
         >
@@ -781,6 +783,7 @@ function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; aut
         <div className="flex justify-center gap-2 mt-4">
           {reviews.map((_, i) => (
             <button
+              type="button"
               key={i}
               onClick={() => scrollToIndex(i)}
               className={`h-2.5 rounded-full transition-all duration-300 ${

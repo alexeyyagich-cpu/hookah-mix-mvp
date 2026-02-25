@@ -93,7 +93,7 @@ export function PricingCard({
       </ul>
 
       {/* Button */}
-      <button
+      <button type="button"
         onClick={onSelect}
         disabled={isCurrent || isLoading}
         className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${

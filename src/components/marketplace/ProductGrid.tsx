@@ -115,7 +115,7 @@ export function ProductGrid({
         <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
           <p className="text-sm">
             {t.otherSupplierWarning}
-            <button
+            <button type="button"
               onClick={() => {/* Clear cart handled in parent */}}
               className="ml-2 text-[var(--color-primary)] underline"
             >

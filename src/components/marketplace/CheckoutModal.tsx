@@ -71,7 +71,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
             <h2 className="font-semibold text-lg">{t.orderConfirmation}</h2>
             {!loading && !success && (
-              <button
+              <button type="button"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
@@ -155,14 +155,14 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
           {/* Footer */}
           {!success && (
             <div className="p-4 border-t border-[var(--color-border)] flex gap-3">
-              <button
+              <button type="button"
                 onClick={onClose}
                 disabled={loading}
                 className="btn btn-ghost flex-1"
               >
                 {t.cancelBtn}
               </button>
-              <button
+              <button type="button"
                 onClick={handleConfirm}
                 disabled={loading}
                 className="btn btn-primary flex-1"

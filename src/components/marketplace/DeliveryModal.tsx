@@ -117,7 +117,7 @@ export function DeliveryModal({
               {step === 'success' && t.doneLabel}
             </h2>
             {!loading && step !== 'success' && (
-              <button
+              <button type="button"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
@@ -205,14 +205,14 @@ export function DeliveryModal({
             <div className="p-4 border-t border-[var(--color-border)] flex gap-3">
               {step === 'confirm' ? (
                 <>
-                  <button
+                  <button type="button"
                     onClick={onClose}
                     disabled={loading}
                     className="btn btn-ghost flex-1"
                   >
                     {t.cancelBtn}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={handleConfirmDelivery}
                     disabled={loading}
                     className="btn btn-primary flex-1"
@@ -222,14 +222,14 @@ export function DeliveryModal({
                 </>
               ) : (
                 <>
-                  <button
+                  <button type="button"
                     onClick={handleSkipInventory}
                     disabled={loading}
                     className="btn btn-ghost flex-1"
                   >
                     {t.skip}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={handleAddToInventory}
                     disabled={loading}
                     className="btn btn-primary flex-1"

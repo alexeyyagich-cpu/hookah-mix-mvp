@@ -35,7 +35,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <div className="text-[var(--color-textMuted)] mb-2">
             {this.props.sectionName ? `${this.props.sectionName} — ` : ''}Something went wrong
           </div>
-          <button
+          <button type="button"
             className="text-sm text-[var(--color-primary)] hover:underline"
             onClick={() => this.setState({ hasError: false, error: null })}
           >

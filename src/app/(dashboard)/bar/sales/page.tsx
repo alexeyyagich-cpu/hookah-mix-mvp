@@ -78,7 +78,7 @@ export default function BarSalesPage() {
         <div className="flex items-center gap-2">
           {/* Export Button with Dropdown */}
           <div className="relative" ref={exportMenuRef}>
-            <button
+            <button type="button"
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport || periodSales.length === 0}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -90,14 +90,14 @@ export default function BarSalesPage() {
 
             {exportMenuOpen && canExport && (
               <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
-                <button
+                <button type="button"
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
                   <IconChart size={16} />
                   {tb.exportSalesCSV}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
@@ -155,7 +155,7 @@ export default function BarSalesPage() {
           { key: 'log' as const, label: tb.tabLog },
           { key: 'analytics' as const, label: tb.analytics },
         ]).map(t => (
-          <button
+          <button type="button"
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -240,7 +240,7 @@ export default function BarSalesPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <button
+                            <button type="button"
                               onClick={() => deleteSale(sale.id)}
                               className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
                               title={tb.deleteTitle}

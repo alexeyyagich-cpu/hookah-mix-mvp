@@ -297,7 +297,7 @@ export default function LoungeProfileSettings() {
           <h3 className="font-medium">{ts.loungePublish}</h3>
           <p className="text-sm text-[var(--color-textMuted)]">{ts.loungePublishDesc}</p>
         </div>
-        <button
+        <button type="button"
           onClick={handlePublishToggle}
           className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
             isPublished ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
@@ -313,7 +313,7 @@ export default function LoungeProfileSettings() {
 
       {/* Save */}
       <div className="flex items-center gap-4">
-        <button
+        <button type="button"
           onClick={handleSave}
           disabled={saving}
           className="btn btn-primary"

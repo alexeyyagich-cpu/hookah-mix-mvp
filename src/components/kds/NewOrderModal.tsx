@@ -341,7 +341,7 @@ export function NewOrderModal({
         {/* Header */}
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)] flex items-center justify-between">
           <h2 className="text-xl font-bold">{t.newOrderHeader}</h2>
-          <button
+          <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
           >
@@ -356,7 +356,7 @@ export function NewOrderModal({
               {t.sectionTable}
             </h3>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              <button
+              <button type="button"
                 onClick={() => setSelectedTableId(null)}
                 className={`p-3 rounded-xl text-sm font-medium border transition-all ${
                   selectedTableId === null
@@ -367,7 +367,7 @@ export function NewOrderModal({
                 {t.noTableBtn}
               </button>
               {tables.map(table => (
-                <button
+                <button type="button"
                   key={table.id}
                   onClick={() => setSelectedTableId(table.id)}
                   className={`p-3 rounded-xl text-sm font-medium border transition-all text-left ${
@@ -393,7 +393,7 @@ export function NewOrderModal({
           {/* Type tabs */}
           {isBarActive && isHookahActive && (
             <div className="flex gap-2 border-b border-[var(--color-border)]">
-              <button
+              <button type="button"
                 onClick={() => setActiveTab('bar')}
                 className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'bar'
@@ -404,7 +404,7 @@ export function NewOrderModal({
                 <IconCocktail size={16} />
                 {t.tabBar}
               </button>
-              <button
+              <button type="button"
                 onClick={() => setActiveTab('hookah')}
                 className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'hookah'
@@ -430,7 +430,7 @@ export function NewOrderModal({
                   {menuRecipes.map(recipe => {
                     const inCart = barItems.find(e => e.recipe.id === recipe.id)
                     return (
-                      <button
+                      <button type="button"
                         key={recipe.id}
                         onClick={() => addBarItem(recipe)}
                         className={`p-3 rounded-xl text-left text-sm border transition-all active:scale-95 ${
@@ -465,20 +465,20 @@ export function NewOrderModal({
                     >
                       <span className="text-sm font-medium truncate flex-1 mr-2">{getLocaleName(entry.recipe, locale)}</span>
                       <div className="flex items-center gap-2">
-                        <button
+                        <button type="button"
                           onClick={() => updateBarItemQty(entry.recipe.id, -1)}
                           className="p-1 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors"
                         >
                           <IconMinus size={14} />
                         </button>
                         <span className="text-sm font-mono font-semibold w-6 text-center">{entry.quantity}</span>
-                        <button
+                        <button type="button"
                           onClick={() => updateBarItemQty(entry.recipe.id, 1)}
                           className="p-1 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors"
                         >
                           <IconPlus size={14} />
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => removeBarItem(entry.recipe.id)}
                           className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors ml-1"
                         >
@@ -497,7 +497,7 @@ export function NewOrderModal({
             <div className="space-y-4">
               {/* Mode toggle */}
               <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1 w-fit">
-                <button
+                <button type="button"
                   onClick={() => setHookahMode('structured')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     hookahMode === 'structured'
@@ -507,7 +507,7 @@ export function NewOrderModal({
                 >
                   {t.hookahModeStructured}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setHookahMode('freetext')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     hookahMode === 'freetext'
@@ -531,7 +531,7 @@ export function NewOrderModal({
                 <div className="space-y-4">
                   {/* Use last mix button */}
                   {tableGuest?.last_mix_snapshot && (
-                    <button
+                    <button type="button"
                       onClick={useLastMix}
                       className="w-full px-4 py-2.5 rounded-xl text-sm font-medium border border-dashed border-[var(--color-success)] text-[var(--color-success)] hover:bg-[var(--color-success)]/10 transition-colors"
                     >
@@ -560,7 +560,7 @@ export function NewOrderModal({
                         const isSelected = selectedTobaccos.some(st => st.tobacco.id === tobacco.id)
                         const stock = getStock(tobacco)
                         return (
-                          <button
+                          <button type="button"
                             key={tobacco.id}
                             onClick={() => addTobacco(tobacco)}
                             disabled={isSelected || selectedTobaccos.length >= 5}
@@ -614,7 +614,7 @@ export function NewOrderModal({
                           <span className="text-sm font-mono font-semibold w-10 text-right">
                             {st.percent}%
                           </span>
-                          <button
+                          <button type="button"
                             onClick={() => removeTobacco(st.tobacco.id)}
                             className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
                           >
@@ -707,13 +707,13 @@ export function NewOrderModal({
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-[var(--color-bgCard)] px-6 py-4 border-t border-[var(--color-border)] flex items-center justify-between">
-          <button
+          <button type="button"
             onClick={onClose}
             className="px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] transition-colors"
           >
             {t.cancelBtn}
           </button>
-          <button
+          <button type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
             className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${

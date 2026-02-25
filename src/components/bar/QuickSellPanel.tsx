@@ -54,7 +54,7 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
           const justSold = soldId === recipe.id
 
           return (
-            <button
+            <button type="button"
               key={recipe.id}
               onClick={() => handleSell(recipe)}
               disabled={isSelling}

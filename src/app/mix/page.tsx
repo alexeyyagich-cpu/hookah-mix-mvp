@@ -516,6 +516,7 @@ function MixPageInner() {
             {/* Миксы dropdown */}
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setIsMixesMenuOpen(!isMixesMenuOpen)}
                 className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
                 style={{
@@ -539,6 +540,7 @@ function MixPageInner() {
                     }}
                   >
                     <button
+                      type="button"
                       onClick={() => { setIsMixesDrawerOpen(true); setIsMixesMenuOpen(false); }}
                       className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors"
                       style={{ color: "var(--color-text)" }}
@@ -548,6 +550,7 @@ function MixPageInner() {
                     </button>
                     {isBusinessUser && (
                       <button
+                        type="button"
                         onClick={() => { setIsSavedMixesDrawerOpen(true); setIsMixesMenuOpen(false); }}
                         className="w-full px-4 py-3 text-left text-sm flex items-center gap-3 hover:bg-[var(--color-bgHover)] transition-colors border-t"
                         style={{ color: "var(--color-text)", borderColor: "var(--color-border)" }}
@@ -564,6 +567,7 @@ function MixPageInner() {
             {/* Гости (только для бизнес-пользователей, не в гостевом режиме) */}
             {isBusinessUser && (
               <button
+                type="button"
                 onClick={() => setIsGuestsDrawerOpen(true)}
                 className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
                 style={{
@@ -579,6 +583,7 @@ function MixPageInner() {
 
             {/* Рандом */}
             <button
+              type="button"
               onClick={() => setIsSlotMachineOpen(true)}
               className="btn text-sm flex items-center gap-1.5 px-2 sm:px-3"
               style={{
@@ -649,6 +654,7 @@ function MixPageInner() {
             <div className="grid grid-cols-5 sm:grid-cols-5 gap-2 max-w-lg mx-auto">
               {CATEGORIES.map(cat => (
                 <button
+                  type="button"
                   key={cat}
                   onClick={() => { setSelectedCategory(cat); setShowCategoryFilter(true); }}
                   className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all hover:scale-105 active:scale-95"
@@ -679,6 +685,7 @@ function MixPageInner() {
           )}
           {selectedTobaccos.map((t, i) => (
             <button
+              type="button"
               key={t.id}
               onClick={() => toggleTobacco(t.id)}
               className="pill animate-scaleIn group cursor-pointer"
@@ -732,6 +739,7 @@ function MixPageInner() {
               {/* Brand filter */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <button
+                  type="button"
                   onClick={() => setSelectedBrand(null)}
                   className={`pill ${selectedBrand === null ? "pill-active" : ""}`}
                 >
@@ -739,6 +747,7 @@ function MixPageInner() {
                 </button>
                 {BRANDS.map(brand => (
                   <button
+                    type="button"
                     key={brand}
                     onClick={() => setSelectedBrand(prev => prev === brand ? null : brand)}
                     className={`pill ${selectedBrand === brand ? "pill-active" : ""}`}
@@ -751,6 +760,7 @@ function MixPageInner() {
               {/* Category filter toggle */}
               <div className="mb-5 pb-5 border-b" style={{ borderColor: "var(--color-border)" }}>
                 <button
+                  type="button"
                   onClick={() => setShowCategoryFilter(prev => !prev)}
                   className="pill flex items-center gap-2"
                   style={{
@@ -770,6 +780,7 @@ function MixPageInner() {
                 {showCategoryFilter && (
                   <div className="flex flex-wrap gap-2 mt-3 animate-fadeInUp">
                     <button
+                      type="button"
                       onClick={() => setSelectedCategory(null)}
                       className={`pill ${selectedCategory === null ? "pill-active" : ""}`}
                     >
@@ -777,6 +788,7 @@ function MixPageInner() {
                     </button>
                     {CATEGORIES.map(cat => (
                       <button
+                        type="button"
                         key={cat}
                         onClick={() => setSelectedCategory(prev => prev === cat ? null : cat)}
                         className={`pill ${selectedCategory === cat ? "pill-active" : ""}`}
@@ -1116,6 +1128,7 @@ function MixPageInner() {
                     <div className="space-y-3">
                       {/* Show to hookah master */}
                       <button
+                        type="button"
                         onClick={() => setShowMasterCard(true)}
                         className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
                         style={{ background: 'var(--color-primary)', color: 'white' }}
@@ -1126,6 +1139,7 @@ function MixPageInner() {
 
                       {/* Try another */}
                       <button
+                        type="button"
                         onClick={() => { setSelectedIds([]); setPercents({}); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                         className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
                         style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}
@@ -1196,6 +1210,7 @@ function MixPageInner() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowRecommendations(false)}
                 aria-label={t.mixCloseRecommendations}
                 className="icon-btn icon-btn-sm icon-btn-ghost"
@@ -1206,6 +1221,7 @@ function MixPageInner() {
             <div className="space-y-2">
               {recommendedMixes.map(mix => (
                 <button
+                  type="button"
                   key={mix.id}
                   onClick={() => {
                     applyMixRecipe(mix);
@@ -1312,6 +1328,7 @@ function MixPageInner() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setIsGuestsDrawerOpen(false)}
                 aria-label={t.mixCloseQuickRepeat}
                 className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -1355,6 +1372,7 @@ function MixPageInner() {
         >
           {/* Timer toggle button */}
           <button
+            type="button"
             onClick={() => setIsTimerVisible(!isTimerVisible)}
             aria-label={isTimerVisible ? t.mixHideTimerLabel : t.mixShowTimerLabel}
             className={`h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-all ${isTimerVisible ? 'animate-pulse' : ''}`}
@@ -1370,6 +1388,7 @@ function MixPageInner() {
           </button>
 
           <button
+            type="button"
             onClick={() => setIsSaveMixModalOpen(true)}
             aria-label={t.mixSaveMixLabel}
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
@@ -1382,6 +1401,7 @@ function MixPageInner() {
             <span className="hidden sm:inline">{t.mixSaveBtn}</span>
           </button>
           <button
+            type="button"
             onClick={() => setIsQuickSessionOpen(true)}
             aria-label={t.mixRecordSession}
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
@@ -1453,6 +1473,7 @@ function MixPageInner() {
 
             {/* Close */}
             <button
+              type="button"
               onClick={() => setShowMasterCard(false)}
               className="w-full py-3 rounded-xl text-sm font-semibold"
               style={{ background: 'var(--color-primary)', color: 'white' }}

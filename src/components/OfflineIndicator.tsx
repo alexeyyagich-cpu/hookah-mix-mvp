@@ -97,10 +97,10 @@ export function OfflineIndicator() {
               {tc.offline.syncFailed(String(failedItems.length))}
             </span>
             <div className="flex gap-1">
-              <button onClick={handleRetryAll} className="px-2 py-0.5 rounded text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors">
+              <button type="button" onClick={handleRetryAll} className="px-2 py-0.5 rounded text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors">
                 {tc.retry}
               </button>
-              <button onClick={handleDiscardAll} className="px-2 py-0.5 rounded text-[var(--color-textMuted)] hover:bg-[var(--color-textMuted)]/10 transition-colors">
+              <button type="button" onClick={handleDiscardAll} className="px-2 py-0.5 rounded text-[var(--color-textMuted)] hover:bg-[var(--color-textMuted)]/10 transition-colors">
                 {tc.delete}
               </button>
             </div>
@@ -121,7 +121,7 @@ export function OfflineIndicator() {
                 )}
               </div>
               <div className="flex gap-1 ml-2 shrink-0">
-                <button
+                <button type="button"
                   onClick={() => item.id && handleRetry(item.id)}
                   className="p-1 rounded hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors"
                   title={tc.retry}
@@ -131,7 +131,7 @@ export function OfflineIndicator() {
                     <path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
                   </svg>
                 </button>
-                <button
+                <button type="button"
                   onClick={() => item.id && handleDiscard(item.id)}
                   className="p-1 rounded hover:bg-[var(--color-error)]/10 text-[var(--color-textMuted)] transition-colors"
                   title={tc.delete}
@@ -147,7 +147,7 @@ export function OfflineIndicator() {
       )}
 
       {/* Main pill */}
-      <button
+      <button type="button"
         onClick={isFailed ? handleFailedClick : undefined}
         className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium shadow-lg border backdrop-blur-sm"
         style={{ background: bg, borderColor: border, color, cursor: isFailed ? 'pointer' : 'default' }}

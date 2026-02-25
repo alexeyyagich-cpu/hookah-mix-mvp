@@ -142,7 +142,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = 'EUR
           {/* Suggested prices */}
           <div className="flex flex-wrap gap-2">
             {suggestedPrices.map((suggestion) => (
-              <button
+              <button type="button"
                 key={suggestion.label}
                 onClick={() => setSellingPrice(suggestion.price.toString())}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"

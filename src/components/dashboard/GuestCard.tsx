@@ -28,7 +28,7 @@ export function GuestCard({ guest, onClick }: GuestCardProps) {
   const tierLabel = tm[`tier${guest.loyalty_tier.charAt(0).toUpperCase()}${guest.loyalty_tier.slice(1)}` as keyof typeof tm] as string
 
   return (
-    <button
+    <button type="button"
       onClick={onClick}
       className="card p-4 text-left hover:border-[var(--color-primary)]/50 transition-colors w-full"
     >

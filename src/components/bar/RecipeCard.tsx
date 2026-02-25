@@ -54,7 +54,7 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
           )}
         </div>
         <div className="flex items-center gap-1 ml-2">
-          <button
+          <button type="button"
             onClick={onToggleFavorite}
             className="p-1.5 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
             title={recipe.is_favorite ? t.removeFavorite : t.addFavorite}
@@ -116,7 +116,7 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
 
       {/* Actions */}
       <div className="flex items-center gap-2">
-        <button
+        <button type="button"
           onClick={onToggleMenu}
           className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             recipe.is_on_menu
@@ -126,13 +126,13 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
         >
           {recipe.is_on_menu ? t.inMenuLabel : t.addToMenuLabel}
         </button>
-        <button
+        <button type="button"
           onClick={onEdit}
           className="px-3 py-1.5 rounded-lg text-xs text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] transition-colors"
         >
           {t.editShort}
         </button>
-        <button
+        <button type="button"
           onClick={onDelete}
           className="px-3 py-1.5 rounded-lg text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
         >

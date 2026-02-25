@@ -31,7 +31,7 @@ export function TableSelector({ tables, selectedId, onSelect, tm }: TableSelecto
         {tables.map(table => {
           const isSelected = table.id === selectedId
           return (
-            <button
+            <button type="button"
               key={table.id}
               onClick={() => onSelect(table.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${

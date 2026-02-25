@@ -133,6 +133,7 @@ export default function StatisticsPage() {
           {/* View Mode Toggle */}
           <div className="flex rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] p-1">
             <button
+              type="button"
               onClick={() => setViewMode('overview')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === 'overview'
@@ -143,6 +144,7 @@ export default function StatisticsPage() {
               {tm.viewOverview}
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('comparison')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === 'comparison'
@@ -153,6 +155,7 @@ export default function StatisticsPage() {
               {tm.viewComparison}
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('abc')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === 'abc'
@@ -174,6 +177,7 @@ export default function StatisticsPage() {
                 { value: 'all', label: tm.periodAll },
               ].map((option) => (
                 <button
+                  type="button"
                   key={option.value}
                   onClick={() => handlePeriodChange(option.value as typeof selectedPeriod)}
                   disabled={isFreeTier && (option.value === '90d' || option.value === 'all')}
@@ -193,6 +197,7 @@ export default function StatisticsPage() {
           {/* Export Button with Dropdown */}
           <div className="relative" ref={exportMenuRef}>
             <button
+              type="button"
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -205,6 +210,7 @@ export default function StatisticsPage() {
             {exportMenuOpen && canExport && (
               <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
                 <button
+                  type="button"
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
@@ -212,6 +218,7 @@ export default function StatisticsPage() {
                   {tm.exportCsv}
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
@@ -265,6 +272,7 @@ export default function StatisticsPage() {
               <span className="text-sm text-[var(--color-textMuted)]">{tm.compare}</span>
               {presets.map((preset, index) => (
                 <button
+                  type="button"
                   key={index}
                   onClick={() => {
                     setSelectedPreset(index)

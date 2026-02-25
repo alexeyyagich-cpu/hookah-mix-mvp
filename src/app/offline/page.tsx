@@ -19,6 +19,7 @@ export default function OfflinePage() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
+            type="button"
             onClick={() => window.location.reload()}
             className="px-6 py-3 rounded-xl font-semibold text-sm"
             style={{ background: '#F59E0B', color: '#0A0A0F' }}

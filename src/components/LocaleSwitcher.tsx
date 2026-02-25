@@ -9,7 +9,7 @@ export function LocaleSwitcher() {
   return (
     <div className="flex items-center gap-1 text-lg">
       {LOCALES.map((loc) => (
-        <button
+        <button type="button"
           key={loc}
           onClick={() => setLocale(loc)}
           className={`transition-opacity ${locale === loc ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}

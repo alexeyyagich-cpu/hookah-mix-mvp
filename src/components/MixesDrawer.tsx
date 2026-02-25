@@ -71,7 +71,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
               {t.mixDrawerRecipeCount(MIX_RECIPES.length)}
             </p>
           </div>
-          <button
+          <button type="button"
             onClick={onClose}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--color-bgHover)]"
             style={{ color: "var(--color-textMuted)" }}
@@ -108,7 +108,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
               style={{ color: "var(--color-text)" }}
             />
             {searchQuery && (
-              <button
+              <button type="button"
                 onClick={() => setSearchQuery("")}
                 className="text-xs px-2 py-1 rounded-lg hover:bg-[var(--color-bgAccent)] transition-colors"
                 style={{ color: "var(--color-textMuted)" }}
@@ -122,14 +122,14 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
         {/* Category tabs */}
         <div className="px-5 py-3 border-b overflow-x-auto" style={{ borderColor: "var(--color-border)" }}>
           <div className="flex gap-2">
-            <button
+            <button type="button"
               onClick={() => setSelectedCategory(null)}
               className={`pill whitespace-nowrap ${!selectedCategory ? "pill-active" : ""}`}
             >
               {t.mixDrawerAll}
             </button>
             {categories.map(cat => (
-              <button
+              <button type="button"
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 className={`pill whitespace-nowrap ${selectedCategory === cat ? "pill-active" : ""}`}
@@ -298,7 +298,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
           </div>
 
           {/* Apply button */}
-          <button
+          <button type="button"
             onClick={(e) => {
               e.stopPropagation();
               onSelect();

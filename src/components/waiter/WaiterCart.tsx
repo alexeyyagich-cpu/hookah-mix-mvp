@@ -84,14 +84,14 @@ export function WaiterCart({
                 <span className="text-sm font-medium truncate">{item.recipe.name}</span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <button onClick={() => onUpdateBarQty(item.recipe.id, -1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center">
+                <button type="button" onClick={() => onUpdateBarQty(item.recipe.id, -1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center">
                   <IconMinus size={12} />
                 </button>
                 <span className="text-sm font-bold w-5 text-center">{item.quantity}</span>
-                <button onClick={() => onUpdateBarQty(item.recipe.id, 1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center">
+                <button type="button" onClick={() => onUpdateBarQty(item.recipe.id, 1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center">
                   <IconPlus size={12} />
                 </button>
-                <button onClick={() => onRemoveBarItem(item.recipe.id)} className="w-7 h-7 rounded-lg text-[var(--color-danger)] flex items-center justify-center">
+                <button type="button" onClick={() => onRemoveBarItem(item.recipe.id)} className="w-7 h-7 rounded-lg text-[var(--color-danger)] flex items-center justify-center">
                   <IconClose size={12} />
                 </button>
               </div>
@@ -142,7 +142,7 @@ export function WaiterCart({
       {/* Bottom bar */}
       <div className="bg-[var(--color-bgCard)] border-t border-[var(--color-border)] p-3 shadow-xl">
         <div className="max-w-lg mx-auto flex items-center gap-3">
-          <button
+          <button type="button"
             onClick={onToggle}
             className="flex items-center gap-2 flex-1 min-w-0"
           >
@@ -157,7 +157,7 @@ export function WaiterCart({
             </div>
             <span className={`text-xs transition-transform ${expanded ? 'rotate-180' : ''}`}>▲</span>
           </button>
-          <button
+          <button type="button"
             onClick={onSubmit}
             disabled={submitting}
             className="px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold transition-all disabled:opacity-50 active:scale-95"

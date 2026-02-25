@@ -72,7 +72,7 @@ export default function BarInventoryPage() {
             {totalVolumeMl > 0 && ` · ${t.volumeInStock((totalVolumeMl / 1000).toFixed(1))}`}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => {
             setEditingItem(null)
             setModalOpen(true)

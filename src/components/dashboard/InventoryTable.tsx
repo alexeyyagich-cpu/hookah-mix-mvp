@@ -157,13 +157,13 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                               className="w-20 px-2 py-1 rounded-lg bg-[var(--color-bgHover)] border border-[var(--color-border)] text-right text-sm"
                               autoFocus
                             />
-                            <button
+                            <button type="button"
                               onClick={() => handleAdjust(item.id)}
                               className="p-1 rounded-lg hover:bg-[var(--color-success)]/20 text-[var(--color-success)]"
                             >
                               ✓
                             </button>
-                            <button
+                            <button type="button"
                               onClick={() => {
                                 setAdjustingId(null)
                                 setAdjustAmount('')
@@ -174,7 +174,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                             </button>
                           </div>
                         ) : (
-                          <button
+                          <button type="button"
                             onClick={() => setAdjustingId(item.id)}
                             className="font-mono hover:text-[var(--color-primary)] transition-colors"
                           >
@@ -221,14 +221,14 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                               <IconShop size={16} />
                             </Link>
                           )}
-                          <button
+                          <button type="button"
                             onClick={() => onEdit(item)}
                             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
                             title={t.editItem}
                           >
                             ✏️
                           </button>
-                          <button
+                          <button type="button"
                             onClick={() => onDelete(item.id)}
                             className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
                             title={t.deleteItem}

@@ -32,6 +32,7 @@ export default function GlobalError({
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
+            type="button"
             onClick={reset}
             className="btn btn-primary px-6 py-3"
           >

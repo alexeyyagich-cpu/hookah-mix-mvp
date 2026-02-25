@@ -63,7 +63,7 @@ export function ABCAnalysisPanel() {
       {/* Mode selector */}
       <div className="flex rounded-xl bg-[var(--color-bgHover)] p-1 w-fit">
         {modes.map(m => (
-          <button
+          <button type="button"
             key={m.key}
             onClick={() => setMode(m.key)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${

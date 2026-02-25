@@ -60,7 +60,7 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
   const hasImage = imagePath && !imageError;
 
   return (
-    <button
+    <button type="button"
       onClick={onClick}
       disabled={isDisabled}
       onMouseEnter={() => setIsHovered(true)}

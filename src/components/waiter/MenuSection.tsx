@@ -107,14 +107,14 @@ export function MenuSection({
 
                 {inCart ? (
                   <div className="flex items-center gap-2">
-                    <button
+                    <button type="button"
                       onClick={() => onUpdateBarItemQty(recipe.id, -1)}
                       className="w-8 h-8 rounded-lg bg-[var(--color-bgHover)] flex items-center justify-center"
                     >
                       <IconMinus size={14} />
                     </button>
                     <span className="text-sm font-bold min-w-[20px] text-center">{inCart.quantity}</span>
-                    <button
+                    <button type="button"
                       onClick={() => onUpdateBarItemQty(recipe.id, 1)}
                       className="w-8 h-8 rounded-lg bg-[var(--color-primary)] text-white flex items-center justify-center"
                     >
@@ -122,7 +122,7 @@ export function MenuSection({
                     </button>
                   </div>
                 ) : (
-                  <button
+                  <button type="button"
                     onClick={() => onAddBarItem(recipe)}
                     className="w-full py-1.5 rounded-lg bg-[var(--color-bgHover)] text-xs font-medium hover:bg-[var(--color-primary)] hover:text-white transition-colors"
                   >
@@ -152,7 +152,7 @@ export function MenuSection({
     <div className="space-y-3">
       {/* Mode toggle */}
       <div className="flex gap-2">
-        <button
+        <button type="button"
           onClick={() => onSetHookahMode('structured')}
           className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
             hookahMode === 'structured'
@@ -162,7 +162,7 @@ export function MenuSection({
         >
           {String(tm.waiterStructured)}
         </button>
-        <button
+        <button type="button"
           onClick={() => onSetHookahMode('freetext')}
           className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
             hookahMode === 'freetext'
@@ -190,7 +190,7 @@ export function MenuSection({
           {tobaccos.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {tobaccos.map(t => (
-                <button
+                <button type="button"
                   key={t.tobacco.id}
                   onClick={() => onRemoveTobacco(t.tobacco.id)}
                   className="pill group cursor-pointer"
@@ -224,7 +224,7 @@ export function MenuSection({
               const invItem = inventory.find(i => i.tobacco_id === tobacco.id)
 
               return (
-                <button
+                <button type="button"
                   key={tobacco.id}
                   onClick={() => !isDisabled && (isSelected ? onRemoveTobacco(tobacco.id) : onAddTobacco(tobacco))}
                   disabled={isDisabled}

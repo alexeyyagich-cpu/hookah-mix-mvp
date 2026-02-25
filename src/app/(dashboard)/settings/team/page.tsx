@@ -134,6 +134,7 @@ export default function TeamPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={() => setShowInviteModal(true)}
           className="btn btn-primary flex items-center gap-2"
         >
@@ -231,6 +232,7 @@ export default function TeamPage() {
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleRemoveMember(member.id, member.display_name || tm.removeStaffFallback)}
                   disabled={actionLoading === member.id}
                   className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50 shrink-0"
@@ -280,6 +282,7 @@ export default function TeamPage() {
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
+                      type="button"
                       onClick={() => handleResendInvitation(invitation.id)}
                       disabled={actionLoading === `resend-${invitation.id}`}
                       className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors disabled:opacity-50"
@@ -292,6 +295,7 @@ export default function TeamPage() {
                       )}
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleCancelInvitation(invitation.id)}
                       disabled={actionLoading === invitation.id}
                       className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
@@ -340,6 +344,7 @@ export default function TeamPage() {
                     <div className="font-medium">{member.display_name || tm.defaultStaffName}</div>
                     {profile ? (
                       <button
+                        type="button"
                         onClick={() => toggleTipEnabled(profile.id)}
                         className={`text-xs px-3 py-1 rounded-full font-medium ${
                           profile.is_tip_enabled
@@ -351,6 +356,7 @@ export default function TeamPage() {
                       </button>
                     ) : (
                       <button
+                        type="button"
                         onClick={async () => {
                           await createStaffProfile(member.id, member.display_name || 'Staff')
                         }}

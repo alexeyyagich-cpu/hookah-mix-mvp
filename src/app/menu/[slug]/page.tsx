@@ -279,6 +279,7 @@ function MenuPageInner({ slug }: { slug: string }) {
           <h1 className="text-2xl font-bold mb-2">{t.orderSent}</h1>
           <p className="text-[var(--color-textMuted)] mb-6">{t.orderSentHint}</p>
           <button
+            type="button"
             onClick={() => setOrderSuccess(false)}
             className="btn btn-primary"
           >
@@ -421,6 +422,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                                   {itemCount > 0 && (
                                     <>
                                       <button
+                                        type="button"
                                         onClick={() => removeBarItem(recipe)}
                                         className="w-7 h-7 rounded-full bg-[var(--color-bgHover)] hover:bg-[var(--color-error)]/20 text-[var(--color-text)] flex items-center justify-center text-sm font-bold transition-colors"
                                       >
@@ -430,6 +432,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                                     </>
                                   )}
                                   <button
+                                    type="button"
                                     onClick={() => addBarItem(recipe)}
                                     className="w-7 h-7 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 flex items-center justify-center text-sm font-bold transition-colors"
                                   >
@@ -576,6 +579,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                   <span className="text-sm text-[var(--color-textMuted)]">{t.strengthPreference}:</span>
                   {(['light', 'medium', 'strong'] as const).map(s => (
                     <button
+                      type="button"
                       key={s}
                       onClick={() => setHookahStrength(s)}
                       className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
@@ -593,6 +597,7 @@ function MenuPageInner({ slug }: { slug: string }) {
               {/* Brand Filter */}
               <div className="flex flex-wrap gap-2 mb-6">
                 <button
+                  type="button"
                   onClick={() => setSelectedBrand(null)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     !selectedBrand
@@ -604,6 +609,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                 </button>
                 {allBrands.map(brand => (
                   <button
+                    type="button"
                     key={brand}
                     onClick={() => setSelectedBrand(brand === selectedBrand ? null : brand)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -637,6 +643,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                         const isSelected = selectedHookahFlavor?.brand === brandGroup.brand && selectedHookahFlavor?.flavor === flavor
                         return (
                           <button
+                            type="button"
                             key={flavor}
                             onClick={isOrderingMode ? () => {
                               if (isSelected) {
@@ -670,6 +677,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                           }
                         </span>
                         <button
+                          type="button"
                           onClick={addHookahItem}
                           className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
                         >
@@ -685,6 +693,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                     <div className="text-4xl mb-4">{'\u{1F50D}'}</div>
                     <p>{t.menuNothingFound}</p>
                     <button
+                      type="button"
                       onClick={() => { setSearchQuery(''); setSelectedBrand(null) }}
                       className="text-[var(--color-primary)] hover:underline mt-2"
                     >
@@ -733,12 +742,14 @@ function MenuPageInner({ slug }: { slug: string }) {
         <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[var(--color-bg)]/95 backdrop-blur-xl border-t border-[var(--color-border)]">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <button
+              type="button"
               onClick={() => setCart([])}
               className="text-sm text-[var(--color-textMuted)] hover:text-[var(--color-error)] transition-colors"
             >
               {t.clearCart}
             </button>
             <button
+              type="button"
               onClick={() => setShowCartOverlay(true)}
               className="btn btn-primary flex items-center gap-2"
             >
@@ -772,6 +783,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-bold">{'\u00D7'}{item.quantity}</span>
                       <button
+                        type="button"
                         onClick={() => removeCartItem(i)}
                         className="text-[var(--color-error)] hover:brightness-110 text-sm"
                       >
@@ -811,12 +823,14 @@ function MenuPageInner({ slug }: { slug: string }) {
 
               <div className="flex gap-3">
                 <button
+                  type="button"
                   onClick={() => setShowCartOverlay(false)}
                   className="btn btn-ghost flex-1"
                 >
                   {t.backToMenu}
                 </button>
                 <button
+                  type="button"
                   onClick={submitOrder}
                   disabled={submitting || cart.length === 0}
                   className="btn btn-primary flex-1 disabled:opacity-50"

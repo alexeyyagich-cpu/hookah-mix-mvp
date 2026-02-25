@@ -233,7 +233,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
             <h2 className="text-lg font-bold">
               {editingRecipe ? t.editRecipe : t.newRecipeTitle}
             </h2>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+            <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -242,7 +242,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
 
           {!editingRecipe && (
             <div className="flex gap-2 mt-3">
-              <button
+              <button type="button"
                 onClick={() => setMode('preset')}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   mode === 'preset' ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
@@ -250,7 +250,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
               >
                 {t.fromCatalog}
               </button>
-              <button
+              <button type="button"
                 onClick={() => setMode('custom')}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   mode === 'custom' ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]'
@@ -274,7 +274,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
               />
               {/* Category filter */}
               <div className="flex flex-wrap gap-1.5">
-                <button
+                <button type="button"
                   onClick={() => setCategoryFilter('all')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                     categoryFilter === 'all'
@@ -285,7 +285,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   {t.all}
                 </button>
                 {COCKTAIL_CATEGORIES.map(cat => (
-                  <button
+                  <button type="button"
                     key={cat}
                     onClick={() => setCategoryFilter(cat)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
@@ -300,7 +300,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
               </div>
               <div className="space-y-1 max-h-[50vh] overflow-y-auto">
                 {filteredPresets.map(preset => (
-                  <button
+                  <button type="button"
                     key={preset.id}
                     onClick={() => selectPreset(preset)}
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors text-left"

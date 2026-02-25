@@ -65,7 +65,7 @@ export default function OrdersPage() {
           const count = countByStatus(tab.key)
           const isActive = statusFilter === tab.key
           return (
-            <button
+            <button type="button"
               key={tab.key}
               onClick={() => setStatusFilter(tab.key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${

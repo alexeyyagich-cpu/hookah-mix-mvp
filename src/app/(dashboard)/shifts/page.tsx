@@ -119,7 +119,7 @@ export default function ShiftsPage() {
           <p className="text-[var(--color-textMuted)]">{tm.shiftsDescription}</p>
         </div>
         {!activeShift && (
-          <button
+          <button type="button"
             onClick={() => setShowOpenModal(true)}
             className="btn btn-primary flex items-center gap-2"
           >
@@ -164,7 +164,7 @@ export default function ShiftsPage() {
                     {activeShift.opened_by_name && ` · ${tm.openedByLabel}: ${activeShift.opened_by_name}`}
                   </p>
                 </div>
-                <button
+                <button type="button"
                   onClick={() => setShowCloseModal(true)}
                   className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
                   style={{ background: 'var(--color-danger)', color: 'white' }}
@@ -190,7 +190,7 @@ export default function ShiftsPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">{tm.noShifts}</h3>
               <p className="text-[var(--color-textMuted)] mb-4">{tm.noShiftsHint}</p>
-              <button
+              <button type="button"
                 onClick={() => setShowOpenModal(true)}
                 className="btn btn-primary"
               >
@@ -200,7 +200,7 @@ export default function ShiftsPage() {
           ) : (
             <div className="card p-6 border-dashed border-2 border-[var(--color-border)] text-center">
               <p className="text-[var(--color-textMuted)] mb-3">{tm.noActiveShift}</p>
-              <button
+              <button type="button"
                 onClick={() => setShowOpenModal(true)}
                 className="btn btn-primary"
               >
@@ -247,7 +247,7 @@ export default function ShiftsPage() {
                           {shift.closing_cash !== null && formatCurrency(shift.closing_cash, locale)}
                         </div>
                       </div>
-                      <button
+                      <button type="button"
                         onClick={() => setSelectedShift(shift)}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--color-border)] hover:bg-[var(--color-bgHover)] transition-colors flex-shrink-0"
                       >
@@ -269,7 +269,7 @@ export default function ShiftsPage() {
           <div className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{tm.openShift}</h2>
-              <button onClick={() => setShowOpenModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <button type="button" onClick={() => setShowOpenModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
                 <IconClose size={20} />
               </button>
             </div>
@@ -297,14 +297,14 @@ export default function ShiftsPage() {
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button
+              <button type="button"
                 onClick={() => setShowOpenModal(false)}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium"
                 style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
               >
                 {tm.cancelBtn}
               </button>
-              <button
+              <button type="button"
                 onClick={handleOpenShift}
                 disabled={submitting}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
@@ -324,7 +324,7 @@ export default function ShiftsPage() {
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{tm.closeShift}</h2>
-              <button onClick={() => setShowCloseModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <button type="button" onClick={() => setShowCloseModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
                 <IconClose size={20} />
               </button>
             </div>
@@ -363,14 +363,14 @@ export default function ShiftsPage() {
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button
+              <button type="button"
                 onClick={() => setShowCloseModal(false)}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium"
                 style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
               >
                 {tm.cancelBtn}
               </button>
-              <button
+              <button type="button"
                 onClick={handleCloseShift}
                 disabled={submitting}
                 className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
@@ -395,7 +395,7 @@ export default function ShiftsPage() {
                   {formatDate(selectedShift.opened_at, locale)} {formatTime(selectedShift.opened_at, locale)} – {selectedShift.closed_at ? formatTime(selectedShift.closed_at, locale) : '...'}
                 </p>
               </div>
-              <button onClick={() => setSelectedShift(null)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <button type="button" onClick={() => setSelectedShift(null)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
                 <IconClose size={20} />
               </button>
             </div>

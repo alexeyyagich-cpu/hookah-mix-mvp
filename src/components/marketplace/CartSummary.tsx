@@ -71,7 +71,7 @@ export function CartSummary({ cart, onCheckout, isCheckoutDisabled }: CartSummar
       </div>
 
       {/* Checkout button */}
-      <button
+      <button type="button"
         onClick={onCheckout}
         disabled={!canCheckout}
         className={`w-full btn btn-primary py-3 ${!canCheckout ? 'opacity-50 cursor-not-allowed' : ''}`}

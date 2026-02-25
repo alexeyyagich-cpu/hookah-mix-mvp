@@ -147,6 +147,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
           <div className="grid grid-cols-4 gap-2 mb-4">
             {PRESET_AMOUNTS.map((amount) => (
               <button
+                type="button"
                 key={amount}
                 onClick={() => { setSelectedAmount(amount); setUseCustom(false) }}
                 className={`py-3 rounded-xl text-lg font-bold transition-all ${
@@ -162,6 +163,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
 
           <div>
             <button
+              type="button"
               onClick={() => setUseCustom(true)}
               className={`w-full text-left text-sm mb-2 ${useCustom ? 'text-amber-400' : 'text-gray-400'}`}
             >
@@ -203,6 +205,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
 
         {/* Pay button */}
         <button
+          type="button"
           onClick={handleSubmit}
           disabled={submitting || finalAmount <= 0}
           className="w-full py-4 rounded-2xl text-lg font-bold transition-all disabled:opacity-50 bg-gradient-to-r from-amber-400 to-orange-500 text-gray-900 hover:shadow-lg hover:shadow-amber-400/30"

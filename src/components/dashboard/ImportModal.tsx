@@ -106,7 +106,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
             <IconExport size={20} />
             {t.importTitle}
           </h2>
-          <button onClick={handleClose} className="btn btn-ghost p-2"><IconClose size={18} /></button>
+          <button type="button" onClick={handleClose} className="btn btn-ghost p-2"><IconClose size={18} /></button>
         </div>
 
         <div className="p-4 space-y-4">
@@ -180,7 +180,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
                   </select>
                 </div>
               ))}
-              <button onClick={handleMappingDone} className="btn btn-primary w-full">
+              <button type="button" onClick={handleMappingDone} className="btn btn-primary w-full">
                 {t.importNext}
               </button>
             </div>
@@ -215,10 +215,10 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
                 </table>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => setStep('mapping')} className="btn btn-ghost flex-1">
+                <button type="button" onClick={() => setStep('mapping')} className="btn btn-ghost flex-1">
                   {t.importBack}
                 </button>
-                <button onClick={handleImport} disabled={importing} className="btn btn-primary flex-1">
+                <button type="button" onClick={handleImport} disabled={importing} className="btn btn-primary flex-1">
                   {importing ? t.importImporting : t.importConfirm}
                 </button>
               </div>
@@ -233,7 +233,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
               <p className="text-sm text-[var(--color-textMuted)] mb-4">
                 {validRows.length} {t.importItemsAdded}
               </p>
-              <button onClick={handleClose} className="btn btn-primary">
+              <button type="button" onClick={handleClose} className="btn btn-primary">
                 {t.importClose}
               </button>
             </div>

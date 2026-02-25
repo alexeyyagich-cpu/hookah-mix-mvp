@@ -191,7 +191,7 @@ export default function OrderDetailPage() {
         <div className="flex gap-2">
           {order.status !== 'cancelled' && order.status !== 'delivered' && (
             <>
-              <button
+              <button type="button"
                 onClick={handleCancelOrder}
                 disabled={updating}
                 className="btn btn-ghost text-[var(--color-danger)]"
@@ -200,7 +200,7 @@ export default function OrderDetailPage() {
                 {t.cancelOrder}
               </button>
               {statusAction && (
-                <button
+                <button type="button"
                   onClick={() => handleStatusUpdate(statusAction.next)}
                   disabled={updating}
                   className="btn btn-primary"

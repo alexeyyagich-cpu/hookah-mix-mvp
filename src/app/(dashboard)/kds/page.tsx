@@ -71,7 +71,7 @@ export default function KdsPage() {
               : tm.noActiveOrders}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => setModalOpen(true)}
           className="btn btn-primary flex items-center gap-2"
         >
@@ -88,7 +88,7 @@ export default function KdsPage() {
             { key: 'bar' as TypeFilter, label: tm.filterBar },
             { key: 'hookah' as TypeFilter, label: tm.filterHookah },
           ]).map(({ key, label }) => (
-            <button
+            <button type="button"
               key={key}
               onClick={() => setTypeFilter(key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -126,7 +126,7 @@ export default function KdsPage() {
           <p className="text-[var(--color-textMuted)] mb-4">
             {tm.createOrderDesc}
           </p>
-          <button
+          <button type="button"
             onClick={() => setModalOpen(true)}
             className="btn btn-primary"
           >
@@ -171,7 +171,7 @@ export default function KdsPage() {
           <div className="lg:hidden space-y-4">
             <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1">
               {columns.map(col => (
-                <button
+                <button type="button"
                   key={col.key}
                   onClick={() => setMobileColumn(col.key)}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${

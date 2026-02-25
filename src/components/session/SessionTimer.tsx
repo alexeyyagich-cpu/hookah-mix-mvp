@@ -102,7 +102,7 @@ export function SessionTimer({
 
   if (compact) {
     return (
-      <button
+      <button type="button"
         onClick={isRunning ? handlePause : handleStart}
         className={`
           flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all
@@ -201,7 +201,7 @@ export function SessionTimer({
 
       <div className="flex items-center gap-2">
         {!isRunning ? (
-          <button
+          <button type="button"
             onClick={handleStart}
             className="flex-1 py-2 rounded-xl font-medium text-sm transition-colors"
             style={{
@@ -212,7 +212,7 @@ export function SessionTimer({
             {seconds > 0 ? t.timerResume : t.timerStart}
           </button>
         ) : (
-          <button
+          <button type="button"
             onClick={handlePause}
             className="flex-1 py-2 rounded-xl font-medium text-sm transition-colors"
             style={{
@@ -226,7 +226,7 @@ export function SessionTimer({
 
         {seconds > 0 && (
           <>
-            <button
+            <button type="button"
               onClick={handleStop}
               className="px-4 py-2 rounded-xl font-medium text-sm transition-colors"
               style={{
@@ -236,7 +236,7 @@ export function SessionTimer({
             >
               {t.timerStop}
             </button>
-            <button
+            <button type="button"
               onClick={handleReset}
               className="px-3 py-2 rounded-xl transition-colors"
               style={{

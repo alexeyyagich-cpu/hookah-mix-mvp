@@ -268,7 +268,7 @@ export function Sidebar() {
 
       {/* Bottom Actions */}
       <div className="p-3 border-t border-[var(--color-border)]">
-        <button
+        <button type="button"
           onClick={() => signOut()}
           aria-label={t.logoutLabel}
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
@@ -283,7 +283,7 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile menu button */}
-      <button
+      <button type="button"
         onClick={() => setMobileOpen(true)}
         aria-label={t.openNav}
         aria-expanded={mobileOpen}
@@ -312,7 +312,7 @@ export function Sidebar() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <button
+        <button type="button"
           onClick={() => setMobileOpen(false)}
           aria-label={t.closeNav}
           className="absolute top-4 right-4 p-2 rounded-lg hover:bg-[var(--color-bgHover)]"

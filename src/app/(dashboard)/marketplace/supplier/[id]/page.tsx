@@ -121,7 +121,7 @@ export default function SupplierPage() {
             </div>
 
             {/* Cart button */}
-            <button
+            <button type="button"
               onClick={() => setCartOpen(true)}
               className="btn btn-primary flex items-center gap-2"
             >

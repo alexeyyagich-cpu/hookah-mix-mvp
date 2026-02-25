@@ -127,7 +127,7 @@ export default function JoinPage() {
             <p className="text-[var(--color-textMuted)]">
               This invitation link has expired or has already been used. Ask the venue owner to send a new one.
             </p>
-            <button onClick={() => router.push('/login')} className="btn btn-primary w-full">
+            <button type="button" onClick={() => router.push('/login')} className="btn btn-primary w-full">
               Go to Login
             </button>
           </div>
@@ -145,12 +145,14 @@ export default function JoinPage() {
             </p>
             <div className="flex flex-col gap-3">
               <button
+                type="button"
                 onClick={() => router.push(`/login?redirect=/join/${token}`)}
                 className="btn btn-primary w-full"
               >
                 Log In
               </button>
               <button
+                type="button"
                 onClick={() => router.push(`/register?invite=${token}`)}
                 className="btn btn-ghost w-full"
               >
@@ -169,7 +171,7 @@ export default function JoinPage() {
             <p className="text-[var(--color-textMuted)]">
               You&apos;ve been invited as <strong>{roleLabel?.label || invite.role}</strong>.
             </p>
-            <button onClick={handleAccept} className="btn btn-primary w-full">
+            <button type="button" onClick={handleAccept} className="btn btn-primary w-full">
               Accept Invitation
             </button>
           </div>
@@ -201,7 +203,7 @@ export default function JoinPage() {
             </div>
             <h2 className="text-xl font-bold">Error</h2>
             <p className="text-[var(--color-textMuted)]">{errorMsg}</p>
-            <button onClick={() => router.push('/login')} className="btn btn-primary w-full">
+            <button type="button" onClick={() => router.push('/login')} className="btn btn-primary w-full">
               Go to Login
             </button>
           </div>

@@ -168,7 +168,7 @@ export default function AutoReorderPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       {/* Status indicator */}
-                      <button
+                      <button type="button"
                         onClick={() => toggleRule(rule.id)}
                         className={`w-12 h-12 rounded-lg flex items-center justify-center transition-colors ${
                           rule.is_enabled
@@ -208,7 +208,7 @@ export default function AutoReorderPage() {
                       </div>
 
                       {/* Delete */}
-                      <button
+                      <button type="button"
                         onClick={() => handleDeleteRule(rule.id)}
                         className={`p-2 rounded-lg transition-colors ${
                           deleteConfirm === rule.id
@@ -246,7 +246,7 @@ export default function AutoReorderPage() {
           <h2 className="font-semibold text-lg">{t.addRule}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {inventoryWithoutRules.map(tobacco => (
-              <button
+              <button type="button"
                 key={tobacco.id}
                 onClick={() => handleOpenModal(tobacco)}
                 className="card p-4 text-left hover:border-[var(--color-primary)]/50 transition-colors group"

@@ -96,7 +96,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
               {t.mixSavedCount(savedMixes.length)}
             </p>
           </div>
-          <button
+          <button type="button"
             onClick={onClose}
             aria-label={t.mixCloseDrawer}
             className="icon-btn icon-btn-sm icon-btn-ghost"
@@ -113,7 +113,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
               { value: 'all' as FilterOption, label: t.mixFilterAll },
               { value: 'favorites' as FilterOption, label: t.mixFilterFavorites },
             ].map(option => (
-              <button
+              <button type="button"
                 key={option.value}
                 onClick={() => setFilterBy(option.value)}
                 className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
@@ -247,7 +247,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    <button
+                    <button type="button"
                       onClick={() => handleSelect(mix)}
                       className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                       style={{
@@ -257,7 +257,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                     >
                       {t.mixLoad}
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => toggleFavorite(mix.id)}
                       className="px-3 py-2 rounded-lg transition-colors"
                       style={{
@@ -268,7 +268,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                     >
                       <IconStar size={16} className={mix.is_favorite ? 'text-[var(--color-warning)]' : 'text-[var(--color-textMuted)]'} />
                     </button>
-                    <button
+                    <button type="button"
                       onClick={() => handleDelete(mix.id)}
                       className="px-3 py-2 rounded-lg transition-colors"
                       style={{

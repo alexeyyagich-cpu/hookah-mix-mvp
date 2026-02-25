@@ -32,7 +32,7 @@ export default function MarketplacePage() {
           >
             {t.myOrders}
           </Link>
-          <button
+          <button type="button"
             onClick={() => setCartOpen(true)}
             className="btn btn-ghost text-sm relative"
           >

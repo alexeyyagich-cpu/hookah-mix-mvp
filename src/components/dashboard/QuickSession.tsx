@@ -162,7 +162,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             <IconSmoke size={22} className="text-[var(--color-primary)]" />
             {t.saveSession}
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
           >
@@ -480,7 +480,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
           >
             {tc.cancel}
           </button>
-          <button
+          <button type="button"
             onClick={handleSubmit}
             disabled={!canSubmit || saving}
             className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"

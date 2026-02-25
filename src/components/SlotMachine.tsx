@@ -331,7 +331,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
           {/* Buttons */}
           <div className="flex flex-col gap-3">
             {!showResult ? (
-              <button
+              <button type="button"
                 onClick={spin}
                 disabled={isSpinning}
                 className={`
@@ -356,13 +356,13 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
               </button>
             ) : (
               <>
-                <button
+                <button type="button"
                   onClick={handleConfirm}
                   className="w-full py-4 rounded-2xl font-bold text-lg bg-[var(--color-success)] text-white hover:brightness-110 active:scale-95 transition-all"
                 >
                   ✅ {t.mixSlotApply}
                 </button>
-                <button
+                <button type="button"
                   onClick={spin}
                   className="w-full py-3 rounded-xl font-medium text-sm bg-[var(--color-surface)] text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] transition-colors"
                 >
@@ -372,7 +372,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
             )}
 
             {!isSpinning && !showResult && (
-              <button
+              <button type="button"
                 onClick={onClose}
                 className="text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors mt-2"
               >

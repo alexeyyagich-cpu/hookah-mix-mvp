@@ -72,7 +72,7 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
 
         <div className="flex items-center gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
-            <button
+            <button type="button"
               key={star}
               onClick={() => onRate(session.id, star)}
               className={`text-lg transition-colors ${
@@ -96,13 +96,13 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
 
       {/* Actions */}
       <div className="mt-4 flex items-center justify-end gap-2">
-        <button
+        <button type="button"
           onClick={() => onView(session)}
           className="text-sm text-[var(--color-primary)] hover:underline"
         >
           {t.viewDetails}
         </button>
-        <button
+        <button type="button"
           onClick={() => onDelete(session.id)}
           className="text-sm text-[var(--color-danger)] hover:underline"
         >

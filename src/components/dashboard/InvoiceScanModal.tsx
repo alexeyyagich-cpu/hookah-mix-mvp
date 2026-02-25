@@ -101,7 +101,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
             <IconScan size={20} />
             {t.ocrTitle}
           </h2>
-          <button onClick={handleClose} className="btn btn-ghost p-2"><IconClose size={18} /></button>
+          <button type="button" onClick={handleClose} className="btn btn-ghost p-2"><IconClose size={18} /></button>
         </div>
 
         <div className="p-4 space-y-4">
@@ -190,7 +190,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
                         placeholder="€"
                       />
                     </div>
-                    <button onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]">
+                    <button type="button" onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]">
                       <IconClose size={14} />
                     </button>
                   </div>
@@ -198,10 +198,10 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
               </div>
 
               <div className="flex gap-2">
-                <button onClick={() => setStep('upload')} className="btn btn-ghost flex-1">
+                <button type="button" onClick={() => setStep('upload')} className="btn btn-ghost flex-1">
                   {t.importBack}
                 </button>
-                <button onClick={handleImport} disabled={importing || items.length === 0} className="btn btn-primary flex-1">
+                <button type="button" onClick={handleImport} disabled={importing || items.length === 0} className="btn btn-primary flex-1">
                   {importing ? t.importImporting : t.ocrAddToInventory}
                 </button>
               </div>
@@ -216,7 +216,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
               <p className="text-sm text-[var(--color-textMuted)] mb-4">
                 {items.length} {t.importItemsAdded}
               </p>
-              <button onClick={handleClose} className="btn btn-primary">
+              <button type="button" onClick={handleClose} className="btn btn-primary">
                 {t.importClose}
               </button>
             </div>

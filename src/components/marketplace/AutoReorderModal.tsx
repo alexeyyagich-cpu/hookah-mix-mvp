@@ -103,7 +103,7 @@ export function AutoReorderModal({
               {t.autoReorderModalTitle}
             </h2>
             {!loading && !success && (
-              <button
+              <button type="button"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
@@ -215,14 +215,14 @@ export function AutoReorderModal({
           {/* Footer */}
           {!success && (
             <div className="p-4 border-t border-[var(--color-border)] flex gap-3">
-              <button
+              <button type="button"
                 onClick={onClose}
                 disabled={loading}
                 className="btn btn-ghost flex-1"
               >
                 {t.cancelBtn}
               </button>
-              <button
+              <button type="button"
                 onClick={handleSave}
                 disabled={loading || matchingProducts.length === 0 || !selectedProductId}
                 className="btn btn-primary flex-1"

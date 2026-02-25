@@ -98,13 +98,13 @@ export default function GuestsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
+          <button type="button"
             onClick={() => setShowSettings(!showSettings)}
             className="btn btn-ghost"
           >
             <IconSettings size={18} />
           </button>
-          <button
+          <button type="button"
             onClick={() => setShowAddForm(true)}
             className="btn btn-primary flex items-center gap-2"
           >
@@ -144,10 +144,10 @@ export default function GuestsPage() {
               className="input w-48"
             />
             <div className="flex gap-2">
-              <button onClick={handleAddGuest} className="btn btn-primary">
+              <button type="button" onClick={handleAddGuest} className="btn btn-primary">
                 {tm.save}
               </button>
-              <button onClick={() => setShowAddForm(false)} className="btn btn-ghost">
+              <button type="button" onClick={() => setShowAddForm(false)} className="btn btn-ghost">
                 {tm.cancel}
               </button>
             </div>
@@ -174,7 +174,7 @@ export default function GuestsPage() {
             { key: 'spent' as SortBy, label: tm.sortSpent },
             { key: 'tier' as SortBy, label: tm.sortTier },
           ]).map(s => (
-            <button
+            <button type="button"
               key={s.key}
               onClick={() => setSortBy(s.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${

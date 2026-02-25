@@ -107,7 +107,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
       {/* Header */}
       <div className="flex items-center justify-between p-4 text-white">
         <h2 className="text-lg font-semibold">{t.scanBarcode}</h2>
-        <button
+        <button type="button"
           onClick={handleClose}
           className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
         >
@@ -121,7 +121,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
           {error ? (
             <div className="bg-[var(--color-danger)]/20 border border-[var(--color-danger)]/50 rounded-xl p-6 text-center text-white">
               <p className="mb-4">{error}</p>
-              <button
+              <button type="button"
                 onClick={onManualEntry}
                 className="btn btn-primary"
               >
@@ -163,7 +163,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
         <p className="text-center text-white/70 text-sm">
           {t.scanInstruction}
         </p>
-        <button
+        <button type="button"
           onClick={onManualEntry}
           className="w-full btn btn-ghost text-white border-white/30"
         >
@@ -197,7 +197,7 @@ export function ScanButton({ onScanResult, onManualAdd }: ScanButtonProps) {
 
   return (
     <>
-      <button
+      <button type="button"
         onClick={() => setShowScanner(true)}
         className="btn btn-ghost flex items-center gap-2"
         title={t.scanBarcode}

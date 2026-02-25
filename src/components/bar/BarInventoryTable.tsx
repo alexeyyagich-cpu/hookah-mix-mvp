@@ -197,7 +197,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                             autoFocus
                             className="w-20 px-2 py-1 text-sm text-right rounded-lg bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                           />
-                          <button
+                          <button type="button"
                             onClick={() => handleAdjust(item.id)}
                             className="text-xs text-[var(--color-primary)] hover:underline"
                           >
@@ -205,7 +205,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                           </button>
                         </div>
                       ) : (
-                        <button
+                        <button type="button"
                           onClick={() => setAdjustingId(item.id)}
                           className="font-mono text-sm font-medium hover:text-[var(--color-primary)] transition-colors"
                           title={t.adjustStock}
@@ -221,13 +221,13 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <button type="button"
                           onClick={() => onEdit(item)}
                           className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
                         >
                           {t.editShort}
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => handleDelete(item.id)}
                           className={`text-xs transition-colors ${
                             deleteConfirm === item.id

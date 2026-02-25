@@ -127,7 +127,7 @@ export default function BowlsPage() {
             {t.bowlsSubtitle}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => openModal()}
           className="btn btn-primary"
           disabled={!canAddMore}
@@ -177,7 +177,7 @@ export default function BowlsPage() {
           <p className="text-[var(--color-textMuted)] mb-4">
             {t.noBowlsDesc}
           </p>
-          <button onClick={() => openModal()} className="btn btn-primary">
+          <button type="button" onClick={() => openModal()} className="btn btn-primary">
             + {t.addBowl}
           </button>
         </div>
@@ -201,7 +201,7 @@ export default function BowlsPage() {
           <h3 className="font-semibold mb-4">{t.bowlPresets}</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {BOWL_PRESETS.slice(0, 8).map((preset) => (
-              <button
+              <button type="button"
                 key={preset.name}
                 onClick={async () => {
                   if (canAddMore) {
@@ -231,7 +231,7 @@ export default function BowlsPage() {
               <h2 className="text-xl font-bold">
                 {editingBowl ? t.editBowl : t.addBowl}
               </h2>
-              <button
+              <button type="button"
                 onClick={closeModal}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >

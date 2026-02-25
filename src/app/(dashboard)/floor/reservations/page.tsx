@@ -108,7 +108,7 @@ export default function ReservationsPage() {
               ['confirmed', tm.statusConfirmed],
               ['cancelled', tm.statusCancelled],
             ] as [StatusFilter, string][]).map(([key, label]) => (
-              <button
+              <button type="button"
                 key={key}
                 onClick={() => setStatusFilter(key)}
                 className={`px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
@@ -206,7 +206,7 @@ export default function ReservationsPage() {
 
                       {/* Actions — only for users with floor.edit permission */}
                       {canEdit && reservation.status === 'pending' && (
-                        <button
+                        <button type="button"
                           onClick={() => updateStatus(reservation.id, 'confirmed')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-success)]/20 text-[var(--color-success)] hover:bg-[var(--color-success)]/30 transition-colors"
                         >
@@ -214,7 +214,7 @@ export default function ReservationsPage() {
                         </button>
                       )}
                       {canEdit && (reservation.status === 'pending' || reservation.status === 'confirmed') && (
-                        <button
+                        <button type="button"
                           onClick={() => updateStatus(reservation.id, 'cancelled')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-danger)]/20 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/30 transition-colors"
                         >
@@ -222,7 +222,7 @@ export default function ReservationsPage() {
                         </button>
                       )}
                       {canEdit && (
-                        <button
+                        <button type="button"
                           onClick={() => handleDelete(reservation.id)}
                           disabled={deletingId === reservation.id}
                           className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"

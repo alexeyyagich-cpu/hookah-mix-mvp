@@ -41,7 +41,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
     <div className="card p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">{tm.loyaltySettings}</h3>
-        <button onClick={onClose} className="btn btn-ghost p-2">
+        <button type="button" onClick={onClose} className="btn btn-ghost p-2">
           <IconClose size={18} />
         </button>
       </div>
@@ -153,7 +153,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
           </div>
         </div>
 
-        <button
+        <button type="button"
           onClick={handleSave}
           disabled={saving}
           className="btn btn-primary w-full"

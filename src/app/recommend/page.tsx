@@ -394,6 +394,7 @@ export default function RecommendPage() {
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowGuestModal(true)}
                 className="btn btn-primary text-sm flex items-center gap-2"
               >
@@ -428,6 +429,7 @@ export default function RecommendPage() {
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => {
                     setSelectedGuest(null)
                     resetFilters()
@@ -444,6 +446,7 @@ export default function RecommendPage() {
             {!selectedGuest && guests.length > 0 && (
               <div>
                 <button
+                  type="button"
                   onClick={() => setShowGuestList(!showGuestList)}
                   className="w-full flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-[var(--color-bgHover)]"
                   style={{ background: 'var(--color-bgAccent)' }}
@@ -464,6 +467,7 @@ export default function RecommendPage() {
                   <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
                     {guests.map(guest => (
                       <button
+                        type="button"
                         key={guest.id}
                         onClick={() => selectGuest(guest)}
                         className="w-full p-3 rounded-xl text-left transition-colors hover:bg-[var(--color-bgHover)] flex items-center gap-3"
@@ -530,6 +534,7 @@ export default function RecommendPage() {
             </div>
             {(hasValidPreferences || selectedTobaccos.length > 0) && (
               <button
+                type="button"
                 onClick={resetFilters}
                 className="text-sm px-4 py-2 rounded-xl transition-all hover:scale-105"
                 style={{
@@ -563,6 +568,7 @@ export default function RecommendPage() {
 
                 return (
                   <button
+                    type="button"
                     key={strength}
                     onClick={() => setSelectedStrength(isSelected ? null : strength)}
                     className={`relative p-4 rounded-xl border-2 transition-all ${
@@ -637,6 +643,7 @@ export default function RecommendPage() {
 
                 return (
                   <button
+                    type="button"
                     key={profile}
                     onClick={() => toggleProfile(profile)}
                     className={`relative flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
@@ -695,6 +702,7 @@ export default function RecommendPage() {
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setUseInventoryFilter(prev => !prev)}
                   className={`relative w-12 h-7 rounded-full transition-all flex-shrink-0 ${
                     useInventoryFilter
@@ -751,6 +759,7 @@ export default function RecommendPage() {
               style={{ borderColor: 'var(--color-border)' }}
             >
               <button
+                type="button"
                 onClick={saveGuestPreferences}
                 className="w-full btn text-sm flex items-center justify-center gap-2"
                 style={{
@@ -811,6 +820,7 @@ export default function RecommendPage() {
                         {percent}%
                       </span>
                       <button
+                        type="button"
                         onClick={() => removeFromMix(tobacco.id)}
                         aria-label={t.recommendRemoveFromMix(tobacco.flavor)}
                         className="icon-btn icon-btn-sm icon-btn-ghost icon-btn-danger"
@@ -874,6 +884,7 @@ export default function RecommendPage() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={openInCalculator}
                   className="btn btn-primary w-full text-sm"
                 >
@@ -1029,6 +1040,7 @@ export default function RecommendPage() {
                     {t.recommendNoResultsHint}
                   </p>
                   <button
+                    type="button"
                     onClick={resetFilters}
                     className="mt-4 btn text-sm"
                     style={{
@@ -1124,6 +1136,7 @@ function GuestModal({
             {initialData ? t.guestModalEditTitle : t.guestModalNewTitle}
           </h2>
           <button
+            type="button"
             onClick={onClose}
             aria-label={t.guestModalClose}
             className="icon-btn icon-btn-sm icon-btn-ghost"
@@ -1162,7 +1175,7 @@ function GuestModal({
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
-              placeholder="+XX XXX XXX XXX"
+              placeholder={t.guestModalPhonePlaceholder}
               className="w-full p-3 rounded-xl border text-sm"
               style={{
                 background: 'var(--color-bgHover)',
@@ -1294,6 +1307,7 @@ function TobaccoResultCard({
 
   return (
     <button
+      type="button"
       onClick={onSelect}
       disabled={isDisabled}
       className={`p-4 rounded-xl transition-all text-left w-full ${
@@ -1511,6 +1525,7 @@ function MixResultCard({
           {/* Apply button */}
           <div className="mt-4">
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation()
                 onApply()

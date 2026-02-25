@@ -260,7 +260,7 @@ export default function WaiterPage() {
           {/* Tabs */}
           {showTabs && (
             <div className="flex gap-2 mb-4">
-              <button
+              <button type="button"
                 onClick={() => setActiveTab('bar')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                   activeTab === 'bar'
@@ -270,7 +270,7 @@ export default function WaiterPage() {
               >
                 🍸 {tm.waiterBarTab}
               </button>
-              <button
+              <button type="button"
                 onClick={() => setActiveTab('hookah')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                   activeTab === 'hookah'

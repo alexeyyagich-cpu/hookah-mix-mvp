@@ -110,7 +110,7 @@ export default function BarRecipesPage() {
             {avgMargin !== null && ` · ${tb.avgMarginLabel(avgMargin.toFixed(0))}`}
           </p>
         </div>
-        <button
+        <button type="button"
           onClick={() => {
             setEditingRecipe(null)
             setModalOpen(true)
@@ -202,7 +202,7 @@ export default function BarRecipesPage() {
             }
           </p>
           {recipes.length === 0 && (
-            <button onClick={() => setModalOpen(true)} className="btn btn-primary">
+            <button type="button" onClick={() => setModalOpen(true)} className="btn btn-primary">
               + {tb.createRecipe}
             </button>
           )}

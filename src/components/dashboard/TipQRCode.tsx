@@ -43,7 +43,7 @@ export function TipQRCode({ slug, displayName }: TipQRCodeProps) {
         <QRCodeSVG value={url} size={160} level="M" />
       </div>
       <p className="text-sm font-medium">{displayName}</p>
-      <button onClick={handleDownload} className="btn btn-ghost text-sm">
+      <button type="button" onClick={handleDownload} className="btn btn-ghost text-sm">
         {ts.downloadQr}
       </button>
     </div>

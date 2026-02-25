@@ -129,7 +129,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
           <h2 className="text-xl font-bold">
             {isEditing ? t.editTobaccoTitle : t.addTobaccoTitle}
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
           >
@@ -353,7 +353,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
             >
               {tc.cancel}
             </button>
-            <button
+            <button type="button"
               onClick={handleSubmit}
               disabled={!brand || !flavor || !packageCount || saving}
               className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"

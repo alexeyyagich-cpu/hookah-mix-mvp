@@ -104,7 +104,7 @@ export default function SessionsPage() {
         <div className="flex items-center gap-2">
           {/* Export Button with Dropdown */}
           <div className="relative" ref={exportMenuRef}>
-            <button
+            <button type="button"
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport || sessions.length === 0}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -116,14 +116,14 @@ export default function SessionsPage() {
 
             {exportMenuOpen && canExport && (
               <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
-                <button
+                <button type="button"
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
                   <IconChart size={16} />
                   {t.exportCSV}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
@@ -233,7 +233,7 @@ export default function SessionsPage() {
           <div className="w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 className="text-xl font-bold">{t.sessionDetails}</h2>
-              <button
+              <button type="button"
                 onClick={() => setSelectedSession(null)}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
@@ -316,7 +316,7 @@ export default function SessionsPage() {
             </div>
 
             <div className="p-6 border-t border-[var(--color-border)] flex justify-end">
-              <button
+              <button type="button"
                 onClick={() => setSelectedSession(null)}
                 className="btn btn-ghost"
               >

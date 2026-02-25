@@ -34,7 +34,7 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
         </div>
         <div className="flex items-center gap-1">
           {!bowl.is_default && (
-            <button
+            <button type="button"
               onClick={() => onSetDefault(bowl.id)}
               className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-warning)] transition-colors"
               title={t.setDefault}
@@ -42,14 +42,14 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
               <IconStar size={18} />
             </button>
           )}
-          <button
+          <button type="button"
             onClick={() => onEdit(bowl)}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
             title={t.editItem}
           >
             <IconEdit size={18} />
           </button>
-          <button
+          <button type="button"
             onClick={() => onDelete(bowl.id)}
             className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
             title={t.deleteItem}

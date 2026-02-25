@@ -142,7 +142,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                 </p>
               </div>
             </div>
-            <button
+            <button type="button"
               onClick={handleClose}
               aria-label={t.guestCloseInfo}
               className="icon-btn icon-btn-sm icon-btn-ghost"
@@ -229,7 +229,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
               )}
 
               {/* QUICK REPEAT BUTTON */}
-              <button
+              <button type="button"
                 onClick={handleQuickRepeat}
                 className="w-full py-4 rounded-xl font-semibold text-lg transition-transform active:scale-[0.98]"
                 style={{
@@ -271,7 +271,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
             </div>
           ) : (
             displayGuests.map(guest => (
-              <button
+              <button type="button"
                 key={guest.id}
                 onClick={() => handleSelectGuest(guest)}
                 className="w-full p-3 rounded-xl flex items-center gap-3 transition-colors hover:bg-[var(--color-bgHover)] text-left"

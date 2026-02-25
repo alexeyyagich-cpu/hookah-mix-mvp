@@ -219,7 +219,7 @@ export default function OnboardingPage() {
             <span className="text-sm text-[var(--color-textMuted)]">
               {t.stepOf(currentStepIndex + 1, totalSteps)}
             </span>
-            <button
+            <button type="button"
               onClick={skipOnboarding}
               className="text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
             >
@@ -261,7 +261,7 @@ export default function OnboardingPage() {
                   <div className="text-xs text-[var(--color-textMuted)]">{t.welcomeAnalytics}</div>
                 </div>
               </div>
-              <button
+              <button type="button"
                 onClick={nextStep}
                 className="btn btn-primary w-full py-3"
               >
@@ -275,7 +275,7 @@ export default function OnboardingPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {BUSINESS_TYPES.map(bt => (
-                  <button
+                  <button type="button"
                     key={bt.type}
                     onClick={() => setSelectedType(bt.type)}
                     disabled={bt.type === 'restaurant'}
@@ -300,10 +300,10 @@ export default function OnboardingPage() {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button onClick={prevStep} className="btn btn-ghost flex-1">
+                <button type="button" onClick={prevStep} className="btn btn-ghost flex-1">
                   {tc.back}
                 </button>
-                <button
+                <button type="button"
                   onClick={handleBusinessTypeContinue}
                   disabled={!selectedType || saving}
                   className="btn btn-primary flex-1 disabled:opacity-50"
@@ -338,10 +338,10 @@ export default function OnboardingPage() {
                 />
               </div>
               <div className="flex gap-3 pt-4">
-                <button onClick={prevStep} className="btn btn-ghost flex-1">
+                <button type="button" onClick={prevStep} className="btn btn-ghost flex-1">
                   {tc.back}
                 </button>
-                <button
+                <button type="button"
                   onClick={handleBusinessSave}
                   disabled={saving}
                   className="btn btn-primary flex-1"
@@ -358,7 +358,7 @@ export default function OnboardingPage() {
               {/* Tab switch for hookah_bar */}
               {needsHookah && needsBar && (
                 <div className="flex gap-1 p-1 rounded-xl bg-[var(--color-bgHover)]">
-                  <button
+                  <button type="button"
                     onClick={() => setSetupTab('hookah')}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       setupTab === 'hookah'
@@ -368,7 +368,7 @@ export default function OnboardingPage() {
                   >
                     🔥 {t.hookahTab}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => setSetupTab('bar')}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       setupTab === 'bar'
@@ -453,7 +453,7 @@ export default function OnboardingPage() {
                   </div>
 
                   {bowlModel && (
-                    <button
+                    <button type="button"
                       onClick={handleBowlSave}
                       disabled={saving}
                       className="btn btn-ghost w-full text-[var(--color-primary)] disabled:opacity-50"
@@ -479,7 +479,7 @@ export default function OnboardingPage() {
                   {/* Brand tabs */}
                   <div className="flex flex-wrap gap-1.5">
                     {getBrandNames().map(b => (
-                      <button
+                      <button type="button"
                         key={b}
                         onClick={() => setTobaccoBrand(b)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
@@ -495,7 +495,7 @@ export default function OnboardingPage() {
 
                   {/* Select all / flavor count */}
                   <div className="flex items-center justify-between">
-                    <button
+                    <button type="button"
                       onClick={toggleAllFlavors}
                       className="text-xs text-[var(--color-primary)] hover:underline"
                     >
@@ -515,7 +515,7 @@ export default function OnboardingPage() {
                     {getFlavorsByBrand(tobaccoBrand).map(flavor => {
                       const isSelected = selectedFlavors.has(flavor)
                       return (
-                        <button
+                        <button type="button"
                           key={flavor}
                           onClick={() => toggleFlavor(flavor)}
                           className={`px-3 py-2 rounded-xl text-sm transition-colors ${
@@ -544,7 +544,7 @@ export default function OnboardingPage() {
                   </div>
 
                   {selectedFlavors.size > 0 && (
-                    <button
+                    <button type="button"
                       onClick={handleBulkTobaccoSave}
                       disabled={saving}
                       className="btn btn-primary w-full disabled:opacity-50"
@@ -593,10 +593,10 @@ export default function OnboardingPage() {
 
               {/* Navigation */}
               <div className="flex gap-3 pt-4">
-                <button onClick={prevStep} className="btn btn-ghost flex-1">
+                <button type="button" onClick={prevStep} className="btn btn-ghost flex-1">
                   {tc.back}
                 </button>
-                <button
+                <button type="button"
                   onClick={handleSetupFinish}
                   className="btn btn-primary flex-1"
                 >
@@ -629,7 +629,7 @@ export default function OnboardingPage() {
                 ))}
               </div>
 
-              <button
+              <button type="button"
                 onClick={handleFinish}
                 className="btn btn-primary w-full py-3"
               >

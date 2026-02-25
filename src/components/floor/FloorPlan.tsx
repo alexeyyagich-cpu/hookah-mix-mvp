@@ -207,7 +207,7 @@ export function FloorPlan({
         ))}
 
         {editable && (
-          <button
+          <button type="button"
             onClick={() => setIsAddModalOpen(true)}
             className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
             style={{
@@ -327,7 +327,7 @@ export function FloorPlan({
               {t.addTablesHint}
             </p>
             {editable && (
-              <button
+              <button type="button"
                 onClick={() => setIsAddModalOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
                 style={{
@@ -471,7 +471,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
           <h2 className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
             {table ? t.editTableTitle : t.newTableTitle}
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]"
             style={{ color: 'var(--color-textMuted)' }}

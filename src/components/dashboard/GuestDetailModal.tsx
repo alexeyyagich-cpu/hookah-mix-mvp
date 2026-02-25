@@ -74,10 +74,10 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setEditing(!editing)} className="btn btn-ghost p-2">
+            <button type="button" onClick={() => setEditing(!editing)} className="btn btn-ghost p-2">
               <IconEdit size={18} />
             </button>
-            <button onClick={onClose} className="btn btn-ghost p-2">
+            <button type="button" onClick={onClose} className="btn btn-ghost p-2">
               <IconClose size={18} />
             </button>
           </div>
@@ -135,8 +135,8 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                 />
               </div>
               <div className="flex gap-2">
-                <button onClick={handleSave} className="btn btn-primary flex-1">{tm.save}</button>
-                <button onClick={() => setEditing(false)} className="btn btn-ghost flex-1">{tm.cancel}</button>
+                <button type="button" onClick={handleSave} className="btn btn-primary flex-1">{tm.save}</button>
+                <button type="button" onClick={() => setEditing(false)} className="btn btn-ghost flex-1">{tm.cancel}</button>
               </div>
             </div>
           ) : (
@@ -218,15 +218,15 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
             {confirmDelete ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-[var(--color-danger)]">{tm.confirmDeleteGuest}</span>
-                <button onClick={onDelete} className="btn btn-ghost text-[var(--color-danger)] text-sm">
+                <button type="button" onClick={onDelete} className="btn btn-ghost text-[var(--color-danger)] text-sm">
                   {tm.delete}
                 </button>
-                <button onClick={() => setConfirmDelete(false)} className="btn btn-ghost text-sm">
+                <button type="button" onClick={() => setConfirmDelete(false)} className="btn btn-ghost text-sm">
                   {tm.cancel}
                 </button>
               </div>
             ) : (
-              <button
+              <button type="button"
                 onClick={() => setConfirmDelete(true)}
                 className="btn btn-ghost text-[var(--color-danger)] text-sm flex items-center gap-1"
               >

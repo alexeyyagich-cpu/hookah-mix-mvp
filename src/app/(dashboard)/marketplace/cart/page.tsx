@@ -105,7 +105,7 @@ export default function CartPage() {
                 {/* Quantity controls */}
                 <div className="flex flex-col items-end gap-2">
                   <div className="flex items-center gap-2" role="group" aria-label={tmk.changeQuantity}>
-                    <button
+                    <button type="button"
                       onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                       aria-label={tmk.decreaseQuantity}
                       className="icon-btn icon-btn-sm"
@@ -113,7 +113,7 @@ export default function CartPage() {
                       <IconMinus size={18} aria-hidden="true" />
                     </button>
                     <span className="w-10 text-center font-medium" aria-live="polite">{item.quantity}</span>
-                    <button
+                    <button type="button"
                       onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                       aria-label={tmk.increaseQuantity}
                       className="icon-btn icon-btn-sm"
@@ -126,7 +126,7 @@ export default function CartPage() {
                     {formatCurrency(item.product.price * item.quantity, locale)}
                   </div>
 
-                  <button
+                  <button type="button"
                     onClick={() => removeFromCart(item.product.id)}
                     aria-label={tmk.removeItemFrom(item.product.flavor)}
                     className="text-sm text-[var(--color-danger)] hover:underline flex items-center gap-1"
@@ -140,7 +140,7 @@ export default function CartPage() {
           ))}
 
           {/* Clear cart */}
-          <button
+          <button type="button"
             onClick={clearCart}
             className="btn btn-ghost text-[var(--color-danger)]"
           >

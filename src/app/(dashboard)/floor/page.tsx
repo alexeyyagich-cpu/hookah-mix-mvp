@@ -401,7 +401,7 @@ export default function FloorPage() {
         {/* Zone filter pills */}
         {zones.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            <button
+            <button type="button"
               onClick={() => setZoneFilter(null)}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
                 !zoneFilter
@@ -412,7 +412,7 @@ export default function FloorPage() {
               {tm.zoneFilterAll}
             </button>
             {zones.map(z => (
-              <button
+              <button type="button"
                 key={z}
                 onClick={() => setZoneFilter(zoneFilter === z ? null : z)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
@@ -428,7 +428,7 @@ export default function FloorPage() {
         )}
 
         {hasPermission('floor.edit') && (
-          <button
+          <button type="button"
             onClick={() => setIsEditMode(!isEditMode)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors self-end ${
               isEditMode ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''
@@ -470,7 +470,7 @@ export default function FloorPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold">{activeSelectedTable.name}</h2>
-                <button
+                <button type="button"
                   onClick={(e) => { e.stopPropagation(); handleDownloadQr(activeSelectedTable); }}
                   className="p-1 rounded text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bgCard)]"
                   title={tm.downloadTableQr}
@@ -537,7 +537,7 @@ export default function FloorPage() {
             <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--color-warning)', color: 'white', opacity: 0.95 }}>
               <div className="flex items-center justify-between mb-2">
                 <span className="font-semibold text-sm">{tm.reservationDetails}</span>
-                <button
+                <button type="button"
                   onClick={handleUnlinkReservation}
                   className="text-xs px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
                 >
@@ -580,7 +580,7 @@ export default function FloorPage() {
                 <div className="w-2 h-2 rounded-full bg-[var(--color-danger)] animate-pulse" />
                 <span className="text-sm font-medium text-[var(--color-danger)]">{tm.sessionActive}</span>
               </div>
-              <button
+              <button type="button"
                 onClick={handleEndSession}
                 className="w-full px-3 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{ background: 'var(--color-danger)', color: 'white' }}
@@ -647,7 +647,7 @@ export default function FloorPage() {
 
                   {/* Serve + Create new mix buttons */}
                   <div className="flex gap-2">
-                    <button
+                    <button type="button"
                       onClick={handleConfirmServe}
                       disabled={serveStatus !== 'idle'}
                       className="flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
@@ -694,7 +694,7 @@ export default function FloorPage() {
               { status: 'reserved' as const, label: tm.statusReserved, color: 'var(--color-warning)' },
               { status: 'cleaning' as const, label: tm.statusCleaning, color: 'var(--color-textMuted)' },
             ] as const).map(({ status, label, color }) => (
-              <button
+              <button type="button"
                 key={status}
                 onClick={async () => {
                   if (status === 'occupied' && activeSelectedTable.status !== 'occupied') {
@@ -751,7 +751,7 @@ export default function FloorPage() {
               {filteredGuests.length > 0 && (
                 <div className="mb-2 max-h-40 overflow-y-auto space-y-1">
                   {filteredGuests.map(g => (
-                    <button
+                    <button type="button"
                       key={g.id}
                       onClick={() => handleStartSession(g.name, g)}
                       className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/10 transition-colors text-left text-sm"
@@ -770,14 +770,14 @@ export default function FloorPage() {
                 </div>
               )}
               <div className="flex gap-2">
-                <button
+                <button type="button"
                   onClick={() => { setShowGuestPicker(false); setGuestSearch('') }}
                   className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
                   style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
                 >
                   {tm.cancelBtn}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => handleStartSession(guestSearch || '')}
                   className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
                   style={{ background: 'var(--color-primary)', color: 'white' }}
@@ -795,7 +795,7 @@ export default function FloorPage() {
 
               {/* Option to link existing reservation */}
               {unlinkedReservations.length > 0 && !showLinkPicker && (
-                <button
+                <button type="button"
                   onClick={() => setShowLinkPicker(true)}
                   className="w-full mb-3 px-3 py-2 rounded-xl text-sm font-medium border border-dashed border-[var(--color-warning)] text-[var(--color-warning)] hover:bg-[var(--color-warning)]/10 transition-colors"
                 >
@@ -807,7 +807,7 @@ export default function FloorPage() {
               {showLinkPicker && (
                 <div className="mb-3 space-y-2">
                   {unlinkedReservations.map(r => (
-                    <button
+                    <button type="button"
                       key={r.id}
                       onClick={() => handleLinkReservation(r.id)}
                       className="w-full flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)] hover:bg-[var(--color-warning)]/10 transition-colors text-left"
@@ -821,7 +821,7 @@ export default function FloorPage() {
                       <span className="font-mono text-sm font-semibold">{r.reservation_time.slice(0, 5)}</span>
                     </button>
                   ))}
-                  <button
+                  <button type="button"
                     onClick={() => setShowLinkPicker(false)}
                     className="w-full text-xs text-[var(--color-textMuted)] py-1"
                   >
@@ -865,14 +865,14 @@ export default function FloorPage() {
                     />
                   </div>
                   <div className="flex gap-2">
-                    <button
+                    <button type="button"
                       onClick={() => setShowQuickReserve(false)}
                       className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
                       style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
                     >
                       {tm.cancelBtn}
                     </button>
-                    <button
+                    <button type="button"
                       onClick={handleQuickReserve}
                       disabled={quickReserving || !quickForm.guest_name || !quickForm.reservation_time}
                       className="flex-1 px-3 py-2 rounded-xl text-sm font-medium disabled:opacity-50"
@@ -886,7 +886,7 @@ export default function FloorPage() {
             </div>
           )}
 
-          <button
+          <button type="button"
             onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false); setShowGuestPicker(false); setGuestSearch(''); setSelectedGuestObj(null); setServeStatus('idle') }}
             className="mt-3 px-4 py-2 rounded-xl text-sm w-full"
             style={{

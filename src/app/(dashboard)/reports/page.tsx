@@ -102,7 +102,7 @@ export default function ReportsPage() {
           {/* Period selector */}
           <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1">
             {presets.map(({ key, label }) => (
-              <button
+              <button type="button"
                 key={key}
                 onClick={() => setSelectedPreset(key)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
@@ -118,7 +118,7 @@ export default function ReportsPage() {
 
           {/* Export dropdown */}
           <div className="relative" ref={exportMenuRef}>
-            <button
+            <button type="button"
               onClick={() => canExport ? setExportMenuOpen(!exportMenuOpen) : null}
               className={`btn btn-ghost flex items-center gap-2 text-sm ${!canExport ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={!canExport ? tm.exportProOnly : tm.exportLabel}
@@ -128,19 +128,19 @@ export default function ReportsPage() {
             </button>
             {exportMenuOpen && canExport && (
               <div className="absolute right-0 mt-2 w-48 bg-[var(--color-bgCard)] border border-[var(--color-border)] rounded-xl shadow-lg z-10 overflow-hidden">
-                <button
+                <button type="button"
                   onClick={handleExportCSV}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] transition-colors"
                 >
                   {tm.downloadCsv}
                 </button>
-                <button
+                <button type="button"
                   onClick={handleExportPDF}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] transition-colors"
                 >
                   {tm.downloadPdf}
                 </button>
-                <button
+                <button type="button"
                   onClick={handleCopyText}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] transition-colors"
                 >
@@ -192,7 +192,7 @@ export default function ReportsPage() {
       {isCombined && (
         <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1 w-fit">
           {(['all', 'bar', 'hookah'] as ModuleFilter[]).map(filter => (
-            <button
+            <button type="button"
               key={filter}
               onClick={() => setModuleFilter(filter)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${

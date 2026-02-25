@@ -508,6 +508,7 @@ export const hookah = {
   guestModalNameLabel: 'Имя *',
   guestModalNamePlaceholder: 'Имя гостя',
   guestModalPhoneLabel: 'Телефон',
+  guestModalPhonePlaceholder: '+7 XXX XXX XX XX',
   guestModalStrengthLabel: 'Предпочитаемая крепость',
   guestModalFlavorsLabel: 'Любимые вкусы',
   guestModalNotesLabel: 'Заметки',

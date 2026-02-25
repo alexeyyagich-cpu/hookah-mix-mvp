@@ -132,7 +132,7 @@ export default function BossPage() {
           </h1>
           <p className="text-sm text-[var(--color-textMuted)]">{tm.bossSubtitle}</p>
         </div>
-        <button
+        <button type="button"
           onClick={doRefresh}
           disabled={refreshing}
           className="p-2 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors disabled:opacity-50"

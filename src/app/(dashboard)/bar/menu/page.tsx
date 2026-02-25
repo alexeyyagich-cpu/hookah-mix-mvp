@@ -227,7 +227,7 @@ export default function BarMenuPage() {
                                   autoFocus
                                   className="w-20 px-2 py-1 rounded-lg bg-[var(--color-bgCard)] border border-[var(--color-primary)] text-sm text-right focus:outline-none"
                                 />
-                                <button
+                                <button type="button"
                                   onClick={() => handlePriceSave(recipe.id)}
                                   className="text-xs text-[var(--color-primary)] hover:underline"
                                 >
@@ -235,7 +235,7 @@ export default function BarMenuPage() {
                                 </button>
                               </div>
                             ) : (
-                              <button
+                              <button type="button"
                                 onClick={() => {
                                   setEditingPrice(recipe.id)
                                   setPriceValue(recipe.menu_price?.toString() || '')
@@ -253,7 +253,7 @@ export default function BarMenuPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <button
+                            <button type="button"
                               onClick={() => toggleOnMenu(recipe.id)}
                               className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
                               title={tb.removeFromMenuTitle}

@@ -157,7 +157,7 @@ export default function InventoryPage() {
         <div className="flex flex-wrap items-center gap-2">
           {/* Export Button with Dropdown */}
           <div className="relative" ref={exportMenuRef}>
-            <button
+            <button type="button"
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport || inventory.length === 0}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
@@ -169,14 +169,14 @@ export default function InventoryPage() {
 
             {exportMenuOpen && canExport && (
               <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
-                <button
+                <button type="button"
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
                   <IconChart size={16} />
                   {t.exportCSV}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
@@ -201,14 +201,14 @@ export default function InventoryPage() {
 
           {!isFreeTier && (
             <>
-              <button
+              <button type="button"
                 onClick={() => setScanModalOpen(true)}
                 className="btn btn-ghost flex items-center gap-2"
               >
                 <IconScan size={16} />
                 {t.ocrBtn}
               </button>
-              <button
+              <button type="button"
                 onClick={() => setImportModalOpen(true)}
                 className="btn btn-ghost flex items-center gap-2"
               >
@@ -217,7 +217,7 @@ export default function InventoryPage() {
               </button>
             </>
           )}
-          <button
+          <button type="button"
             onClick={() => {
               setScannedTobacco(null)
               setEditingItem(null)

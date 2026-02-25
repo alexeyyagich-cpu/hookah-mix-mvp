@@ -71,7 +71,7 @@ export function CartDrawer({
             <IconCart size={20} aria-hidden="true" />
             {t.cartDrawerLabel}
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
             aria-label={t.closeCart}
             className="icon-btn icon-btn-ghost"
@@ -85,7 +85,7 @@ export function CartDrawer({
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <IconCart size={48} className="text-[var(--color-textMuted)] mb-4" />
             <p className="text-[var(--color-textMuted)]">{t.cartEmptyDrawer}</p>
-            <button onClick={onClose} className="btn btn-ghost mt-4">
+            <button type="button" onClick={onClose} className="btn btn-ghost mt-4">
               {t.continueShopping}
             </button>
           </div>
@@ -109,7 +109,7 @@ export function CartDrawer({
                         {item.product.package_grams}g × {formatCurrency(item.product.price, locale)}
                       </div>
                     </div>
-                    <button
+                    <button type="button"
                       onClick={() => removeFromCart(item.product.id)}
                       aria-label={t.removeItemFrom(item.product.flavor)}
                       className="icon-btn icon-btn-sm icon-btn-ghost icon-btn-danger"
@@ -121,7 +121,7 @@ export function CartDrawer({
                   {/* Quantity controls */}
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-2" role="group" aria-label={t.changeQuantity}>
-                      <button
+                      <button type="button"
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                         aria-label={t.decreaseQuantity}
                         className="icon-btn icon-btn-sm"
@@ -129,7 +129,7 @@ export function CartDrawer({
                         <IconMinus size={18} aria-hidden="true" />
                       </button>
                       <span className="w-10 text-center font-medium" aria-live="polite">{item.quantity}</span>
-                      <button
+                      <button type="button"
                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                         aria-label={t.increaseQuantity}
                         className="icon-btn icon-btn-sm"
@@ -162,7 +162,7 @@ export function CartDrawer({
 
               {/* Actions */}
               <div className="flex gap-2">
-                <button
+                <button type="button"
                   onClick={clearCart}
                   className="btn btn-ghost flex-1"
                 >

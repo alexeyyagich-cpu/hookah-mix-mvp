@@ -502,6 +502,7 @@ export const hookah: typeof HookahType = {
   guestModalNameLabel: 'Name *',
   guestModalNamePlaceholder: 'Gastname',
   guestModalPhoneLabel: 'Telefon',
+  guestModalPhonePlaceholder: '+49 XXX XXXXXXX',
   guestModalStrengthLabel: 'Bevorzugte Stärke',
   guestModalFlavorsLabel: 'Lieblingsgeschmäcker',
   guestModalNotesLabel: 'Notizen',

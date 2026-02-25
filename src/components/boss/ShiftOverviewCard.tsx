@@ -34,7 +34,7 @@ export function ShiftOverviewCard({ activeShift, reconciliation, shiftDurationMs
           <p className="font-medium mb-1">{tm.bossNoActiveShift}</p>
           <p className="text-sm text-[var(--color-textMuted)] mb-4">{tm.bossNoActiveShiftHint}</p>
           <div className="flex gap-2 justify-center">
-            <button
+            <button type="button"
               onClick={onQuickOpen}
               disabled={opening}
               className="btn btn-primary text-sm disabled:opacity-50"

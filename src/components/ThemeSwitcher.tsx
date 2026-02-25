@@ -26,7 +26,7 @@ export default function ThemeSwitcher() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
+      <button type="button"
         onClick={() => setIsOpen(prev => !prev)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
         style={{
@@ -58,7 +58,7 @@ export default function ThemeSwitcher() {
             const isActive = themeId === id;
 
             return (
-              <button
+              <button type="button"
                 key={id}
                 onClick={() => {
                   setTheme(id);

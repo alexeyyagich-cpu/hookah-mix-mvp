@@ -69,7 +69,7 @@ export default function ReviewsPage() {
           ['published', tm.filterPublished(publishedCount)],
           ['hidden', tm.filterHidden(hiddenCount)],
         ] as [Filter, string][]).map(([key, label]) => (
-          <button
+          <button type="button"
             key={key}
             onClick={() => setFilter(key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
@@ -136,13 +136,13 @@ export default function ReviewsPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button
+                      <button type="button"
                         onClick={() => togglePublished(review.id, !review.is_published)}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/20 text-[var(--color-textMuted)] hover:text-[var(--color-primary)]"
                       >
                         {review.is_published ? tm.actionHide : tm.actionPublish}
                       </button>
-                      <button
+                      <button type="button"
                         onClick={() => handleDelete(review.id)}
                         disabled={deletingId === review.id}
                         className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"

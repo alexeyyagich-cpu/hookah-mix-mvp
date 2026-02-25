@@ -128,7 +128,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
             <h2 className="text-lg font-bold">
               {editingItem ? t.editLabel : t.addIngredientLabel}
             </h2>
-            <button
+            <button type="button"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
             >
@@ -141,7 +141,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
           {/* Mode tabs */}
           {!editingItem && (
             <div className="flex gap-2 mt-3">
-              <button
+              <button type="button"
                 onClick={() => setMode('catalog')}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   mode === 'catalog'
@@ -151,7 +151,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
               >
                 {t.fromCatalogTab}
               </button>
-              <button
+              <button type="button"
                 onClick={() => setMode('custom')}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   mode === 'custom'
@@ -178,7 +178,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
 
               {/* Category filter */}
               <div className="flex flex-wrap gap-1.5">
-                <button
+                <button type="button"
                   onClick={() => setCatalogCategory('all')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                     catalogCategory === 'all'
@@ -189,7 +189,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   {t.all}
                 </button>
                 {CATEGORIES.map(cat => (
-                  <button
+                  <button type="button"
                     key={cat}
                     onClick={() => setCatalogCategory(cat)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
@@ -206,7 +206,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
               {/* Preset list */}
               <div className="space-y-1 max-h-[40vh] overflow-y-auto">
                 {filteredPresets.map(preset => (
-                  <button
+                  <button type="button"
                     key={preset.id}
                     onClick={() => selectFromCatalog(preset)}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors text-left"

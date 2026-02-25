@@ -69,7 +69,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
             <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
               {t.mixSaveTitle}
             </h2>
-            <button
+            <button type="button"
               onClick={onClose}
               aria-label={t.mixSaveClose}
               className="icon-btn icon-btn-sm icon-btn-ghost"
