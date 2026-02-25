@@ -121,4 +121,73 @@ export const BAR_INGREDIENT_PRESETS: BarIngredientPreset[] = [
   { id: 'ot-salt', name: 'Соль', name_en: 'Salt', brand: '', category: 'other', defaultUnit: 'g', defaultPackageSize: 500 },
   { id: 'ot-tabasco', name: 'Табаско', name_en: 'Tabasco', brand: 'Tabasco', category: 'other', defaultUnit: 'ml', defaultPackageSize: 60 },
   { id: 'ot-worcester', name: 'Вустерский соус', name_en: 'Worcestershire Sauce', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 150 },
+
+  // === Additional Liqueurs ===
+  { id: 'lq-chartreuse-g', name: 'Шартрёз зелёный', name_en: 'Green Chartreuse', brand: 'Chartreuse', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-chartreuse-y', name: 'Шартрёз жёлтый', name_en: 'Yellow Chartreuse', brand: 'Chartreuse', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-fernet', name: 'Фернет Бранка', name_en: 'Fernet Branca', brand: 'Fernet-Branca', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-midori', name: 'Мидори (дыня)', name_en: 'Midori (Melon)', brand: 'Midori', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-blue-curacao', name: 'Блю Кюрасао', name_en: 'Blue Curacao', brand: '', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-jagermeister', name: 'Егермейстер', name_en: 'Jägermeister', brand: 'Jägermeister', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-sambuca', name: 'Самбука', name_en: 'Sambuca', brand: '', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-limoncello', name: 'Лимончелло', name_en: 'Limoncello', brand: '', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-galliano', name: 'Гальяно', name_en: 'Galliano', brand: 'Galliano', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-frangelico', name: 'Франжелико', name_en: 'Frangelico', brand: 'Frangelico', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-passoa', name: 'Пассоа (маракуйя)', name_en: 'Passoa (Passion Fruit)', brand: 'Passoa', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-peach', name: 'Персиковый ликёр', name_en: 'Peach Liqueur', brand: '', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'lq-st-germain', name: 'Сен-Жермен (бузина)', name_en: 'St-Germain (Elderflower)', brand: 'St-Germain', category: 'liqueur', defaultUnit: 'ml', defaultPackageSize: 700 },
+
+  // === Purées ===
+  { id: 'pu-strawberry', name: 'Пюре клубника', name_en: 'Strawberry Purée', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'pu-mango', name: 'Пюре манго', name_en: 'Mango Purée', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'pu-passion', name: 'Пюре маракуйя', name_en: 'Passion Fruit Purée', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'pu-raspberry', name: 'Пюре малина', name_en: 'Raspberry Purée', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'pu-banana', name: 'Пюре банан', name_en: 'Banana Purée', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'jc-grapefruit', name: 'Грейпфрутовый сок', name_en: 'Grapefruit Juice', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'jc-apple', name: 'Яблочный сок', name_en: 'Apple Juice', brand: '', category: 'juice', defaultUnit: 'ml', defaultPackageSize: 1000 },
+
+  // === Additional Syrups ===
+  { id: 'sy-lavender', name: 'Лавандовый сироп', name_en: 'Lavender Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-orgeat', name: 'Оршад (миндальный)', name_en: 'Orgeat Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-cinnamon', name: 'Коричный сироп', name_en: 'Cinnamon Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-ginger', name: 'Имбирный сироп', name_en: 'Ginger Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-elderflower', name: 'Бузиновый сироп', name_en: 'Elderflower Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-passion', name: 'Сироп маракуйя', name_en: 'Passion Fruit Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-peach', name: 'Персиковый сироп', name_en: 'Peach Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+  { id: 'sy-raspberry', name: 'Малиновый сироп', name_en: 'Raspberry Syrup', brand: '', category: 'syrup', defaultUnit: 'ml', defaultPackageSize: 700 },
+
+  // === Coffee & Tea ===
+  { id: 'ot-espresso', name: 'Эспрессо', name_en: 'Espresso', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'ot-green-tea', name: 'Зелёный чай', name_en: 'Green Tea', brand: '', category: 'other', defaultUnit: 'g', defaultPackageSize: 200 },
+  { id: 'ot-chai', name: 'Чай масала (концентрат)', name_en: 'Chai Concentrate', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'ot-matcha', name: 'Матча (порошок)', name_en: 'Matcha Powder', brand: '', category: 'other', defaultUnit: 'g', defaultPackageSize: 100 },
+
+  // === Dairy & Alt-Milk ===
+  { id: 'ot-oat-milk', name: 'Овсяное молоко', name_en: 'Oat Milk', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'ot-almond-milk', name: 'Миндальное молоко', name_en: 'Almond Milk', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'ot-coconut-milk', name: 'Кокосовое молоко', name_en: 'Coconut Milk', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 400 },
+  { id: 'ot-whipped-cream', name: 'Взбитые сливки', name_en: 'Whipped Cream', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 500 },
+  { id: 'ot-yogurt', name: 'Йогурт натуральный', name_en: 'Natural Yogurt', brand: '', category: 'other', defaultUnit: 'ml', defaultPackageSize: 500 },
+
+  // === Spices & Fresh ===
+  { id: 'gr-cucumber', name: 'Огурец', name_en: 'Cucumber', brand: '', category: 'garnish', defaultUnit: 'pcs', defaultPackageSize: 5 },
+  { id: 'gr-ginger', name: 'Имбирь (свежий)', name_en: 'Fresh Ginger', brand: '', category: 'garnish', defaultUnit: 'g', defaultPackageSize: 200 },
+  { id: 'gr-cinnamon', name: 'Палочка корицы', name_en: 'Cinnamon Stick', brand: '', category: 'garnish', defaultUnit: 'pcs', defaultPackageSize: 20 },
+  { id: 'gr-chili', name: 'Перец чили', name_en: 'Chili Pepper', brand: '', category: 'garnish', defaultUnit: 'pcs', defaultPackageSize: 10 },
+  { id: 'gr-rosemary', name: 'Розмарин', name_en: 'Rosemary', brand: '', category: 'garnish', defaultUnit: 'pcs', defaultPackageSize: 20 },
+  { id: 'gr-basil', name: 'Базилик', name_en: 'Basil', brand: '', category: 'garnish', defaultUnit: 'pcs', defaultPackageSize: 30 },
+  { id: 'ot-nutmeg', name: 'Мускатный орех', name_en: 'Nutmeg', brand: '', category: 'other', defaultUnit: 'g', defaultPackageSize: 50 },
+  { id: 'ot-chocolate', name: 'Горячий шоколад', name_en: 'Hot Chocolate Mix', brand: '', category: 'other', defaultUnit: 'g', defaultPackageSize: 500 },
+  { id: 'ot-protein', name: 'Протеин (порошок)', name_en: 'Protein Powder', brand: '', category: 'other', defaultUnit: 'g', defaultPackageSize: 1000 },
+
+  // === Additional Mixers ===
+  { id: 'mx-lemonade', name: 'Лимонад', name_en: 'Lemonade', brand: '', category: 'mixer', defaultUnit: 'ml', defaultPackageSize: 1000 },
+  { id: 'mx-sprite', name: 'Спрайт / 7UP', name_en: 'Sprite / 7UP', brand: '', category: 'mixer', defaultUnit: 'ml', defaultPackageSize: 1000 },
+
+  // === Wine & Beer ===
+  { id: 'wn-red', name: 'Красное вино', name_en: 'Red Wine', brand: '', category: 'wine', defaultUnit: 'ml', defaultPackageSize: 750 },
+  { id: 'wn-white', name: 'Белое вино', name_en: 'White Wine', brand: '', category: 'wine', defaultUnit: 'ml', defaultPackageSize: 750 },
+  { id: 'wn-rose', name: 'Розовое вино', name_en: 'Rosé Wine', brand: '', category: 'wine', defaultUnit: 'ml', defaultPackageSize: 750 },
+  { id: 'br-lager', name: 'Пиво лагер', name_en: 'Lager Beer', brand: '', category: 'beer', defaultUnit: 'ml', defaultPackageSize: 500 },
+  { id: 'br-stout', name: 'Стаут / Гиннесс', name_en: 'Stout / Guinness', brand: '', category: 'beer', defaultUnit: 'ml', defaultPackageSize: 440 },
 ]

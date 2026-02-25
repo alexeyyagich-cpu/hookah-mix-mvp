@@ -131,6 +131,25 @@ const DEMO_GUESTS: Guest[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
+  {
+    id: '5',
+    profile_id: 'demo',
+    name: 'Tomasz',
+    phone: null,
+    photo_url: null,
+    notes: 'First-time visitor, came with Anna',
+    strength_preference: 'light',
+    flavor_profiles: ['sweet', 'fruity'],
+    last_mix_snapshot: null,
+    bonus_balance: 0,
+    discount_percent: 0,
+    total_spent: 15,
+    loyalty_tier: 'bronze',
+    visit_count: 1,
+    last_visit_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
 ]
 
 export interface NewGuest {

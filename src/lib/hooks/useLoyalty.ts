@@ -20,39 +20,47 @@ const DEFAULT_SETTINGS: LoyaltySettings = {
   updated_at: new Date().toISOString(),
 }
 
+const D = 24 * 60 * 60 * 1000
 const DEMO_TRANSACTIONS: BonusTransaction[] = [
   {
-    id: 'bt1',
-    guest_id: '1',
-    profile_id: 'demo',
-    type: 'accrual',
-    amount: 1.25,
-    balance_after: 25.50,
-    related_session_id: null,
-    description: 'Session bonus (5%)',
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    id: 'bt1', guest_id: '1', profile_id: 'demo', type: 'accrual',
+    amount: 1.25, balance_after: 25.50, related_session_id: '7',
+    description: 'Session bonus (5%)', created_at: new Date(Date.now() - 1 * D).toISOString(),
   },
   {
-    id: 'bt2',
-    guest_id: '4',
-    profile_id: 'demo',
-    type: 'accrual',
-    amount: 1.50,
-    balance_after: 45,
-    related_session_id: null,
-    description: 'Session bonus (5%)',
-    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    id: 'bt2', guest_id: '4', profile_id: 'demo', type: 'accrual',
+    amount: 1.50, balance_after: 45, related_session_id: '5',
+    description: 'Session bonus (5%)', created_at: new Date(Date.now() - 1 * D).toISOString(),
   },
   {
-    id: 'bt3',
-    guest_id: '2',
-    profile_id: 'demo',
-    type: 'redemption',
-    amount: -5,
-    balance_after: 12,
-    related_session_id: null,
-    description: 'Bonus redeemed',
-    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    id: 'bt3', guest_id: '2', profile_id: 'demo', type: 'redemption',
+    amount: -5, balance_after: 12, related_session_id: '9',
+    description: 'Bonus redeemed', created_at: new Date(Date.now() - 5 * D).toISOString(),
+  },
+  {
+    id: 'bt4', guest_id: '1', profile_id: 'demo', type: 'accrual',
+    amount: 0.75, balance_after: 24.25, related_session_id: '1',
+    description: 'Session bonus (5%)', created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'bt5', guest_id: '2', profile_id: 'demo', type: 'accrual',
+    amount: 1.00, balance_after: 17, related_session_id: '3',
+    description: 'Session bonus (5%)', created_at: new Date(Date.now() - 1 * D).toISOString(),
+  },
+  {
+    id: 'bt6', guest_id: '3', profile_id: 'demo', type: 'accrual',
+    amount: 1.00, balance_after: 1.00, related_session_id: '8',
+    description: 'Session bonus (5%)', created_at: new Date(Date.now() - 3 * D).toISOString(),
+  },
+  {
+    id: 'bt7', guest_id: '4', profile_id: 'demo', type: 'redemption',
+    amount: -10, balance_after: 43.50, related_session_id: null,
+    description: 'Bonus redeemed', created_at: new Date(Date.now() - 7 * D).toISOString(),
+  },
+  {
+    id: 'bt8', guest_id: '1', profile_id: 'demo', type: 'manual',
+    amount: 5, balance_after: 23.50, related_session_id: null,
+    description: 'Birthday bonus', created_at: new Date(Date.now() - 10 * D).toISOString(),
   },
 ]
 

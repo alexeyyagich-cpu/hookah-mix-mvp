@@ -302,7 +302,68 @@ export function useShifts(): UseShiftsReturn {
       tips: { count: 0, total: 0 },
     }
 
-    if (isDemoMode || !supabase || !effectiveProfileId) return emptyResult
+    if (isDemoMode || !supabase || !effectiveProfileId) {
+      // Return realistic demo reconciliation for closed shifts
+      if (shift.status === 'closed' && shift.closing_cash !== null) {
+        const shiftDurationMs = new Date(end).getTime() - new Date(start).getTime()
+        const hoursWorked = Math.round((shiftDurationMs / 3600000) * 100) / 100
+        const hookahRevenue = Math.round((shift.closing_cash - (shift.starting_cash || 0)) * 0.55)
+        const barRevenue = Math.round((shift.closing_cash - (shift.starting_cash || 0)) * 0.35)
+        const tobaccoCost = Math.round(hookahRevenue * 0.25)
+        const barCost = Math.round(barRevenue * 0.3)
+        return {
+          hookah: {
+            sessionsCount: Math.round(hoursWorked * 1.2),
+            totalGrams: Math.round(hoursWorked * 1.2) * 18,
+            avgCompatibility: 86,
+            topTobaccos: [
+              { brand: 'Musthave', flavor: 'Pinkman', grams: 45 },
+              { brand: 'Darkside', flavor: 'Supernova', grams: 32 },
+              { brand: 'Tangiers', flavor: 'Cane Mint', grams: 28 },
+            ],
+            tobaccoCost,
+            revenue: hookahRevenue,
+            profit: hookahRevenue - tobaccoCost,
+          },
+          bar: {
+            salesCount: Math.round(hoursWorked * 3),
+            totalRevenue: barRevenue,
+            totalCost: barCost,
+            profit: barRevenue - barCost,
+            marginPercent: 70,
+            topCocktails: [
+              { name: 'Mojito', count: 5, revenue: 45 },
+              { name: 'Aperol Spritz', count: 4, revenue: 36 },
+              { name: 'Gin & Tonic', count: 3, revenue: 24 },
+            ],
+          },
+          kds: {
+            totalOrders: Math.round(hoursWorked * 2.5),
+            byStatus: { served: Math.round(hoursWorked * 2), cancelled: 1 },
+            avgCompletionMinutes: 4.2,
+          },
+          cash: {
+            startingCash: shift.starting_cash || 0,
+            barRevenue,
+            hookahRevenue,
+            expectedCash: (shift.starting_cash || 0) + barRevenue + hookahRevenue,
+            actualCash: shift.closing_cash,
+            difference: shift.closing_cash - ((shift.starting_cash || 0) + barRevenue + hookahRevenue),
+          },
+          payroll: {
+            staffName: shift.opened_by_name || 'Staff',
+            hoursWorked,
+            hourlyRate: 12,
+            basePay: Math.round(hoursWorked * 12 * 100) / 100,
+            commissionPercent: 5,
+            commissionPay: Math.round((barRevenue + hookahRevenue) * 0.05 * 100) / 100,
+            totalPay: Math.round((hoursWorked * 12 + (barRevenue + hookahRevenue) * 0.05) * 100) / 100,
+          },
+          tips: { count: 3, total: 18 },
+        }
+      }
+      return emptyResult
+    }
 
     // Fetch all needed data in parallel — includes ALL statuses for KDS
     const [sessionsRes, salesRes, kdsRes, inventoryRes, teamRes] = await Promise.all([

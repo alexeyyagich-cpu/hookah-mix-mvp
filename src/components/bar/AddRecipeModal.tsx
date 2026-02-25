@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
-import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, BarPortionUnit } from '@/types/database'
-import { RECIPE_PRESETS, type RecipePreset } from '@/data/bar-recipes'
+import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, CocktailCategory, BarPortionUnit } from '@/types/database'
+import { RECIPE_PRESETS, COCKTAIL_CATEGORY_EMOJI, type RecipePreset } from '@/data/bar-recipes'
 import { BAR_INGREDIENT_PRESETS } from '@/data/bar-ingredients'
+
+const COCKTAIL_CATEGORIES: CocktailCategory[] = ['classic', 'tiki', 'sour', 'highball', 'shot', 'hot', 'non_alcoholic', 'smoothie', 'signature']
 
 type RecipeInput = Omit<BarRecipe, 'id' | 'profile_id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'>
 type IngredientInput = Omit<BarRecipeIngredient, 'id' | 'recipe_id' | 'created_at'>
@@ -53,6 +55,13 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
 
   const [mode, setMode] = useState<'preset' | 'custom'>('preset')
   const [presetFilter, setPresetFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<'all' | CocktailCategory>('all')
+
+  const CATEGORY_LABELS: Record<CocktailCategory, string> = {
+    classic: t.catClassic, tiki: t.catTiki, sour: t.catSour, highball: t.catHighball,
+    shot: t.catShot, hot: t.catHot, non_alcoholic: t.catNonAlcoholic,
+    smoothie: t.catSmoothie, signature: t.catSignature,
+  }
 
   // Form state
   const [name, setName] = useState('')
@@ -105,6 +114,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
     setNotes('')
     setIngredients([])
     setPresetFilter('')
+    setCategoryFilter('all')
   }
 
   const selectPreset = (preset: RecipePreset) => {
@@ -163,10 +173,14 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
     })
   }
 
-  const filteredPresets = RECIPE_PRESETS.filter(p =>
-    p.name.toLowerCase().includes(presetFilter.toLowerCase()) ||
-    p.name_en.toLowerCase().includes(presetFilter.toLowerCase())
-  )
+  const filteredPresets = RECIPE_PRESETS.filter(p => {
+    if (categoryFilter !== 'all' && p.category !== categoryFilter) return false
+    if (presetFilter) {
+      const q = presetFilter.toLowerCase()
+      if (!p.name.toLowerCase().includes(q) && !p.name_en.toLowerCase().includes(q)) return false
+    }
+    return true
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -250,7 +264,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
 
         <div className="p-6">
           {mode === 'preset' && !editingRecipe ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <input
                 type="text"
                 value={presetFilter}
@@ -258,6 +272,32 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 placeholder={t.searchCocktail}
                 className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               />
+              {/* Category filter */}
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setCategoryFilter('all')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    categoryFilter === 'all'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                      : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
+                  }`}
+                >
+                  {t.all}
+                </button>
+                {COCKTAIL_CATEGORIES.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setCategoryFilter(cat)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      categoryFilter === cat
+                        ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                        : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
+                    }`}
+                  >
+                    {COCKTAIL_CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
+                  </button>
+                ))}
+              </div>
               <div className="space-y-1 max-h-[50vh] overflow-y-auto">
                 {filteredPresets.map(preset => (
                   <button
@@ -266,7 +306,9 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors text-left"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium">{getLocaleName(preset, locale)}</div>
+                      <div className="text-sm font-medium">
+                        {COCKTAIL_CATEGORY_EMOJI[preset.category]} {getLocaleName(preset, locale)}
+                      </div>
                       <div className="text-xs text-[var(--color-textMuted)]">
                         {locale === 'ru' ? preset.name_en : preset.name} · {METHOD_LABELS[preset.method]} · {preset.ingredients.length} {t.ingredientsShort}
                       </div>

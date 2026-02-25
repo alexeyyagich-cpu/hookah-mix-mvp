@@ -31,28 +31,43 @@ const DEMO_STAFF: StaffProfile[] = [
   },
 ]
 
+const D = 24 * 60 * 60 * 1000
 const DEMO_TIPS: Tip[] = [
   {
-    id: 't1',
-    staff_profile_id: 'sp1',
-    amount: 5,
-    currency: 'EUR',
-    stripe_payment_intent_id: null,
-    status: 'completed',
-    payer_name: 'John',
-    message: 'Great service!',
+    id: 't1', staff_profile_id: 'sp1', amount: 5, currency: 'EUR',
+    stripe_payment_intent_id: null, status: 'completed',
+    payer_name: 'John', message: 'Great service!',
     created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
   {
-    id: 't2',
-    staff_profile_id: 'sp1',
-    amount: 10,
-    currency: 'EUR',
-    stripe_payment_intent_id: null,
-    status: 'completed',
-    payer_name: null,
-    message: null,
-    created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    id: 't2', staff_profile_id: 'sp1', amount: 10, currency: 'EUR',
+    stripe_payment_intent_id: null, status: 'completed',
+    payer_name: null, message: null,
+    created_at: new Date(Date.now() - 1 * D).toISOString(),
+  },
+  {
+    id: 't3', staff_profile_id: 'sp2', amount: 8, currency: 'EUR',
+    stripe_payment_intent_id: null, status: 'completed',
+    payer_name: 'Anna', message: 'Amazing cocktails, thank you!',
+    created_at: new Date(Date.now() - 1 * D - 3 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 't4', staff_profile_id: 'sp2', amount: 5, currency: 'EUR',
+    stripe_payment_intent_id: null, status: 'completed',
+    payer_name: 'Max', message: null,
+    created_at: new Date(Date.now() - 2 * D).toISOString(),
+  },
+  {
+    id: 't5', staff_profile_id: 'sp1', amount: 15, currency: 'EUR',
+    stripe_payment_intent_id: null, status: 'completed',
+    payer_name: 'Tomasz K.', message: 'VIP service, perfect evening!',
+    created_at: new Date(Date.now() - 3 * D).toISOString(),
+  },
+  {
+    id: 't6', staff_profile_id: 'sp2', amount: 3, currency: 'EUR',
+    stripe_payment_intent_id: null, status: 'completed',
+    payer_name: null, message: null,
+    created_at: new Date(Date.now() - 4 * D).toISOString(),
   },
 ]
 

@@ -812,6 +812,8 @@ export interface BarTransaction {
 
 export type CocktailMethod = 'build' | 'stir' | 'shake' | 'blend' | 'layer' | 'muddle'
 
+export type CocktailCategory = 'classic' | 'tiki' | 'sour' | 'highball' | 'shot' | 'hot' | 'non_alcoholic' | 'smoothie' | 'signature'
+
 export interface BarRecipe {
   id: string
   profile_id: string
