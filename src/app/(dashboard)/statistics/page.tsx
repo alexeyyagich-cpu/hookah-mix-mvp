@@ -25,6 +25,7 @@ import {
   IconWarning,
 } from '@/components/Icons'
 import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 type ViewMode = 'overview' | 'comparison' | 'abc'
 
@@ -33,7 +34,7 @@ export default function StatisticsPage() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const { settings: notificationSettings } = useNotificationSettings()
-  const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
+  const lowStockThreshold = notificationSettings?.low_stock_threshold || LOW_STOCK_THRESHOLD
   const { statistics, loading, error, dateRange, setDateRange } = useStatistics({ lowStockThreshold })
   const {
     periodA,

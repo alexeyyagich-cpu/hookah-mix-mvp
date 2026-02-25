@@ -21,6 +21,7 @@ import {
 } from '@/components/Icons'
 import Link from 'next/link'
 import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 export function HookahSection() {
   const t = useTranslation('manage')
@@ -28,7 +29,7 @@ export function HookahSection() {
   const { inventory } = useInventory()
   const { sessions } = useSessions()
   const { settings: notificationSettings } = useNotificationSettings()
-  const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
+  const lowStockThreshold = notificationSettings?.low_stock_threshold || LOW_STOCK_THRESHOLD
   const { statistics, loading } = useStatistics({ lowStockThreshold })
   const { savedMixes } = useSavedMixes()
 

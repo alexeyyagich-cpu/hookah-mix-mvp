@@ -3,6 +3,7 @@
 import { use, useState, useMemo, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePublicLounge, type PublicTobaccoGroup } from '@/lib/hooks/useLoungeProfile'
 import { BrandLoader } from '@/components/BrandLoader'
 import {
@@ -200,7 +201,7 @@ function MenuPageInner({ slug }: { slug: string }) {
       const responses = await Promise.all(requests)
       for (const res of responses) {
         if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
+          const data = await res.json().catch((err) => { console.error('Menu fetch error:', err); return {} })
           if (res.status === 429) {
             setOrderError(t.orderRateLimit)
           } else {
@@ -301,7 +302,7 @@ function MenuPageInner({ slug }: { slug: string }) {
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href={`/lounge/${slug}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             {lounge.logo_url ? (
-              <img src={lounge.logo_url} alt={lounge.name} className="w-10 h-10 rounded-xl object-cover" />
+              <Image src={lounge.logo_url} alt={lounge.name} width={40} height={40} className="rounded-xl object-cover" unoptimized />
             ) : (
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-purple-600 flex items-center justify-center text-lg text-white font-bold">
                 {lounge.name.charAt(0)}

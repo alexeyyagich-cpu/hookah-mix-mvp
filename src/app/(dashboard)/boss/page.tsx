@@ -16,6 +16,7 @@ import { useReviews } from '@/lib/hooks/useReviews'
 import { useTips } from '@/lib/hooks/useTips'
 import { useTranslation } from '@/lib/i18n'
 import { IconCrown, IconRefresh } from '@/components/Icons'
+import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import Link from 'next/link'
 import type { ShiftReconciliation } from '@/types/database'
 
@@ -118,7 +119,7 @@ export default function BossPage() {
     )
   }
 
-  const lowStockThreshold = notifSettings?.low_stock_threshold ?? 50
+  const lowStockThreshold = notifSettings?.low_stock_threshold ?? LOW_STOCK_THRESHOLD
 
   return (
     <div className="space-y-4 max-w-2xl mx-auto">

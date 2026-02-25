@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { useLoungeProfile } from '@/lib/hooks/useLoungeProfile'
 import { useTranslation } from '@/lib/i18n'
+import { TOAST_TIMEOUT } from '@/lib/constants'
 import { LOUNGE_FEATURES } from '@/types/lounge'
 import type { LoungeFeature, WorkingHours, DayHours } from '@/types/lounge'
 
@@ -88,7 +89,7 @@ export default function LoungeProfileSettings() {
     })
     setMessage(ts.loungeSaved)
     setSaving(false)
-    setTimeout(() => setMessage(''), 3000)
+    setTimeout(() => setMessage(''), TOAST_TIMEOUT)
   }, [lounge, updateLounge, description, city, instagram, telegram, website, coverImageUrl, logoUrl, features, workingHours, isPublished, ts])
 
   const handlePublishToggle = useCallback(async () => {

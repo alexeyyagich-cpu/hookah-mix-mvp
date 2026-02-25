@@ -88,7 +88,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
       const scanner = scannerRef.current
       scannerRef.current = null
       if (scanner) {
-        scanner.stop().then(() => scanner.clear()).catch(() => {})
+        scanner.stop().then(() => scanner.clear()).catch((err: unknown) => console.error('BarcodeScanner error:', err))
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,7 +97,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
   const handleClose = () => {
     const scanner = scannerRef.current
     if (scanner) {
-      scanner.stop().catch(() => {})
+      scanner.stop().catch((err: unknown) => console.error('BarcodeScanner error:', err))
     }
     onClose()
   }

@@ -84,6 +84,10 @@ export async function GET(
       barRecipes: (recipesRes.data || []).map(r => ({ ...r, ingredients: iMap[r.id] || [] })),
       tobaccoMenu: Object.entries(tMap).map(([brand, flavors]) => ({ brand, flavors: flavors.sort() })),
       tables: tablesRes.data || [],
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
     })
   }
 
@@ -166,5 +170,9 @@ export async function GET(
     barRecipes,
     tobaccoMenu,
     tables: tables || [],
+  }, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+    },
   })
 }

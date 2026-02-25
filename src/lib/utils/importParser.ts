@@ -1,5 +1,5 @@
-import Papa from 'papaparse'
-import readXlsxFile from 'read-excel-file'
+// Dynamic imports — Papa (~47KB) and readXlsxFile (~90KB) are loaded on demand
+// to avoid bundling them in the initial chunk since CSV/Excel import is rarely used
 
 export interface ImportRow {
   brand: string
@@ -34,7 +34,8 @@ const COLUMN_ALIASES: Record<keyof ColumnMapping, string[]> = {
   package_grams: ['package', 'package_grams', 'упаковка', 'пакет', 'packung', 'paketgröße'],
 }
 
-export function parseCSV(file: File): Promise<ParseResult> {
+export async function parseCSV(file: File): Promise<ParseResult> {
+  const Papa = (await import('papaparse')).default
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
@@ -57,6 +58,7 @@ export function parseCSV(file: File): Promise<ParseResult> {
 
 export async function parseExcel(file: File): Promise<ParseResult> {
   try {
+    const readXlsxFile = (await import('read-excel-file')).default
     const rows = await readXlsxFile(file)
     if (rows.length < 2) {
       return { headers: [], rows: [], error: 'File has no data rows' }

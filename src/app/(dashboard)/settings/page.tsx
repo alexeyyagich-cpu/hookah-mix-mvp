@@ -14,6 +14,7 @@ import { useLocale, useTranslation, LOCALES, LOCALE_LABELS } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { Locale } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/client'
+import { LOW_STOCK_THRESHOLD, TOAST_TIMEOUT } from '@/lib/constants'
 import { QRCodeCanvas } from 'qrcode.react'
 import LoungeProfileSettings from '@/components/settings/LoungeProfileSettings'
 import Link from 'next/link'
@@ -94,7 +95,7 @@ export default function SettingsPage() {
       await refreshProfile()
     }
     setSlugSaving(false)
-    setTimeout(() => setSlugMessage(''), 3000)
+    setTimeout(() => setSlugMessage(''), TOAST_TIMEOUT)
   }, [user, venueSlug, supabase, refreshProfile, ts, tc])
 
   const handleCopyUrl = useCallback(() => {
@@ -138,7 +139,7 @@ export default function SettingsPage() {
     }
 
     setSaving(false)
-    setTimeout(() => setMessage(''), 3000)
+    setTimeout(() => setMessage(''), TOAST_TIMEOUT)
   }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -188,12 +189,12 @@ export default function SettingsPage() {
         window.location.href = data.url
       } else {
         setMessage(tc.error + ': ' + (data.error || ts.portalError))
-        setTimeout(() => setMessage(''), 3000)
+        setTimeout(() => setMessage(''), TOAST_TIMEOUT)
       }
     } catch (error) {
       void error
       setMessage(ts.portalOpenError)
-      setTimeout(() => setMessage(''), 3000)
+      setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } finally {
       setPortalLoading(false)
     }
@@ -564,7 +565,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium">{ts.warningThreshold}</label>
               <span className="text-sm font-bold text-[var(--color-primary)]">
-                {notificationSettings?.low_stock_threshold || 50}{tc.grams}
+                {notificationSettings?.low_stock_threshold || LOW_STOCK_THRESHOLD}{tc.grams}
               </span>
             </div>
             <input
@@ -572,7 +573,7 @@ export default function SettingsPage() {
               min={10}
               max={200}
               step={10}
-              value={notificationSettings?.low_stock_threshold || 50}
+              value={notificationSettings?.low_stock_threshold || LOW_STOCK_THRESHOLD}
               onChange={(e) => updateNotificationSettings({
                 low_stock_threshold: parseInt(e.target.value)
               })}

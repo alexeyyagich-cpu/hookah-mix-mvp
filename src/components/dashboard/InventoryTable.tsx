@@ -8,6 +8,7 @@ import type { ForecastResult } from '@/lib/utils/forecast'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { IconShop } from '@/components/Icons'
+import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 interface InventoryTableProps {
   inventory: TobaccoInventory[]
@@ -19,7 +20,7 @@ interface InventoryTableProps {
   loading?: boolean
 }
 
-export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, onEdit, onDelete, onAdjust, loading }: InventoryTableProps) {
+export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_STOCK_THRESHOLD, onEdit, onDelete, onAdjust, loading }: InventoryTableProps) {
   const t = useTranslation('hookah')
   const [sortField, setSortField] = useState<keyof TobaccoInventory>('brand')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')

@@ -14,6 +14,7 @@ import { InvoiceScanModal } from '@/components/dashboard/InvoiceScanModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
 import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
+import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
 import type { ImportRow } from '@/lib/utils/importParser'
@@ -37,7 +38,7 @@ export default function InventoryPage() {
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [scanModalOpen, setScanModalOpen] = useState(false)
   const { settings: notificationSettings } = useNotificationSettings()
-  const lowStockThreshold = notificationSettings?.low_stock_threshold || 50
+  const lowStockThreshold = notificationSettings?.low_stock_threshold || LOW_STOCK_THRESHOLD
   const { statistics } = useStatistics({ lowStockThreshold })
 
   // Create forecasts map from statistics

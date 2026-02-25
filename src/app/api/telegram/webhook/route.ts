@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import {
   sendMessage, editMessageText, answerCallbackQuery, setMyCommands,
   verifyWebhookSecret, verifyConnectionToken,
@@ -8,15 +8,31 @@ import {
 } from '@/lib/telegram/bot'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import type { TelegramUpdate } from '@/lib/telegram/types'
+import type { Session, BarSale, TobaccoInventory, Shift } from '@/types/database'
+import { STRIPE_MESSAGE_MAX_LENGTH } from '@/lib/constants'
+
+interface TelegramConnection {
+  id: string
+  profile_id: string
+  telegram_user_id: number | null
+  telegram_username: string | null
+  chat_id: number
+  is_active: boolean
+  notifications_enabled: boolean
+  low_stock_alerts: boolean
+  session_reminders: boolean
+  daily_summary: boolean
+  updated_at: string
+  profiles?: { business_name: string | null }
+}
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
 
-const MAX_MESSAGE_LENGTH = 1000
+const MAX_MESSAGE_LENGTH = STRIPE_MESSAGE_MAX_LENGTH
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getSupabase(): any {
+function getSupabase(): SupabaseClient | null {
   if (!supabaseUrl || !supabaseServiceKey) return null
   return createClient(supabaseUrl, supabaseServiceKey)
 }
@@ -65,18 +81,16 @@ function mainMenuText(businessName: string) {
 
 // --- Data fetchers ---
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function getConnection(supabase: any, chatId: number): Promise<any> {
+async function getConnection(supabase: SupabaseClient, chatId: number): Promise<TelegramConnection | null> {
   const { data } = await supabase
     .from('telegram_connections')
     .select('*, profiles(business_name)')
     .eq('chat_id', chatId)
     .single()
-  return data
+  return data as TelegramConnection | null
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchStatusText(supabase: any, chatId: number) {
+async function fetchStatusText(supabase: SupabaseClient, chatId: number) {
   const connection = await getConnection(supabase, chatId)
   if (!connection) return { text: '❌ Not connected. Use the link from app settings.', keyboard: undefined, connection: null }
 
@@ -87,20 +101,19 @@ async function fetchStatusText(supabase: any, chatId: number) {
   return { text, keyboard: statusKeyboard(connection), connection }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchReportText(supabase: any, profileId: string) {
+async function fetchReportText(supabase: SupabaseClient, profileId: string) {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const sessionsRes = await supabase.from('sessions').select('total_grams, selling_price')
-    .eq('profile_id', profileId).gte('session_date', todayStart.toISOString())
-  const barRes = await supabase.from('bar_sales').select('total_revenue, total_cost, quantity')
-    .eq('profile_id', profileId).gte('sold_at', todayStart.toISOString())
+  const [sessionsRes, barRes] = await Promise.all([
+    supabase.from('sessions').select('total_grams, selling_price')
+      .eq('profile_id', profileId).gte('session_date', todayStart.toISOString()),
+    supabase.from('bar_sales').select('total_revenue, total_cost, quantity')
+      .eq('profile_id', profileId).gte('sold_at', todayStart.toISOString()),
+  ])
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const s: any[] = sessionsRes.data || []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const b: any[] = barRes.data || []
+  const s: Pick<Session, 'total_grams' | 'selling_price'>[] = sessionsRes.data || []
+  const b: Pick<BarSale, 'total_revenue' | 'total_cost' | 'quantity'>[] = barRes.data || []
   const hookahRevenue = s.reduce((sum, x) => sum + (x.selling_price || 0), 0)
   const barRevenue = b.reduce((sum, x) => sum + x.total_revenue, 0)
   const barCost = b.reduce((sum, x) => sum + x.total_cost, 0)
@@ -118,50 +131,46 @@ async function fetchReportText(supabase: any, profileId: string) {
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchStockText(supabase: any, profileId: string) {
+async function fetchStockText(supabase: SupabaseClient, profileId: string) {
   const settingsRes = await supabase
     .from('notification_settings').select('low_stock_threshold')
     .eq('profile_id', profileId).single()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const threshold = (settingsRes.data as any)?.low_stock_threshold || 50
+  const threshold = (settingsRes.data as { low_stock_threshold: number } | null)?.low_stock_threshold || 50
 
   const invRes = await supabase
     .from('tobacco_inventory').select('brand, flavor, quantity_grams')
     .eq('profile_id', profileId).lte('quantity_grams', threshold)
     .order('quantity_grams', { ascending: true })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const items: Pick<TobaccoInventory, 'brand' | 'flavor' | 'quantity_grams'>[] = invRes.data || []
   return formatLowStockReport(
-    ((invRes.data || []) as any[]).map(i => ({ brand: i.brand, flavor: i.flavor, quantity: i.quantity_grams, threshold }))
+    items.map(i => ({ brand: i.brand, flavor: i.flavor, quantity: i.quantity_grams, threshold }))
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function fetchShiftText(supabase: any, profileId: string) {
+async function fetchShiftText(supabase: SupabaseClient, profileId: string) {
   const shiftsRes = await supabase
     .from('shifts').select('*')
     .eq('profile_id', profileId).order('opened_at', { ascending: false }).limit(1)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const shift: any = (shiftsRes.data as any[])?.[0]
+  const shift: Shift | undefined = (shiftsRes.data as Shift[] | null)?.[0]
   if (!shift) return formatShiftReport(null)
 
   const start = new Date(shift.opened_at)
   const end = shift.closed_at ? new Date(shift.closed_at) : new Date()
 
-  const sessionsRes = await supabase.from('sessions').select('selling_price')
-    .eq('profile_id', profileId)
-    .gte('session_date', start.toISOString()).lte('session_date', end.toISOString())
-  const barRes = await supabase.from('bar_sales').select('total_revenue, quantity')
-    .eq('profile_id', profileId)
-    .gte('sold_at', start.toISOString()).lte('sold_at', end.toISOString())
+  const [sessionsRes, barRes] = await Promise.all([
+    supabase.from('sessions').select('selling_price')
+      .eq('profile_id', profileId)
+      .gte('session_date', start.toISOString()).lte('session_date', end.toISOString()),
+    supabase.from('bar_sales').select('total_revenue, quantity')
+      .eq('profile_id', profileId)
+      .gte('sold_at', start.toISOString()).lte('sold_at', end.toISOString()),
+  ])
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const s: any[] = sessionsRes.data || []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const b: any[] = barRes.data || []
+  const s: Pick<Session, 'selling_price'>[] = sessionsRes.data || []
+  const b: Pick<BarSale, 'total_revenue' | 'quantity'>[] = barRes.data || []
   const hookahRevenue = s.reduce((sum, x) => sum + (x.selling_price || 0), 0)
   const barRevenue = b.reduce((sum, x) => sum + x.total_revenue, 0)
 
@@ -179,11 +188,10 @@ async function fetchShiftText(supabase: any, profileId: string) {
 
 // --- Send main menu ---
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function sendMainMenu(supabase: any, chatId: number) {
+async function sendMainMenu(supabase: SupabaseClient, chatId: number) {
   const connection = await getConnection(supabase, chatId)
   if (connection) {
-    await sendMessage(chatId, mainMenuText(connection.profiles?.business_name), {
+    await sendMessage(chatId, mainMenuText(connection.profiles?.business_name ?? ''), {
       parseMode: 'HTML', replyMarkup: mainMenu,
     })
   } else {

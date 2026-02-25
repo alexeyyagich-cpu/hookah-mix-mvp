@@ -53,7 +53,7 @@ export function useTelegram(): UseTelegramReturn {
         setIsConfigured(data.configured)
         setConnectLink(data.link || '')
       })
-      .catch(() => {})
+      .catch((err) => console.error('Telegram hook error:', err))
   }, [user, isDemoMode])
 
   // Return demo data if in demo mode
