@@ -8,6 +8,7 @@ import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 const BOWL_BACKGROUNDS = [
   '/images/bowl-bg-1.jpg',
@@ -91,10 +92,15 @@ export default function BowlsPage() {
     setCapacity('')
   }
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
   const handleDelete = async (id: string) => {
-    if (confirm(t.deleteBowlConfirm)) {
-      await deleteBowl(id)
-    }
+    setConfirmDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    if (confirmDeleteId) await deleteBowl(confirmDeleteId)
+    setConfirmDeleteId(null)
   }
 
   return (
@@ -280,6 +286,16 @@ export default function BowlsPage() {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={!!confirmDeleteId}
+        title={t.deleteBowlConfirm}
+        message={t.deleteBowlConfirm}
+        confirmLabel={tc.delete}
+        cancelLabel={tc.cancel}
+        danger
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   )
 }

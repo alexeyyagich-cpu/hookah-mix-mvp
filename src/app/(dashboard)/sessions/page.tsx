@@ -9,9 +9,8 @@ import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus, IconExport, I
 import { exportSessionsCSV, exportSessionsPDF } from '@/lib/utils/exportReport'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
-import { useTranslation, useLocale } from '@/lib/i18n'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export default function SessionsPage() {
   const t = useTranslation('hookah')
@@ -66,10 +65,15 @@ export default function SessionsPage() {
     await updateSession(id, { rating })
   }
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+
   const handleDelete = async (id: string) => {
-    if (confirm(t.deleteSessionConfirm)) {
-      await deleteSession(id)
-    }
+    setConfirmDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    if (confirmDeleteId) await deleteSession(confirmDeleteId)
+    setConfirmDeleteId(null)
   }
 
   return (
@@ -322,6 +326,16 @@ export default function SessionsPage() {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={!!confirmDeleteId}
+        title={t.deleteSessionConfirm}
+        message={t.deleteSessionConfirm}
+        confirmLabel={tc.delete}
+        cancelLabel={tc.cancel}
+        danger
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   )
 }

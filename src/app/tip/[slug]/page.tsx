@@ -3,12 +3,14 @@
 import { use, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
+import { useTranslation } from '@/lib/i18n'
 import type { StaffProfile } from '@/types/database'
 
 const PRESET_AMOUNTS = [5, 10, 15, 20]
 
 export default function TipPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
+  const t = useTranslation('tip')
   const [staff, setStaff] = useState<StaffProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +25,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
   useEffect(() => {
     const fetchStaff = async () => {
       if (!isSupabaseConfigured) {
-        setError('Service not configured')
+        setError(t.serviceNotConfigured)
         setLoading(false)
         return
       }
@@ -45,7 +47,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
     }
 
     fetchStaff()
-  }, [slug])
+  }, [slug, t.serviceNotConfigured])
 
   const finalAmount = useCustom ? parseFloat(customAmount) || 0 : selectedAmount
 
@@ -74,10 +76,10 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
       } else if (data.success) {
         setSuccess(true)
       } else {
-        setError(data.error || 'Payment failed')
+        setError(data.error || t.paymentFailed)
       }
     } catch {
-      setError('Connection error')
+      setError(t.connectionError)
     } finally {
       setSubmitting(false)
     }
@@ -96,8 +98,8 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
         <div className="text-center">
           <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-xl font-bold text-white mb-2">Staff member not found</h1>
-          <p className="text-gray-400">This tip link may be invalid or disabled.</p>
+          <h1 className="text-xl font-bold text-white mb-2">{t.staffNotFound}</h1>
+          <p className="text-gray-400">{t.staffNotFoundDesc}</p>
         </div>
       </div>
     )
@@ -108,8 +110,8 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
         <div className="text-center">
           <div className="text-6xl mb-4">🎉</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Thank you!</h1>
-          <p className="text-gray-400">Your tip of {finalAmount}€ for {staff.display_name} has been received.</p>
+          <h1 className="text-2xl font-bold text-white mb-2">{t.thankYou}</h1>
+          <p className="text-gray-400">{t.tipReceived(finalAmount, staff.display_name)}</p>
         </div>
       </div>
     )
@@ -120,7 +122,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-xl font-bold text-white mb-2">Error</h1>
+          <h1 className="text-xl font-bold text-white mb-2">{t.error}</h1>
           <p className="text-gray-400">{error}</p>
         </div>
       </div>
@@ -136,7 +138,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
             {(staff.display_name?.[0] || '?').toUpperCase()}
           </div>
           <h1 className="text-xl font-bold text-white">{staff.display_name}</h1>
-          <p className="text-gray-400 text-sm mt-1">Leave a tip</p>
+          <p className="text-gray-400 text-sm mt-1">{t.leaveTip}</p>
         </div>
 
         {/* Amount selection */}
@@ -162,11 +164,12 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
               onClick={() => setUseCustom(true)}
               className={`w-full text-left text-sm mb-2 ${useCustom ? 'text-amber-400' : 'text-gray-400'}`}
             >
-              Custom amount
+              {t.customAmount}
             </button>
             {useCustom && (
               <input
                 type="number"
+                inputMode="decimal"
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
                 placeholder="0"
@@ -185,14 +188,14 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
             type="text"
             value={payerName}
             onChange={(e) => setPayerName(e.target.value)}
-            placeholder="Your name (optional)"
+            placeholder={t.namePlaceholder}
             className="w-full px-4 py-2.5 rounded-xl bg-gray-700 border border-gray-600 text-white text-sm focus:border-amber-400 focus:outline-none placeholder-gray-500"
           />
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Message (optional)"
+            placeholder={t.messagePlaceholder}
             className="w-full px-4 py-2.5 rounded-xl bg-gray-700 border border-gray-600 text-white text-sm focus:border-amber-400 focus:outline-none placeholder-gray-500"
           />
         </div>
@@ -203,12 +206,12 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
           disabled={submitting || finalAmount <= 0}
           className="w-full py-4 rounded-2xl text-lg font-bold transition-all disabled:opacity-50 bg-gradient-to-r from-amber-400 to-orange-500 text-gray-900 hover:shadow-lg hover:shadow-amber-400/30"
         >
-          {submitting ? 'Processing...' : `Tip ${finalAmount > 0 ? `${finalAmount}€` : ''}`}
+          {submitting ? t.processing : `${t.tipBtn} ${finalAmount > 0 ? `${finalAmount}€` : ''}`}
         </button>
 
         {/* Powered by */}
         <p className="text-center text-xs text-gray-600 mt-4">
-          Powered by Hookah Torus
+          {t.poweredBy}
         </p>
       </div>
     </div>

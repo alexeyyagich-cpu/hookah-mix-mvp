@@ -1,0 +1,17 @@
+export const tip = {
+  leaveTip: 'Оставить чаевые',
+  customAmount: 'Своя сумма',
+  namePlaceholder: 'Ваше имя (необязательно)',
+  messagePlaceholder: 'Сообщение (необязательно)',
+  processing: 'Обработка...',
+  tipBtn: 'Чаевые',
+  thankYou: 'Спасибо!',
+  tipReceived: (amount: number, name: string) => `Ваши чаевые ${amount}\u20AC для ${name} получены.`,
+  staffNotFound: 'Сотрудник не найден',
+  staffNotFoundDesc: 'Ссылка на чаевые недействительна или отключена.',
+  error: 'Ошибка',
+  serviceNotConfigured: 'Сервис не настроен',
+  paymentFailed: 'Ошибка оплаты',
+  connectionError: 'Ошибка соединения',
+  poweredBy: 'Работает на Hookah Torus',
+}

@@ -271,6 +271,7 @@ export function useKDS(): UseKDSReturn {
 
     const interval = setInterval(() => {
       if (typeof navigator !== 'undefined' && !navigator.onLine) return
+      if (typeof document !== 'undefined' && document.hidden) return
       fetchOrders()
     }, 10000)
 

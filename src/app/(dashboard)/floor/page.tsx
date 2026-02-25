@@ -8,7 +8,7 @@ import { useReservations } from '@/lib/hooks/useReservations'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { IconSettings, IconCalendar } from '@/components/Icons'
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useKDS } from '@/lib/hooks/useKDS'
@@ -20,7 +20,6 @@ import { useRole } from '@/lib/hooks/useRole'
 import { QRCodeCanvas } from 'qrcode.react'
 import { toast } from 'sonner'
 
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
 
 const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {

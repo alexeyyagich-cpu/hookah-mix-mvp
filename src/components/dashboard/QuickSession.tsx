@@ -326,6 +326,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                     {useBonus && (
                       <input
                         type="number"
+                        inputMode="decimal"
                         value={bonusAmount}
                         onChange={(e) => {
                           const val = parseFloat(e.target.value)
@@ -374,6 +375,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             <label className="block text-sm font-medium">{t.totalGrams}</label>
             <input
               type="number"
+              inputMode="decimal"
               value={totalGrams}
               onChange={(e) => setTotalGrams(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
@@ -387,6 +389,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             <label className="block text-sm font-medium">{t.sellingPrice} (€)</label>
             <input
               type="number"
+              inputMode="decimal"
               value={sellingPrice}
               onChange={(e) => setSellingPrice(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"

@@ -8,6 +8,7 @@ import { hookah as ruHookah } from './ru/hookah'
 import { bar as ruBar } from './ru/bar'
 import { manage as ruManage } from './ru/manage'
 import { market as ruMarket } from './ru/market'
+import { tip as ruTip } from './ru/tip'
 
 import { common as enCommon } from './en/common'
 import { nav as enNav } from './en/nav'
@@ -17,6 +18,7 @@ import { hookah as enHookah } from './en/hookah'
 import { bar as enBar } from './en/bar'
 import { manage as enManage } from './en/manage'
 import { market as enMarket } from './en/market'
+import { tip as enTip } from './en/tip'
 
 import { common as deCommon } from './de/common'
 import { nav as deNav } from './de/nav'
@@ -26,6 +28,7 @@ import { hookah as deHookah } from './de/hookah'
 import { bar as deBar } from './de/bar'
 import { manage as deManage } from './de/manage'
 import { market as deMarket } from './de/market'
+import { tip as deTip } from './de/tip'
 
 const ru = {
   common: ruCommon,
@@ -36,6 +39,7 @@ const ru = {
   bar: ruBar,
   manage: ruManage,
   market: ruMarket,
+  tip: ruTip,
 }
 
 const en = {
@@ -47,6 +51,7 @@ const en = {
   bar: enBar,
   manage: enManage,
   market: enMarket,
+  tip: enTip,
 }
 
 const de = {
@@ -58,6 +63,7 @@ const de = {
   bar: deBar,
   manage: deManage,
   market: deMarket,
+  tip: deTip,
 }
 
 export const dictionaries: Record<Locale, typeof ru> = { ru, en, de }

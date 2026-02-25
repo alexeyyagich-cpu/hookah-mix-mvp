@@ -295,6 +295,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       <label className="block text-sm font-medium">{t.packageCount}</label>
                       <input
                         type="number"
+                        inputMode="decimal"
                         value={packageCount}
                         onChange={(e) => setPackageCount(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
@@ -313,6 +314,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                     <label className="block text-sm font-medium">{t.purchasePricePerPackage}</label>
                     <input
                       type="number"
+                      inputMode="decimal"
                       value={purchasePrice}
                       onChange={(e) => setPurchasePrice(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"

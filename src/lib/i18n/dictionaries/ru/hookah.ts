@@ -618,7 +618,7 @@ export const hookah = {
   reservationNamePlaceholder: 'Как вас зовут?',
   reservationGuestCount: 'Кол-во гостей *',
   reservationPhoneLabel: 'Телефон',
-  reservationPhonePlaceholder: '+48 512 345 678 (необязательно)',
+  reservationPhonePlaceholder: '+XX XXX XXX XXX (необязательно)',
   reservationCommentLabel: 'Комментарий',
   reservationCommentPlaceholder: 'Особые пожелания (необязательно)',
   reservationSubmitting: 'Отправка...',

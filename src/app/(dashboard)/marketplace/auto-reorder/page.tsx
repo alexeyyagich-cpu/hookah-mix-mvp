@@ -17,10 +17,8 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export default function AutoReorderPage() {
   const t = useTranslation('market')

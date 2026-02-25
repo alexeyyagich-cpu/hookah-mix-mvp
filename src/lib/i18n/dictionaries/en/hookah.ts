@@ -612,7 +612,7 @@ export const hookah: typeof HookahType = {
   reservationNamePlaceholder: 'What is your name?',
   reservationGuestCount: 'Number of guests *',
   reservationPhoneLabel: 'Phone',
-  reservationPhonePlaceholder: '+48 512 345 678 (optional)',
+  reservationPhonePlaceholder: '+XX XXX XXX XXX (optional)',
   reservationCommentLabel: 'Comment',
   reservationCommentPlaceholder: 'Special requests (optional)',
   reservationSubmitting: 'Submitting...',

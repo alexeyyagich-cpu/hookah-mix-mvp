@@ -11,6 +11,7 @@ import { usePushNotifications } from '@/lib/hooks/usePushNotifications'
 import { useTelegram } from '@/lib/hooks/useTelegram'
 import { useEmailSettings } from '@/lib/hooks/useEmailSettings'
 import { useLocale, useTranslation, LOCALES, LOCALE_LABELS } from '@/lib/i18n'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { Locale } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/client'
 import { QRCodeCanvas } from 'qrcode.react'
@@ -140,10 +141,14 @@ export default function SettingsPage() {
     setTimeout(() => setMessage(''), 3000)
   }
 
-  const handleDeleteAccount = async () => {
-    if (!confirm(ts.deleteConfirm1)) return
-    if (!confirm(ts.deleteConfirm2)) return
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
+  const handleDeleteAccount = async () => {
+    setShowDeleteConfirm(true)
+  }
+
+  const confirmDeleteAccount = async () => {
+    setShowDeleteConfirm(false)
     setDeleteLoading(true)
     try {
       const res = await fetch('/api/account/delete', {
@@ -406,7 +411,7 @@ export default function SettingsPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="+48 22 123 4567"
+            placeholder="+XX XXX XXX XXX"
           />
         </div>
 
@@ -990,6 +995,16 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title={ts.deleteConfirm1}
+        message={ts.deleteConfirm2}
+        confirmLabel={tc.delete}
+        cancelLabel={tc.cancel}
+        danger
+        onConfirm={confirmDeleteAccount}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   )
 }

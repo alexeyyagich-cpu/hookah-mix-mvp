@@ -474,6 +474,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
               <label className="block text-sm font-medium mb-1">{t.labelCapacity}</label>
               <input
                 type="number"
+                inputMode="numeric"
                 value={capacity}
                 onChange={(e) => setCapacity(e.target.value)}
                 min="1"
@@ -500,6 +501,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
               <label className="block text-sm font-medium mb-1">{t.labelWidth}</label>
               <input
                 type="number"
+                inputMode="numeric"
                 value={width}
                 onChange={(e) => setWidth(e.target.value)}
                 min="40"
@@ -511,6 +513,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
               <label className="block text-sm font-medium mb-1">{t.labelHeight}</label>
               <input
                 type="number"
+                inputMode="numeric"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 min="40"

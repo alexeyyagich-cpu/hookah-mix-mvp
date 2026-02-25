@@ -3,11 +3,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useShifts } from '@/lib/hooks/useShifts'
 import { useModules } from '@/lib/hooks/useModules'
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 import { IconTimer, IconPlus, IconClose, IconCoin, IconBowl, IconCocktail, IconMenuList } from '@/components/Icons'
 import type { Shift, ShiftReconciliation } from '@/types/database'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 function formatDuration(ms: number, t: { hoursShort: string; minutesShort: string }): string {
   const hours = Math.floor(ms / 3600000)

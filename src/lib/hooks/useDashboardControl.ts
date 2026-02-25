@@ -154,7 +154,10 @@ export function useDashboardControl(): UseDashboardControlReturn {
   // Auto-refresh every 60s
   useEffect(() => {
     if (isDemoMode) return
-    const interval = setInterval(fetchSnapshot, 60_000)
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return
+      fetchSnapshot()
+    }, 60_000)
     return () => clearInterval(interval)
   }, [fetchSnapshot, isDemoMode])
 

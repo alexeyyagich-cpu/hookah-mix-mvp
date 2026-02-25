@@ -24,9 +24,7 @@ import {
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from '@/data/tobaccos'
 import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
 import { IconTarget } from '@/components/Icons'
-import { useTranslation, useLocale } from '@/lib/i18n'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 
 // Mix item for the builder
 interface SelectedTobacco {
@@ -1164,7 +1162,7 @@ function GuestModal({
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
-              placeholder="+48 512 345 678"
+              placeholder="+XX XXX XXX XXX"
               className="w-full p-3 rounded-xl border text-sm"
               style={{
                 background: 'var(--color-bgHover)',

@@ -4,6 +4,12 @@ export const LOCALES: Locale[] = ['ru', 'en', 'de']
 
 export const DEFAULT_LOCALE: Locale = 'ru'
 
+export const LOCALE_MAP: Record<string, string> = {
+  ru: 'ru-RU',
+  en: 'en-US',
+  de: 'de-DE',
+}
+
 export const LOCALE_LABELS: Record<Locale, { name: string; flag: string }> = {
   ru: { name: 'Русский', flag: '🇷🇺' },
   en: { name: 'English', flag: '🇬🇧' },

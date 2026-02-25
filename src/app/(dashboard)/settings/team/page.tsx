@@ -8,11 +8,10 @@ import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
 import { TipQRCode } from '@/components/dashboard/TipQRCode'
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useRouter } from 'next/navigation'
 import type { OrgRole } from '@/types/database'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 const INVITABLE_ROLES: OrgRole[] = ['manager', 'hookah_master', 'bartender', 'cook']
 
@@ -69,12 +68,10 @@ export default function TeamPage() {
     setInviting(false)
   }
 
-  const handleRemoveMember = async (memberId: string, name: string) => {
-    if (!confirm(tm.confirmRemoveStaff(name))) return
+  const [confirmAction, setConfirmAction] = useState<{ type: 'remove' | 'cancel'; id: string; name?: string } | null>(null)
 
-    setActionLoading(memberId)
-    await removeMember(memberId)
-    setActionLoading(null)
+  const handleRemoveMember = (memberId: string, name: string) => {
+    setConfirmAction({ type: 'remove', id: memberId, name })
   }
 
   const handleRoleChange = async (memberId: string, newRole: OrgRole) => {
@@ -83,12 +80,17 @@ export default function TeamPage() {
     setActionLoading(null)
   }
 
-  const handleCancelInvitation = async (invitationId: string) => {
-    if (!confirm(tm.confirmCancelInvitation)) return
+  const handleCancelInvitation = (invitationId: string) => {
+    setConfirmAction({ type: 'cancel', id: invitationId })
+  }
 
-    setActionLoading(invitationId)
-    await cancelInvitation(invitationId)
+  const executeConfirmAction = async () => {
+    if (!confirmAction) return
+    setActionLoading(confirmAction.id)
+    if (confirmAction.type === 'remove') await removeMember(confirmAction.id)
+    else await cancelInvitation(confirmAction.id)
     setActionLoading(null)
+    setConfirmAction(null)
   }
 
   const handleResendInvitation = async (invitationId: string) => {
@@ -466,6 +468,20 @@ export default function TeamPage() {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={!!confirmAction}
+        title={confirmAction?.type === 'remove'
+          ? tm.confirmRemoveStaff(confirmAction?.name || '')
+          : tm.confirmCancelInvitation}
+        message={confirmAction?.type === 'remove'
+          ? tm.confirmRemoveStaff(confirmAction?.name || '')
+          : tm.confirmCancelInvitation}
+        confirmLabel={tc.confirm}
+        cancelLabel={tc.cancel}
+        danger
+        onConfirm={executeConfirmAction}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   )
 }

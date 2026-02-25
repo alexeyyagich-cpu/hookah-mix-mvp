@@ -1,9 +1,7 @@
 'use client'
 
 import type { PnLLineItem } from '@/lib/hooks/usePnL'
-import { useTranslation, useLocale } from '@/lib/i18n'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 
 interface PnLChartProps {
   data: PnLLineItem[]

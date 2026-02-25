@@ -65,6 +65,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
             <div className="flex items-center gap-2 mt-1">
               <input
                 type="number"
+                inputMode="decimal"
                 value={accrualPercent}
                 onChange={e => setAccrualPercent(e.target.value)}
                 className="input w-24"
@@ -80,6 +81,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
             <div className="flex items-center gap-2 mt-1">
               <input
                 type="number"
+                inputMode="decimal"
                 value={maxRedemption}
                 onChange={e => setMaxRedemption(e.target.value)}
                 className="input w-24"
@@ -102,6 +104,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
                 <span className="text-sm">€</span>
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={silverThreshold}
                   onChange={e => setSilverThreshold(e.target.value)}
                   className="input w-28"
@@ -111,6 +114,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
               </div>
               <input
                 type="number"
+                inputMode="decimal"
                 value={silverDiscount}
                 onChange={e => setSilverDiscount(e.target.value)}
                 className="input w-20 mt-1"
@@ -126,6 +130,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
                 <span className="text-sm">€</span>
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={goldThreshold}
                   onChange={e => setGoldThreshold(e.target.value)}
                   className="input w-28"
@@ -135,6 +140,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
               </div>
               <input
                 type="number"
+                inputMode="decimal"
                 value={goldDiscount}
                 onChange={e => setGoldDiscount(e.target.value)}
                 className="input w-20 mt-1"

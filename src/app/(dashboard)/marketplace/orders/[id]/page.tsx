@@ -14,13 +14,13 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 export default function OrderDetailPage() {
   const t = useTranslation('market')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const params = useParams()
   const orderId = params.id as string
@@ -101,9 +101,16 @@ export default function OrderDetailPage() {
     return true
   }
 
-  const handleCancelOrder = async () => {
-    if (!order || !confirm(t.cancelConfirmMsg)) return
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
 
+  const handleCancelOrder = () => {
+    if (!order) return
+    setShowCancelConfirm(true)
+  }
+
+  const confirmCancelOrder = async () => {
+    setShowCancelConfirm(false)
+    if (!order) return
     setUpdating(true)
     await updateOrderStatus(order.id, 'cancelled')
     setUpdating(false)
@@ -339,6 +346,16 @@ export default function OrderDetailPage() {
         order={order}
         onConfirmDelivery={handleConfirmDelivery}
         onAddToInventory={handleAddToInventory}
+      />
+      <ConfirmDialog
+        open={showCancelConfirm}
+        title={t.cancelConfirmMsg}
+        message={t.cancelConfirmMsg}
+        confirmLabel={tc.confirm}
+        cancelLabel={tc.cancel}
+        danger
+        onConfirm={confirmCancelOrder}
+        onCancel={() => setShowCancelConfirm(false)}
       />
     </div>
   )

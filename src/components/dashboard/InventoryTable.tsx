@@ -149,6 +149,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = 50, o
                           <div className="flex items-center justify-end gap-2">
                             <input
                               type="number"
+                              inputMode="decimal"
                               value={adjustAmount}
                               onChange={(e) => setAdjustAmount(e.target.value)}
                               placeholder="+/-"

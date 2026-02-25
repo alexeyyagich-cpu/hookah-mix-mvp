@@ -5,12 +5,10 @@ import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconTrash } from '@/components/Icons'
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 import { useRole } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { ReservationStatus } from '@/types/database'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
 
 const STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',

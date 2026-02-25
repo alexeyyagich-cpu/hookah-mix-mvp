@@ -7,9 +7,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
 import { IconExport, IconLock, IconChart } from '@/components/Icons'
 import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
-import { useTranslation, useLocale } from '@/lib/i18n'
-
-const LOCALE_MAP: Record<string, string> = { ru: 'ru-RU', en: 'en-US', de: 'de-DE' }
+import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
 
 type Period = 7 | 14 | 30
 

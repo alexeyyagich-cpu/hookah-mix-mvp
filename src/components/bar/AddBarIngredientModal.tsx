@@ -290,6 +290,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   <label className="block text-sm font-medium">{t.stockLeft}</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="any"
                     value={quantity}
                     onChange={e => setQuantity(e.target.value)}
@@ -302,6 +303,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   <label className="block text-sm font-medium">{t.minStock}</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="any"
                     value={minQuantity}
                     onChange={e => setMinQuantity(e.target.value)}
@@ -316,6 +318,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   <label className="block text-sm font-medium">{t.purchasePriceEur}</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     value={purchasePrice}
                     onChange={e => setPurchasePrice(e.target.value)}
@@ -328,6 +331,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   <label className="block text-sm font-medium">{t.packageVolume(UNIT_LABELS[unitType])}</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="any"
                     value={packageSize}
                     onChange={e => setPackageSize(e.target.value)}
