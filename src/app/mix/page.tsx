@@ -1105,7 +1105,7 @@ function MixPageInner() {
                       items={items}
                       totalGrams={20}
                       inventory={inventory}
-                      currency="€"
+                      currency="EUR"
                     />
                   </div>
                 )}

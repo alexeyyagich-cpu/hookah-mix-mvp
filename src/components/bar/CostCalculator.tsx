@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import type { RecipeCost } from '@/types/database'
 
 interface CostCalculatorProps {
@@ -9,6 +9,7 @@ interface CostCalculatorProps {
 
 export function CostCalculator({ cost }: CostCalculatorProps) {
   const t = useTranslation('bar')
+  const { locale } = useLocale()
   const marginColor = cost.margin !== null
     ? cost.margin >= 60 ? 'success' : cost.margin >= 40 ? 'warning' : 'danger'
     : 'textMuted'
@@ -31,7 +32,7 @@ export function CostCalculator({ cost }: CostCalculatorProps) {
               </span>
             </div>
             <span className="font-mono text-xs ml-2">
-              {ing.total_cost > 0 ? `${ing.total_cost.toFixed(2)}€` : '—'}
+              {ing.total_cost > 0 ? formatCurrency(ing.total_cost, locale) : '—'}
             </span>
           </div>
         ))}
@@ -42,13 +43,13 @@ export function CostCalculator({ cost }: CostCalculatorProps) {
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">{t.costTotal}</span>
           <span className="font-mono font-semibold">
-            {cost.total_cost > 0 ? `${cost.total_cost.toFixed(2)}€` : '—'}
+            {cost.total_cost > 0 ? formatCurrency(cost.total_cost, locale) : '—'}
           </span>
         </div>
         {cost.menu_price !== null && (
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{t.sellingPrice}</span>
-            <span className="font-mono font-semibold">{cost.menu_price.toFixed(2)}€</span>
+            <span className="font-mono font-semibold">{formatCurrency(cost.menu_price, locale)}</span>
           </div>
         )}
         {cost.margin !== null && (
@@ -63,7 +64,7 @@ export function CostCalculator({ cost }: CostCalculatorProps) {
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{t.profitPerServing}</span>
             <span className="font-mono font-semibold text-[var(--color-success)]">
-              {(cost.menu_price - cost.total_cost).toFixed(2)}€
+              {formatCurrency(cost.menu_price - cost.total_cost, locale)}
             </span>
           </div>
         )}

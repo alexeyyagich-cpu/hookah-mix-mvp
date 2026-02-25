@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, RecipeCost } from '@/types/database'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 
@@ -95,13 +95,13 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
         <div className="flex-1">
           <div className="text-xs text-[var(--color-textMuted)]">{t.costLabel2}</div>
           <div className="font-mono font-semibold text-sm">
-            {cost.total_cost > 0 ? `${cost.total_cost.toFixed(2)}€` : '—'}
+            {cost.total_cost > 0 ? formatCurrency(cost.total_cost, locale) : '—'}
           </div>
         </div>
         {recipe.menu_price && (
           <div className="flex-1">
             <div className="text-xs text-[var(--color-textMuted)]">{t.priceLabel}</div>
-            <div className="font-mono font-semibold text-sm">{recipe.menu_price.toFixed(2)}€</div>
+            <div className="font-mono font-semibold text-sm">{formatCurrency(recipe.menu_price, locale)}</div>
           </div>
         )}
         {cost.margin !== null && (

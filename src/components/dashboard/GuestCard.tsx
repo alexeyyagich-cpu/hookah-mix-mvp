@@ -1,7 +1,7 @@
 'use client'
 
 import type { Guest, LoyaltyTier } from '@/types/database'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { IconStar, IconCoin } from '@/components/Icons'
 
 const TIER_COLORS: Record<LoyaltyTier, string> = {
@@ -23,6 +23,7 @@ interface GuestCardProps {
 
 export function GuestCard({ guest, onClick }: GuestCardProps) {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
 
   const tierLabel = tm[`tier${guest.loyalty_tier.charAt(0).toUpperCase()}${guest.loyalty_tier.slice(1)}` as keyof typeof tm] as string
 
@@ -61,12 +62,12 @@ export function GuestCard({ guest, onClick }: GuestCardProps) {
         </div>
         <div>
           <div className="text-[var(--color-textMuted)] text-xs">{tm.spent}</div>
-          <div className="font-medium">{guest.total_spent > 0 ? `€${guest.total_spent.toFixed(0)}` : '—'}</div>
+          <div className="font-medium">{guest.total_spent > 0 ? formatCurrency(guest.total_spent, locale) : '—'}</div>
         </div>
         <div>
           <div className="text-[var(--color-textMuted)] text-xs">{tm.bonus}</div>
           <div className="font-medium text-[var(--color-success)]">
-            {guest.bonus_balance > 0 ? `€${guest.bonus_balance.toFixed(0)}` : '—'}
+            {guest.bonus_balance > 0 ? formatCurrency(guest.bonus_balance, locale) : '—'}
           </div>
         </div>
       </div>

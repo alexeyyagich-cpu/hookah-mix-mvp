@@ -1,7 +1,7 @@
 'use client'
 
 import type { CostCategory } from '@/lib/hooks/usePnL'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface CostBreakdownChartProps {
   data: CostCategory[]
@@ -43,6 +43,7 @@ function createArcPath(startAngle: number, endAngle: number, radius: number) {
 
 export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
   const t = useTranslation('manage')
+  const { locale } = useLocale()
 
   const categoryLabels: Record<string, string> = {
     spirit: t.categorySpirit,
@@ -106,7 +107,7 @@ export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
             textAnchor="middle"
             className="fill-[var(--color-text)] text-[8px] font-bold"
           >
-            {total.toFixed(0)}€
+            {formatCurrency(total, locale)}
           </text>
           <text
             x="50"
@@ -136,7 +137,7 @@ export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
               </span>
             </div>
             <span className="text-[var(--color-textMuted)] whitespace-nowrap ml-2">
-              {segment.cost.toFixed(0)}€ ({segment.percentage.toFixed(0)}%)
+              {formatCurrency(segment.cost, locale)} ({segment.percentage.toFixed(0)}%)
             </span>
           </div>
         ))}

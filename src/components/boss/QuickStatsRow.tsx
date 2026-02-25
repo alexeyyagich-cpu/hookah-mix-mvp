@@ -1,6 +1,7 @@
 'use client'
 
 import type { Session, KdsOrder, Tip } from '@/types/database'
+import { useLocale, formatCurrency } from '@/lib/i18n'
 import type { Dictionary } from '@/lib/i18n'
 
 interface QuickStatsRowProps {
@@ -13,6 +14,7 @@ interface QuickStatsRowProps {
 }
 
 export function QuickStatsRow({ sessions, avgRating, tips, kdsOrders, todayStr, tm }: QuickStatsRowProps) {
+  const { locale } = useLocale()
   const todaySessions = sessions.filter(s => s.session_date.startsWith(todayStr)).length
   const todayTips = tips
     .filter(t => t.created_at.startsWith(todayStr) && t.status === 'completed')
@@ -22,7 +24,7 @@ export function QuickStatsRow({ sessions, avgRating, tips, kdsOrders, todayStr, 
   const stats = [
     { label: tm.bossTodaySessions, value: String(todaySessions), color: 'var(--color-primary)' },
     { label: tm.bossAvgRating, value: avgRating > 0 ? avgRating.toFixed(1) : '—', color: 'var(--color-warning)' },
-    { label: tm.bossTipsToday, value: todayTips > 0 ? `${Math.round(todayTips)}€` : '—', color: 'var(--color-success)' },
+    { label: tm.bossTipsToday, value: todayTips > 0 ? formatCurrency(Math.round(todayTips), locale) : '—', color: 'var(--color-success)' },
     { label: tm.bossKdsActive, value: String(activeKds), color: 'var(--color-info, var(--color-primary))' },
   ]
 

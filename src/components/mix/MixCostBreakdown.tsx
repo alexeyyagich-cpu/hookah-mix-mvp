@@ -1,14 +1,13 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import type { Tobacco } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
 import {
   calculateMixCost,
   calculateProfit,
   getSuggestedPrices,
-  formatPrice,
 } from '@/logic/costCalculator'
 import { IconCoin } from '@/components/Icons'
 
@@ -19,8 +18,9 @@ interface Props {
   currency?: string
 }
 
-export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€' }: Props) {
+export function MixCostBreakdown({ items, totalGrams, inventory, currency = 'EUR' }: Props) {
   const t = useTranslation('hookah')
+  const { locale } = useLocale()
   const [sellingPrice, setSellingPrice] = useState<string>('')
 
   const costResult = useMemo(
@@ -97,7 +97,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
               className="font-medium"
               style={{ color: item.cost !== null ? 'var(--color-text)' : 'var(--color-textMuted)' }}
             >
-              {formatPrice(item.cost, currency)}
+              {item.cost !== null ? formatCurrency(item.cost, locale) : '—'}
             </span>
           </div>
         ))}
@@ -118,7 +118,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
             className="text-xl font-bold"
             style={{ color: 'var(--color-primary)' }}
           >
-            {formatPrice(costResult.totalCost, currency)}
+            {formatCurrency(costResult.totalCost, locale)}
           </span>
         </div>
       )}
@@ -151,7 +151,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
                   color: 'var(--color-text)',
                 }}
               >
-                {suggestion.label} = {formatPrice(suggestion.price, currency)}
+                {suggestion.label} = {formatCurrency(suggestion.price, locale)}
               </button>
             ))}
           </div>
@@ -166,7 +166,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-sm"
                 style={{ color: 'var(--color-textMuted)' }}
               >
-                {currency}
+                {formatCurrency(0, locale).replace(/[\d.,\s]/g, '').trim()}
               </span>
               <input
                 type="number"
@@ -205,7 +205,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = '€
                     color: profit.profit > 0 ? 'var(--color-success)' : 'var(--color-danger)',
                   }}
                 >
-                  {formatPrice(profit.profit, currency)}
+                  {formatCurrency(profit.profit, locale)}
                 </p>
               </div>
               <div className="text-right">

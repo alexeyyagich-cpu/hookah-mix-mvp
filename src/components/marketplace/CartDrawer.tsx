@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import type { Cart } from '@/types/database'
 import { IconClose, IconPlus, IconMinus, IconTrash, IconCart } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface CartDrawerProps {
   isOpen: boolean
@@ -24,6 +24,7 @@ export function CartDrawer({
   clearCart,
 }: CartDrawerProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
 
   // Close on escape key
   useEffect(() => {
@@ -105,7 +106,7 @@ export function CartDrawer({
                       <div className="text-xs text-[var(--color-textMuted)]">{item.product.brand}</div>
                       <div className="font-medium">{item.product.flavor}</div>
                       <div className="text-sm text-[var(--color-textMuted)]">
-                        {item.product.package_grams}g × {item.product.price}€
+                        {item.product.package_grams}g × {formatCurrency(item.product.price, locale)}
                       </div>
                     </div>
                     <button
@@ -137,7 +138,7 @@ export function CartDrawer({
                       </button>
                     </div>
                     <div className="font-semibold">
-                      {(item.product.price * item.quantity).toFixed(2)}€
+                      {formatCurrency(item.product.price * item.quantity, locale)}
                     </div>
                   </div>
                 </div>
@@ -149,7 +150,7 @@ export function CartDrawer({
               {/* Subtotal */}
               <div className="flex justify-between items-center">
                 <span className="text-[var(--color-textMuted)]">{t.drawerTotal}</span>
-                <span className="text-2xl font-bold">{cart.subtotal.toFixed(2)}€</span>
+                <span className="text-2xl font-bold">{formatCurrency(cart.subtotal, locale)}</span>
               </div>
 
               {/* Min order warning */}

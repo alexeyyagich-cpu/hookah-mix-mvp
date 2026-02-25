@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, RecipeCost } from '@/types/database'
 
 interface QuickSellPanelProps {
@@ -73,7 +73,7 @@ export function QuickSellPanel({ recipes, calculateCost, onSell }: QuickSellPane
               )}
               <div className="flex items-center justify-between mt-2">
                 <span className="font-mono font-bold text-base">
-                  {recipe.menu_price ? `${recipe.menu_price}€` : '—'}
+                  {recipe.menu_price ? formatCurrency(recipe.menu_price, locale) : '—'}
                 </span>
                 {cost.margin !== null && (
                   <span className={`text-xs font-mono ${

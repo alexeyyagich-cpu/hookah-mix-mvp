@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { SupplierProduct, Supplier } from '@/types/database'
 import { IconPlus, IconMinus, IconCart } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface ProductCardProps {
   product: SupplierProduct
@@ -15,6 +15,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canAdd }: ProductCardProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
   const [quantity, setQuantity] = useState(1)
 
   const handleAdd = () => {
@@ -40,9 +41,9 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
 
       {/* Price */}
       <div className="mt-3">
-        <div className="text-2xl font-bold">{product.price}€</div>
+        <div className="text-2xl font-bold">{formatCurrency(product.price, locale)}</div>
         <div className="text-xs text-[var(--color-textMuted)]">
-          {product.package_grams}g • {pricePerGram}€/g
+          {product.package_grams}g • {formatCurrency(Number(pricePerGram), locale)}/g
         </div>
       </div>
 

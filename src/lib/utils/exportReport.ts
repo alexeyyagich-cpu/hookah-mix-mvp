@@ -1,6 +1,8 @@
 'use client'
 
 import type { TobaccoInventory, SessionWithItems, BarSale, BarAnalytics } from '@/types/database'
+import type { Locale } from '@/lib/i18n/types'
+import { formatCurrency } from '@/lib/i18n/format'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -319,8 +321,8 @@ export function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThresh
 // BAR SALES EXPORTS
 // ========================================
 
-export function exportBarSalesCSV(sales: BarSale[]) {
-  const headers = ['Date/Time', 'Cocktail', 'Qty', 'Revenue (€)', 'Cost (€)', 'Margin (%)']
+export function exportBarSalesCSV(sales: BarSale[], locale: Locale = 'en') {
+  const headers = ['Date/Time', 'Cocktail', 'Qty', 'Revenue (EUR)', 'Cost (EUR)', 'Margin (%)']
   const rows = sales.map(sale => [
     new Date(sale.sold_at).toLocaleString('en-US'),
     `"${sale.recipe_name}"`,
@@ -335,7 +337,8 @@ export function exportBarSalesCSV(sales: BarSale[]) {
   downloadFile(blob, `bar-sales-${getDateString()}.csv`)
 }
 
-export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number) {
+export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number, locale: Locale = 'en') {
+  const fc = (v: number) => formatCurrency(v, locale)
   const doc = new jsPDF()
 
   // Title
@@ -356,9 +359,9 @@ export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, per
     startY: 46,
     head: [['Metric', 'Value']],
     body: [
-      ['Revenue', `${analytics.totalRevenue.toFixed(2)}€`],
-      ['Cost', `${analytics.totalCost.toFixed(2)}€`],
-      ['Profit', `${analytics.totalProfit.toFixed(2)}€`],
+      ['Revenue', fc(analytics.totalRevenue)],
+      ['Cost', fc(analytics.totalCost)],
+      ['Profit', fc(analytics.totalProfit)],
       ['Sales', `${analytics.totalSales}`],
       ['Average margin', analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(1)}%` : '—'],
     ],
@@ -376,7 +379,7 @@ export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, per
     autoTable(doc, {
       startY: currentY + 4,
       head: [['Cocktail', 'Sales', 'Revenue']],
-      body: analytics.topCocktails.map(c => [c.name, c.count.toString(), `${c.revenue.toFixed(2)}€`]),
+      body: analytics.topCocktails.map(c => [c.name, c.count.toString(), fc(c.revenue)]),
       theme: 'striped',
       headStyles: { fillColor: [99, 102, 241] },
     })
@@ -401,8 +404,8 @@ export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, per
         new Date(sale.sold_at).toLocaleString('en-US', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
         sale.recipe_name,
         sale.quantity.toString(),
-        `${sale.total_revenue.toFixed(2)}€`,
-        `${sale.total_cost.toFixed(2)}€`,
+        fc(sale.total_revenue),
+        fc(sale.total_cost),
         sale.margin_percent !== null ? `${sale.margin_percent.toFixed(0)}%` : '—',
       ]),
       theme: 'striped',

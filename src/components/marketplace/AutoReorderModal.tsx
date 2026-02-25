@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { TobaccoInventory, SupplierProduct, Supplier } from '@/types/database'
 import { IconClose, IconRefresh, IconCheck } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface AutoReorderModalProps {
   isOpen: boolean
@@ -27,6 +27,7 @@ export function AutoReorderModal({
   onSave,
 }: AutoReorderModalProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
   const [selectedProductId, setSelectedProductId] = useState('')
   const [threshold, setThreshold] = useState(50)
   const [quantity, setQuantity] = useState(3)
@@ -153,7 +154,7 @@ export function AutoReorderModal({
                         const supplier = suppliers.find(s => s.id === product.supplier_id)
                         return (
                           <option key={product.id} value={product.id}>
-                            {supplier?.name} - {product.package_grams}g / {product.price}€
+                            {supplier?.name} - {product.package_grams}g / {formatCurrency(product.price, locale)}
                           </option>
                         )
                       })}
@@ -194,7 +195,7 @@ export function AutoReorderModal({
                   {selectedProduct && (
                     <p className="text-xs text-[var(--color-textMuted)] mt-1">
                       {quantity} × {selectedProduct.package_grams}g = {quantity * selectedProduct.package_grams}g
-                      ({(quantity * selectedProduct.price).toFixed(2)}€)
+                      ({formatCurrency(quantity * selectedProduct.price, locale)})
                     </p>
                   )}
                 </div>

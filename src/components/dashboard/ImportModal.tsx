@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { IconClose, IconExport } from '@/components/Icons'
 import { parseFile, autoMapColumns, validateImportRow } from '@/lib/utils/importParser'
 import type { ParseResult, ColumnMapping, ImportRow } from '@/lib/utils/importParser'
@@ -16,6 +16,7 @@ interface ImportModalProps {
 
 export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   const t = useTranslation('hookah')
+  const { locale } = useLocale()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [step, setStep] = useState<Step>('upload')
@@ -207,7 +208,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
                         <td className="p-2">{row.brand}</td>
                         <td className="p-2">{row.flavor}</td>
                         <td className="p-2 text-right">{row.quantity_grams}g</td>
-                        <td className="p-2 text-right">€{row.purchase_price.toFixed(2)}</td>
+                        <td className="p-2 text-right">{formatCurrency(row.purchase_price, locale)}</td>
                       </tr>
                     ))}
                   </tbody>

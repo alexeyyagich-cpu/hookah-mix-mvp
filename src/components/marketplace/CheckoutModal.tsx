@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -14,6 +14,7 @@ interface CheckoutModalProps {
 
 export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModalProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -113,7 +114,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                           <span className="text-[var(--color-textMuted)]"> × {item.quantity}</span>
                         </span>
                         <span className="font-medium">
-                          {(item.product.price * item.quantity).toFixed(2)}€
+                          {formatCurrency(item.product.price * item.quantity, locale)}
                         </span>
                       </div>
                     ))}
@@ -123,7 +124,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                 {/* Total */}
                 <div className="flex justify-between items-center pt-4 border-t border-[var(--color-border)]">
                   <span className="font-medium">{t.totalToPay}</span>
-                  <span className="text-xl font-bold">{cart.subtotal.toFixed(2)}€</span>
+                  <span className="text-xl font-bold">{formatCurrency(cart.subtotal, locale)}</span>
                 </div>
 
                 {/* Estimated delivery */}

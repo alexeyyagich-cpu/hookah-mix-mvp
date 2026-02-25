@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
-import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
@@ -116,7 +116,7 @@ export default function BarMenuPage() {
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tb.avgPriceCard}</div>
           <div className="text-2xl font-bold mt-1">
-            {avgPrice !== null ? `${avgPrice.toFixed(0)}€` : '—'}
+            {avgPrice !== null ? formatCurrency(avgPrice, locale) : '—'}
           </div>
         </div>
         <div className="card p-4">
@@ -132,7 +132,7 @@ export default function BarMenuPage() {
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tb.revenuePotential}</div>
           <div className="text-2xl font-bold mt-1">
-            {totalRevenuePotential > 0 ? `${totalRevenuePotential.toFixed(0)}€` : '—'}
+            {totalRevenuePotential > 0 ? formatCurrency(totalRevenuePotential, locale) : '—'}
           </div>
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function BarMenuPage() {
                           </td>
                           <td className="px-4 py-3 text-right">
                             <span className="font-mono text-sm">
-                              {cost.total_cost > 0 ? `${cost.total_cost.toFixed(2)}€` : '—'}
+                              {cost.total_cost > 0 ? formatCurrency(cost.total_cost, locale) : '—'}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-right">
@@ -243,7 +243,7 @@ export default function BarMenuPage() {
                                 className="font-mono text-sm font-semibold hover:text-[var(--color-primary)] transition-colors"
                                 title={tb.clickToEdit}
                               >
-                                {recipe.menu_price ? `${recipe.menu_price.toFixed(2)}€` : tb.setPrice}
+                                {recipe.menu_price ? formatCurrency(recipe.menu_price, locale) : tb.setPrice}
                               </button>
                             )}
                           </td>

@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { formatCurrency } from '@/lib/i18n/format'
 
 // Initialize Resend client
 const resendApiKey = process.env.RESEND_API_KEY
@@ -159,7 +160,7 @@ export function generateOrderStatusEmailHtml(data: OrderStatusEmailData, busines
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
               <span style="color: #666;">Total:</span>
-              <span style="font-weight: 600;">${data.total.toFixed(2)} €</span>
+              <span style="font-weight: 600;">${formatCurrency(data.total, 'en')}</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #666;">Status:</span>

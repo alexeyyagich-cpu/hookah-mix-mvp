@@ -8,11 +8,12 @@ import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
 import { CartSummary } from '@/components/marketplace/CartSummary'
 import { CheckoutModal } from '@/components/marketplace/CheckoutModal'
 import { IconChevronLeft, IconCart, IconPlus, IconMinus, IconTrash } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 export default function CartPage() {
   const tmk = useTranslation('market')
   const tc = useTranslation('common')
+  const { locale } = useLocale()
   const router = useRouter()
   const { cart, updateQuantity, removeFromCart, clearCart } = useCart()
   const { createOrder } = useMarketplaceOrders()
@@ -92,7 +93,7 @@ export default function CartPage() {
                   </div>
                   <div className="font-semibold text-lg">{item.product.flavor}</div>
                   <div className="text-sm text-[var(--color-textMuted)]">
-                    {item.product.package_grams}{tc.grams} • {item.product.price}€/{tc.pieces}
+                    {item.product.package_grams}{tc.grams} • {formatCurrency(item.product.price, locale)}/{tc.pieces}
                   </div>
                   {item.product.sku && (
                     <div className="text-xs text-[var(--color-textMuted)] mt-1">
@@ -122,7 +123,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="font-semibold text-lg">
-                    {(item.product.price * item.quantity).toFixed(2)}€
+                    {formatCurrency(item.product.price * item.quantity, locale)}
                   </div>
 
                   <button

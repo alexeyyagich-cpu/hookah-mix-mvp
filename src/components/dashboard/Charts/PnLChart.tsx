@@ -1,7 +1,7 @@
 'use client'
 
 import type { PnLLineItem } from '@/lib/hooks/usePnL'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, LOCALE_MAP } from '@/lib/i18n'
 
 interface PnLChartProps {
   data: PnLLineItem[]
@@ -42,13 +42,13 @@ export function PnLChart({ data, showHookah = true }: PnLChartProps) {
             >
               {/* Tooltip */}
               <div className="absolute -top-14 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1.5 rounded-lg shadow-lg border border-[var(--color-border)]">
-                <div className="font-medium text-[var(--color-success)]">{day.barRevenue.toFixed(0)}€</div>
+                <div className="font-medium text-[var(--color-success)]">{formatCurrency(day.barRevenue, locale)}</div>
                 <div className="text-[var(--color-danger)]">{t.tooltipBar(parseFloat(day.barCost.toFixed(0)))}</div>
                 {showHookah && day.hookahCost > 0 && (
                   <div className="text-[var(--color-warning)]">{t.tooltipTobacco(parseFloat(day.hookahCost.toFixed(0)))}</div>
                 )}
                 <div className={day.profit >= 0 ? 'font-medium text-[var(--color-success)]' : 'font-medium text-[var(--color-danger)]'}>
-                  = {day.profit.toFixed(0)}€
+                  = {formatCurrency(day.profit, locale)}
                 </div>
               </div>
 

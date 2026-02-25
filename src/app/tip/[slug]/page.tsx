@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import type { StaffProfile } from '@/types/database'
 
 const PRESET_AMOUNTS = [5, 10, 15, 20]
@@ -11,6 +11,7 @@ const PRESET_AMOUNTS = [5, 10, 15, 20]
 export default function TipPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const t = useTranslation('tip')
+  const { locale } = useLocale()
   const [staff, setStaff] = useState<StaffProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -154,7 +155,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
                     : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
               >
-                {amount}€
+                {formatCurrency(amount, locale)}
               </button>
             ))}
           </div>
@@ -206,7 +207,7 @@ export default function TipPage({ params }: { params: Promise<{ slug: string }> 
           disabled={submitting || finalAmount <= 0}
           className="w-full py-4 rounded-2xl text-lg font-bold transition-all disabled:opacity-50 bg-gradient-to-r from-amber-400 to-orange-500 text-gray-900 hover:shadow-lg hover:shadow-amber-400/30"
         >
-          {submitting ? t.processing : `${t.tipBtn} ${finalAmount > 0 ? `${finalAmount}€` : ''}`}
+          {submitting ? t.processing : `${t.tipBtn} ${finalAmount > 0 ? formatCurrency(finalAmount, locale) : ''}`}
         </button>
 
         {/* Powered by */}

@@ -14,7 +14,7 @@ import {
   IconCocktail,
 } from '@/components/Icons'
 import Link from 'next/link'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
 
 export function BarSection() {
   const t = useTranslation('manage')
@@ -38,13 +38,13 @@ export function BarSection() {
         <StatsCard
           icon={<IconCoin size={20} />}
           label={t.barRevenueLabelShort}
-          value={`${analytics.totalRevenue.toFixed(0)}€`}
+          value={formatCurrency(analytics.totalRevenue, locale)}
           color="success"
         />
         <StatsCard
           icon={<IconTrendUp size={20} />}
           label={t.barProfitLabel}
-          value={`${analytics.totalProfit.toFixed(0)}€`}
+          value={formatCurrency(analytics.totalProfit, locale)}
           color="primary"
         />
         <StatsCard
@@ -136,7 +136,7 @@ export function BarSection() {
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-sm font-medium">{cocktail.count} {t.pcsShort}</div>
-                    <div className="text-xs text-[var(--color-textMuted)]">{cocktail.revenue.toFixed(0)}€</div>
+                    <div className="text-xs text-[var(--color-textMuted)]">{formatCurrency(cocktail.revenue, locale)}</div>
                   </div>
                 </div>
               ))}
@@ -188,10 +188,10 @@ export function BarSection() {
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-[var(--color-success)]">
-                    {sale.total_revenue.toFixed(0)}€
+                    {formatCurrency(sale.total_revenue, locale)}
                   </div>
                   <div className="text-xs text-[var(--color-textMuted)]">
-                    {t.costShort} {sale.total_cost.toFixed(0)}€
+                    {t.costShort} {formatCurrency(sale.total_cost, locale)}
                   </div>
                 </div>
               </div>

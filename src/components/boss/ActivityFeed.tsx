@@ -2,6 +2,7 @@
 
 import type { Session, BarSale, KdsOrder, Tip } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
+import { useLocale, formatCurrency } from '@/lib/i18n'
 
 interface Review {
   id: string
@@ -40,6 +41,7 @@ function timeAgo(isoDate: string, tm: Dictionary['manage']): string {
 }
 
 export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: ActivityFeedProps) {
+  const { locale } = useLocale()
   const events: ActivityEvent[] = []
 
   // Sessions (last 10)
@@ -61,7 +63,7 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
       id: `b-${s.id}`,
       emoji: '🍸',
       title: s.recipe_name,
-      subtitle: `x${s.quantity} · ${s.total_revenue}€`,
+      subtitle: `x${s.quantity} · ${formatCurrency(s.total_revenue, locale)}`,
       timestamp: s.sold_at,
     })
   }
@@ -94,7 +96,7 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
       id: `t-${t.id}`,
       emoji: '💰',
       title: 'Tip',
-      subtitle: `${t.amount}€${t.payer_name ? ` from ${t.payer_name}` : ''}`,
+      subtitle: `${formatCurrency(t.amount, locale)}${t.payer_name ? ` from ${t.payer_name}` : ''}`,
       timestamp: t.created_at,
     })
   }

@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { IconSearch, IconPlus, IconMinus } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
-import { getLocaleName, useLocale } from '@/lib/i18n'
+import { getLocaleName, useLocale, formatCurrency } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, BowlType, TobaccoInventory } from '@/types/database'
 
 interface BarItemEntry {
@@ -102,7 +102,7 @@ export function MenuSection({
               >
                 <div className="text-sm font-medium truncate mb-1">{displayName}</div>
                 {recipe.menu_price && (
-                  <div className="text-xs text-[var(--color-textMuted)] mb-2">{recipe.menu_price}€</div>
+                  <div className="text-xs text-[var(--color-textMuted)] mb-2">{formatCurrency(recipe.menu_price, locale)}</div>
                 )}
 
                 {inCart ? (

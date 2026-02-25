@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, LOCALE_MAP } from '@/lib/i18n'
 
 interface DayRevenue {
   date: string
@@ -41,8 +41,8 @@ export function BarRevenueChart({ data }: BarRevenueChartProps) {
               style={{ height: chartHeight }}
             >
               <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-center whitespace-nowrap z-10 bg-[var(--color-bgCard)] px-2 py-1 rounded-lg shadow-lg border border-[var(--color-border)]">
-                <div className="font-medium text-[var(--color-success)]">{day.revenue.toFixed(0)}€</div>
-                <div className="text-[var(--color-textMuted)]">{t.costShort} {day.cost.toFixed(0)}€</div>
+                <div className="font-medium text-[var(--color-success)]">{formatCurrency(day.revenue, locale)}</div>
+                <div className="text-[var(--color-textMuted)]">{t.costShort} {formatCurrency(day.cost, locale)}</div>
               </div>
 
               <div className="w-full relative">

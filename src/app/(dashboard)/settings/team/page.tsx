@@ -8,7 +8,7 @@ import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
 import { TipQRCode } from '@/components/dashboard/TipQRCode'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useRouter } from 'next/navigation'
 import type { OrgRole } from '@/types/database'
@@ -369,7 +369,7 @@ export default function TeamPage() {
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
                             <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
                               <div className="text-xs text-[var(--color-textMuted)]">{ts.tipTotal}</div>
-                              <div className="font-semibold">{stats.total}€</div>
+                              <div className="font-semibold">{formatCurrency(stats.total, locale)}</div>
                             </div>
                             <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
                               <div className="text-xs text-[var(--color-textMuted)]">{ts.tipCount}</div>
@@ -377,7 +377,7 @@ export default function TeamPage() {
                             </div>
                             <div className="p-2 rounded-lg bg-[var(--color-bgHover)]">
                               <div className="text-xs text-[var(--color-textMuted)]">{ts.tipAvg}</div>
-                              <div className="font-semibold">{stats.avgTip.toFixed(1)}€</div>
+                              <div className="font-semibold">{formatCurrency(stats.avgTip, locale)}</div>
                             </div>
                           </div>
                         </div>

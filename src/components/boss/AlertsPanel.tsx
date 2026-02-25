@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { TobaccoInventory, KdsOrder, Shift, ShiftReconciliation } from '@/types/database'
+import { useLocale, formatCurrency } from '@/lib/i18n'
 import type { Dictionary } from '@/lib/i18n'
 
 interface Review {
@@ -28,6 +29,7 @@ interface Alert {
 }
 
 export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, shifts, getReconciliation, tm }: AlertsPanelProps) {
+  const { locale } = useLocale()
   const [cashShortageAlert, setCashShortageAlert] = useState<Alert | null>(null)
 
   // Fetch cash shortage alert async
@@ -41,7 +43,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       if (recon.cash.difference !== null && recon.cash.difference < 0) {
         setCashShortageAlert({
           id: 'cash-shortage',
-          text: tm.bossCashShortage(`${Math.abs(recon.cash.difference)}€`),
+          text: tm.bossCashShortage(formatCurrency(Math.abs(recon.cash.difference), locale)),
           severity: 'warning',
           href: '/shifts',
           emoji: '💰',

@@ -2,6 +2,7 @@
 
 import { createHmac } from 'crypto'
 import type { TelegramNotification, InlineKeyboardMarkup, InlineKeyboardButton } from './types'
+import { formatCurrency } from '@/lib/i18n/format'
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TELEGRAM_WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET
@@ -228,7 +229,7 @@ export function formatDailySummary(stats: {
 • Sessions today: ${stats.sessionsToday}
 • Tobacco used: ${stats.tobaccoUsed}g
 • Low stock items: ${stats.lowStockCount}
-${stats.revenue ? `• Revenue: €${stats.revenue.toFixed(2)}` : ''}
+${stats.revenue ? `• Revenue: ${formatCurrency(stats.revenue, 'en')}` : ''}
 
 <a href="${process.env.NEXT_PUBLIC_APP_URL}/statistics">Detailed Statistics</a>
   `.trim()
@@ -252,16 +253,16 @@ export function formatDailyReport(data: {
 <b>Hookah</b>
 • Sessions: ${data.sessions}
 • Tobacco used: ${data.tobaccoGrams}g
-• Revenue: €${data.hookahRevenue.toFixed(2)}
+• Revenue: ${formatCurrency(data.hookahRevenue, 'en')}
 
 <b>Bar</b>
 • Sales: ${data.barSales}
-• Revenue: €${data.barRevenue.toFixed(2)}
+• Revenue: ${formatCurrency(data.barRevenue, 'en')}
 
 <b>Totals</b>
-• Revenue: €${data.totalRevenue.toFixed(2)}
-• Cost: €${data.totalCost.toFixed(2)}
-• Profit: €${data.profit.toFixed(2)}
+• Revenue: ${formatCurrency(data.totalRevenue, 'en')}
+• Cost: ${formatCurrency(data.totalCost, 'en')}
+• Profit: ${formatCurrency(data.profit, 'en')}
 
 <a href="${process.env.NEXT_PUBLIC_APP_URL}/reports">Full P&L Report</a>
   `.trim()
@@ -314,9 +315,9 @@ Duration: ${duration}h
 
 • Hookah sessions: ${shift.sessions}
 • Bar sales: ${shift.barSales}
-• Hookah revenue: €${shift.hookahRevenue.toFixed(2)}
-• Bar revenue: €${shift.barRevenue.toFixed(2)}
-• Total revenue: €${shift.totalRevenue.toFixed(2)}
+• Hookah revenue: ${formatCurrency(shift.hookahRevenue, 'en')}
+• Bar revenue: ${formatCurrency(shift.barRevenue, 'en')}
+• Total revenue: ${formatCurrency(shift.totalRevenue, 'en')}
 
 <a href="${process.env.NEXT_PUBLIC_APP_URL}/shifts">Open Shifts</a>
   `.trim()

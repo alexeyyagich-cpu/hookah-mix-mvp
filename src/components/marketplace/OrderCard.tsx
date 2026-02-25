@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 import { IconPackage, IconTruck, IconCheck, IconClose, IconChevronRight } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface OrderCardProps {
   order: MarketplaceOrderWithItems
@@ -19,6 +19,7 @@ const STATUS_STYLE: Record<OrderStatus, { colorClass: string; bgClass: string; I
 
 export function OrderCard({ order }: OrderCardProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
 
   const STATUS_LABELS: Record<OrderStatus, string> = {
     pending: t.statusPendingCard,
@@ -84,7 +85,7 @@ export function OrderCard({ order }: OrderCardProps) {
         {/* Right side */}
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <div className="font-semibold">{order.total.toFixed(2)}€</div>
+            <div className="font-semibold">{formatCurrency(order.total, locale)}</div>
             <div className={`text-xs font-medium ${status.colorClass}`}>
               {statusLabel}
             </div>

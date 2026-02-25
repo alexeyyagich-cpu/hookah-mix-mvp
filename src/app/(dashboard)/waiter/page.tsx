@@ -9,7 +9,7 @@ import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useModules } from '@/lib/hooks/useModules'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
 import { getHeatRecommendation } from '@/logic/quickRepeatEngine'
 import { IconWaiter, IconLock } from '@/components/Icons'
@@ -38,6 +38,7 @@ function getStrengthFromAvg(avgStrength: number): StrengthPreference {
 
 export default function WaiterPage() {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
   const { isFreeTier } = useSubscription()
   const { tables } = useFloorPlan()
   const { createOrder } = useKDS()
@@ -123,7 +124,7 @@ export default function WaiterPage() {
         const barOrderItems: KdsOrderItem[] = barItems.map(b => ({
           name: b.recipe.name,
           quantity: b.quantity,
-          details: b.recipe.menu_price ? `${b.recipe.menu_price}€` : null,
+          details: b.recipe.menu_price ? formatCurrency(b.recipe.menu_price, locale) : null,
         }))
 
         await createOrder({

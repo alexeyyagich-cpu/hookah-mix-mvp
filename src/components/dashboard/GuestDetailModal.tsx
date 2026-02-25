@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Guest, BonusTransaction, LoyaltyTier } from '@/types/database'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { IconClose, IconEdit, IconTrash, IconCoin } from '@/components/Icons'
 
 const TIER_COLORS: Record<LoyaltyTier, string> = {
@@ -21,6 +21,7 @@ interface GuestDetailModalProps {
 
 export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDelete }: GuestDetailModalProps) {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(guest.name)
   const [phone, setPhone] = useState(guest.phone || '')
@@ -90,11 +91,11 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
               <div className="text-xs text-[var(--color-textMuted)]">{tm.visits}</div>
             </div>
             <div className="text-center p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <div className="text-lg font-bold">€{guest.total_spent.toFixed(0)}</div>
+              <div className="text-lg font-bold">{formatCurrency(guest.total_spent, locale)}</div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.spent}</div>
             </div>
             <div className="text-center p-3 rounded-xl bg-[var(--color-bgHover)]">
-              <div className="text-lg font-bold text-[var(--color-success)]">€{guest.bonus_balance.toFixed(1)}</div>
+              <div className="text-lg font-bold text-[var(--color-success)]">{formatCurrency(guest.bonus_balance, locale)}</div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.bonus}</div>
             </div>
             <div className="text-center p-3 rounded-xl bg-[var(--color-bgHover)]">
@@ -176,7 +177,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                   >
                     <div>
                       <span className={tx.type === 'accrual' ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}>
-                        {tx.type === 'accrual' ? '+' : ''}{tx.amount.toFixed(2)}€
+                        {tx.type === 'accrual' ? '+' : ''}{formatCurrency(tx.amount, locale)}
                       </span>
                       <span className="text-[var(--color-textMuted)] ml-2">{tx.description}</span>
                     </div>

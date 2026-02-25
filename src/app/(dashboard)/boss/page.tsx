@@ -73,6 +73,7 @@ export default function BossPage() {
   const [refreshing, setRefreshing] = useState(false)
 
   const doRefresh = useCallback(async () => {
+    if (typeof document !== 'undefined' && document.hidden) return
     setRefreshing(true)
     await Promise.all([refreshShifts(), refreshFloor()])
     setLastRefresh(new Date())

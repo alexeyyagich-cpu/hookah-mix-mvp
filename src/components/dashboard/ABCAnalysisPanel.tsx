@@ -6,7 +6,7 @@ import { useInventory } from '@/lib/hooks/useInventory'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { calculateABCByUsage, calculateABCByRevenue, calculateABCByMargin } from '@/lib/utils/abcAnalysis'
 import type { ABCResult, ABCCategory } from '@/lib/utils/abcAnalysis'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { IconLock } from '@/components/Icons'
 import Link from 'next/link'
 
@@ -20,6 +20,7 @@ const CATEGORY_COLORS: Record<ABCCategory, string> = {
 
 export function ABCAnalysisPanel() {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
   const { sessions } = useSessions()
   const { inventory } = useInventory()
   const { isFreeTier } = useSubscription()
@@ -141,7 +142,7 @@ export function ABCAnalysisPanel() {
                 </div>
                 <div className="text-right flex-shrink-0">
                   <div className="text-sm font-medium">
-                    {mode === 'usage' ? `${item.value.toFixed(0)}g` : `€${item.value.toFixed(2)}`}
+                    {mode === 'usage' ? `${item.value.toFixed(0)}g` : formatCurrency(item.value, locale)}
                   </div>
                   <div className="text-xs text-[var(--color-textMuted)]">
                     {item.cumulativePercent.toFixed(0)}%

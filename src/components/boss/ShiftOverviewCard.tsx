@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { Shift, ShiftReconciliation } from '@/types/database'
+import { useLocale, formatCurrency } from '@/lib/i18n'
 import type { Dictionary } from '@/lib/i18n'
 
 interface ShiftOverviewCardProps {
@@ -21,6 +22,8 @@ function formatDuration(ms: number): string {
 }
 
 export function ShiftOverviewCard({ activeShift, reconciliation, shiftDurationMs, onQuickOpen, opening, tm }: ShiftOverviewCardProps) {
+  const { locale } = useLocale()
+
   if (!activeShift) {
     return (
       <div className="card p-5">
@@ -74,7 +77,7 @@ export function ShiftOverviewCard({ activeShift, reconciliation, shiftDurationMs
         {activeShift.starting_cash !== null && (
           <div>
             <div className="text-[10px] text-[var(--color-textMuted)] uppercase">Cash</div>
-            <div className="text-sm font-semibold">{activeShift.starting_cash}€</div>
+            <div className="text-sm font-semibold">{formatCurrency(activeShift.starting_cash, locale)}</div>
           </div>
         )}
         {r && (

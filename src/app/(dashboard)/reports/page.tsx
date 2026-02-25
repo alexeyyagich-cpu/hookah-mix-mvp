@@ -18,7 +18,7 @@ import {
   IconLock,
   IconCocktail,
 } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import Link from 'next/link'
 
 type ModuleFilter = 'all' | 'bar' | 'hookah'
@@ -26,6 +26,7 @@ type ModuleFilter = 'all' | 'bar' | 'hookah'
 export default function ReportsPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
+  const { locale } = useLocale()
   const { data, loading, selectedPreset, setSelectedPreset, period } = usePnL()
   const { isHookahActive, isBarActive } = useModules()
   const { isFreeTier, canExport } = useSubscription()
@@ -160,21 +161,21 @@ export default function ReportsPage() {
         <StatsCard
           icon={<IconCoin size={20} />}
           label={tm.labelRevenue}
-          value={`${data.totalRevenue.toFixed(0)}€`}
+          value={formatCurrency(data.totalRevenue, locale)}
           color="success"
           trend={data.revenueChange !== null ? { value: Math.round(data.revenueChange), isPositive: data.revenueChange >= 0 } : undefined}
         />
         <StatsCard
           icon={<IconCart size={20} />}
           label={tm.labelExpenses}
-          value={`${data.totalCost.toFixed(0)}€`}
+          value={formatCurrency(data.totalCost, locale)}
           color="danger"
           trend={data.costChange !== null ? { value: Math.round(data.costChange), isPositive: data.costChange <= 0 } : undefined}
         />
         <StatsCard
           icon={<IconTrendUp size={20} />}
           label={tm.labelProfit}
-          value={`${data.grossProfit.toFixed(0)}€`}
+          value={formatCurrency(data.grossProfit, locale)}
           color="primary"
           trend={data.profitChange !== null ? { value: Math.round(data.profitChange), isPositive: data.profitChange >= 0 } : undefined}
         />
@@ -262,8 +263,8 @@ export default function ReportsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 sm:gap-4 text-sm shrink-0">
-                    <span className="text-[var(--color-success)]">{item.revenue.toFixed(0)}€</span>
-                    <span className="text-[var(--color-textMuted)]">{tm.costShort} {item.cost.toFixed(0)}€</span>
+                    <span className="text-[var(--color-success)]">{formatCurrency(item.revenue, locale)}</span>
+                    <span className="text-[var(--color-textMuted)]">{tm.costShort} {formatCurrency(item.cost, locale)}</span>
                     <span className={`font-medium ${item.margin >= 60 ? 'text-[var(--color-success)]' : item.margin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'}`}>
                       {item.margin.toFixed(0)}%
                     </span>
@@ -290,18 +291,18 @@ export default function ReportsPage() {
             {data.hookah.revenue > 0 && (
               <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
                 <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahRevenueLabel}</div>
-                <div className="text-lg font-bold text-[var(--color-success)]">{data.hookah.revenue.toFixed(0)}€</div>
+                <div className="text-lg font-bold text-[var(--color-success)]">{formatCurrency(data.hookah.revenue, locale)}</div>
               </div>
             )}
             <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
               <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahCostLabel}</div>
-              <div className="text-lg font-bold">{data.hookah.cost.toFixed(0)}€</div>
+              <div className="text-lg font-bold">{formatCurrency(data.hookah.cost, locale)}</div>
             </div>
             {data.hookah.revenue > 0 && (
               <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
                 <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahProfitLabel}</div>
                 <div className={`text-lg font-bold ${data.hookah.profit >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
-                  {data.hookah.profit.toFixed(0)}€
+                  {formatCurrency(data.hookah.profit, locale)}
                 </div>
               </div>
             )}
@@ -321,7 +322,7 @@ export default function ReportsPage() {
             </div>
             <div className="p-3 rounded-xl bg-[var(--color-bgHover)] overflow-hidden">
               <div className="text-xs text-[var(--color-textMuted)] truncate">{tm.hookahCostPerSession}</div>
-              <div className="text-lg font-bold">{data.hookah.costPerSession.toFixed(1)}€</div>
+              <div className="text-lg font-bold">{formatCurrency(data.hookah.costPerSession, locale)}</div>
             </div>
           </div>
 
@@ -335,7 +336,7 @@ export default function ReportsPage() {
                   className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)]"
                 >
                   <span className="font-medium truncate min-w-0">{item.name}</span>
-                  <span className="text-sm text-[var(--color-textMuted)] shrink-0">{item.cost.toFixed(0)}€</span>
+                  <span className="text-sm text-[var(--color-textMuted)] shrink-0">{formatCurrency(item.cost, locale)}</span>
                 </div>
               ))}
             </div>

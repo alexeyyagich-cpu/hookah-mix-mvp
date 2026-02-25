@@ -14,7 +14,7 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 
@@ -240,7 +240,7 @@ export default function OrderDetailPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold">{item.total_price.toFixed(2)}€</div>
+                    <div className="font-semibold">{formatCurrency(item.total_price, locale)}</div>
                     <div className="text-sm text-[var(--color-textMuted)]">
                       {t.totalGrams(item.quantity * item.package_grams)}
                     </div>
@@ -285,15 +285,15 @@ export default function OrderDetailPage() {
             <h3 className="text-sm text-[var(--color-textMuted)] mb-2">{t.orderSumLabel}</h3>
             <div className="flex justify-between text-sm">
               <span>{t.subtotalLabel}</span>
-              <span>{order.subtotal.toFixed(2)}€</span>
+              <span>{formatCurrency(order.subtotal, locale)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>{t.shippingLabel}</span>
-              <span>{order.shipping_cost > 0 ? `${order.shipping_cost.toFixed(2)}€` : t.freeShipping}</span>
+              <span>{order.shipping_cost > 0 ? formatCurrency(order.shipping_cost, locale) : t.freeShipping}</span>
             </div>
             <div className="flex justify-between font-semibold pt-2 border-t border-[var(--color-border)]">
               <span>{t.totalLabel}</span>
-              <span>{order.total.toFixed(2)}€</span>
+              <span>{formatCurrency(order.total, locale)}</span>
             </div>
           </div>
 

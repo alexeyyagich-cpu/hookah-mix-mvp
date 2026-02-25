@@ -7,6 +7,8 @@
 
 import type { TobaccoInventory } from '@/types/database'
 import type { Tobacco } from '@/data/tobaccos'
+import type { Locale } from '@/lib/i18n/types'
+import { formatCurrency } from '@/lib/i18n/format'
 
 // ============================================================================
 // Types
@@ -196,15 +198,15 @@ function roundPrice(price: number): number {
 /**
  * Format price for display
  */
-export function formatPrice(price: number | null, currency = '€'): string {
+export function formatPrice(price: number | null, locale: Locale = 'en'): string {
   if (price === null) return '—'
-  return `${currency}${price.toFixed(2)}`
+  return formatCurrency(price, locale)
 }
 
 /**
  * Format price per gram
  */
-export function formatPricePerGram(pricePerGram: number | null, currency = '€'): string {
+export function formatPricePerGram(pricePerGram: number | null, locale: Locale = 'en'): string {
   if (pricePerGram === null) return '—'
-  return `${currency}${pricePerGram.toFixed(3)}/g`
+  return `${formatCurrency(pricePerGram, locale)}/g`
 }

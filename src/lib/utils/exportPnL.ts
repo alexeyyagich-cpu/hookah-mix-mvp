@@ -3,6 +3,8 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { PnLData } from '@/lib/hooks/usePnL'
+import type { Locale } from '@/lib/i18n/types'
+import { formatCurrency } from '@/lib/i18n/format'
 
 function downloadFile(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
@@ -25,7 +27,8 @@ function formatPeriod(period: { start: Date; end: Date }): string {
 // CSV EXPORT
 // ========================================
 
-export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }) {
+export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en') {
+  const fc = (v: number) => formatCurrency(v, locale)
   const lines: string[] = []
 
   lines.push('P&L REPORT')
@@ -33,48 +36,48 @@ export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }) 
   lines.push('')
 
   lines.push('TOTAL')
-  lines.push(`Revenue,${data.totalRevenue.toFixed(2)}€`)
-  lines.push(`Expenses,${data.totalCost.toFixed(2)}€`)
-  lines.push(`Gross Profit,${data.grossProfit.toFixed(2)}€`)
+  lines.push(`Revenue,${fc(data.totalRevenue)}`)
+  lines.push(`Expenses,${fc(data.totalCost)}`)
+  lines.push(`Gross Profit,${fc(data.grossProfit)}`)
   lines.push(`Margin,${data.marginPercent !== null ? data.marginPercent.toFixed(1) + '%' : '—'}`)
   lines.push('')
 
   if (data.bar) {
     lines.push('BAR')
-    lines.push(`Revenue,${data.bar.revenue.toFixed(2)}€`)
-    lines.push(`Cost,${data.bar.cost.toFixed(2)}€`)
-    lines.push(`Profit,${data.bar.profit.toFixed(2)}€`)
+    lines.push(`Revenue,${fc(data.bar.revenue)}`)
+    lines.push(`Cost,${fc(data.bar.cost)}`)
+    lines.push(`Profit,${fc(data.bar.profit)}`)
     lines.push(`Sales,${data.bar.salesCount}`)
     lines.push('')
   }
 
   if (data.hookah) {
     lines.push('HOOKAH')
-    lines.push(`Tobacco cost,${data.hookah.cost.toFixed(2)}€`)
+    lines.push(`Tobacco cost,${fc(data.hookah.cost)}`)
     lines.push(`Used,${data.hookah.gramsUsed.toFixed(0)}g`)
     lines.push(`Sessions,${data.hookah.sessionsCount}`)
-    lines.push(`Cost/session,${data.hookah.costPerSession.toFixed(2)}€`)
+    lines.push(`Cost/session,${fc(data.hookah.costPerSession)}`)
     lines.push('')
   }
 
   lines.push('BY DAY')
   lines.push('Date,Revenue,Bar cost,Tobacco cost,Total expenses,Profit')
   for (const d of data.dailyPnL) {
-    lines.push(`${d.date},${d.barRevenue.toFixed(2)},${d.barCost.toFixed(2)},${d.hookahCost.toFixed(2)},${d.totalCost.toFixed(2)},${d.profit.toFixed(2)}`)
+    lines.push(`${d.date},${fc(d.barRevenue)},${fc(d.barCost)},${fc(d.hookahCost)},${fc(d.totalCost)},${fc(d.profit)}`)
   }
   lines.push('')
 
   lines.push('EXPENSES BY CATEGORY')
   lines.push('Category,Module,Amount,Share')
   for (const c of data.costByCategory) {
-    lines.push(`${c.category},${c.module},${c.cost.toFixed(2)}€,${c.percentage.toFixed(1)}%`)
+    lines.push(`${c.category},${c.module},${fc(c.cost)},${c.percentage.toFixed(1)}%`)
   }
   lines.push('')
 
   lines.push('TOP ITEMS')
   lines.push('Name,Module,Revenue,Cost,Profit,Margin')
   for (const item of data.topItems.slice(0, 10)) {
-    lines.push(`${item.name},${item.module},${item.revenue.toFixed(2)}€,${item.cost.toFixed(2)}€,${item.profit.toFixed(2)}€,${item.margin.toFixed(1)}%`)
+    lines.push(`${item.name},${item.module},${fc(item.revenue)},${fc(item.cost)},${fc(item.profit)},${item.margin.toFixed(1)}%`)
   }
 
   const csv = lines.join('\n')
@@ -86,7 +89,8 @@ export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }) 
 // PDF EXPORT
 // ========================================
 
-export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }) {
+export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en') {
+  const fc = (v: number) => formatCurrency(v, locale)
   const doc = new jsPDF()
 
   doc.setFontSize(18)
@@ -100,9 +104,9 @@ export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }) 
     startY: 42,
     head: [['Metric', 'Value']],
     body: [
-      ['Revenue', `${data.totalRevenue.toFixed(2)}€`],
-      ['Expenses', `${data.totalCost.toFixed(2)}€`],
-      ['Gross Profit', `${data.grossProfit.toFixed(2)}€`],
+      ['Revenue', fc(data.totalRevenue)],
+      ['Expenses', fc(data.totalCost)],
+      ['Gross Profit', fc(data.grossProfit)],
       ['Margin', data.marginPercent !== null ? `${data.marginPercent.toFixed(1)}%` : '—'],
     ],
     theme: 'grid',
@@ -112,9 +116,9 @@ export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }) 
   // Daily breakdown
   const dailyBody = data.dailyPnL.map(d => [
     d.date,
-    `${d.barRevenue.toFixed(0)}€`,
-    `${d.totalCost.toFixed(0)}€`,
-    `${d.profit.toFixed(0)}€`,
+    fc(d.barRevenue),
+    fc(d.totalCost),
+    fc(d.profit),
   ])
 
   autoTable(doc, {
@@ -130,8 +134,8 @@ export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }) 
     const topBody = data.topItems.slice(0, 8).map(i => [
       i.name,
       i.module === 'bar' ? 'Bar' : 'Hookah',
-      `${i.revenue.toFixed(0)}€`,
-      `${i.cost.toFixed(0)}€`,
+      fc(i.revenue),
+      fc(i.cost),
       `${i.margin.toFixed(0)}%`,
     ])
 
@@ -151,14 +155,15 @@ export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }) 
 // COPY AS TEXT
 // ========================================
 
-export function copyPnLAsText(data: PnLData, period: { start: Date; end: Date }): Promise<void> {
+export function copyPnLAsText(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en'): Promise<void> {
+  const fc = (v: number) => formatCurrency(v, locale)
   const lines: string[] = []
 
   lines.push(`P&L REPORT — ${formatPeriod(period)}`)
   lines.push('')
-  lines.push(`Revenue: ${data.totalRevenue.toFixed(0)}€`)
-  lines.push(`Expenses: ${data.totalCost.toFixed(0)}€`)
-  lines.push(`Profit: ${data.grossProfit.toFixed(0)}€`)
+  lines.push(`Revenue: ${fc(data.totalRevenue)}`)
+  lines.push(`Expenses: ${fc(data.totalCost)}`)
+  lines.push(`Profit: ${fc(data.grossProfit)}`)
   if (data.marginPercent !== null) lines.push(`Margin: ${data.marginPercent.toFixed(1)}%`)
   lines.push('')
 
@@ -170,7 +175,7 @@ export function copyPnLAsText(data: PnLData, period: { start: Date; end: Date })
   if (data.topItems.length > 0) {
     lines.push('Top items:')
     for (const item of data.topItems.slice(0, 5)) {
-      lines.push(`  ${item.name} — ${item.revenue.toFixed(0)}€ revenue, margin ${item.margin.toFixed(0)}%`)
+      lines.push(`  ${item.name} — ${fc(item.revenue)} revenue, margin ${item.margin.toFixed(0)}%`)
     }
   }
 

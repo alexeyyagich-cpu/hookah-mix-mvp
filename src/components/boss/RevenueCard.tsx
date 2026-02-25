@@ -2,6 +2,7 @@
 
 import type { Session, BarSale } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
+import { useLocale, formatCurrency } from '@/lib/i18n'
 
 interface RevenueCardProps {
   sessions: Session[]
@@ -12,6 +13,7 @@ interface RevenueCardProps {
 }
 
 export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: RevenueCardProps) {
+  const { locale } = useLocale()
   const todayHookah = sessions
     .filter(s => s.session_date.startsWith(todayStr) && s.selling_price)
     .reduce((sum, s) => sum + (s.selling_price || 0), 0)
@@ -45,7 +47,7 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
       {todayTotal > 0 ? (
         <>
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
-            <span className="text-3xl font-bold">{todayTotal}€</span>
+            <span className="text-3xl font-bold">{formatCurrency(todayTotal, locale)}</span>
             {change !== null && (
               <span className={`text-sm font-semibold ${change >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
                 {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% {tm.bossVsYesterday}
@@ -56,11 +58,11 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <div>
               <span className="text-[var(--color-textMuted)]">{tm.bossHookahRevenue}: </span>
-              <span className="font-semibold">{Math.round(todayHookah * 100) / 100}€</span>
+              <span className="font-semibold">{formatCurrency(todayHookah, locale)}</span>
             </div>
             <div>
               <span className="text-[var(--color-textMuted)]">{tm.bossBarRevenue}: </span>
-              <span className="font-semibold">{Math.round(todayBar * 100) / 100}€</span>
+              <span className="font-semibold">{formatCurrency(todayBar, locale)}</span>
             </div>
           </div>
         </>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useShifts } from '@/lib/hooks/useShifts'
 import { useModules } from '@/lib/hooks/useModules'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
 import { IconTimer, IconPlus, IconClose, IconCoin, IconBowl, IconCocktail, IconMenuList } from '@/components/Icons'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 
@@ -176,7 +176,7 @@ export default function ShiftsPage() {
               {activeShift.starting_cash !== null && (
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-[var(--color-textMuted)]">{tm.startingCash}:</span>
-                  <span className="font-semibold">{activeShift.starting_cash}€</span>
+                  <span className="font-semibold">{formatCurrency(activeShift.starting_cash, locale)}</span>
                 </div>
               )}
               {activeShift.open_notes && (
@@ -244,7 +244,7 @@ export default function ShiftsPage() {
                         </div>
                         <div className="text-xs text-[var(--color-textMuted)]">
                           {shift.opened_by_name && <>{shift.opened_by_name} · </>}
-                          {shift.closing_cash !== null && `${shift.closing_cash}€`}
+                          {shift.closing_cash !== null && formatCurrency(shift.closing_cash, locale)}
                         </div>
                       </div>
                       <button
@@ -428,6 +428,7 @@ function ReconciliationPanel({
   compact?: boolean
 }) {
   const r = reconciliation
+  const { locale } = useLocale()
 
   return (
     <div className={`space-y-4 ${compact ? '' : 'card p-5'}`}>
@@ -447,34 +448,34 @@ function ReconciliationPanel({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <div>
             <div className="text-xs text-[var(--color-textMuted)]">{tm.cashStartingLabel}</div>
-            <div className="font-semibold">{r.cash.startingCash}€</div>
+            <div className="font-semibold">{formatCurrency(r.cash.startingCash, locale)}</div>
           </div>
           <div>
             <div className="text-xs text-[var(--color-textMuted)]">{tm.cashBarRevenueLabel}</div>
-            <div className="font-semibold text-[var(--color-success)]">+{r.cash.barRevenue}€</div>
+            <div className="font-semibold text-[var(--color-success)]">+{formatCurrency(r.cash.barRevenue, locale)}</div>
           </div>
           {r.cash.hookahRevenue > 0 && (
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahRevenueLabel}</div>
-              <div className="font-semibold text-[var(--color-success)]">+{r.cash.hookahRevenue}€</div>
+              <div className="font-semibold text-[var(--color-success)]">+{formatCurrency(r.cash.hookahRevenue, locale)}</div>
             </div>
           )}
           <div>
             <div className="text-xs text-[var(--color-textMuted)]">{tm.cashExpectedLabel}</div>
-            <div className="font-semibold">{r.cash.expectedCash}€</div>
+            <div className="font-semibold">{formatCurrency(r.cash.expectedCash, locale)}</div>
           </div>
           {r.cash.actualCash !== null && (
             <>
               <div>
                 <div className="text-xs text-[var(--color-textMuted)]">{tm.cashActualLabel}</div>
-                <div className="font-semibold">{r.cash.actualCash}€</div>
+                <div className="font-semibold">{formatCurrency(r.cash.actualCash, locale)}</div>
               </div>
               <div>
                 <div className="text-xs text-[var(--color-textMuted)]">{tm.cashDifferenceLabel}</div>
                 <div className={`font-semibold ${
                   r.cash.difference! >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'
                 }`}>
-                  {r.cash.difference! >= 0 ? `+${r.cash.difference}€ (${tm.cashSurplus})` : `${r.cash.difference}€ (${tm.cashShortage})`}
+                  {r.cash.difference! >= 0 ? `+${formatCurrency(r.cash.difference!, locale)} (${tm.cashSurplus})` : `${formatCurrency(r.cash.difference!, locale)} (${tm.cashShortage})`}
                 </div>
               </div>
             </>
@@ -506,19 +507,19 @@ function ReconciliationPanel({
             )}
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.shiftHookahCost}</div>
-              <div className="font-semibold">{r.hookah.tobaccoCost}€</div>
+              <div className="font-semibold">{formatCurrency(r.hookah.tobaccoCost, locale)}</div>
             </div>
             {r.hookah.revenue > 0 && (
               <div>
                 <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahRevenueLabel}</div>
-                <div className="font-semibold text-[var(--color-success)]">{r.hookah.revenue}€</div>
+                <div className="font-semibold text-[var(--color-success)]">{formatCurrency(r.hookah.revenue, locale)}</div>
               </div>
             )}
             {r.hookah.revenue > 0 && (
               <div>
                 <div className="text-xs text-[var(--color-textMuted)]">{tm.hookahProfitLabel}</div>
                 <div className={`font-semibold ${r.hookah.profit >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
-                  {r.hookah.profit}€
+                  {formatCurrency(r.hookah.profit, locale)}
                 </div>
               </div>
             )}
@@ -552,15 +553,15 @@ function ReconciliationPanel({
             </div>
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.barTotalRevenueLabel}</div>
-              <div className="font-semibold text-[var(--color-success)]">{r.bar.totalRevenue}€</div>
+              <div className="font-semibold text-[var(--color-success)]">{formatCurrency(r.bar.totalRevenue, locale)}</div>
             </div>
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.barTotalCostLabel}</div>
-              <div className="font-semibold">{r.bar.totalCost}€</div>
+              <div className="font-semibold">{formatCurrency(r.bar.totalCost, locale)}</div>
             </div>
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.barProfitLabel2}</div>
-              <div className="font-semibold text-[var(--color-success)]">{r.bar.profit}€</div>
+              <div className="font-semibold text-[var(--color-success)]">{formatCurrency(r.bar.profit, locale)}</div>
             </div>
             {r.bar.marginPercent !== null && (
               <div>
@@ -575,7 +576,7 @@ function ReconciliationPanel({
               <div className="flex flex-wrap gap-1.5">
                 {r.bar.topCocktails.map((c, i) => (
                   <span key={i} className="px-2 py-0.5 rounded-full text-xs bg-[var(--color-bgCard)] border border-[var(--color-border)]">
-                    {c.name} x{c.count} ({c.revenue}€)
+                    {c.name} x{c.count} ({formatCurrency(c.revenue, locale)})
                   </span>
                 ))}
               </div>
@@ -604,17 +605,17 @@ function ReconciliationPanel({
             </div>
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.basePay}</div>
-              <div className="font-semibold">{r.payroll.basePay}€</div>
+              <div className="font-semibold">{formatCurrency(r.payroll.basePay, locale)}</div>
             </div>
             {r.payroll.commissionPay > 0 && (
               <div>
                 <div className="text-xs text-[var(--color-textMuted)]">{tm.commissionPay} ({r.payroll.commissionPercent}%)</div>
-                <div className="font-semibold">{r.payroll.commissionPay}€</div>
+                <div className="font-semibold">{formatCurrency(r.payroll.commissionPay, locale)}</div>
               </div>
             )}
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.totalPay}</div>
-              <div className="font-semibold text-[var(--color-primary)]">{r.payroll.totalPay}€</div>
+              <div className="font-semibold text-[var(--color-primary)]">{formatCurrency(r.payroll.totalPay, locale)}</div>
             </div>
           </div>
         </div>
@@ -668,7 +669,7 @@ function ReconciliationPanel({
             </div>
             <div>
               <div className="text-xs text-[var(--color-textMuted)]">{tm.tipsReceivedTotal}</div>
-              <div className="font-semibold text-[var(--color-success)]">{r.tips.total}€</div>
+              <div className="font-semibold text-[var(--color-success)]">{formatCurrency(r.tips.total, locale)}</div>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
 import { IconExport, IconLock, IconChart } from '@/components/Icons'
 import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
 
 type Period = 7 | 14 | 30
 
@@ -124,12 +124,12 @@ export default function BarSalesPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tb.revenue}</div>
-          <div className="text-2xl font-bold mt-1">{analytics.totalRevenue.toFixed(0)}€</div>
+          <div className="text-2xl font-bold mt-1">{formatCurrency(analytics.totalRevenue, locale)}</div>
         </div>
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tb.profit}</div>
           <div className="text-2xl font-bold text-[var(--color-success)] mt-1">
-            {analytics.totalProfit.toFixed(0)}€
+            {formatCurrency(analytics.totalProfit, locale)}
           </div>
         </div>
         <div className="card p-4">
@@ -229,10 +229,10 @@ export default function BarSalesPage() {
                           </td>
                           <td className="px-4 py-3 text-right text-sm">{sale.quantity}</td>
                           <td className="px-4 py-3 text-right font-mono text-sm font-semibold">
-                            {sale.total_revenue.toFixed(2)}€
+                            {formatCurrency(sale.total_revenue, locale)}
                           </td>
                           <td className="px-4 py-3 text-right font-mono text-sm text-[var(--color-textMuted)]">
-                            {sale.total_cost.toFixed(2)}€
+                            {formatCurrency(sale.total_cost, locale)}
                           </td>
                           <td className="px-4 py-3 text-right">
                             <span className={`font-mono text-sm font-semibold text-[var(--color-${marginColor})]`}>
@@ -289,8 +289,8 @@ export default function BarSalesPage() {
                             />
                           </div>
                           <div className="text-xs text-right w-20 flex-shrink-0">
-                            <span className="font-semibold">{day.revenue.toFixed(0)}€</span>
-                            <span className="text-[var(--color-textMuted)]"> / {day.cost.toFixed(0)}€</span>
+                            <span className="font-semibold">{formatCurrency(day.revenue, locale)}</span>
+                            <span className="text-[var(--color-textMuted)]"> / {formatCurrency(day.cost, locale)}</span>
                           </div>
                         </div>
                       )
@@ -325,7 +325,7 @@ export default function BarSalesPage() {
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-sm font-medium truncate">{cocktail.name}</span>
                               <span className="text-xs text-[var(--color-textMuted)] ml-2">
-                                {cocktail.count} {tb.pcsUnit} · {cocktail.revenue.toFixed(0)}€
+                                {cocktail.count} {tb.pcsUnit} · {formatCurrency(cocktail.revenue, locale)}
                               </span>
                             </div>
                             <div className="h-2 rounded-full bg-[var(--color-bgHover)] overflow-hidden">
@@ -349,15 +349,15 @@ export default function BarSalesPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-[var(--color-textMuted)]">{tb.revenueLabel}</span>
-                      <span className="font-mono font-semibold">{analytics.totalRevenue.toFixed(2)}€</span>
+                      <span className="font-mono font-semibold">{formatCurrency(analytics.totalRevenue, locale)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--color-textMuted)]">{tb.costPriceLabel}</span>
-                      <span className="font-mono text-[var(--color-danger)]">{analytics.totalCost.toFixed(2)}€</span>
+                      <span className="font-mono text-[var(--color-danger)]">{formatCurrency(analytics.totalCost, locale)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-[var(--color-border)]">
                       <span className="font-medium">{tb.profitLabel}</span>
-                      <span className="font-mono font-bold text-[var(--color-success)]">{analytics.totalProfit.toFixed(2)}€</span>
+                      <span className="font-mono font-bold text-[var(--color-success)]">{formatCurrency(analytics.totalProfit, locale)}</span>
                     </div>
                   </div>
                 </div>
@@ -373,15 +373,15 @@ export default function BarSalesPage() {
                     <div className="flex justify-between">
                       <span className="text-[var(--color-textMuted)]">{tb.revenuePerDay}</span>
                       <span className="font-mono font-semibold">
-                        {period > 0 ? (analytics.totalRevenue / period).toFixed(0) : '0'}€
+                        {formatCurrency(period > 0 ? analytics.totalRevenue / period : 0, locale)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--color-textMuted)]">{tb.avgCheck}</span>
                       <span className="font-mono font-semibold">
-                        {analytics.totalSales > 0
-                          ? (analytics.totalRevenue / analytics.totalSales).toFixed(2)
-                          : '0'}€
+                        {formatCurrency(analytics.totalSales > 0
+                          ? analytics.totalRevenue / analytics.totalSales
+                          : 0, locale)}
                       </span>
                     </div>
                   </div>

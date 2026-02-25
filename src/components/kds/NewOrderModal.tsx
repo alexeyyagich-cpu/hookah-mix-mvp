@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import { IconPlus, IconMinus, IconClose, IconCocktail, IconBowl, IconSearch } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
 import { getHeatRecommendation } from '@/logic/quickRepeatEngine'
@@ -441,7 +441,7 @@ export function NewOrderModal({
                       >
                         <div className="font-medium truncate">{getLocaleName(recipe, locale)}</div>
                         {recipe.menu_price && (
-                          <div className="text-xs text-[var(--color-textMuted)] mt-0.5">{recipe.menu_price}€</div>
+                          <div className="text-xs text-[var(--color-textMuted)] mt-0.5">{formatCurrency(recipe.menu_price, locale)}</div>
                         )}
                         {inCart && (
                           <div className="text-xs font-semibold text-[var(--color-primary)] mt-1">

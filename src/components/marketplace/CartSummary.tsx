@@ -2,7 +2,7 @@
 
 import type { Cart } from '@/types/database'
 import { IconTruck } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 interface CartSummaryProps {
   cart: Cart
@@ -12,6 +12,7 @@ interface CartSummaryProps {
 
 export function CartSummary({ cart, onCheckout, isCheckoutDisabled }: CartSummaryProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
   const itemsCount = cart.items.reduce((sum, item) => sum + item.quantity, 0)
   const totalGrams = cart.items.reduce(
     (sum, item) => sum + (item.product.package_grams * item.quantity),
@@ -33,7 +34,7 @@ export function CartSummary({ cart, onCheckout, isCheckoutDisabled }: CartSummar
         </div>
         <div className="flex justify-between">
           <span className="text-[var(--color-textMuted)]">{t.subtotal}</span>
-          <span>{cart.subtotal.toFixed(2)}€</span>
+          <span>{formatCurrency(cart.subtotal, locale)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-[var(--color-textMuted)]">{t.deliveryLabel}</span>
@@ -44,7 +45,7 @@ export function CartSummary({ cart, onCheckout, isCheckoutDisabled }: CartSummar
       <div className="border-t border-[var(--color-border)] pt-4">
         <div className="flex justify-between items-center">
           <span className="font-medium">{t.totalLabelSummary}</span>
-          <span className="text-2xl font-bold">{cart.subtotal.toFixed(2)}€</span>
+          <span className="text-2xl font-bold">{formatCurrency(cart.subtotal, locale)}</span>
         </div>
       </div>
 

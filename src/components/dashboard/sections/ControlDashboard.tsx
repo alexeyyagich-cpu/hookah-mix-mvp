@@ -2,7 +2,7 @@
 
 import { useDashboardControl } from '@/lib/hooks/useDashboardControl'
 import { useModules } from '@/lib/hooks/useModules'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { StatsCard } from '@/components/dashboard/StatsCard'
 import { StaffComparisonTable } from './StaffComparisonTable'
 import { LowStockAlertPanel } from './LowStockAlertPanel'
@@ -17,6 +17,7 @@ export function ControlDashboard() {
   const { data, staffEnriched, loading, error } = useDashboardControl()
   const { isHookahActive, isBarActive } = useModules()
   const t = useTranslation('manage')
+  const { locale } = useLocale()
 
   if (loading) {
     return (
@@ -50,7 +51,7 @@ export function ControlDashboard() {
           icon={<IconScale size={20} />}
           label={t.controlTobaccoUsage}
           value={`${tobacco_usage.total_grams_today}g`}
-          subtext={`${tobacco_usage.cost_today.toFixed(2)}€ ${t.controlCostLabel}`}
+          subtext={`${formatCurrency(tobacco_usage.cost_today, locale)} ${t.controlCostLabel}`}
           trend={gramsTrend !== null ? {
             value: Math.abs(gramsTrend),
             isPositive: gramsTrend <= 0,
@@ -75,7 +76,7 @@ export function ControlDashboard() {
         <StatsCard
           icon={<IconCoin size={20} />}
           label={t.controlRevenueToday}
-          value={`${revenue_snapshot.combined_revenue_today.toFixed(0)}€`}
+          value={formatCurrency(revenue_snapshot.combined_revenue_today, locale)}
           subtext={revenue_snapshot.combined_margin_pct !== null
             ? `${t.controlMargin}: ${revenue_snapshot.combined_margin_pct}%`
             : undefined
@@ -107,17 +108,17 @@ export function ControlDashboard() {
         <div className="grid grid-cols-2 gap-4">
           <div className="card p-4">
             <div className="text-sm text-[var(--color-textMuted)] mb-1">{t.controlHookahRevenue}</div>
-            <div className="text-2xl font-bold">{revenue_snapshot.hookah_revenue_today.toFixed(0)}€</div>
+            <div className="text-2xl font-bold">{formatCurrency(revenue_snapshot.hookah_revenue_today, locale)}</div>
             <div className="text-xs text-[var(--color-textMuted)]">
-              {t.controlCostLabel}: {revenue_snapshot.hookah_cost_today.toFixed(2)}€
+              {t.controlCostLabel}: {formatCurrency(revenue_snapshot.hookah_cost_today, locale)}
               {revenue_snapshot.hookah_margin_pct !== null && ` · ${t.controlMargin}: ${revenue_snapshot.hookah_margin_pct}%`}
             </div>
           </div>
           <div className="card p-4">
             <div className="text-sm text-[var(--color-textMuted)] mb-1">{t.controlBarRevenue}</div>
-            <div className="text-2xl font-bold">{revenue_snapshot.bar_revenue_today.toFixed(0)}€</div>
+            <div className="text-2xl font-bold">{formatCurrency(revenue_snapshot.bar_revenue_today, locale)}</div>
             <div className="text-xs text-[var(--color-textMuted)]">
-              {t.controlCostLabel}: {revenue_snapshot.bar_cost_today.toFixed(2)}€
+              {t.controlCostLabel}: {formatCurrency(revenue_snapshot.bar_cost_today, locale)}
               {revenue_snapshot.bar_margin_pct !== null && ` · ${t.controlMargin}: ${revenue_snapshot.bar_margin_pct}%`}
             </div>
           </div>

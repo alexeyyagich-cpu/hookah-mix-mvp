@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
@@ -31,6 +31,7 @@ interface QuickSessionProps {
 export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessionProps) {
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
+  const { locale } = useLocale()
   const { bowls, defaultBowl } = useBowls()
   const { inventory } = useInventory()
   const { guests, searchGuests, recordVisit } = useGuests()
@@ -268,7 +269,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                           <span className="font-medium">{guest.name}</span>
                           <span className="text-xs text-[var(--color-textMuted)]">
                             {guest.loyalty_tier && <span className="mr-2 px-1.5 py-0.5 rounded bg-[var(--color-primary)]/10 text-[var(--color-primary)]">{guest.loyalty_tier}</span>}
-                            {guest.bonus_balance > 0 && `${guest.bonus_balance}€`}
+                            {guest.bonus_balance > 0 && formatCurrency(guest.bonus_balance, locale)}
                           </span>
                         </button>
                       ))}
@@ -308,8 +309,8 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                 {selectedGuest.bonus_balance > 0 && loyaltySettings.is_enabled && (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs text-[var(--color-textMuted)]">
-                      <span>{t.loyaltyBonusBalance}: {selectedGuest.bonus_balance}€</span>
-                      {maxBonusRedemption > 0 && <span>{t.loyaltyMaxRedemption}: {maxBonusRedemption.toFixed(1)}€</span>}
+                      <span>{t.loyaltyBonusBalance}: {formatCurrency(selectedGuest.bonus_balance, locale)}</span>
+                      {maxBonusRedemption > 0 && <span>{t.loyaltyMaxRedemption}: {formatCurrency(maxBonusRedemption, locale)}</span>}
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -336,7 +337,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                             setBonusAmount(e.target.value)
                           }
                         }}
-                        placeholder={`max ${maxBonusRedemption.toFixed(1)}€`}
+                        placeholder={`max ${formatCurrency(maxBonusRedemption, locale)}`}
                         className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] text-sm focus:border-[var(--color-primary)] focus:outline-none"
                         min="0"
                         max={maxBonusRedemption}
@@ -409,7 +410,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                       : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                   }`}
                 >
-                  {price}€
+                  {formatCurrency(price, locale)}
                 </button>
               ))}
             </div>
