@@ -146,7 +146,7 @@ export default function BossPage() {
         tables={tables}
         kdsOrders={kdsOrders}
         shiftDurationMs={shiftDurationMs}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Revenue Card */}
@@ -155,7 +155,7 @@ export default function BossPage() {
         sales={sales}
         todayStr={todayStr}
         yesterdayStr={yesterdayStr}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Shift Overview */}
@@ -165,7 +165,7 @@ export default function BossPage() {
         shiftDurationMs={shiftDurationMs}
         onQuickOpen={handleQuickOpen}
         opening={opening}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Quick Stats */}
@@ -175,7 +175,7 @@ export default function BossPage() {
         tips={tips}
         kdsOrders={kdsOrders}
         todayStr={todayStr}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Alerts */}
@@ -186,13 +186,13 @@ export default function BossPage() {
         reviews={reviews}
         shifts={shifts}
         getReconciliation={getReconciliation}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Floor Mini Map */}
       <FloorMiniMap
         tables={tables}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Activity Feed */}
@@ -202,7 +202,7 @@ export default function BossPage() {
         kdsOrders={kdsOrders}
         reviews={reviews}
         tips={tips}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
 
       {/* Last Updated */}

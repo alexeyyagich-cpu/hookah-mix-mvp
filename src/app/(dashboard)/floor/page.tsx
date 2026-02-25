@@ -13,8 +13,6 @@ import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useKDS } from '@/lib/hooks/useKDS'
 import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
-import { createClient } from '@/lib/supabase/client'
-import { isSupabaseConfigured } from '@/lib/config'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useRole } from '@/lib/hooks/useRole'
 import { QRCodeCanvas } from 'qrcode.react'
@@ -38,7 +36,7 @@ export default function FloorPage() {
   const { hasPermission } = useRole(contextOrgRole)
   const floorPlan = useFloorPlan()
   const { tables, setTableStatus, startSession, endSession, loading } = floorPlan
-  const { reservations, assignTable, refresh: refreshReservations } = useReservations()
+  const { reservations, createReservation, assignTable, refresh: refreshReservations } = useReservations()
   const { guests, recordVisit } = useGuests()
   const { inventory } = useInventory()
   const { createSession } = useSessions()
@@ -257,41 +255,19 @@ export default function FloorPage() {
     setQuickReserving(true)
 
     try {
-      if (isDemoMode) {
-        // Demo mode: just set table status
-        await setTableStatus(activeSelectedTable.id, 'reserved', quickForm.guest_name)
-        setShowQuickReserve(false)
-        setQuickForm({ guest_name: '', guest_phone: '', guest_count: '2', reservation_time: '' })
-        setQuickReserving(false)
-        return
-      }
+      const newRes = await createReservation({
+        table_id: activeSelectedTable.id,
+        guest_name: quickForm.guest_name,
+        guest_phone: quickForm.guest_phone || null,
+        guest_count: parseInt(quickForm.guest_count) || 2,
+        reservation_date: today,
+        reservation_time: quickForm.reservation_time,
+        source: 'walk_in',
+      })
 
-      if (!user || !isSupabaseConfigured) return
-      const supabase = createClient()
+      if (!newRes) throw new Error('Failed to create reservation')
 
-      // Create reservation in DB
-      const { data: newRes, error } = await supabase
-        .from('reservations')
-        .insert({
-          profile_id: user.id,
-          table_id: activeSelectedTable.id,
-          guest_name: quickForm.guest_name,
-          guest_phone: quickForm.guest_phone || null,
-          guest_count: parseInt(quickForm.guest_count) || 2,
-          reservation_date: today,
-          reservation_time: quickForm.reservation_time,
-          source: 'walk_in' as const,
-          ...(organizationId ? { organization_id: organizationId } : {}),
-          ...(locationId ? { location_id: locationId } : {}),
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-
-      // Set table status to reserved with guest name
       await setTableStatus(activeSelectedTable.id, 'reserved', quickForm.guest_name)
-      await refreshReservations()
 
       setShowQuickReserve(false)
       setQuickForm({ guest_name: '', guest_phone: '', guest_count: '2', reservation_time: '' })

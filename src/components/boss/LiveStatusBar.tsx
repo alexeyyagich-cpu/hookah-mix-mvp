@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import type { Shift, FloorTable, KdsOrder } from '@/types/database'
+import type { Dictionary } from '@/lib/i18n'
 
 interface LiveStatusBarProps {
   activeShift: Shift | null
   tables: FloorTable[]
   kdsOrders: KdsOrder[]
   shiftDurationMs: number
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 function formatDurationShort(ms: number): string {
@@ -29,7 +30,7 @@ export function LiveStatusBar({ activeShift, tables, kdsOrders, shiftDurationMs,
         <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${activeShift ? 'bg-[var(--color-success)] animate-pulse' : 'bg-[var(--color-textMuted)]'}`} />
         <div className="min-w-0">
           <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold truncate">
-            {activeShift ? String(tm.bossShiftActive) : String(tm.bossShiftClosed)}
+            {activeShift ? tm.bossShiftActive : tm.bossShiftClosed}
           </div>
           {activeShift && (
             <div className="text-sm font-bold">{formatDurationShort(shiftDurationMs)}</div>
@@ -40,16 +41,16 @@ export function LiveStatusBar({ activeShift, tables, kdsOrders, shiftDurationMs,
       <Link href="/floor" className="card p-3 flex items-center gap-2 hover:bg-[var(--color-bgHover)] transition-colors">
         <span className="text-base">🗺️</span>
         <div className="min-w-0">
-          <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold truncate">{String(tm.bossFloorMap)}</div>
-          <div className="text-sm font-bold">{(tm.bossFloorOccupancy as (o: number, t: number) => string)(occupied, totalTables)}</div>
+          <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold truncate">{tm.bossFloorMap}</div>
+          <div className="text-sm font-bold">{tm.bossFloorOccupancy(occupied, totalTables)}</div>
         </div>
       </Link>
 
       <Link href="/kds" className="card p-3 flex items-center gap-2 hover:bg-[var(--color-bgHover)] transition-colors">
         <span className="text-base">📋</span>
         <div className="min-w-0">
-          <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold truncate">{String(tm.bossKdsActive)}</div>
-          <div className="text-sm font-bold">{(tm.bossActiveOrders as (n: number) => string)(activeOrders)}</div>
+          <div className="text-[10px] text-[var(--color-textMuted)] uppercase font-semibold truncate">{tm.bossKdsActive}</div>
+          <div className="text-sm font-bold">{tm.bossActiveOrders(activeOrders)}</div>
         </div>
       </Link>
     </div>

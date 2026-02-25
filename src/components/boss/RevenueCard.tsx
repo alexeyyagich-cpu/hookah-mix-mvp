@@ -1,13 +1,14 @@
 'use client'
 
 import type { Session, BarSale } from '@/types/database'
+import type { Dictionary } from '@/lib/i18n'
 
 interface RevenueCardProps {
   sessions: Session[]
   sales: BarSale[]
   todayStr: string
   yesterdayStr: string
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: RevenueCardProps) {
@@ -38,7 +39,7 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
   return (
     <div className="card p-5">
       <div className="text-xs text-[var(--color-textMuted)] uppercase font-semibold mb-2">
-        {String(tm.bossTodayRevenue)}
+        {tm.bossTodayRevenue}
       </div>
 
       {todayTotal > 0 ? (
@@ -47,24 +48,24 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
             <span className="text-3xl font-bold">{todayTotal}€</span>
             {change !== null && (
               <span className={`text-sm font-semibold ${change >= 0 ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]'}`}>
-                {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% {String(tm.bossVsYesterday)}
+                {change >= 0 ? '↑' : '↓'} {Math.abs(change)}% {tm.bossVsYesterday}
               </span>
             )}
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <div>
-              <span className="text-[var(--color-textMuted)]">{String(tm.bossHookahRevenue)}: </span>
+              <span className="text-[var(--color-textMuted)]">{tm.bossHookahRevenue}: </span>
               <span className="font-semibold">{Math.round(todayHookah * 100) / 100}€</span>
             </div>
             <div>
-              <span className="text-[var(--color-textMuted)]">{String(tm.bossBarRevenue)}: </span>
+              <span className="text-[var(--color-textMuted)]">{tm.bossBarRevenue}: </span>
               <span className="font-semibold">{Math.round(todayBar * 100) / 100}€</span>
             </div>
           </div>
         </>
       ) : (
-        <p className="text-[var(--color-textMuted)]">{String(tm.bossNoRevenue)}</p>
+        <p className="text-[var(--color-textMuted)]">{tm.bossNoRevenue}</p>
       )}
     </div>
   )

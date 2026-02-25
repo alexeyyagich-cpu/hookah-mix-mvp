@@ -75,10 +75,22 @@ const DEMO_RESERVATIONS: Reservation[] = [
 // Dashboard hook (owner) — full CRUD
 // ============================================================================
 
+interface CreateReservationInput {
+  table_id?: string | null
+  guest_name: string
+  guest_phone?: string | null
+  guest_count: number
+  reservation_date: string
+  reservation_time: string
+  notes?: string | null
+  source?: 'online' | 'phone' | 'walk_in'
+}
+
 interface UseReservationsReturn {
   reservations: Reservation[]
   loading: boolean
   error: string | null
+  createReservation: (input: CreateReservationInput) => Promise<Reservation | null>
   updateStatus: (id: string, status: ReservationStatus) => Promise<void>
   assignTable: (id: string, tableId: string | null) => Promise<void>
   deleteReservation: (id: string) => Promise<void>
@@ -138,6 +150,57 @@ export function useReservations(): UseReservationsReturn {
       fetchReservations()
     }
   }, [fetchReservations, isDemoMode])
+
+  const createReservation = useCallback(async (input: CreateReservationInput): Promise<Reservation | null> => {
+    if (isDemoMode) {
+      const newRes: Reservation = {
+        id: `demo-${Date.now()}`,
+        profile_id: 'demo',
+        table_id: input.table_id || null,
+        guest_name: input.guest_name,
+        guest_phone: input.guest_phone || null,
+        guest_count: input.guest_count,
+        reservation_date: input.reservation_date,
+        reservation_time: input.reservation_time,
+        duration_minutes: 120,
+        status: 'confirmed',
+        notes: input.notes || null,
+        source: input.source || 'walk_in',
+        created_at: new Date().toISOString(),
+      }
+      setReservations(prev => [...prev, newRes])
+      return newRes
+    }
+
+    if (!user || !supabase) return null
+
+    try {
+      const { data, error: insertError } = await supabase
+        .from('reservations')
+        .insert({
+          profile_id: user.id,
+          table_id: input.table_id || null,
+          guest_name: input.guest_name,
+          guest_phone: input.guest_phone || null,
+          guest_count: input.guest_count,
+          reservation_date: input.reservation_date,
+          reservation_time: input.reservation_time,
+          notes: input.notes || null,
+          source: input.source || 'walk_in',
+          ...(organizationId ? { organization_id: organizationId } : {}),
+          ...(locationId ? { location_id: locationId } : {}),
+        })
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+      setReservations(prev => [...prev, data])
+      return data
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create reservation')
+      return null
+    }
+  }, [user, supabase, isDemoMode, organizationId, locationId])
 
   const updateStatus = useCallback(async (id: string, status: ReservationStatus) => {
     if (isDemoMode) {
@@ -217,6 +280,7 @@ export function useReservations(): UseReservationsReturn {
     reservations,
     loading,
     error,
+    createReservation,
     updateStatus,
     assignTable,
     deleteReservation,

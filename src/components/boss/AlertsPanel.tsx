@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { TobaccoInventory, KdsOrder, Shift, ShiftReconciliation } from '@/types/database'
+import type { Dictionary } from '@/lib/i18n'
 
 interface Review {
   created_at: string
@@ -15,7 +16,7 @@ interface AlertsPanelProps {
   reviews: Review[]
   shifts: Shift[]
   getReconciliation: (shift: Shift) => Promise<ShiftReconciliation>
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 interface Alert {
@@ -40,7 +41,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       if (recon.cash.difference !== null && recon.cash.difference < 0) {
         setCashShortageAlert({
           id: 'cash-shortage',
-          text: (tm.bossCashShortage as (a: string) => string)(`${Math.abs(recon.cash.difference)}€`),
+          text: tm.bossCashShortage(`${Math.abs(recon.cash.difference)}€`),
           severity: 'warning',
           href: '/shifts',
           emoji: '💰',
@@ -59,7 +60,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
   if (outOfStock.length > 0) {
     alerts.push({
       id: 'out-of-stock',
-      text: (tm.bossOutOfStock as (n: number) => string)(outOfStock.length),
+      text: tm.bossOutOfStock(outOfStock.length),
       severity: 'danger',
       href: '/inventory',
       emoji: '🚨',
@@ -71,7 +72,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
   if (lowStock.length > 0) {
     alerts.push({
       id: 'low-stock',
-      text: (tm.bossLowStock as (n: number) => string)(lowStock.length),
+      text: tm.bossLowStock(lowStock.length),
       severity: 'warning',
       href: '/inventory',
       emoji: '⚠️',
@@ -87,7 +88,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
   if (overdue.length > 0) {
     alerts.push({
       id: 'overdue-kds',
-      text: (tm.bossOverdueOrders as (n: number) => string)(overdue.length),
+      text: tm.bossOverdueOrders(overdue.length),
       severity: 'danger',
       href: '/kds',
       emoji: '🕐',
@@ -100,7 +101,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
   if (newReviews.length > 0) {
     alerts.push({
       id: 'new-reviews',
-      text: (tm.bossNewReviews as (n: number) => string)(newReviews.length),
+      text: tm.bossNewReviews(newReviews.length),
       severity: 'info',
       href: '/reviews',
       emoji: '⭐',
@@ -115,13 +116,13 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
   return (
     <div className="card p-5">
       <div className="text-xs text-[var(--color-textMuted)] uppercase font-semibold mb-3">
-        {String(tm.bossAlerts)}
+        {tm.bossAlerts}
       </div>
 
       {alerts.length === 0 ? (
         <div className="flex items-center gap-2 text-[var(--color-success)]">
           <span>✅</span>
-          <span className="text-sm font-medium">{String(tm.bossAllClear)}</span>
+          <span className="text-sm font-medium">{tm.bossAllClear}</span>
         </div>
       ) : (
         <div className="space-y-2">

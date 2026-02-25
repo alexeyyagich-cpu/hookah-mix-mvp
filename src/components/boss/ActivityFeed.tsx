@@ -1,6 +1,7 @@
 'use client'
 
 import type { Session, BarSale, KdsOrder, Tip } from '@/types/database'
+import type { Dictionary } from '@/lib/i18n'
 
 interface Review {
   id: string
@@ -16,7 +17,7 @@ interface ActivityFeedProps {
   kdsOrders: KdsOrder[]
   reviews: Review[]
   tips: Tip[]
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 interface ActivityEvent {
@@ -27,15 +28,15 @@ interface ActivityEvent {
   timestamp: string
 }
 
-function timeAgo(isoDate: string, tm: Record<string, unknown>): string {
+function timeAgo(isoDate: string, tm: Dictionary['manage']): string {
   const diff = Date.now() - new Date(isoDate).getTime()
   const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return (tm.bossTimeAgo as (v: number, u: string) => string)(0, 'm')
-  if (minutes < 60) return (tm.bossTimeAgo as (v: number, u: string) => string)(minutes, 'm')
+  if (minutes < 1) return tm.bossTimeAgo(0, 'm')
+  if (minutes < 60) return tm.bossTimeAgo(minutes, 'm')
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return (tm.bossTimeAgo as (v: number, u: string) => string)(hours, 'h')
+  if (hours < 24) return tm.bossTimeAgo(hours, 'h')
   const days = Math.floor(hours / 24)
-  return (tm.bossTimeAgo as (v: number, u: string) => string)(days, 'd')
+  return tm.bossTimeAgo(days, 'd')
 }
 
 export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: ActivityFeedProps) {
@@ -105,11 +106,11 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
   return (
     <div className="card p-5">
       <div className="text-xs text-[var(--color-textMuted)] uppercase font-semibold mb-3">
-        {String(tm.bossRecentActivity)}
+        {tm.bossRecentActivity}
       </div>
 
       {top5.length === 0 ? (
-        <p className="text-sm text-[var(--color-textMuted)]">{String(tm.bossNoActivity)}</p>
+        <p className="text-sm text-[var(--color-textMuted)]">{tm.bossNoActivity}</p>
       ) : (
         <div className="space-y-2">
           {top5.map(event => (

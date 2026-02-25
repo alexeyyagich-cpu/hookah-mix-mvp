@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useMemo } from 'react'
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus } from '@/components/Icons'
@@ -69,20 +69,6 @@ export function FloorPlan({
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const getPointerPos = (e: React.MouseEvent | React.TouchEvent) => {
-    if ('touches' in e) {
-      return { x: e.touches[0].clientX, y: e.touches[0].clientY }
-    }
-    return { x: e.clientX, y: e.clientY }
-  }
-
-  const getPointerEndPos = (e: React.MouseEvent | React.TouchEvent) => {
-    if ('changedTouches' in e) {
-      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }
-    }
-    return { x: e.clientX, y: e.clientY }
-  }
-
   const handlePointerDown = useCallback((e: React.MouseEvent | React.TouchEvent, table: FloorTable) => {
     if (!editable) return
     e.preventDefault()
@@ -101,35 +87,79 @@ export function FloorPlan({
     })
   }, [editable])
 
-  const handlePointerMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!draggedTable || !containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const pos = getPointerPos(e)
-    const x = Math.max(0, Math.min(rect.width - 60, pos.x - rect.left - dragOffset.x))
-    const y = Math.max(0, Math.min(rect.height - 60, pos.y - rect.top - dragOffset.y))
+  // Window-level drag listeners — works even when finger/pointer leaves the canvas
+  const isDraggingRef = useRef(false)
+  const draggedTableRef = useRef<string | null>(null)
+  const dragOffsetRef = useRef({ x: 0, y: 0 })
 
-    setIsDragging(true)
+  // Keep refs in sync with state
+  isDraggingRef.current = isDragging
+  draggedTableRef.current = draggedTable
+  dragOffsetRef.current = dragOffset
 
-    const tableEl = document.getElementById(`table-${draggedTable}`)
-    if (tableEl) {
-      tableEl.style.left = `${x}px`
-      tableEl.style.top = `${y}px`
+  useEffect(() => {
+    if (!draggedTable) return
+
+    const getNativePos = (e: MouseEvent | TouchEvent) => {
+      if ('touches' in e && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      }
+      if ('changedTouches' in e && e.changedTouches.length > 0) {
+        return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }
+      }
+      if ('clientX' in e) {
+        return { x: e.clientX, y: e.clientY }
+      }
+      return { x: 0, y: 0 }
     }
-  }, [draggedTable, dragOffset])
 
-  const handlePointerUp = useCallback(async (e: React.MouseEvent | React.TouchEvent) => {
-    if (!draggedTable || !containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const pos = getPointerEndPos(e)
-    const x = Math.max(0, Math.min(rect.width - 60, pos.x - rect.left - dragOffset.x))
-    const y = Math.max(0, Math.min(rect.height - 60, pos.y - rect.top - dragOffset.y))
+    const onMove = (e: MouseEvent | TouchEvent) => {
+      if (!containerRef.current) return
+      e.preventDefault()
+      const rect = containerRef.current.getBoundingClientRect()
+      const pos = getNativePos(e)
+      const off = dragOffsetRef.current
+      const x = Math.max(0, Math.min(rect.width - 60, pos.x - rect.left - off.x))
+      const y = Math.max(0, Math.min(rect.height - 60, pos.y - rect.top - off.y))
 
-    if (isDragging) {
-      await moveTable(draggedTable, Math.round(x), Math.round(y))
+      setIsDragging(true)
+
+      const tableEl = document.getElementById(`table-${draggedTableRef.current}`)
+      if (tableEl) {
+        tableEl.style.left = `${x}px`
+        tableEl.style.top = `${y}px`
+      }
     }
-    setDraggedTable(null)
-    setIsDragging(false)
-  }, [draggedTable, dragOffset, isDragging, moveTable])
+
+    const onEnd = async (e: MouseEvent | TouchEvent) => {
+      if (!containerRef.current || !draggedTableRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      const pos = getNativePos(e)
+      const off = dragOffsetRef.current
+      const x = Math.max(0, Math.min(rect.width - 60, pos.x - rect.left - off.x))
+      const y = Math.max(0, Math.min(rect.height - 60, pos.y - rect.top - off.y))
+
+      if (isDraggingRef.current) {
+        await moveTable(draggedTableRef.current, Math.round(x), Math.round(y))
+      }
+      setDraggedTable(null)
+      setIsDragging(false)
+    }
+
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onEnd)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('touchend', onEnd)
+    window.addEventListener('touchcancel', onEnd)
+
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onEnd)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('touchend', onEnd)
+      window.removeEventListener('touchcancel', onEnd)
+    }
+  }, [draggedTable, moveTable])
 
   const handleTableClick = useCallback((e: React.MouseEvent | React.TouchEvent, table: FloorTable) => {
     if (isDragging) return
@@ -202,12 +232,6 @@ export function FloorPlan({
           minHeight: '400px',
           touchAction: editable ? 'none' : undefined,
         }}
-        onMouseMove={handlePointerMove}
-        onMouseUp={handlePointerUp}
-        onMouseLeave={handlePointerUp}
-        onTouchMove={handlePointerMove}
-        onTouchEnd={handlePointerUp}
-        onTouchCancel={handlePointerUp}
       >
         {/* Grid pattern */}
         <div

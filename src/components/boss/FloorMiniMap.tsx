@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import type { FloorTable, TableStatus } from '@/types/database'
+import type { Dictionary } from '@/lib/i18n'
 import { STATUS_COLORS } from '@/components/floor/FloorPlan'
 
 interface FloorMiniMapProps {
   tables: FloorTable[]
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 export function FloorMiniMap({ tables, tm }: FloorMiniMapProps) {
@@ -15,7 +16,7 @@ export function FloorMiniMap({ tables, tm }: FloorMiniMapProps) {
   return (
     <div className="card p-5">
       <div className="text-xs text-[var(--color-textMuted)] uppercase font-semibold mb-3">
-        {String(tm.bossFloorMap)}
+        {tm.bossFloorMap}
       </div>
 
       <Link href="/floor" className="block">
