@@ -1,5 +1,5 @@
 # Hookah Torus - Robots.txt
-# https://hookah-torus.com
+# https://hookahtorus.com
 
 User-agent: *
 Allow: /
@@ -23,7 +23,7 @@ Disallow: /login
 Disallow: /register
 
 # Sitemap
-Sitemap: https://hookah-torus.com/sitemap.xml
+Sitemap: https://hookahtorus.com/sitemap.xml
 
 # Crawl delay for aggressive bots
 User-agent: AhrefsBot
