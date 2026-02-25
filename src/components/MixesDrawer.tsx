@@ -234,7 +234,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
         <div className="flex items-center gap-2 mt-3">
           {mix.ingredients.map((ing, i) => (
             <div
-              key={i}
+              key={`${ing.brand ?? ''}-${ing.flavor}`}
               className="h-2 rounded-full"
               style={{
                 width: `${ing.percent}%`,
@@ -255,7 +255,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
           {/* Ingredients list */}
           <div className="space-y-2 mb-4">
             {mix.ingredients.map((ing, i) => (
-              <div key={i} className="flex items-center justify-between text-sm">
+              <div key={`${ing.brand ?? ''}-${ing.flavor}`} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full"
@@ -285,7 +285,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
           <div className="flex flex-wrap gap-1.5 mb-4">
             {(useEn ? mix.tags_en : mix.tags).map((tag, i) => (
               <span
-                key={i}
+                key={`${tag}-${i}`}
                 className="text-[10px] px-2 py-1 rounded-lg"
                 style={{
                   background: "var(--color-bgAccent)",

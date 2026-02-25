@@ -25,6 +25,7 @@ export function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
   }
 
   const maxGrams = Math.max(...data.map(d => d.grams), 1)
+  // Chart data-series palette — hex values intentionally not theme-variable
   const colors = [
     'var(--color-primary)',
     'var(--color-success)',

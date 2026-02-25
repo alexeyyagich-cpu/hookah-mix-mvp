@@ -14,7 +14,7 @@ import {
   IconCocktail,
 } from '@/components/Icons'
 import Link from 'next/link'
-import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDateTime } from '@/lib/i18n'
 
 export function BarSection() {
   const t = useTranslation('manage')
@@ -177,12 +177,7 @@ export function BarSection() {
                       {sale.recipe_name} {sale.quantity > 1 ? `×${sale.quantity}` : ''}
                     </div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {new Date(sale.sold_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {formatDateTime(sale.sold_at, locale)}
                     </div>
                   </div>
                 </div>

@@ -119,6 +119,7 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
               disabled={acting}
               className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
               title={t.cancelTooltip}
+              aria-label={t.cancelTooltip}
             >
               <IconClose size={14} />
             </button>

@@ -110,6 +110,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
         <button type="button"
           onClick={handleClose}
           className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+          aria-label="Close"
         >
           <IconClose size={20} />
         </button>

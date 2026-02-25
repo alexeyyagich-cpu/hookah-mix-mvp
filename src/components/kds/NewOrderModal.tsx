@@ -344,6 +344,7 @@ export function NewOrderModal({
           <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+            aria-label="Close"
           >
             <IconClose size={20} />
           </button>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useShifts } from '@/lib/hooks/useShifts'
 import { useModules } from '@/lib/hooks/useModules'
-import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate, formatTime } from '@/lib/i18n'
 import { IconTimer, IconPlus, IconClose, IconCoin, IconBowl, IconCocktail, IconMenuList } from '@/components/Icons'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 
@@ -12,20 +12,6 @@ function formatDuration(ms: number, t: { hoursShort: string; minutesShort: strin
   const minutes = Math.floor((ms % 3600000) / 60000)
   if (hours === 0) return `${minutes}${t.minutesShort}`
   return `${hours}${t.hoursShort} ${minutes}${t.minutesShort}`
-}
-
-function formatTime(iso: string, localeStr: string): string {
-  return new Date(iso).toLocaleTimeString(LOCALE_MAP[localeStr] || 'ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function formatDate(iso: string, localeStr: string): string {
-  return new Date(iso).toLocaleDateString(LOCALE_MAP[localeStr] || 'ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-  })
 }
 
 export default function ShiftsPage() {

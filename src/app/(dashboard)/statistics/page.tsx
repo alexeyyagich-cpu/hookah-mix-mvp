@@ -25,7 +25,7 @@ import {
   IconExport,
   IconWarning,
 } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 type ViewMode = 'overview' | 'comparison' | 'abc'
@@ -290,9 +290,9 @@ export default function StatisticsPage() {
               ))}
             </div>
             <div className="mt-3 text-xs text-[var(--color-textMuted)]">
-              {tm.periodALabel}: {periodsConfig.periodA.start.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')} — {periodsConfig.periodA.end.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
+              {tm.periodALabel}: {formatDate(periodsConfig.periodA.start, locale)} — {formatDate(periodsConfig.periodA.end, locale)}
               {' | '}
-              {tm.periodBLabel}: {periodsConfig.periodB.start.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')} — {periodsConfig.periodB.end.toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
+              {tm.periodBLabel}: {formatDate(periodsConfig.periodB.start, locale)} — {formatDate(periodsConfig.periodB.end, locale)}
             </div>
           </div>
 

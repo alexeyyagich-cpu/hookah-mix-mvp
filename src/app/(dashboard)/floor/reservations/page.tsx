@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconTrash } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useRole } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { ReservationStatus } from '@/types/database'
@@ -145,10 +145,7 @@ export default function ReservationsPage() {
                   <div className="flex-shrink-0 text-center sm:w-20">
                     <div className="text-2xl font-bold">{reservation.reservation_time.slice(0, 5)}</div>
                     <div className="text-xs text-[var(--color-textMuted)]">
-                      {new Date(reservation.reservation_date + 'T00:00:00').toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
+                      {formatDate(reservation.reservation_date + 'T00:00:00', locale, 'short')}
                     </div>
                   </div>
 

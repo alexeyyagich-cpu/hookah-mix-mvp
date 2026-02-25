@@ -120,7 +120,7 @@ export default function PromotionsPage() {
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">{editingPromo ? tm.editPromo : tm.createPromo}</h3>
-            <button type="button" onClick={resetForm} className="btn btn-ghost p-2"><IconClose size={18} /></button>
+            <button type="button" onClick={resetForm} className="btn btn-ghost p-2" aria-label="Close"><IconClose size={18} /></button>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">

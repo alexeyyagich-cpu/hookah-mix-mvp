@@ -9,7 +9,7 @@ import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus, IconExport, I
 import { exportSessionsCSV, exportSessionsPDF } from '@/lib/utils/exportReport'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export default function SessionsPage() {
@@ -245,14 +245,7 @@ export default function SessionsPage() {
               {/* Date & Bowl */}
               <div className="flex items-center justify-between">
                 <div className="text-[var(--color-textMuted)]">
-                  {new Date(selectedSession.session_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateTime(selectedSession.session_date, locale)}
                 </div>
                 {selectedSession.bowl_type && (
                   <span className="badge badge-primary flex items-center gap-1">

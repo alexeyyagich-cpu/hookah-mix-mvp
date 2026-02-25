@@ -8,7 +8,7 @@ import { useReservations } from '@/lib/hooks/useReservations'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { IconSettings, IconCalendar } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatTime } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useKDS } from '@/lib/hooks/useKDS'
@@ -520,10 +520,7 @@ export default function FloorPage() {
             <div className="mb-4">
               <p className="text-sm text-[var(--color-textMuted)]">{tm.sessionStart}</p>
               <p className="font-medium">
-                {new Date(activeSelectedTable.session_start_time).toLocaleTimeString(LOCALE_MAP[locale] || 'ru-RU', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatTime(activeSelectedTable.session_start_time, locale)}
               </p>
             </div>
           )}

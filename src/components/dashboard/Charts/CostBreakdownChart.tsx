@@ -7,6 +7,7 @@ interface CostBreakdownChartProps {
   data: CostCategory[]
 }
 
+// Chart data-series palette — intentionally not theme-variable
 const COLORS = [
   '#EF4444', // red
   '#F59E0B', // amber

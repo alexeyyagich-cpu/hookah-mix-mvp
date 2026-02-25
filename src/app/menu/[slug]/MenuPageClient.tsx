@@ -15,6 +15,7 @@ import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import type { PublicBarRecipe } from '@/types/lounge'
 
+// Brand identity colors — intentionally not theme-variable
 const BRAND_COLORS: Record<string, string> = {
   'Musthave': '#EC4899',
   'Darkside': '#6366F1',

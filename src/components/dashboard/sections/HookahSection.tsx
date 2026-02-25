@@ -20,7 +20,7 @@ import {
   IconSmoke,
 } from '@/components/Icons'
 import Link from 'next/link'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 export function HookahSection() {
@@ -198,12 +198,7 @@ export function HookahSection() {
                       {session.session_items?.map(i => i.flavor).join(' + ') || t.mixFallback}
                     </div>
                     <div className="text-sm text-[var(--color-textMuted)]">
-                      {new Date(session.session_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {formatDateTime(session.session_date, locale)}
                     </div>
                   </div>
                 </div>

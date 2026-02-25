@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 
 type Filter = 'all' | 'published' | 'hidden'
 
@@ -124,7 +124,7 @@ export default function ReviewsPage() {
                           ))}
                         </div>
                         <span className="text-xs text-[var(--color-textMuted)]">
-                          {new Date(review.created_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
+                          {formatDate(review.created_at, locale)}
                         </span>
                         {!review.is_published && (
                           <span className="px-2 py-0.5 rounded text-xs bg-[var(--color-bgHover)] text-[var(--color-textMuted)]">

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
-import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -74,6 +74,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
               <button type="button"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+                aria-label="Close"
               >
                 <IconClose size={20} />
               </button>
@@ -129,11 +130,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
 
                 {/* Estimated delivery */}
                 <div className="text-sm text-[var(--color-textMuted)]">
-                  {t.estimatedDeliveryLabel} {estimatedDelivery.toLocaleDateString('ru-RU', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
+                  {t.estimatedDeliveryLabel} {formatDate(estimatedDelivery, locale, 'long')}
                 </div>
 
                 {/* Notes */}

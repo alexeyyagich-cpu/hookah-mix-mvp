@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import type { Guest, BonusTransaction, LoyaltyTier } from '@/types/database'
-import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 import { IconClose, IconEdit, IconTrash, IconCoin } from '@/components/Icons'
 
+// Loyalty tier identity colors — intentionally not theme-variable
 const TIER_COLORS: Record<LoyaltyTier, string> = {
   bronze: '#CD7F32',
   silver: '#C0C0C0',
@@ -74,10 +75,10 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setEditing(!editing)} className="btn btn-ghost p-2">
+            <button type="button" onClick={() => setEditing(!editing)} className="btn btn-ghost p-2" aria-label="Edit">
               <IconEdit size={18} />
             </button>
-            <button type="button" onClick={onClose} className="btn btn-ghost p-2">
+            <button type="button" onClick={onClose} className="btn btn-ghost p-2" aria-label="Close">
               <IconClose size={18} />
             </button>
           </div>
@@ -150,7 +151,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
               {guest.last_visit_at && (
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--color-textMuted)]">{tm.lastVisit}</span>
-                  <span>{new Date(guest.last_visit_at).toLocaleDateString()}</span>
+                  <span>{formatDate(guest.last_visit_at, locale)}</span>
                 </div>
               )}
               {guest.notes && (
@@ -182,7 +183,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                       <span className="text-[var(--color-textMuted)] ml-2">{tx.description}</span>
                     </div>
                     <span className="text-xs text-[var(--color-textMuted)]">
-                      {new Date(tx.created_at).toLocaleDateString()}
+                      {formatDate(tx.created_at, locale)}
                     </span>
                   </div>
                 ))}

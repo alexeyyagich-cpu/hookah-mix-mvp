@@ -724,6 +724,7 @@ function MixPageInner() {
                   style={{
                     ...(selectedIds.length === 0
                       ? {
+                          // Decorative shimmer gradient — purple midpoint intentionally not theme-variable
                           background: 'linear-gradient(90deg, var(--color-primary), #a78bfa, var(--color-primary))',
                           backgroundSize: '200% 100%',
                           WebkitBackgroundClip: 'text',

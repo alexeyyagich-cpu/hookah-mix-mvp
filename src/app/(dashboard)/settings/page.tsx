@@ -741,7 +741,7 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* POS (ready2order) */}
+      {/* POS (ready2order) — brand color #00b341 intentionally not theme-variable */}
       <div className="card p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#00b341] flex items-center justify-center">
@@ -855,7 +855,7 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* Telegram Integration */}
+      {/* Telegram Integration — brand color #0088cc intentionally not theme-variable */}
       <div className="card p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#0088cc] flex items-center justify-center">

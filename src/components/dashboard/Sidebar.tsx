@@ -179,6 +179,7 @@ export function Sidebar() {
           <span
             className="badge"
             style={{
+              // Decorative gradient — pink endpoint intentionally not theme-variable
               background: isOwner
                 ? 'linear-gradient(135deg, var(--color-primary) 0%, #ec4899 100%)'
                 : 'var(--color-bgHover)',

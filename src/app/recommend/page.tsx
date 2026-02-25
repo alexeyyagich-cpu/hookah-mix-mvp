@@ -24,7 +24,7 @@ import {
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from '@/data/tobaccos'
 import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
 import { IconTarget } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 
 // Mix item for the builder
 interface SelectedTobacco {
@@ -423,7 +423,7 @@ export default function RecommendPage() {
                     <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
                       {t.recommendVisits(selectedGuest.visit_count)}
                       {selectedGuest.last_visit_at && (
-                        <> &middot; {new Date(selectedGuest.last_visit_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}</>
+                        <> &middot; {formatDate(selectedGuest.last_visit_at, locale)}</>
                       )}
                     </p>
                   </div>
@@ -560,9 +560,9 @@ export default function RecommendPage() {
                 const info = STRENGTH_LABELS[strength]
                 const isSelected = selectedStrength === strength
                 const strengthColors = {
-                  light: { bg: '#22c55e', label: t.recommendStrengthLight },
-                  medium: { bg: '#f59e0b', label: t.recommendStrengthMedium },
-                  strong: { bg: '#ef4444', label: t.recommendStrengthStrong },
+                  light: { bg: 'var(--color-success)', label: t.recommendStrengthLight },
+                  medium: { bg: 'var(--color-warning)', label: t.recommendStrengthMedium },
+                  strong: { bg: 'var(--color-danger)', label: t.recommendStrengthStrong },
                 }
                 const colorInfo = strengthColors[strength as keyof typeof strengthColors]
 
@@ -578,7 +578,7 @@ export default function RecommendPage() {
                     }`}
                     style={{
                       background: isSelected
-                        ? `linear-gradient(135deg, ${colorInfo.bg}20 0%, ${colorInfo.bg}10 100%)`
+                        ? `linear-gradient(135deg, color-mix(in srgb, ${colorInfo.bg} 12%, transparent) 0%, color-mix(in srgb, ${colorInfo.bg} 6%, transparent) 100%)`
                         : 'var(--color-bgHover)',
                     }}
                   >
@@ -630,7 +630,7 @@ export default function RecommendPage() {
               {getAllFlavorProfiles().map(profile => {
                 const info = FLAVOR_PROFILE_LABELS[profile]
                 const isSelected = selectedProfiles.includes(profile)
-                // Color coding for each flavor type
+                // Flavor identity colors — intentionally not theme-variable
                 const flavorColors: Record<string, string> = {
                   fresh: '#06b6d4',   // cyan
                   fruity: '#f43f5e',  // rose
@@ -922,6 +922,7 @@ export default function RecommendPage() {
             <div
               className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center relative overflow-hidden"
               style={{
+                // Decorative gradient — pink endpoint intentionally not theme-variable
                 background: 'linear-gradient(135deg, var(--color-primary) 0%, #ec4899 100%)',
                 opacity: 0.9
               }}
@@ -1427,7 +1428,7 @@ function MixResultCard({
           <div className="flex flex-wrap gap-1 mt-2">
             {matchReasons.slice(0, 3).map((reason, i) => (
               <span
-                key={i}
+                key={`${reason}-${i}`}
                 className="text-xs px-1.5 py-0.5 rounded"
                 style={{
                   background: 'color-mix(in srgb, var(--color-primary) 15%, transparent)',
@@ -1477,8 +1478,8 @@ function MixResultCard({
             {t.recommendComposition}
           </p>
           <div className="space-y-1.5">
-            {mix.ingredients.map((ing, i) => (
-              <div key={i} className="flex items-center justify-between text-sm">
+            {mix.ingredients.map((ing) => (
+              <div key={`${ing.brand ?? ''}-${ing.flavor}`} className="flex items-center justify-between text-sm">
                 <span style={{ color: 'var(--color-text)' }}>
                   {ing.brand ? `${ing.brand} ` : ''}{ing.flavor}
                 </span>
@@ -1497,8 +1498,8 @@ function MixResultCard({
                 {t.recommendMissing}
               </p>
               <ul className="text-xs space-y-1" style={{ color: 'var(--color-textMuted)' }}>
-                {missingTobaccos.map((t, i) => (
-                  <li key={i}>• {t}</li>
+                {missingTobaccos.map((tobacco) => (
+                  <li key={tobacco}>• {tobacco}</li>
                 ))}
               </ul>
 
@@ -1511,8 +1512,8 @@ function MixResultCard({
                     {t.recommendReplacements}
                   </p>
                   <ul className="text-xs space-y-1" style={{ color: 'var(--color-textMuted)' }}>
-                    {replacements.map((r, i) => (
-                      <li key={i}>
+                    {replacements.map((r) => (
+                      <li key={`${r.originalFlavor}-${r.replacement.flavor}`}>
                         {r.originalFlavor} → {r.replacement.brand} {r.replacement.flavor}
                       </li>
                     ))}

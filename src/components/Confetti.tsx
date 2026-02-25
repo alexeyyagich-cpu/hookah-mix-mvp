@@ -17,6 +17,7 @@ type Props = {
   duration?: number;
 };
 
+// Confetti particle palette — intentionally not theme-variable
 const COLORS = ["#F59E0B", "#EC4899", "#22C55E", "#06B6D4", "#8B5CF6", "#EF4444", "#FACC15"];
 
 export default function Confetti({ active, duration = 3000 }: Props) {

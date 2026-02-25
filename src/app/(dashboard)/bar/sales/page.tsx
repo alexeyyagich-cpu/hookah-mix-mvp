@@ -7,7 +7,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
 import { IconExport, IconLock, IconChart } from '@/components/Icons'
 import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
-import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
 
 type Period = 7 | 14 | 30
 
@@ -57,10 +57,7 @@ export default function BarSalesPage() {
     return sales.filter(s => new Date(s.sold_at) >= cutoff)
   }, [sales, period])
 
-  const formatTime = (iso: string) => {
-    const d = new Date(iso)
-    return d.toLocaleString(LOCALE_MAP[locale] || 'ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-  }
+  const fmtDateTime = (iso: string) => formatDateTime(iso, locale)
 
   // Revenue chart — simple bar chart with CSS
   const maxDayRevenue = Math.max(...analytics.revenueByDay.map(d => d.revenue), 1)
@@ -222,7 +219,7 @@ export default function BarSalesPage() {
                       return (
                         <tr key={sale.id} className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-bgHover)] transition-colors">
                           <td className="px-4 py-3 text-sm text-[var(--color-textMuted)]">
-                            {formatTime(sale.sold_at)}
+                            {fmtDateTime(sale.sold_at)}
                           </td>
                           <td className="px-4 py-3">
                             <span className="text-sm font-medium">{sale.recipe_name}</span>
@@ -276,7 +273,7 @@ export default function BarSalesPage() {
                       return (
                         <div key={day.date} className="flex items-center gap-3">
                           <span className="text-xs text-[var(--color-textMuted)] w-12 flex-shrink-0">
-                            {new Date(day.date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', { day: '2-digit', month: '2-digit' })}
+                            {formatDate(day.date, locale, 'short')}
                           </span>
                           <div className="flex-1 relative h-6 rounded-lg bg-[var(--color-bgHover)] overflow-hidden">
                             <div

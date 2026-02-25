@@ -2,7 +2,7 @@
 
 import type { OrderStatus } from '@/types/database'
 import { IconPackage, IconCheck, IconTruck, IconClose } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
 
 interface OrderTimelineProps {
   status: OrderStatus
@@ -25,6 +25,7 @@ export function OrderTimeline({
   actualDeliveryDate,
 }: OrderTimelineProps) {
   const t = useTranslation('market')
+  const { locale } = useLocale()
 
   const TIMELINE_LABELS: Record<string, string> = {
     pending: t.timelineOrdered,
@@ -33,15 +34,7 @@ export function OrderTimeline({
     delivered: t.timelineDelivered,
   }
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+  const fmtDateTime = (dateStr: string) => formatDateTime(dateStr, locale)
 
   const getStatusIndex = (s: OrderStatus) => {
     if (s === 'cancelled') return -1
@@ -60,7 +53,7 @@ export function OrderTimeline({
           <div>
             <div className="font-semibold text-[var(--color-danger)]">{t.orderCancelled}</div>
             <div className="text-sm text-[var(--color-textMuted)]">
-              {formatDate(createdAt)}
+              {fmtDateTime(createdAt)}
             </div>
           </div>
         </div>
@@ -111,15 +104,15 @@ export function OrderTimeline({
                 {/* Show date for completed or current status */}
                 {isCompleted && (
                   <div className="text-sm text-[var(--color-textMuted)] mt-0.5">
-                    {item.key === 'pending' && formatDate(createdAt)}
-                    {item.key === 'delivered' && actualDeliveryDate && formatDate(actualDeliveryDate)}
+                    {item.key === 'pending' && fmtDateTime(createdAt)}
+                    {item.key === 'delivered' && actualDeliveryDate && fmtDateTime(actualDeliveryDate)}
                   </div>
                 )}
 
                 {/* Show estimated delivery for shipped */}
                 {item.key === 'delivered' && !isCompleted && estimatedDeliveryDate && (
                   <div className="text-sm text-[var(--color-textMuted)] mt-0.5">
-                    {t.expectedLabel} {formatDate(estimatedDeliveryDate)}
+                    {t.expectedLabel} {fmtDateTime(estimatedDeliveryDate)}
                   </div>
                 )}
               </div>

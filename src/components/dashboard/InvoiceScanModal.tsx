@@ -101,7 +101,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
             <IconScan size={20} />
             {t.ocrTitle}
           </h2>
-          <button type="button" onClick={handleClose} className="btn btn-ghost p-2"><IconClose size={18} /></button>
+          <button type="button" onClick={handleClose} className="btn btn-ghost p-2" aria-label="Close"><IconClose size={18} /></button>
         </div>
 
         <div className="p-4 space-y-4">
@@ -190,7 +190,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
                         placeholder="€"
                       />
                     </div>
-                    <button type="button" onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]">
+                    <button type="button" onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]" aria-label="Remove">
                       <IconClose size={14} />
                     </button>
                   </div>

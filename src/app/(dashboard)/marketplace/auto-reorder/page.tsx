@@ -17,7 +17,7 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
 
 export default function AutoReorderPage() {
@@ -230,7 +230,7 @@ export default function AutoReorderPage() {
 
                   {rule.last_triggered_at && (
                     <div className="mt-2 text-xs text-[var(--color-textMuted)]">
-                      {t.lastOrder} {new Date(rule.last_triggered_at).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU')}
+                      {t.lastOrder} {formatDate(rule.last_triggered_at, locale)}
                     </div>
                   )}
                 </div>

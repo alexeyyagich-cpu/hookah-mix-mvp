@@ -14,7 +14,7 @@ import {
   IconCheck,
   IconClose,
 } from '@/components/Icons'
-import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 
@@ -116,15 +116,7 @@ export default function OrderDetailPage() {
     setUpdating(false)
   }
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+  const fmtDateTime = (dateStr: string) => formatDateTime(dateStr, locale)
 
   if (loading) {
     return (
@@ -183,7 +175,7 @@ export default function OrderDetailPage() {
             )}
           </div>
           <p className="text-[var(--color-textMuted)] mt-1">
-            {formatDate(order.created_at)}
+            {fmtDateTime(order.created_at)}
           </p>
         </div>
 
@@ -305,11 +297,7 @@ export default function OrderDetailPage() {
                 <span>{t.expectedDelivery}</span>
               </div>
               <div className="font-medium mt-1">
-                {new Date(order.estimated_delivery_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+                {formatDate(order.estimated_delivery_date, locale, 'long')}
               </div>
             </div>
           )}
@@ -321,11 +309,7 @@ export default function OrderDetailPage() {
                 <span>{t.deliveredLabel}</span>
               </div>
               <div className="font-medium mt-1">
-                {new Date(order.actual_delivery_date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+                {formatDate(order.actual_delivery_date, locale, 'long')}
               </div>
             </div>
           )}

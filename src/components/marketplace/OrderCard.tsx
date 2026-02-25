@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 import { IconPackage, IconTruck, IconCheck, IconClose, IconChevronRight } from '@/components/Icons'
-import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 
 interface OrderCardProps {
   order: MarketplaceOrderWithItems
@@ -33,15 +33,6 @@ export function OrderCard({ order }: OrderCardProps) {
   const statusLabel = STATUS_LABELS[order.status]
   const StatusIcon = status.Icon
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
-
   const itemsSummary = order.order_items.slice(0, 3).map(item =>
     `${item.brand} ${item.flavor}`
   ).join(', ')
@@ -66,7 +57,7 @@ export function OrderCard({ order }: OrderCardProps) {
             <div>
               <div className="font-medium">#{order.order_number}</div>
               <div className="text-sm text-[var(--color-textMuted)]">
-                {formatDate(order.created_at)}
+                {formatDate(order.created_at, locale)}
               </div>
             </div>
           </div>
@@ -101,7 +92,7 @@ export function OrderCard({ order }: OrderCardProps) {
       {order.status === 'shipped' && order.estimated_delivery_date && (
         <div className="mt-3 pt-3 border-t border-[var(--color-border)] text-sm">
           <span className="text-[var(--color-textMuted)]">{t.expectedDeliveryColon}</span>
-          <span className="ml-2 font-medium">{formatDate(order.estimated_delivery_date)}</span>
+          <span className="ml-2 font-medium">{formatDate(order.estimated_delivery_date, locale)}</span>
         </div>
       )}
 

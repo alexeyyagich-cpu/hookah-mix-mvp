@@ -4,6 +4,7 @@ import type { Guest, LoyaltyTier } from '@/types/database'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { IconStar, IconCoin } from '@/components/Icons'
 
+// Loyalty tier identity colors — intentionally not theme-variable
 const TIER_COLORS: Record<LoyaltyTier, string> = {
   bronze: '#CD7F32',
   silver: '#C0C0C0',

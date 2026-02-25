@@ -12,6 +12,7 @@ interface BrandPieChartProps {
   data: BrandData[]
 }
 
+// Chart data-series palette — intentionally not theme-variable
 const COLORS = [
   '#F59E0B', // primary
   '#22C55E', // success

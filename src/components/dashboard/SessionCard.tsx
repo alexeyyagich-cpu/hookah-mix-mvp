@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation, useLocale } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
 import type { SessionWithItems } from '@/types/database'
 
 interface SessionCardProps {
@@ -13,14 +13,7 @@ interface SessionCardProps {
 export function SessionCard({ session, onView, onDelete, onRate }: SessionCardProps) {
   const t = useTranslation('hookah')
   const { locale } = useLocale()
-  const date = new Date(session.session_date)
-  const formattedDate = date.toLocaleDateString(locale, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const formattedDate = formatDateTime(session.session_date, locale)
 
   const getScoreColor = (score: number | null) => {
     if (!score) return 'text-[var(--color-textMuted)]'

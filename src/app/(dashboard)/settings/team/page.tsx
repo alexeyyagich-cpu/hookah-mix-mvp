@@ -8,7 +8,7 @@ import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
 import { TipQRCode } from '@/components/dashboard/TipQRCode'
-import { useTranslation, useLocale, LOCALE_MAP, formatCurrency } from '@/lib/i18n'
+import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useRouter } from 'next/navigation'
 import type { OrgRole } from '@/types/database'
@@ -99,13 +99,7 @@ export default function TeamPage() {
     setActionLoading(null)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
-  }
+  const fmtDate = (dateString: string) => formatDate(dateString, locale)
 
   const getDaysUntilExpiry = (expiresAt: string) => {
     const diff = new Date(expiresAt).getTime() - Date.now()
@@ -190,7 +184,7 @@ export default function TeamPage() {
                       </select>
                     </div>
                     <div className="text-xs text-[var(--color-textMuted)] mt-1">
-                      {tm.memberSince(formatDate(member.created_at))}
+                      {tm.memberSince(fmtDate(member.created_at))}
                     </div>
                     <div className="flex flex-wrap items-center gap-2 mt-2">
                       <div className="flex items-center gap-1">
@@ -273,7 +267,7 @@ export default function TeamPage() {
                         {getRoleLabel(invitation.role)}
                       </div>
                       <div className="text-sm text-[var(--color-textMuted)]">
-                        {tm.inviteSentAt(formatDate(invitation.created_at))}
+                        {tm.inviteSentAt(fmtDate(invitation.created_at))}
                       </div>
                       <div className={`text-xs ${daysLeft <= 2 ? 'text-[var(--color-warning)]' : 'text-[var(--color-textMuted)]'}`}>
                         {tm.expiresInDays(daysLeft)}

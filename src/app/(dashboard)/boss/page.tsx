@@ -14,7 +14,7 @@ import { useInventory } from '@/lib/hooks/useInventory'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { useTips } from '@/lib/hooks/useTips'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatTime } from '@/lib/i18n'
 import { IconCrown, IconRefresh } from '@/components/Icons'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import Link from 'next/link'
@@ -30,6 +30,7 @@ import { ActivityFeed } from '@/components/boss/ActivityFeed'
 
 export default function BossPage() {
   const tm = useTranslation('manage')
+  const { locale } = useLocale()
   const router = useRouter()
   const { orgRole } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
@@ -137,6 +138,7 @@ export default function BossPage() {
           disabled={refreshing}
           className="p-2 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors disabled:opacity-50"
           title="Refresh"
+          aria-label="Refresh"
         >
           <IconRefresh size={20} className={refreshing ? 'animate-spin' : ''} />
         </button>
@@ -211,7 +213,7 @@ export default function BossPage() {
       <div className="text-center text-xs text-[var(--color-textMuted)] pb-4">
         {refreshing
           ? tm.bossRefreshing
-          : tm.bossLastUpdated(lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
+          : tm.bossLastUpdated(formatTime(lastRefresh, locale))
         }
       </div>
     </div>

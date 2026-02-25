@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslation, useLocale, LOCALE_MAP } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 
 interface DailyData {
   date: string
@@ -62,7 +62,7 @@ export function ConsumptionChart({ data }: ConsumptionChartProps) {
           <div key={day.date} className="flex-1 text-center">
             {(data.length <= 7 || index === 0 || index === data.length - 1) && (
               <div className="text-[10px] text-[var(--color-textMuted)]">
-                {new Date(day.date).toLocaleDateString(LOCALE_MAP[locale] || 'ru-RU', { day: 'numeric', month: 'short' })}
+                {formatDate(day.date, locale, 'short')}
               </div>
             )}
           </div>

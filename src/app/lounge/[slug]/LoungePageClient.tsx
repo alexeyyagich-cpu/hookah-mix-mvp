@@ -312,9 +312,9 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {mix.tobaccos.map((tb, i) => (
+                    {mix.tobaccos.map((tb) => (
                       <span
-                        key={i}
+                        key={`${tb.flavor}-${tb.percent}`}
                         className="px-2 py-1 rounded-lg text-xs"
                         style={{
                           backgroundColor: `${tb.color}20`,

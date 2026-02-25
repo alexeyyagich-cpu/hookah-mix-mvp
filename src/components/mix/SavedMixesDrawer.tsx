@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
 import { IconStar, IconMix, IconTrash } from '@/components/Icons'
 import { MixRating, MixNotes } from './MixRating'
@@ -18,6 +18,7 @@ type FilterOption = 'all' | 'favorites'
 
 export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDrawerProps) {
   const t = useTranslation('hookah')
+  const { locale } = useLocale()
   const { savedMixes, loading, deleteMix, toggleFavorite, incrementUsage, updateMix } = useSavedMixes()
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [filterBy, setFilterBy] = useState<FilterOption>('all')
@@ -188,7 +189,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                         )}
                       </div>
                       <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
-                        {t.mixUsageCount(mix.usage_count, new Date(mix.created_at).toLocaleDateString())}
+                        {t.mixUsageCount(mix.usage_count, formatDate(mix.created_at, locale))}
                       </p>
                       {/* Rating */}
                       <div className="mt-2">
