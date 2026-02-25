@@ -74,6 +74,7 @@ export const auth = {
   heroCta: 'Попробовать бесплатно',
   heroCtaCalculator: 'Открыть калькулятор',
   heroNote: 'Бесплатный старт за 2 минуты',
+  tryDemo: 'или попробуйте демо без регистрации',
 
   // Landing page — Features
   featuresTitle1: 'Всё что нужно для ',

@@ -302,6 +302,10 @@ export const bar: typeof BarType = {
   glassTiki: 'Tiki',
   glassOther: 'Other',
 
+  // CTA buttons
+  goToRecipes: 'Go to Recipes',
+  addFirstIngredient: 'Add your first bar ingredient to get started',
+
   // Export
   exportSales: 'Export sales',
   exportSalesCSV: 'Download CSV',

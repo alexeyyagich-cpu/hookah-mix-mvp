@@ -760,4 +760,17 @@ export const hookah: typeof HookahType = {
   setupBannerTitle: 'Complete your venue setup',
   setupBannerDesc: 'Configure your business type and modules to unlock all features.',
   setupBannerBtn: 'Go to Settings',
+
+  // Quick Start checklist
+  quickStartTitle: 'Quick Start',
+  quickStartProgress: (done: number, total: number) => `${done}/${total} completed`,
+  quickStartDismiss: 'Dismiss',
+  quickStartAddTobacco: 'Add your tobacco inventory',
+  quickStartAddTobaccoDesc: 'Add the tobacco brands and flavors you stock',
+  quickStartCreateMix: 'Create your first mix',
+  quickStartCreateMixDesc: 'Use the mix calculator to craft a session',
+  quickStartSetupProfile: 'Complete your business profile',
+  quickStartSetupProfileDesc: 'Add phone number and venue details',
+  quickStartInviteTeam: 'Invite your team',
+  quickStartInviteTeamDesc: 'Add hookah masters and bartenders (optional)',
 }

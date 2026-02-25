@@ -307,6 +307,10 @@ export const bar = {
   glassTiki: 'Тики',
   glassOther: 'Другой',
 
+  // CTA buttons
+  goToRecipes: 'Перейти к рецептам',
+  addFirstIngredient: 'Добавьте первый ингредиент для начала работы',
+
   // Export
   exportSales: 'Экспорт продаж',
   exportSalesCSV: 'Скачать CSV',

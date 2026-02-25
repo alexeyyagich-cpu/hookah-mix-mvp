@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
@@ -149,6 +150,9 @@ export default function BarMenuPage() {
           <p className="text-[var(--color-textMuted)] max-w-md mx-auto">
             {tb.menuEmptyGoToRecipes}
           </p>
+          <Link href="/bar/recipes" className="btn btn-primary mt-4">
+            {tb.goToRecipes}
+          </Link>
         </div>
       ) : (
         <div className="space-y-6">

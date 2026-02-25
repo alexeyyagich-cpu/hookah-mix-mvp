@@ -11,9 +11,10 @@ interface BarInventoryTableProps {
   onDelete: (id: string) => void
   onAdjust: (id: string, amount: number) => void
   loading?: boolean
+  onAdd?: () => void
 }
 
-export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading }: BarInventoryTableProps) {
+export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading, onAdd }: BarInventoryTableProps) {
   const t = useTranslation('bar')
   const CATEGORY_LABELS: Record<string, string> = {
     spirit: t.catSpirit, liqueur: t.catLiqueur, wine: t.catWine,
@@ -107,11 +108,16 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   if (inventory.length === 0) {
     return (
       <div className="card p-12 text-center">
-        <div className="text-4xl mb-4">🍸</div>
-        <h3 className="text-lg font-semibold mb-2">{t.barInventoryEmpty}</h3>
-        <p className="text-[var(--color-textMuted)]">
-          {t.addIngredientsToStart}
+        <div className="text-4xl mb-3">🍶</div>
+        <h3 className="text-lg font-semibold mb-2">{t.noIngredients}</h3>
+        <p className="text-[var(--color-textMuted)] mb-4">
+          {t.addFirstIngredient}
         </p>
+        {onAdd && (
+          <button type="button" onClick={onAdd} className="btn btn-primary">
+            + {t.addIngredient}
+          </button>
+        )}
       </div>
     )
   }

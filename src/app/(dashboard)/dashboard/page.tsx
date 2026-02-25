@@ -9,6 +9,7 @@ import { useTranslation } from '@/lib/i18n'
 import { HookahSection } from '@/components/dashboard/sections/HookahSection'
 import { BarSection } from '@/components/dashboard/sections/BarSection'
 import { FloorStatusWidget } from '@/components/dashboard/sections/FloorStatusWidget'
+import { QuickStartCard } from '@/components/dashboard/QuickStartCard'
 import { ControlDashboard } from '@/components/dashboard/sections/ControlDashboard'
 import {
   IconCalculator,
@@ -82,6 +83,11 @@ export default function DashboardPage() {
           </Link>
         )}
       </div>
+
+      {/* Quick Start Checklist */}
+      <ErrorBoundary sectionName="Quick Start">
+        <QuickStartCard />
+      </ErrorBoundary>
 
       {/* Floor Status — always visible */}
       <ErrorBoundary sectionName="Floor Status">

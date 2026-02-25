@@ -760,4 +760,17 @@ export const hookah: typeof HookahType = {
   setupBannerTitle: 'Einrichtung abschließen',
   setupBannerDesc: 'Konfigurieren Sie Ihren Geschäftstyp und Module, um alle Funktionen freizuschalten.',
   setupBannerBtn: 'Zu den Einstellungen',
+
+  // Quick Start checklist
+  quickStartTitle: 'Schnellstart',
+  quickStartProgress: (done: number, total: number) => `${done}/${total} erledigt`,
+  quickStartDismiss: 'Ausblenden',
+  quickStartAddTobacco: 'Tabakbestand hinzufügen',
+  quickStartAddTobaccoDesc: 'Fügen Sie Ihre Tabakmarken und Sorten hinzu',
+  quickStartCreateMix: 'Ersten Mix erstellen',
+  quickStartCreateMixDesc: 'Nutzen Sie den Kalkulator für eine Session',
+  quickStartSetupProfile: 'Geschäftsprofil vervollständigen',
+  quickStartSetupProfileDesc: 'Telefonnummer und Details hinzufügen',
+  quickStartInviteTeam: 'Team einladen',
+  quickStartInviteTeamDesc: 'Shisha-Meister und Barkeeper hinzufügen (optional)',
 }

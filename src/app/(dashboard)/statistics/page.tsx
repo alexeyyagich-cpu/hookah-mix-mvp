@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useStatisticsComparison } from '@/lib/hooks/useStatisticsComparison'
@@ -414,6 +415,9 @@ export default function StatisticsPage() {
           <p className="text-[var(--color-textMuted)]">
             {tm.createSessionsHint}
           </p>
+          <Link href="/mix" className="btn btn-primary mt-4">
+            {tm.goToMixCalculator}
+          </Link>
         </div>
       ) : viewMode === 'overview' && statistics ? (
         <>

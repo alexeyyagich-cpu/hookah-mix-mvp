@@ -70,6 +70,7 @@ export const auth: typeof AuthType = {
   heroCta: 'Try for free',
   heroCtaCalculator: 'Open calculator',
   heroNote: 'Free start in 2 minutes',
+  tryDemo: 'or try the demo without signing up',
 
   // Landing page — Features
   featuresTitle1: 'Everything you need for ',

@@ -141,6 +141,10 @@ export default function BarInventoryPage() {
           onDelete={handleDelete}
           onAdjust={handleAdjust}
           loading={loading}
+          onAdd={() => {
+            setEditingItem(null)
+            setModalOpen(true)
+          }}
         />
       </ErrorBoundary>
 

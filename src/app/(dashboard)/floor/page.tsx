@@ -443,19 +443,32 @@ export default function FloorPage() {
           </button>
         )}
       </div>
-      <div className="card p-6">
-        <FloorPlan
-          tables={filteredTables}
-          loading={loading}
-          editable={isEditMode}
-          onTableSelect={handleTableSelect}
-          addTable={floorPlan.addTable}
-          updateTable={floorPlan.updateTable}
-          deleteTable={floorPlan.deleteTable}
-          moveTable={floorPlan.moveTable}
-          setTableStatus={floorPlan.setTableStatus}
-        />
-      </div>
+      {tables.length === 0 && !loading && !isEditMode ? (
+        <div className="card p-12 text-center">
+          <div className="text-4xl mb-3">🪑</div>
+          <h3 className="text-lg font-semibold mb-2">{tm.noTables}</h3>
+          <p className="text-[var(--color-textMuted)] mb-4">{tm.noTablesHint}</p>
+          {hasPermission('floor.edit') && (
+            <button type="button" onClick={() => setIsEditMode(true)} className="btn btn-primary">
+              {tm.enableEditMode}
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="card p-6">
+          <FloorPlan
+            tables={filteredTables}
+            loading={loading}
+            editable={isEditMode}
+            onTableSelect={handleTableSelect}
+            addTable={floorPlan.addTable}
+            updateTable={floorPlan.updateTable}
+            deleteTable={floorPlan.deleteTable}
+            moveTable={floorPlan.moveTable}
+            setTableStatus={floorPlan.setTableStatus}
+          />
+        </div>
+      )}
 
       {/* Selected Table Info */}
       {activeSelectedTable && !isEditMode && (

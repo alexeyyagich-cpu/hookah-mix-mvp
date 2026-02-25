@@ -677,6 +677,11 @@ export const manage: typeof ManageType = {
   zoneFilterAll: 'All zones',
   zoneOther: 'No zone',
 
+  // CTA buttons
+  goToMixCalculator: 'Open Mix Calculator',
+  noTablesHint: 'Switch to edit mode to add your first table',
+  enableEditMode: 'Edit Mode',
+
   // Floor plan — Timer alerts
   floorLongSession: 'Long session',
   floorSessionExceeds: (minutes: number) => `Session exceeds ${minutes} min`,

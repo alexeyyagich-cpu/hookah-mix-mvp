@@ -11,7 +11,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { signIn, signInDemo, isDemoMode } = useAuth()
+  const { signIn, signInDemo } = useAuth()
   const t = useTranslation('auth')
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -64,26 +64,24 @@ export function LoginForm() {
       </div>
 
       {/* Demo Mode Banner */}
-      {isDemoMode && (
-        <div className="mb-6 p-4 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">🎮</span>
-            <div>
-              <h3 className="font-semibold">{t.demoMode}</h3>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {t.demoDescription}
-              </p>
-            </div>
+      <div className="mb-6 p-4 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-2xl">🎮</span>
+          <div>
+            <h3 className="font-semibold">{t.demoMode}</h3>
+            <p className="text-sm text-[var(--color-textMuted)]">
+              {t.demoDescription}
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            className="w-full btn btn-primary py-3"
-          >
-            {t.demoLogin}
-          </button>
         </div>
-      )}
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          className="w-full btn btn-primary py-3"
+        >
+          {t.demoLogin}
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit} className="card p-6 space-y-6">
         {error && (

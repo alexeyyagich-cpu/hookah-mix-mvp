@@ -683,6 +683,11 @@ export const manage = {
   zoneFilterAll: 'Все зоны',
   zoneOther: 'Без зоны',
 
+  // CTA buttons
+  goToMixCalculator: 'Открыть калькулятор',
+  noTablesHint: 'Включите режим редактирования, чтобы добавить первый стол',
+  enableEditMode: 'Режим редактирования',
+
   // Floor plan — Timer alerts
   floorLongSession: 'Длинная сессия',
   floorSessionExceeds: (minutes: number) => `Сессия превышает ${minutes} мин`,

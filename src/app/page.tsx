@@ -186,6 +186,10 @@ export default function LandingPage() {
             <p className="mt-6 text-sm text-[var(--color-textMuted)]">
               {t.heroNote}
             </p>
+
+            <Link href="/login?demo=true" className="mt-2 inline-block text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
+              {t.tryDemo}
+            </Link>
           </div>
         </div>
       </section>

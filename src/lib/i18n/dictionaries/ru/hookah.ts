@@ -766,4 +766,17 @@ export const hookah = {
   setupBannerTitle: 'Завершите настройку заведения',
   setupBannerDesc: 'Укажите тип бизнеса и модули, чтобы разблокировать все функции.',
   setupBannerBtn: 'Перейти в настройки',
+
+  // Quick Start checklist
+  quickStartTitle: 'Быстрый старт',
+  quickStartProgress: (done: number, total: number) => `${done}/${total} выполнено`,
+  quickStartDismiss: 'Скрыть',
+  quickStartAddTobacco: 'Добавьте табак в инвентарь',
+  quickStartAddTobaccoDesc: 'Внесите бренды и вкусы, которые есть в наличии',
+  quickStartCreateMix: 'Создайте первый микс',
+  quickStartCreateMixDesc: 'Используйте калькулятор для создания сессии',
+  quickStartSetupProfile: 'Заполните профиль заведения',
+  quickStartSetupProfileDesc: 'Добавьте телефон и данные заведения',
+  quickStartInviteTeam: 'Пригласите команду',
+  quickStartInviteTeamDesc: 'Добавьте кальянщиков и барменов (опционально)',
 }
