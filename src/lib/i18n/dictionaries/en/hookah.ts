@@ -773,4 +773,8 @@ export const hookah: typeof HookahType = {
   quickStartSetupProfileDesc: 'Add phone number and venue details',
   quickStartInviteTeam: 'Invite your team',
   quickStartInviteTeamDesc: 'Add hookah masters and bartenders (optional)',
+
+  // Approaching limit warnings
+  approachingLimit: (current: number, max: number) => `${current}/${max} items — approaching limit`,
+  approachingBowlLimit: (current: number, max: number) => `${current}/${max} bowls — approaching limit`,
 }

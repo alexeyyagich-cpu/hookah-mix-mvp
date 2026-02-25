@@ -156,6 +156,12 @@ export const settings: typeof SettingsType = {
   loungeSaturday: 'Saturday',
   loungeSunday: 'Sunday',
 
+  publicMenuLink: 'Public Menu',
+  publicMenuLinkDesc: 'Share this link or QR code with your guests',
+  copyLink: 'Copy',
+  copiedLink: 'Copied!',
+  openInNewTab: 'Open menu',
+
   dangerZone: 'Danger zone',
   logoutTitle: 'Log out',
   logoutDesc: 'You will be logged out on this device',

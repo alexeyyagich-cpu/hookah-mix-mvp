@@ -779,4 +779,8 @@ export const hookah = {
   quickStartSetupProfileDesc: 'Добавьте телефон и данные заведения',
   quickStartInviteTeam: 'Пригласите команду',
   quickStartInviteTeamDesc: 'Добавьте кальянщиков и барменов (опционально)',
+
+  // Approaching limit warnings
+  approachingLimit: (current: number, max: number) => `${current}/${max} позиций — приближаетесь к лимиту`,
+  approachingBowlLimit: (current: number, max: number) => `${current}/${max} чаш — приближаетесь к лимиту`,
 }

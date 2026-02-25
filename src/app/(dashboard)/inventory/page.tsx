@@ -14,6 +14,7 @@ import { InvoiceScanModal } from '@/components/dashboard/InvoiceScanModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
 import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
+import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import type { TobaccoInventory } from '@/types/database'
@@ -254,6 +255,19 @@ export default function InventoryPage() {
           </div>
         </div>
       </div>
+
+      {/* Approaching Limit Warning */}
+      {isFreeTier && itemsLimit && inventory.length >= Math.floor(itemsLimit * 0.8) && inventory.length < itemsLimit && (
+        <div className="p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            <span className="text-sm">{t.approachingLimit(inventory.length, itemsLimit)}</span>
+          </div>
+          <Link href="/pricing" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
+            {tc.upgrade}
+          </Link>
+        </div>
+      )}
 
       {/* Limit Warning */}
       {isFreeTier && !canAddMore && (

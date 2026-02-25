@@ -316,4 +316,7 @@ export const bar = {
   exportSalesCSV: 'Скачать CSV',
   exportSalesPDF: 'Скачать PDF',
   exportProOnly: 'Экспорт доступен в Pro',
+
+  // Approaching limit warnings
+  approachingBarLimit: (current: number, max: number) => `${current}/${max} ингредиентов — приближаетесь к лимиту`,
 }

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useLoungeProfile } from '@/lib/hooks/useLoungeProfile'
 import { useTranslation } from '@/lib/i18n'
 import { TOAST_TIMEOUT } from '@/lib/constants'
 import { LOUNGE_FEATURES } from '@/types/lounge'
 import type { LoungeFeature, WorkingHours, DayHours } from '@/types/lounge'
+import { QRCodeSVG } from 'qrcode.react'
 
 const DAYS: (keyof WorkingHours)[] = [
   'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
@@ -16,6 +17,8 @@ export default function LoungeProfileSettings() {
   const { lounge, loading, updateLounge } = useLoungeProfile()
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
+  const qrRef = useRef<HTMLDivElement>(null)
 
   // Local form state
   const [description, setDescription] = useState(lounge?.description || '')
@@ -99,6 +102,40 @@ export default function LoungeProfileSettings() {
       await updateLounge({ is_published: next })
     }
   }, [isPublished, lounge, updateLounge])
+
+  const menuUrl = lounge?.slug
+    ? `https://hookahtorus.com/menu/${lounge.slug}`
+    : ''
+
+  const handleCopyLink = useCallback(() => {
+    if (!menuUrl) return
+    navigator.clipboard.writeText(menuUrl)
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), TOAST_TIMEOUT)
+  }, [menuUrl])
+
+  const handleDownloadQR = useCallback(() => {
+    if (!qrRef.current) return
+    const svg = qrRef.current.querySelector('svg')
+    if (!svg) return
+
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const img = new Image()
+
+    img.onload = () => {
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx?.drawImage(img, 0, 0)
+      const link = document.createElement('a')
+      link.download = `menu-qr-${lounge?.slug}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    }
+
+    img.src = 'data:image/svg+xml;base64,' + btoa(svgData)
+  }, [lounge?.slug])
 
   if (loading) {
     return (
@@ -310,6 +347,53 @@ export default function LoungeProfileSettings() {
           />
         </button>
       </div>
+
+      {/* Public Menu Link */}
+      {lounge?.slug && isPublished && (
+        <div className="pt-4 border-t border-[var(--color-border)]">
+          <h3 className="font-semibold mb-4">{ts.publicMenuLink}</h3>
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div ref={qrRef} className="shrink-0 w-32 h-32 bg-white p-2 rounded-lg flex items-center justify-center">
+              <QRCodeSVG value={menuUrl} size={112} level="M" />
+            </div>
+            <div className="flex-1 space-y-3 min-w-0">
+              <p className="text-sm text-[var(--color-textMuted)]">{ts.publicMenuLinkDesc}</p>
+              <div className="flex gap-2">
+                <input
+                  readOnly
+                  value={menuUrl}
+                  className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] flex-1 min-w-0"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="btn btn-primary px-4 shrink-0"
+                >
+                  {linkCopied ? ts.copiedLink : ts.copyLink}
+                </button>
+              </div>
+              <div className="flex gap-3">
+                <a
+                  href={`/menu/${lounge.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[var(--color-primary)] hover:underline"
+                >
+                  {ts.openInNewTab} &rarr;
+                </a>
+                <button
+                  type="button"
+                  onClick={handleDownloadQR}
+                  className="text-sm text-[var(--color-primary)] hover:underline"
+                >
+                  {ts.downloadQr}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Save */}
       <div className="flex items-center gap-4">

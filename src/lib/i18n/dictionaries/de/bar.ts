@@ -311,4 +311,7 @@ export const bar: typeof BarType = {
   exportSalesCSV: 'CSV herunterladen',
   exportSalesPDF: 'PDF herunterladen',
   exportProOnly: 'Export in Pro verfügbar',
+
+  // Approaching limit warnings
+  approachingBarLimit: (current: number, max: number) => `${current}/${max} Zutaten — Limit fast erreicht`,
 } as const

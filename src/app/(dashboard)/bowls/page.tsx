@@ -8,6 +8,7 @@ import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
+import Link from 'next/link'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 const BOWL_BACKGROUNDS = [
@@ -135,6 +136,19 @@ export default function BowlsPage() {
           + {t.addBowl}
         </button>
       </div>
+
+      {/* Approaching Limit Warning */}
+      {isFreeTier && bowlsLimit && bowls.length >= Math.floor(bowlsLimit * 0.8) && bowls.length < bowlsLimit && (
+        <div className="p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            <span className="text-sm">{t.approachingBowlLimit(bowls.length, bowlsLimit)}</span>
+          </div>
+          <Link href="/pricing" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
+            {tc.upgrade}
+          </Link>
+        </div>
+      )}
 
       {/* Limit Warning */}
       {isFreeTier && !canAddMore && (

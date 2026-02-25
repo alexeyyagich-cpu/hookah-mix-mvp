@@ -164,6 +164,12 @@ export const settings = {
   loungeSaturday: 'Суббота',
   loungeSunday: 'Воскресенье',
 
+  publicMenuLink: 'Публичное меню',
+  publicMenuLinkDesc: 'Поделитесь ссылкой или QR-кодом с гостями',
+  copyLink: 'Копировать',
+  copiedLink: 'Скопировано!',
+  openInNewTab: 'Открыть меню',
+
   // Danger zone
   dangerZone: 'Опасная зона',
   logoutTitle: 'Выйти из аккаунта',

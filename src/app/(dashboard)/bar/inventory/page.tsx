@@ -7,6 +7,7 @@ import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
 import { AddBarIngredientModal } from '@/components/bar/AddBarIngredientModal'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useTranslation } from '@/lib/i18n'
+import Link from 'next/link'
 import type { BarInventoryItem } from '@/types/database'
 
 export default function BarInventoryPage() {
@@ -107,6 +108,19 @@ export default function BarInventoryPage() {
           </div>
         </div>
       </div>
+
+      {/* Approaching Limit Warning */}
+      {isFreeTier && itemsLimit && inventory.length >= Math.floor(itemsLimit * 0.8) && inventory.length < itemsLimit && (
+        <div className="p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            <span className="text-sm">{t.approachingBarLimit(inventory.length, itemsLimit)}</span>
+          </div>
+          <Link href="/pricing" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
+            {tc.upgrade}
+          </Link>
+        </div>
+      )}
 
       {/* Limit Warning */}
       {isFreeTier && !canAddMore && (
