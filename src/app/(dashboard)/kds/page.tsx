@@ -11,6 +11,7 @@ import { useModules } from '@/lib/hooks/useModules'
 import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
 import { IconPlus, IconMenuList } from '@/components/Icons'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useTranslation } from '@/lib/i18n'
 import type { KdsOrderStatus } from '@/types/database'
 
@@ -110,6 +111,7 @@ export default function KdsPage() {
       )}
 
       {/* Loading */}
+      <ErrorBoundary sectionName="KDS Board">
       {loading ? (
         <div className="card p-12 text-center">
           <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
@@ -214,6 +216,7 @@ export default function KdsPage() {
           </div>
         </>
       )}
+      </ErrorBoundary>
 
       {/* New Order Modal */}
       <NewOrderModal

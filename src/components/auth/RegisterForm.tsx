@@ -111,7 +111,7 @@ export function RegisterForm() {
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-            placeholder="Lounge Bar"
+            placeholder={t.placeholderBusinessName}
           />
         </div>
 
@@ -125,7 +125,7 @@ export function RegisterForm() {
             value={ownerName}
             onChange={(e) => setOwnerName(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-            placeholder="Jan Kowalski"
+            placeholder={t.placeholderOwnerName}
           />
         </div>
 
@@ -139,7 +139,7 @@ export function RegisterForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
-            placeholder="your@email.com"
+            placeholder={t.placeholderEmail}
             required
           />
         </div>

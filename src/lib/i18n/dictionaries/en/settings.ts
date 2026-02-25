@@ -116,6 +116,16 @@ export const settings: typeof SettingsType = {
   tipProOnly: 'Available on Pro plan',
   tipProOnlyDesc: 'Upgrade your subscription for QR tips',
 
+  // Placeholders
+  placeholderBusinessName: 'Lounge Bar',
+  placeholderOwnerName: 'Jan Kowalski',
+  placeholderPhone: '+XX XXX XXX XXX',
+  placeholderAddress: '123 Main St, City',
+  placeholderSlug: 'my-lounge',
+  placeholderUrl: 'https://...',
+  placeholderUsername: '@username',
+  placeholderChannel: '@channel',
+
   // Lounge Profile
   loungeProfile: 'Lounge Profile',
   loungeProfileDesc: 'Set up the public page for your venue',

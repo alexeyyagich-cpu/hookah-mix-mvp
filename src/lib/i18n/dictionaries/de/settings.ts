@@ -116,6 +116,16 @@ export const settings: typeof SettingsType = {
   tipProOnly: 'Verfügbar im Pro-Tarif',
   tipProOnlyDesc: 'Upgraden Sie für QR-Trinkgeld',
 
+  // Placeholders
+  placeholderBusinessName: 'Meine Bar',
+  placeholderOwnerName: 'Max Mustermann',
+  placeholderPhone: '+49 XXX XXXXXXX',
+  placeholderAddress: 'Musterstraße 42, Berlin',
+  placeholderSlug: 'meine-bar',
+  placeholderUrl: 'https://...',
+  placeholderUsername: '@benutzername',
+  placeholderChannel: '@kanal',
+
   // Lounge Profile
   loungeProfile: 'Lounge-Profil',
   loungeProfileDesc: 'Richten Sie die öffentliche Seite Ihres Lokals ein',

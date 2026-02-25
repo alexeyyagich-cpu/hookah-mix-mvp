@@ -93,14 +93,14 @@ export function OfflineIndicator() {
           style={{ background: 'rgba(15, 15, 25, 0.95)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
         >
           <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-            <span className="text-red-400 font-medium">
+            <span className="text-[var(--color-error)] font-medium">
               {tc.offline.syncFailed(String(failedItems.length))}
             </span>
             <div className="flex gap-1">
-              <button onClick={handleRetryAll} className="px-2 py-0.5 rounded text-blue-400 hover:bg-blue-400/10 transition-colors">
+              <button onClick={handleRetryAll} className="px-2 py-0.5 rounded text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors">
                 {tc.retry}
               </button>
-              <button onClick={handleDiscardAll} className="px-2 py-0.5 rounded text-zinc-500 hover:bg-zinc-500/10 transition-colors">
+              <button onClick={handleDiscardAll} className="px-2 py-0.5 rounded text-[var(--color-textMuted)] hover:bg-[var(--color-textMuted)]/10 transition-colors">
                 {tc.delete}
               </button>
             </div>
@@ -113,17 +113,17 @@ export function OfflineIndicator() {
               style={{ borderColor: 'rgba(255,255,255,0.05)' }}
             >
               <div className="flex-1 min-w-0">
-                <div className="text-zinc-300 truncate">
+                <div className="text-[var(--color-text)] truncate">
                   {LABELS[item.table] || item.table} — {item.operation}
                 </div>
                 {item.error && (
-                  <div className="text-red-400/70 truncate mt-0.5">{item.error}</div>
+                  <div className="text-[var(--color-error)]/70 truncate mt-0.5">{item.error}</div>
                 )}
               </div>
               <div className="flex gap-1 ml-2 shrink-0">
                 <button
                   onClick={() => item.id && handleRetry(item.id)}
-                  className="p-1 rounded hover:bg-blue-400/10 text-blue-400 transition-colors"
+                  className="p-1 rounded hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors"
                   title={tc.retry}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -133,7 +133,7 @@ export function OfflineIndicator() {
                 </button>
                 <button
                   onClick={() => item.id && handleDiscard(item.id)}
-                  className="p-1 rounded hover:bg-red-400/10 text-zinc-500 transition-colors"
+                  className="p-1 rounded hover:bg-[var(--color-error)]/10 text-[var(--color-textMuted)] transition-colors"
                   title={tc.delete}
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

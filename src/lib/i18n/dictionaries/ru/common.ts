@@ -140,6 +140,8 @@ export const common = {
   legalImpressum: 'Impressum',
   legalAllRights: 'Все права защищены.',
 
+  changeTheme: 'Сменить тему',
+
   // Cookie consent
   cookieText: 'Мы используем файлы cookie для обеспечения работы сайта и улучшения качества обслуживания.',
   privacyPolicy: 'Политика конфиденциальности',

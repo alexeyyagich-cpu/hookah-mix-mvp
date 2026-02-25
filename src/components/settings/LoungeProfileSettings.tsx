@@ -129,8 +129,8 @@ export default function LoungeProfileSettings() {
         </div>
         <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
           isPublished
-            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-            : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+            ? 'bg-[var(--color-success)]/10 text-[var(--color-success)]'
+            : 'bg-[var(--color-warning)]/10 text-[var(--color-warning)]'
         }`}>
           {isPublished ? ts.loungePublished : ts.loungeDraft}
         </span>
@@ -167,7 +167,7 @@ export default function LoungeProfileSettings() {
             type="url"
             value={coverImageUrl}
             onChange={e => setCoverImageUrl(e.target.value)}
-            placeholder="https://..."
+            placeholder={ts.placeholderUrl}
             className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
           />
         </div>
@@ -177,7 +177,7 @@ export default function LoungeProfileSettings() {
             type="url"
             value={logoUrl}
             onChange={e => setLogoUrl(e.target.value)}
-            placeholder="https://..."
+            placeholder={ts.placeholderUrl}
             className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
           />
         </div>
@@ -202,8 +202,8 @@ export default function LoungeProfileSettings() {
                   onClick={() => updateDayHours(key, 'is_closed', !isClosed)}
                   className={`shrink-0 text-xs px-2 py-1 rounded-lg border transition-colors ${
                     isClosed
-                      ? 'bg-red-50 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
-                      : 'bg-green-50 border-green-200 text-green-600 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400'
+                      ? 'bg-[var(--color-error)]/10 border-[var(--color-error)]/30 text-[var(--color-error)]'
+                      : 'bg-[var(--color-success)]/10 border-[var(--color-success)]/30 text-[var(--color-success)]'
                   }`}
                 >
                   {isClosed ? ts.loungeClosed : ts.loungeOpen}
@@ -264,7 +264,7 @@ export default function LoungeProfileSettings() {
               type="text"
               value={instagram}
               onChange={e => setInstagram(e.target.value)}
-              placeholder="@username"
+              placeholder={ts.placeholderUsername}
               className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
           </div>
@@ -274,7 +274,7 @@ export default function LoungeProfileSettings() {
               type="text"
               value={telegram}
               onChange={e => setTelegram(e.target.value)}
-              placeholder="@channel"
+              placeholder={ts.placeholderChannel}
               className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
           </div>
@@ -284,7 +284,7 @@ export default function LoungeProfileSettings() {
               type="url"
               value={website}
               onChange={e => setWebsite(e.target.value)}
-              placeholder="https://..."
+              placeholder={ts.placeholderUrl}
               className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
           </div>
@@ -321,7 +321,7 @@ export default function LoungeProfileSettings() {
           {saving ? '...' : ts.saveSlug}
         </button>
         {message && (
-          <span className="text-sm text-green-600 dark:text-green-400">{message}</span>
+          <span className="text-sm text-[var(--color-success)]">{message}</span>
         )}
       </div>
     </div>

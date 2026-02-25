@@ -14,6 +14,7 @@ import {
   IconCalculator,
   IconSettings,
 } from '@/components/Icons'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import Link from 'next/link'
 
 export default function DashboardPage() {
@@ -83,10 +84,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Floor Status — always visible */}
-      <FloorStatusWidget />
+      <ErrorBoundary sectionName="Floor Status">
+        <FloorStatusWidget />
+      </ErrorBoundary>
 
       {/* Control Panel — financial overview */}
-      <ControlDashboard />
+      <ErrorBoundary sectionName="Control Dashboard">
+        <ControlDashboard />
+      </ErrorBoundary>
 
       {/* Hookah Section */}
       {isHookahActive && (
@@ -96,7 +101,9 @@ export default function DashboardPage() {
               <span>🔥</span> {th.dashboardTitle}
             </h2>
           )}
-          <HookahSection />
+          <ErrorBoundary sectionName="Hookah Section">
+            <HookahSection />
+          </ErrorBoundary>
         </div>
       )}
 
@@ -108,7 +115,9 @@ export default function DashboardPage() {
               <span>🍸</span> {tc.modules.bar}
             </h2>
           )}
-          <BarSection />
+          <ErrorBoundary sectionName="Bar Section">
+            <BarSection />
+          </ErrorBoundary>
         </div>
       )}
 

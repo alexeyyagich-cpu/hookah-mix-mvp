@@ -28,6 +28,10 @@ export const auth: typeof AuthType = {
   passwordTooShort: 'Passwort muss mindestens 6 Zeichen lang sein',
   passwordPlaceholder: 'Mindestens 6 Zeichen',
   repeatPasswordPlaceholder: 'Passwort wiederholen',
+  placeholderEmail: 'ihre@email.com',
+  placeholderPassword: '••••••••',
+  placeholderBusinessName: 'Meine Bar',
+  placeholderOwnerName: 'Max Mustermann',
 
   checkEmail: 'Prüfen Sie Ihre E-Mail',
   emailSentTo: (email: string) => `Wir haben eine E-Mail an ${email} gesendet.`,

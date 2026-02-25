@@ -124,6 +124,16 @@ export const settings = {
   tipProOnly: 'Доступно на тарифе Pro',
   tipProOnlyDesc: 'Обновите подписку для QR-чаевых',
 
+  // Placeholders
+  placeholderBusinessName: 'Мой бар',
+  placeholderOwnerName: 'Иван Иванов',
+  placeholderPhone: '+7 XXX XXX XX XX',
+  placeholderAddress: 'ул. Примерная, 42, Москва',
+  placeholderSlug: 'moy-bar',
+  placeholderUrl: 'https://...',
+  placeholderUsername: '@username',
+  placeholderChannel: '@канал',
+
   // Lounge Profile
   loungeProfile: 'Профиль лаунжа',
   loungeProfileDesc: 'Настройте публичную страницу вашего заведения',

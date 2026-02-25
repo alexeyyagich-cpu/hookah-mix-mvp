@@ -422,7 +422,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                                     <>
                                       <button
                                         onClick={() => removeBarItem(recipe)}
-                                        className="w-7 h-7 rounded-full bg-[var(--color-bgHover)] hover:bg-red-500/20 text-[var(--color-text)] flex items-center justify-center text-sm font-bold transition-colors"
+                                        className="w-7 h-7 rounded-full bg-[var(--color-bgHover)] hover:bg-[var(--color-error)]/20 text-[var(--color-text)] flex items-center justify-center text-sm font-bold transition-colors"
                                       >
                                         -
                                       </button>
@@ -734,7 +734,7 @@ function MenuPageInner({ slug }: { slug: string }) {
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <button
               onClick={() => setCart([])}
-              className="text-sm text-[var(--color-textMuted)] hover:text-red-400 transition-colors"
+              className="text-sm text-[var(--color-textMuted)] hover:text-[var(--color-error)] transition-colors"
             >
               {t.clearCart}
             </button>
@@ -773,7 +773,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                       <span className="text-sm font-bold">{'\u00D7'}{item.quantity}</span>
                       <button
                         onClick={() => removeCartItem(i)}
-                        className="text-red-400 hover:text-red-300 text-sm"
+                        className="text-[var(--color-error)] hover:brightness-110 text-sm"
                       >
                         {t.removeFromCart}
                       </button>
@@ -806,7 +806,7 @@ function MenuPageInner({ slug }: { slug: string }) {
               </div>
 
               {orderError && (
-                <div className="mb-4 p-3 rounded-xl bg-red-500/10 text-red-400 text-sm">{orderError}</div>
+                <div className="mb-4 p-3 rounded-xl bg-[var(--color-error)]/10 text-[var(--color-error)] text-sm">{orderError}</div>
               )}
 
               <div className="flex gap-3">

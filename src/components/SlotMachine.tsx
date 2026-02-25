@@ -149,7 +149,7 @@ function Reel({
             <span className="text-sm font-bold text-white text-center px-1 leading-tight line-clamp-2">
               {finalItem.flavor}
             </span>
-            <span className="text-[11px] text-gray-400 font-medium">
+            <span className="text-[11px] text-[var(--color-textMuted)] font-medium">
               {finalItem.brand}
             </span>
           </div>
@@ -177,7 +177,7 @@ function Reel({
                 >
                   {CATEGORY_EMOJI[tobacco.category]}
                 </div>
-                <span className="text-[10px] text-gray-300 text-center mt-1 truncate w-full px-1 font-medium">
+                <span className="text-[10px] text-[var(--color-textMuted)] text-center mt-1 truncate w-full px-1 font-medium">
                   {tobacco.flavor}
                 </span>
               </div>
@@ -185,7 +185,7 @@ function Reel({
           </div>
         ) : (
           // Idle state - show placeholder
-          <div className="flex flex-col items-center justify-center text-gray-500">
+          <div className="flex flex-col items-center justify-center text-[var(--color-textMuted)]">
             <span className="text-4xl mb-2">❓</span>
             <span className="text-xs">{t.mixSlotIdle}</span>
           </div>
@@ -299,7 +299,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
               {t.mixSlotTitle}
               <span className="text-3xl animate-bounce" style={{ animationDelay: "0.1s" }}>🎰</span>
             </h2>
-            <p className="text-sm text-gray-400 mt-2">{t.mixSlotSubtitle}</p>
+            <p className="text-sm text-[var(--color-textMuted)] mt-2">{t.mixSlotSubtitle}</p>
           </div>
 
           {/* Slot Reels */}
@@ -318,9 +318,9 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
           {/* Result message */}
           {showResult && (
             <div className="text-center mb-4 animate-bounce-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/50">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--color-success)]/20 border border-[var(--color-success)]/50">
                 <span className="text-2xl">🎉</span>
-                <span className="text-lg font-bold text-green-400">
+                <span className="text-lg font-bold text-[var(--color-success)]">
                   {t.mixSlotReady}
                 </span>
                 <span className="text-2xl">🎉</span>
@@ -338,7 +338,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
                   w-full py-4 rounded-2xl font-bold text-lg uppercase tracking-wider
                   transition-all duration-200
                   ${isSpinning
-                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    ? "bg-[var(--color-surface)] text-[var(--color-textMuted)] cursor-not-allowed"
                     : "bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white hover:scale-105 hover:shadow-lg hover:shadow-orange-500/50 active:scale-95"
                   }
                 `}
@@ -358,13 +358,13 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
               <>
                 <button
                   onClick={handleConfirm}
-                  className="w-full py-4 rounded-2xl font-bold text-lg bg-green-500 text-white hover:bg-green-600 active:scale-95 transition-all"
+                  className="w-full py-4 rounded-2xl font-bold text-lg bg-[var(--color-success)] text-white hover:brightness-110 active:scale-95 transition-all"
                 >
                   ✅ {t.mixSlotApply}
                 </button>
                 <button
                   onClick={spin}
-                  className="w-full py-3 rounded-xl font-medium text-sm bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+                  className="w-full py-3 rounded-xl font-medium text-sm bg-[var(--color-surface)] text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] transition-colors"
                 >
                   🔄 {t.mixSlotSpinAgain}
                 </button>
@@ -374,7 +374,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
             {!isSpinning && !showResult && (
               <button
                 onClick={onClose}
-                className="text-sm text-gray-500 hover:text-gray-300 transition-colors mt-2"
+                className="text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors mt-2"
               >
                 {t.mixSlotCancel}
               </button>

@@ -389,7 +389,7 @@ export default function SettingsPage() {
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              placeholder="Lounge Bar"
+              placeholder={ts.placeholderBusinessName}
             />
           </div>
 
@@ -400,7 +400,7 @@ export default function SettingsPage() {
               value={ownerName}
               onChange={(e) => setOwnerName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              placeholder="Jan Kowalski"
+              placeholder={ts.placeholderOwnerName}
             />
           </div>
         </div>
@@ -412,7 +412,7 @@ export default function SettingsPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="+XX XXX XXX XXX"
+            placeholder={ts.placeholderPhone}
           />
         </div>
 
@@ -423,7 +423,7 @@ export default function SettingsPage() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-            placeholder="ul. Nowy Swiat 42, Warsaw"
+            placeholder={ts.placeholderAddress}
           />
         </div>
 
@@ -465,7 +465,7 @@ export default function SettingsPage() {
                   value={venueSlug}
                   onChange={(e) => setVenueSlug(e.target.value)}
                   className="flex-1 px-3 py-3 bg-transparent focus:outline-none"
-                  placeholder="my-lounge"
+                  placeholder={ts.placeholderSlug}
                 />
               </div>
               <button

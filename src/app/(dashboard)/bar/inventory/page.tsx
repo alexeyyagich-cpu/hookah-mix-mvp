@@ -5,6 +5,7 @@ import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
 import { AddBarIngredientModal } from '@/components/bar/AddBarIngredientModal'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
 
@@ -133,13 +134,15 @@ export default function BarInventoryPage() {
       )}
 
       {/* Table */}
-      <BarInventoryTable
-        inventory={inventory}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onAdjust={handleAdjust}
-        loading={loading}
-      />
+      <ErrorBoundary sectionName="Bar Inventory Table">
+        <BarInventoryTable
+          inventory={inventory}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onAdjust={handleAdjust}
+          loading={loading}
+        />
+      </ErrorBoundary>
 
       {/* Modal */}
       <AddBarIngredientModal

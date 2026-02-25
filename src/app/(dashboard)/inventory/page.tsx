@@ -14,6 +14,7 @@ import { InvoiceScanModal } from '@/components/dashboard/InvoiceScanModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
 import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
@@ -283,15 +284,17 @@ export default function InventoryPage() {
       )}
 
       {/* Table */}
-      <InventoryTable
-        inventory={inventory}
-        forecasts={forecastsMap}
-        lowStockThreshold={lowStockThreshold}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onAdjust={handleAdjust}
-        loading={loading}
-      />
+      <ErrorBoundary sectionName="Inventory Table">
+        <InventoryTable
+          inventory={inventory}
+          forecasts={forecastsMap}
+          lowStockThreshold={lowStockThreshold}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onAdjust={handleAdjust}
+          loading={loading}
+        />
+      </ErrorBoundary>
 
       {/* Delete Confirmation Toast */}
       {deleteConfirm && (

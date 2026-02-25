@@ -28,6 +28,10 @@ export const auth: typeof AuthType = {
   passwordTooShort: 'Password must be at least 6 characters',
   passwordPlaceholder: 'At least 6 characters',
   repeatPasswordPlaceholder: 'Repeat password',
+  placeholderEmail: 'your@email.com',
+  placeholderPassword: '••••••••',
+  placeholderBusinessName: 'Lounge Bar',
+  placeholderOwnerName: 'Jan Kowalski',
 
   checkEmail: 'Check your email',
   emailSentTo: (email: string) => `We sent an email to ${email}.`,

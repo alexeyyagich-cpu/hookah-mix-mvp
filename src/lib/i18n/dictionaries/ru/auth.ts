@@ -29,6 +29,10 @@ export const auth = {
   passwordTooShort: 'Пароль должен содержать минимум 6 символов',
   passwordPlaceholder: 'Минимум 6 символов',
   repeatPasswordPlaceholder: 'Повторите пароль',
+  placeholderEmail: 'ваш@email.com',
+  placeholderPassword: '••••••••',
+  placeholderBusinessName: 'Мой бар',
+  placeholderOwnerName: 'Иван Иванов',
 
   // Email confirmation
   checkEmail: 'Проверьте почту',

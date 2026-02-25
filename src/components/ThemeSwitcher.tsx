@@ -3,9 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/lib/ThemeContext";
 import { THEME_ORDER, THEMES } from "@/lib/themes";
+import { useTranslation } from "@/lib/i18n";
 
 export default function ThemeSwitcher() {
   const { themeId, setTheme, theme } = useTheme();
+  const tc = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +34,7 @@ export default function ThemeSwitcher() {
           color: "var(--color-text)",
           border: "1px solid var(--color-border)",
         }}
-        title="Change theme"
+        title={tc.changeTheme}
       >
         <span
           className="w-3 h-3 rounded-full"

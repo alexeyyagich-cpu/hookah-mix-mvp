@@ -126,6 +126,8 @@ export const common: typeof CommonType = {
   legalImpressum: 'Impressum',
   legalAllRights: 'Alle Rechte vorbehalten.',
 
+  changeTheme: 'Design ändern',
+
   // Cookie consent
   cookieText: 'Wir verwenden Cookies, um den Betrieb der Website zu gewährleisten und unseren Service zu verbessern.',
   privacyPolicy: 'Datenschutzerklärung',
