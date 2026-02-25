@@ -42,7 +42,7 @@ export function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
+      <div className="absolute inset-0 bg-black/50" role="button" tabIndex={-1} aria-label="Close" onClick={onCancel} onKeyDown={(e) => e.key === 'Escape' && onCancel()} />
       <div className="relative w-full max-w-sm rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
         <h3 className="text-lg font-bold mb-2">{title}</h3>
         <p className="text-sm text-[var(--color-textMuted)] mb-5">{message}</p>

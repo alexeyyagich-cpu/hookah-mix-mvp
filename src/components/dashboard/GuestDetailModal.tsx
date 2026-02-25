@@ -49,7 +49,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const tierLabel = tm[`tier${guest.loyalty_tier.charAt(0).toUpperCase()}${guest.loyalty_tier.slice(1)}` as keyof typeof tm] as string
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="button" tabIndex={-1} aria-label="Close" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
       <div
         className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-xl"
         onClick={e => e.stopPropagation()}

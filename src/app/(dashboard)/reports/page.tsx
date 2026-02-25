@@ -58,17 +58,17 @@ export default function ReportsPage() {
   const showHookah = moduleFilter === 'all' || moduleFilter === 'hookah'
 
   const handleExportCSV = () => {
-    exportPnLCSV(data, period)
+    exportPnLCSV(data, period, locale)
     setExportMenuOpen(false)
   }
 
   const handleExportPDF = () => {
-    exportPnLPDF(data, period)
+    exportPnLPDF(data, period, locale)
     setExportMenuOpen(false)
   }
 
   const handleCopyText = async () => {
-    await copyPnLAsText(data, period)
+    await copyPnLAsText(data, period, locale)
     setCopyMessage(tm.copied)
     setExportMenuOpen(false)
     setTimeout(() => setCopyMessage(''), 2000)

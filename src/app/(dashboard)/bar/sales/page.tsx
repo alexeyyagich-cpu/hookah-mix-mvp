@@ -39,9 +39,9 @@ export default function BarSalesPage() {
   const handleExport = (format: 'csv' | 'pdf') => {
     if (!canExport || periodSales.length === 0) return
     if (format === 'csv') {
-      exportBarSalesCSV(periodSales)
+      exportBarSalesCSV(periodSales, locale)
     } else {
-      exportBarSalesPDF(periodSales, analytics, period)
+      exportBarSalesPDF(periodSales, analytics, period, locale)
     }
     setExportMenuOpen(false)
   }
