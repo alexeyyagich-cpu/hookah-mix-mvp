@@ -140,6 +140,7 @@ export function RegisterForm() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
             placeholder={t.placeholderEmail}
+            autoComplete="email"
             required
           />
         </div>
@@ -155,6 +156,8 @@ export function RegisterForm() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
             placeholder={t.passwordPlaceholder}
+            autoComplete="new-password"
+            minLength={6}
             required
           />
         </div>
@@ -170,6 +173,8 @@ export function RegisterForm() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
             placeholder={t.repeatPasswordPlaceholder}
+            autoComplete="new-password"
+            minLength={6}
             required
           />
         </div>

@@ -259,6 +259,7 @@ export const manage = {
   staffCannotEditInventory: 'Редактировать инвентарь и настройки',
   staffCannotViewStats: 'Просматривать статистику и маркетплейс',
   staffEmailLabel: 'Email сотрудника',
+  placeholderStaffEmail: 'сотрудник@пример.com',
   inviteLinkHint: 'Сотрудник получит ссылку для регистрации. Приглашение действительно 7 дней.',
   sending: 'Отправка...',
   send: 'Отправить',

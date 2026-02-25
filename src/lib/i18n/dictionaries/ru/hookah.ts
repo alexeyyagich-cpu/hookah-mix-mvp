@@ -190,6 +190,8 @@ export const hookah = {
   startSetup: 'Начать настройку',
   businessNameLabel: 'Название заведения',
   ownerNameLabel: 'Ваше имя',
+  placeholderBusinessName: 'Кальянная',
+  placeholderOwnerName: 'Иван Иванов',
   addBowlPrompt: 'Добавьте чашу',
   addBowlPromptDesc: 'Для точного расчёта граммовки',
   modelLabel: 'Модель',

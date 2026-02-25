@@ -15,7 +15,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
   const t = useTranslation('hookah')
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
-  const scannerRef = useRef<any>(null)
+  const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const onScanRef = useRef(onScan)
   const lastScannedRef = useRef<string | null>(null)

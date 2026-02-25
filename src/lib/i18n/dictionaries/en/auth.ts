@@ -31,7 +31,7 @@ export const auth: typeof AuthType = {
   placeholderEmail: 'your@email.com',
   placeholderPassword: '••••••••',
   placeholderBusinessName: 'Lounge Bar',
-  placeholderOwnerName: 'Jan Kowalski',
+  placeholderOwnerName: 'John Smith',
 
   checkEmail: 'Check your email',
   emailSentTo: (email: string) => `We sent an email to ${email}.`,

@@ -412,7 +412,7 @@ export default function TeamPage() {
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder="staff@example.com"
+                  placeholder={tm.placeholderStaffEmail}
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                   required
                   autoFocus

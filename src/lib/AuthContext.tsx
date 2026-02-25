@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Safety timeout — never show spinner longer than 5s
     const timeout = setTimeout(() => {
       if (!didSettle) {
-        console.warn('Auth session loading timed out after 5s')
+        // Safety fallback — stop loading spinner if auth takes too long
         didSettle = true
         setLoading(false)
       }

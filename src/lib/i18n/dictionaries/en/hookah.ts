@@ -184,6 +184,8 @@ export const hookah: typeof HookahType = {
   startSetup: 'Start setup',
   businessNameLabel: 'Venue name',
   ownerNameLabel: 'Your name',
+  placeholderBusinessName: 'Lounge Bar',
+  placeholderOwnerName: 'John Smith',
   addBowlPrompt: 'Add a bowl',
   addBowlPromptDesc: 'For precise gram calculations',
   modelLabel: 'Model',

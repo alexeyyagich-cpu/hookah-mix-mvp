@@ -201,12 +201,18 @@ function MenuPageInner({ slug }: { slug: string }) {
       const responses = await Promise.all(requests)
       for (const res of responses) {
         if (!res.ok) {
-          const data = await res.json().catch((err) => { console.error('Menu fetch error:', err); return {} })
+          let errorMessage = t.orderError
           if (res.status === 429) {
-            setOrderError(t.orderRateLimit)
+            errorMessage = t.orderRateLimit
           } else {
-            setOrderError(data.error || t.orderError)
+            try {
+              const data = await res.json()
+              if (data.error) errorMessage = data.error
+            } catch {
+              // Response body is not valid JSON — use default error message
+            }
           }
+          setOrderError(errorMessage)
           setSubmitting(false)
           return
         }

@@ -42,7 +42,6 @@ export async function processSyncQueue(
     }
   }
 
-  console.log(`[sync] Complete: ${synced} synced, ${failed} failed`)
   return { synced, failed }
 }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { PricingCard } from '@/components/pricing/PricingCard'
@@ -101,6 +101,17 @@ function PricingPageContent() {
   const searchParams = useSearchParams()
   const [isYearly, setIsYearly] = useState(true)
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const showError = useCallback((message: string) => {
+    setError(message)
+  }, [])
+
+  useEffect(() => {
+    if (!error) return
+    const timer = setTimeout(() => setError(null), 5000)
+    return () => clearTimeout(timer)
+  }, [error])
 
   const canceled = searchParams.get('canceled')
 
@@ -124,7 +135,7 @@ function PricingPageContent() {
     // Check if Stripe is configured
     const priceId = isYearly ? plan.stripePriceYearly : plan.stripePriceMonthly
     if (!priceId) {
-      alert(ta.stripeNotConfigured)
+      showError(ta.stripeNotConfigured)
       return
     }
 
@@ -151,7 +162,7 @@ function PricingPageContent() {
       }
     } catch (error) {
       void error
-      alert(ta.paymentError)
+      showError(ta.paymentError)
     } finally {
       setLoadingPlan(null)
     }
@@ -239,6 +250,13 @@ function PricingPageContent() {
             </span>
           </button>
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)] text-center text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-16">

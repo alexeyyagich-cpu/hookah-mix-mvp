@@ -253,6 +253,7 @@ export const manage: typeof ManageType = {
   staffCannotEditInventory: 'Inventar und Einstellungen bearbeiten',
   staffCannotViewStats: 'Statistiken und Marktplatz einsehen',
   staffEmailLabel: 'E-Mail des Mitarbeiters',
+  placeholderStaffEmail: 'mitarbeiter@beispiel.de',
   inviteLinkHint: 'Der Mitarbeiter erhält einen Registrierungslink. Die Einladung gilt 7 Tage.',
   sending: 'Wird gesendet...',
   send: 'Senden',

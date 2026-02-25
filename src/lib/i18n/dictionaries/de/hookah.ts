@@ -184,6 +184,8 @@ export const hookah: typeof HookahType = {
   startSetup: 'Einrichtung starten',
   businessNameLabel: 'Lokalname',
   ownerNameLabel: 'Ihr Name',
+  placeholderBusinessName: 'Shisha Bar',
+  placeholderOwnerName: 'Max Mustermann',
   addBowlPrompt: 'Kopf hinzufügen',
   addBowlPromptDesc: 'Für präzise Grammberechnung',
   modelLabel: 'Modell',
