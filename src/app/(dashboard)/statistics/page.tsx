@@ -101,7 +101,7 @@ export default function StatisticsPage() {
     if (format === 'csv') {
       exportStatisticsCSV(statistics)
     } else {
-      exportStatisticsPDF(statistics, dateRange)
+      void exportStatisticsPDF(statistics, dateRange)
     }
     setExportMenuOpen(false)
   }

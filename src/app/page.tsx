@@ -112,8 +112,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl overflow-hidden">
-              <video autoPlay loop muted playsInline preload="metadata" poster="/images/torus-logo.png" className="w-full h-full object-cover">
+              <video autoPlay loop muted playsInline preload="none" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                 <source src="/images/logo-animated.mp4" type="video/mp4" />
+                <img src="/images/torus-logo.png" alt="Hookah Torus" className="w-full h-full object-cover" />
               </video>
             </div>
             <span className="text-xl font-bold">Hookah Torus</span>
@@ -226,6 +227,7 @@ export default function LandingPage() {
                 alt="Hookah Torus Bar Management"
                 width={1920}
                 height={1080}
+                loading="lazy"
                 className="w-full h-auto"
               />
             </div>
@@ -355,6 +357,7 @@ export default function LandingPage() {
                 <div className="w-8 h-8 rounded-lg overflow-hidden">
                   <video autoPlay loop muted playsInline preload="none" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                     <source src="/images/logo-animated.mp4" type="video/mp4" />
+                    <img src="/images/torus-logo.png" alt="Hookah Torus" className="w-full h-full object-cover" />
                   </video>
                 </div>
                 <span className="font-bold">Hookah Torus</span>

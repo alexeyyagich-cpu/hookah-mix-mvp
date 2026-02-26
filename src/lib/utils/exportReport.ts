@@ -3,8 +3,6 @@
 import type { TobaccoInventory, SessionWithItems, BarSale, BarAnalytics } from '@/types/database'
 import type { Locale } from '@/lib/i18n/types'
 import { formatCurrency } from '@/lib/i18n/format'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 
 interface Statistics {
   totalSessions: number
@@ -128,10 +126,12 @@ export function exportStatisticsCSV(statistics: Statistics) {
 // PDF EXPORTS
 // ========================================
 
-export function exportStatisticsPDF(
+export async function exportStatisticsPDF(
   statistics: Statistics,
   dateRange: { start: Date; end: Date }
 ) {
+  const { default: jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title
@@ -248,7 +248,9 @@ export function exportStatisticsPDF(
   doc.save(`hookah-report-${getDateString()}.pdf`)
 }
 
-export function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThreshold: number = 50) {
+export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThreshold: number = 50) {
+  const { default: jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title
@@ -337,8 +339,10 @@ export function exportBarSalesCSV(sales: BarSale[], locale: Locale = 'en') {
   downloadFile(blob, `bar-sales-${getDateString()}.csv`)
 }
 
-export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number, locale: Locale = 'en') {
+export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number, locale: Locale = 'en') {
   const fc = (v: number) => formatCurrency(v, locale)
+  const { default: jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title
@@ -434,7 +438,9 @@ export function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, per
 // SESSIONS PDF EXPORT
 // ========================================
 
-export function exportSessionsPDF(sessions: SessionWithItems[]) {
+export async function exportSessionsPDF(sessions: SessionWithItems[]) {
+  const { default: jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title

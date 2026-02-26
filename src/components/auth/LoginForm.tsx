@@ -50,11 +50,12 @@ export function LoginForm() {
             loop
             muted
             playsInline
-            preload="metadata"
+            preload="none"
             poster="/images/torus-logo.png"
             className="w-full h-full object-cover"
           >
             <source src="/images/logo-animated.mp4" type="video/mp4" />
+            <img src="/images/torus-logo.png" alt="Hookah Torus" className="w-full h-full object-cover" />
           </video>
         </div>
         <h1 className="text-3xl font-bold mb-2">{t.loginTitle}</h1>

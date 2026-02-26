@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useLoungeProfile } from '@/lib/hooks/useLoungeProfile'
 import { useTranslation } from '@/lib/i18n'
 import { TOAST_TIMEOUT } from '@/lib/constants'
@@ -19,6 +19,18 @@ export default function LoungeProfileSettings() {
   const [message, setMessage] = useState('')
   const [linkCopied, setLinkCopied] = useState(false)
   const qrRef = useRef<HTMLDivElement>(null)
+  const [isDirty, setIsDirty] = useState(false)
+
+  // Warn on navigation with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [isDirty])
 
   // Local form state
   const [description, setDescription] = useState(lounge?.description || '')
@@ -62,6 +74,7 @@ export default function LoungeProfileSettings() {
     setFeatures(prev =>
       prev.includes(feature) ? prev.filter(f => f !== feature) : [...prev, feature]
     )
+    setIsDirty(true)
   }, [])
 
   const updateDayHours = useCallback((day: keyof WorkingHours, field: keyof DayHours, value: string | boolean) => {
@@ -72,6 +85,7 @@ export default function LoungeProfileSettings() {
         [field]: value,
       } as DayHours,
     }))
+    setIsDirty(true)
   }, [])
 
   const handleSave = useCallback(async () => {
@@ -90,6 +104,7 @@ export default function LoungeProfileSettings() {
       working_hours: workingHours,
       is_published: isPublished,
     })
+    setIsDirty(false)
     setMessage(ts.loungeSaved)
     setSaving(false)
     setTimeout(() => setMessage(''), TOAST_TIMEOUT)
@@ -178,7 +193,7 @@ export default function LoungeProfileSettings() {
         <label className="block text-sm font-medium mb-1">{ts.loungeDescription}</label>
         <textarea
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={e => { setDescription(e.target.value); setIsDirty(true) }}
           placeholder={ts.loungeDescriptionHint}
           rows={3}
           className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
@@ -191,7 +206,7 @@ export default function LoungeProfileSettings() {
         <input
           type="text"
           value={city}
-          onChange={e => setCity(e.target.value)}
+          onChange={e => { setCity(e.target.value); setIsDirty(true) }}
           className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
         />
       </div>
@@ -203,7 +218,7 @@ export default function LoungeProfileSettings() {
           <input
             type="url"
             value={coverImageUrl}
-            onChange={e => setCoverImageUrl(e.target.value)}
+            onChange={e => { setCoverImageUrl(e.target.value); setIsDirty(true) }}
             placeholder={ts.placeholderUrl}
             className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
           />
@@ -213,7 +228,7 @@ export default function LoungeProfileSettings() {
           <input
             type="url"
             value={logoUrl}
-            onChange={e => setLogoUrl(e.target.value)}
+            onChange={e => { setLogoUrl(e.target.value); setIsDirty(true) }}
             placeholder={ts.placeholderUrl}
             className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
           />
@@ -300,7 +315,7 @@ export default function LoungeProfileSettings() {
             <input
               type="text"
               value={instagram}
-              onChange={e => setInstagram(e.target.value)}
+              onChange={e => { setInstagram(e.target.value); setIsDirty(true) }}
               placeholder={ts.placeholderUsername}
               className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
@@ -310,7 +325,7 @@ export default function LoungeProfileSettings() {
             <input
               type="text"
               value={telegram}
-              onChange={e => setTelegram(e.target.value)}
+              onChange={e => { setTelegram(e.target.value); setIsDirty(true) }}
               placeholder={ts.placeholderChannel}
               className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
@@ -320,7 +335,7 @@ export default function LoungeProfileSettings() {
             <input
               type="url"
               value={website}
-              onChange={e => setWebsite(e.target.value)}
+              onChange={e => { setWebsite(e.target.value); setIsDirty(true) }}
               placeholder={ts.placeholderUrl}
               className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bgCard)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />

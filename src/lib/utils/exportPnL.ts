@@ -1,7 +1,5 @@
 'use client'
 
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import type { PnLData } from '@/lib/hooks/usePnL'
 import type { Locale } from '@/lib/i18n/types'
 import { formatCurrency } from '@/lib/i18n/format'
@@ -89,8 +87,10 @@ export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }, 
 // PDF EXPORT
 // ========================================
 
-export function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en') {
+export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en') {
   const fc = (v: number) => formatCurrency(v, locale)
+  const { default: jsPDF } = await import('jspdf')
+  const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   doc.setFontSize(18)

@@ -56,7 +56,7 @@ export default function SessionsPage() {
     if (format === 'csv') {
       exportSessionsCSV(filteredSessions)
     } else {
-      exportSessionsPDF(filteredSessions)
+      void exportSessionsPDF(filteredSessions)
     }
     setExportMenuOpen(false)
   }

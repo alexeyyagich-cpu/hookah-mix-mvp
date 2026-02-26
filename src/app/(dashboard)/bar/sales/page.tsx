@@ -41,7 +41,7 @@ export default function BarSalesPage() {
     if (format === 'csv') {
       exportBarSalesCSV(periodSales, locale)
     } else {
-      exportBarSalesPDF(periodSales, analytics, period, locale)
+      void exportBarSalesPDF(periodSales, analytics, period, locale)
     }
     setExportMenuOpen(false)
   }

@@ -63,7 +63,7 @@ export default function ReportsPage() {
   }
 
   const handleExportPDF = () => {
-    exportPnLPDF(data, period, locale)
+    void exportPnLPDF(data, period, locale)
     setExportMenuOpen(false)
   }
 

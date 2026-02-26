@@ -177,8 +177,9 @@ function PricingPageContent() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-xl font-bold flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <video autoPlay loop muted playsInline preload="metadata" poster="/images/torus-logo.png" className="w-full h-full object-cover">
+              <video autoPlay loop muted playsInline preload="none" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                 <source src="/images/logo-animated.mp4" type="video/mp4" />
+                <img src="/images/torus-logo.png" alt="Hookah Torus" className="w-full h-full object-cover" />
               </video>
             </div>
             Hookah Torus

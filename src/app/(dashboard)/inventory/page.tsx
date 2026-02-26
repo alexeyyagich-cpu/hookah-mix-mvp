@@ -85,7 +85,7 @@ export default function InventoryPage() {
     if (format === 'csv') {
       exportInventoryCSV(inventory, lowStockThreshold)
     } else {
-      exportInventoryPDF(inventory, lowStockThreshold)
+      void exportInventoryPDF(inventory, lowStockThreshold)
     }
     setExportMenuOpen(false)
   }
