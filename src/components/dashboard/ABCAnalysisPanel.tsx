@@ -52,11 +52,11 @@ export function ABCAnalysisPanel() {
     )
   }
 
-  const modes: { key: ABCMode; label: string }[] = [
+  const modes: { key: ABCMode; label: string }[] = useMemo(() => [
     { key: 'usage', label: tm.abcByUsage },
     { key: 'revenue', label: tm.abcByRevenue },
     { key: 'margin', label: tm.abcByMargin },
-  ]
+  ], [tm])
 
   return (
     <div className="space-y-4">

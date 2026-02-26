@@ -85,8 +85,10 @@ export async function setCachedData<T>(
   try {
     const db = await getDb()
     await db.put('cache', { data, cachedAt: Date.now() }, `${storeName}:${userId}`)
-  } catch {
-    // IndexedDB write failed (quota, etc.) — non-critical
+  } catch (err) {
+    // IndexedDB write failed (quota, etc.) — non-critical but log for debugging
+    const msg = err instanceof Error ? err.message : 'Unknown IndexedDB error'
+    console.warn('[offline-cache] setCachedData failed:', msg)
   }
 }
 

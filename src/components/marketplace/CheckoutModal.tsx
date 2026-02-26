@@ -83,7 +83,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
         <div className={`w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">

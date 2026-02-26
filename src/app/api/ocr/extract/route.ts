@@ -43,11 +43,18 @@ export async function POST(request: NextRequest) {
 
     // Convert to base64
     const buffer = await file.arrayBuffer()
+    const bytes = new Uint8Array(buffer)
     const base64 = Buffer.from(buffer).toString('base64')
 
-    // Determine media type
-    const mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(mediaType)) {
+    // Validate actual file content via magic bytes (don't trust client MIME type)
+    type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
+    let mediaType: ImageMediaType | null = null
+    if (bytes[0] === 0xFF && bytes[1] === 0xD8) mediaType = 'image/jpeg'
+    else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) mediaType = 'image/png'
+    else if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) mediaType = 'image/gif'
+    else if (bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) mediaType = 'image/webp'
+
+    if (!mediaType) {
       return NextResponse.json({ error: 'Unsupported image format. Use JPEG, PNG, or WebP.' }, { status: 400 })
     }
 

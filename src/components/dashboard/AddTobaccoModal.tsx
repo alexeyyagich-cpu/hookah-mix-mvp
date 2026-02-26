@@ -156,7 +156,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   if (!visible) return null
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`}>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`} role="dialog" aria-modal="true">
       <div className={`w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col ${isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
         {/* Header */}
         <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
@@ -175,7 +175,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
         <div className="flex-1 overflow-y-auto p-6">
           {!canAddMore && !isEditing ? (
             <div className="text-center py-8">
-              <div className="text-4xl mb-4">🔒</div>
+              <div className="text-4xl mb-4" aria-hidden="true">🔒</div>
               <h3 className="text-lg font-semibold mb-2">{t.limitReachedTitle}</h3>
               <p className="text-[var(--color-textMuted)] mb-4">
                 {t.upgradeForUnlimited}

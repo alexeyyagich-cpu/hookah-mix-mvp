@@ -68,6 +68,8 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
             <button type="button"
               key={star}
               onClick={() => onRate(session.id, star)}
+              aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+              aria-pressed={(session.rating || 0) >= star}
               className={`text-lg transition-colors ${
                 (session.rating || 0) >= star
                   ? 'text-[var(--color-primary)]'

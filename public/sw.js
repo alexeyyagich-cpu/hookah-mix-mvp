@@ -3,6 +3,7 @@ const CACHE_NAME = 'hookah-torus-v14'
 
 // Critical routes — SW install MUST succeed for these
 const CRITICAL_URLS = [
+  '/',
   '/dashboard',
   '/mix',
   '/offline',

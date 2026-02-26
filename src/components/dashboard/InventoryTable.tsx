@@ -71,7 +71,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
 
   if (loading) {
     return (
-      <div className="card p-8 text-center">
+      <div className="card p-8 text-center" role="status" aria-live="polite">
         <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
         <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingInventory}</p>
       </div>
@@ -102,18 +102,30 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
               <tr className="border-b border-[var(--color-border)]">
                 <th
                   onClick={() => handleSort('brand')}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), handleSort('brand'))}
+                  tabIndex={0}
+                  role="columnheader"
+                  aria-sort={sortField === 'brand' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
                 >
                   {t.brandColumn} {sortField === 'brand' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
                   onClick={() => handleSort('flavor')}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), handleSort('flavor'))}
+                  tabIndex={0}
+                  role="columnheader"
+                  aria-sort={sortField === 'flavor' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
                 >
                   {t.flavorColumn} {sortField === 'flavor' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th
                   onClick={() => handleSort('quantity_grams')}
+                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), handleSort('quantity_grams'))}
+                  tabIndex={0}
+                  role="columnheader"
+                  aria-sort={sortField === 'quantity_grams' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-textMuted)] cursor-pointer hover:text-[var(--color-text)]"
                 >
                   {t.remainingColumn} {sortField === 'quantity_grams' && (sortDirection === 'asc' ? '↑' : '↓')}

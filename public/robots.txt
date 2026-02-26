@@ -10,7 +10,7 @@ Allow: /setup
 Allow: /lounge
 Allow: /menu
 
-# Protected routes
+# Protected dashboard routes
 Disallow: /dashboard
 Disallow: /inventory
 Disallow: /sessions
@@ -18,9 +18,24 @@ Disallow: /guests
 Disallow: /statistics
 Disallow: /settings
 Disallow: /marketplace
+Disallow: /bowls
+Disallow: /kds
+Disallow: /floor
+Disallow: /bar/
+Disallow: /shifts
+Disallow: /waiter
+Disallow: /reports
+Disallow: /reviews
+Disallow: /promotions
+Disallow: /boss
+Disallow: /onboarding
+
+# Auth routes
 Disallow: /api
 Disallow: /login
 Disallow: /register
+Disallow: /forgot-password
+Disallow: /update-password
 
 # Sitemap
 Sitemap: https://hookahtorus.com/sitemap.xml

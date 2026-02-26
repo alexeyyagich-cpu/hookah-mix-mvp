@@ -1,6 +1,11 @@
 import { Resend } from 'resend'
 import { formatCurrency } from '@/lib/i18n/format'
 
+/** Escape user-provided strings before interpolating into HTML email templates. */
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 // Initialize Resend client
 const resendApiKey = process.env.RESEND_API_KEY
 export const resend = resendApiKey ? new Resend(resendApiKey) : null
@@ -56,8 +61,8 @@ export function generateLowStockEmailHtml(items: LowStockItem[], businessName: s
   const itemsHtml = items
     .map(item => `
       <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.brand}</td>
-        <td style="padding: 12px; border-bottom: 1px solid #eee;">${item.flavor}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">${esc(item.brand)}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">${esc(item.flavor)}</td>
         <td style="padding: 12px; border-bottom: 1px solid #eee; color: ${item.quantity <= 0 ? '#ef4444' : '#f59e0b'};">
           ${item.quantity.toFixed(0)}g
         </td>
@@ -81,7 +86,7 @@ export function generateLowStockEmailHtml(items: LowStockItem[], businessName: s
         <div style="padding: 24px;">
           <h2 style="color: #333; margin: 0 0 8px;">Low Tobacco Stock</h2>
           <p style="color: #666; margin: 0 0 24px;">
-            ${businessName} — ${items.length} items need attention
+            ${esc(businessName)} — ${items.length} items need attention
           </p>
 
           <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
@@ -147,16 +152,16 @@ export function generateOrderStatusEmailHtml(data: OrderStatusEmailData, busines
         </div>
         <div style="padding: 24px;">
           <h2 style="color: #333; margin: 0 0 8px;">Order Update</h2>
-          <p style="color: #666; margin: 0 0 24px;">${businessName}</p>
+          <p style="color: #666; margin: 0 0 24px;">${esc(businessName)}</p>
 
           <div style="background: #f8f8f8; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
               <span style="color: #666;">Order:</span>
-              <span style="font-weight: 600;">${data.orderNumber}</span>
+              <span style="font-weight: 600;">${esc(data.orderNumber)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
               <span style="color: #666;">Supplier:</span>
-              <span style="font-weight: 600;">${data.supplierName}</span>
+              <span style="font-weight: 600;">${esc(data.supplierName)}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
               <span style="color: #666;">Total:</span>
@@ -165,13 +170,13 @@ export function generateOrderStatusEmailHtml(data: OrderStatusEmailData, busines
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="color: #666;">Status:</span>
               <span style="background: ${statusColors[data.status] || '#666'}; color: #fff; padding: 4px 12px; border-radius: 4px; font-weight: 600; font-size: 14px;">
-                ${data.statusText}
+                ${esc(data.statusText)}
               </span>
             </div>
             ${data.estimatedDelivery ? `
             <div style="display: flex; justify-content: space-between; margin-top: 12px;">
               <span style="color: #666;">Delivery:</span>
-              <span style="font-weight: 600;">${data.estimatedDelivery}</span>
+              <span style="font-weight: 600;">${esc(data.estimatedDelivery)}</span>
             </div>
             ` : ''}
           </div>
@@ -217,7 +222,7 @@ export function generateDailySummaryEmailHtml(data: DailySummaryData, businessNa
         <div style="padding: 24px;">
           <h2 style="color: #333; margin: 0 0 8px;">Daily Report</h2>
           <p style="color: #666; margin: 0 0 24px;">
-            ${businessName} — ${date}
+            ${esc(businessName)} — ${esc(date)}
           </p>
 
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
@@ -237,7 +242,7 @@ export function generateDailySummaryEmailHtml(data: DailySummaryData, businessNa
             ` : ''}
             ${data.topFlavor ? `
             <div style="background: #faf5ff; border-radius: 8px; padding: 16px; text-align: center;">
-              <div style="font-size: 18px; font-weight: 700; color: #8b5cf6;">${data.topFlavor}</div>
+              <div style="font-size: 18px; font-weight: 700; color: #8b5cf6;">${esc(data.topFlavor)}</div>
               <div style="color: #666; font-size: 14px;">Top Flavor</div>
             </div>
             ` : ''}
@@ -275,10 +280,10 @@ export function generateWelcomeEmailHtml(ownerName: string, businessName: string
         </div>
         <div style="padding: 24px;">
           <p style="font-size: 18px; color: #333; margin: 0 0 16px;">
-            Hello, ${ownerName || 'Owner'}!
+            Hello, ${esc(ownerName || 'Owner')}!
           </p>
           <p style="color: #666; margin: 0 0 24px; line-height: 1.6;">
-            We're glad that ${businessName || 'your business'} is now with us. Hookah Torus will help you:
+            We're glad that ${esc(businessName || 'your business')} is now with us. Hookah Torus will help you:
           </p>
 
           <div style="margin-bottom: 24px;">

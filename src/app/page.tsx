@@ -204,7 +204,7 @@ export default function LandingPage() {
               <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
-            <div className="pt-8 bg-[var(--color-bg)]">
+            <div className="pt-8 bg-[var(--color-bg)]" style={{ aspectRatio: '1920/1080' }}>
               <Image
                 src="/images/dashboard-preview.jpg"
                 alt="Hookah Torus Dashboard"
@@ -221,7 +221,7 @@ export default function LandingPage() {
               <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
-            <div className="pt-8 bg-[var(--color-bg)]">
+            <div className="pt-8 bg-[var(--color-bg)]" style={{ aspectRatio: '1920/1080' }}>
               <Image
                 src="/images/bar-preview.jpg"
                 alt="Hookah Torus Bar Management"

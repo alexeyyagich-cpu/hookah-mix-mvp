@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
+import { getPendingCount } from '@/lib/offline/db'
 
 export function ServiceWorkerRegistration() {
   const tc = useTranslation('common')
@@ -43,7 +44,14 @@ export function ServiceWorkerRegistration() {
               description: tc.sw.updateDescription,
               action: {
                 label: tc.sw.update,
-                onClick: () => {
+                onClick: async () => {
+                  // Wait for pending offline mutations to sync before reloading
+                  const pending = await getPendingCount()
+                  if (pending > 0) {
+                    window.dispatchEvent(new Event('online'))
+                    // Give sync engine time to flush
+                    await new Promise(r => setTimeout(r, 3000))
+                  }
                   newWorker.postMessage({ type: 'SKIP_WAITING' })
                   window.location.reload()
                 },

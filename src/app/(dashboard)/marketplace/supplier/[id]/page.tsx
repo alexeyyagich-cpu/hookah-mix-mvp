@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useSuppliers } from '@/lib/hooks/useSuppliers'
@@ -41,9 +41,9 @@ export default function SupplierPage() {
     }
   }, [suppliersLoading, supplierId, getSupplier])
 
-  const handleAddToCart = (product: SupplierProduct, sup: Supplier, quantity: number) => {
+  const handleAddToCart = useCallback((product: SupplierProduct, sup: Supplier, quantity: number) => {
     addToCart(product, sup, quantity)
-  }
+  }, [addToCart])
 
   const loading = suppliersLoading || productsLoading
 

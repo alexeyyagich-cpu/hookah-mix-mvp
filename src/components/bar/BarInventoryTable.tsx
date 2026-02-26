@@ -99,7 +99,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
 
   if (loading) {
     return (
-      <div className="card p-8 text-center">
+      <div className="card p-8 text-center" role="status" aria-live="polite">
         <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
         <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingBarInventory}</p>
       </div>
@@ -109,7 +109,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   if (inventory.length === 0) {
     return (
       <div className="card p-12 text-center">
-        <div className="text-4xl mb-3">🍶</div>
+        <div className="text-4xl mb-3" aria-hidden="true">🍶</div>
         <h3 className="text-lg font-semibold mb-2">{t.noIngredients}</h3>
         <p className="text-[var(--color-textMuted)] mb-4">
           {t.addFirstIngredient}

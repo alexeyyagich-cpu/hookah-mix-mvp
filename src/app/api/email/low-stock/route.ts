@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { sendEmail, generateLowStockEmailHtml, isEmailConfigured } from '@/lib/email/resend'
 import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { emailLowStockSchema, validateBody } from '@/lib/validation'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -46,18 +47,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let body: any
+    let rawBody: unknown
     try {
-      body = await request.json()
+      rawBody = await request.json()
     } catch {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
-    const { profileId, items } = body
-
-    if (!profileId || !items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    const validated = validateBody(emailLowStockSchema, rawBody)
+    if (validated.error) {
+      return NextResponse.json({ error: validated.error }, { status: 400 })
     }
+    const { profileId, items } = validated.data!
 
     // SECURITY: Verify profileId matches authenticated user
     if (user.id !== profileId) {

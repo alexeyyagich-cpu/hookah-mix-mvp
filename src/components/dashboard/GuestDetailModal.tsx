@@ -50,9 +50,11 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const tierLabel = tm[`tier${guest.loyalty_tier.charAt(0).toUpperCase()}${guest.loyalty_tier.slice(1)}` as keyof typeof tm] as string
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" aria-hidden="true" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
       <div
         className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-xl"
+        role="dialog"
+        aria-modal="true"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}

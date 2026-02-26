@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured, isDemoMode as DEMO_MODE } from '@/lib/config'
+import { clearSyncQueue, clearAllCache } from '@/lib/offline/db'
 import type { User, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import type { Profile } from '@/types/database'
 
@@ -198,6 +199,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (supabase) {
       await supabase.auth.signOut()
     }
+    // Clear offline sync queue and cache to prevent data leaking to next user
+    await clearSyncQueue()
+    await clearAllCache()
     setUser(null)
     setSession(null)
     setProfile(null)

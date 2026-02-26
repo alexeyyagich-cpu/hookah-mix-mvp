@@ -21,8 +21,8 @@ export function ControlDashboard() {
 
   if (loading) {
     return (
-      <div className="card p-8 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+      <div className="card p-8 flex items-center justify-center" role="status" aria-live="polite">
+        <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" aria-label="Loading" />
       </div>
     )
   }

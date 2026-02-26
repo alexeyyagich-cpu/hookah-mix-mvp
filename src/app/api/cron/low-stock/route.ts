@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
+import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 export async function GET(request: NextRequest) {
+  // Rate limit: prevent abuse if cron secret leaks
+  const rateCheck = await checkRateLimit('cron:low-stock', rateLimits.strict)
+  if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
   // Verify Vercel cron secret
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

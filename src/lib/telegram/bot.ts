@@ -1,6 +1,6 @@
 // Telegram Bot Client
 
-import { createHmac } from 'crypto'
+import { createHmac, timingSafeEqual } from 'crypto'
 import type { TelegramNotification, InlineKeyboardMarkup, InlineKeyboardButton } from './types'
 import { formatCurrency } from '@/lib/i18n/format'
 
@@ -13,11 +13,13 @@ export const webhookSecretConfigured = Boolean(TELEGRAM_WEBHOOK_SECRET)
 
 // Verify webhook request is from Telegram
 export function verifyWebhookSecret(secretHeader: string | null): boolean {
-  if (!TELEGRAM_WEBHOOK_SECRET) {
-    // Fail closed: reject all requests when secret is not configured
+  if (!TELEGRAM_WEBHOOK_SECRET || !secretHeader) {
     return false
   }
-  return secretHeader === TELEGRAM_WEBHOOK_SECRET
+  if (secretHeader.length !== TELEGRAM_WEBHOOK_SECRET.length) {
+    return false
+  }
+  return timingSafeEqual(Buffer.from(secretHeader), Buffer.from(TELEGRAM_WEBHOOK_SECRET))
 }
 
 // Compact binary token: 16-byte UUID + 4-byte timestamp (seconds) + 8-byte HMAC = 28 bytes → 38 chars base64url

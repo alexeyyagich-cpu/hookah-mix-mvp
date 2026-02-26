@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
@@ -103,7 +103,7 @@ export function Sidebar() {
     })
   }, [])
 
-  const navigationGroups: NavGroup[] = [
+  const navigationGroups: NavGroup[] = useMemo(() => [
     {
       label: null,
       items: [
@@ -162,13 +162,13 @@ export function Sidebar() {
         { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view' },
       ],
     },
-  ]
+  ], [t])
 
   // Build flat list of all items for active-state matching
-  const allItems = navigationGroups.flatMap(g => g.items)
+  const allItems = useMemo(() => navigationGroups.flatMap(g => g.items), [navigationGroups])
 
   // Filter groups and items by role permissions and active modules
-  const filteredGroups = navigationGroups
+  const filteredGroups = useMemo(() => navigationGroups
     .filter(group => {
       // Hide entire group if its module is inactive
       if (group.module && !modules.includes(group.module)) return false
@@ -188,7 +188,8 @@ export function Sidebar() {
         return true
       }),
     }))
-    .filter(group => group.items.length > 0)
+    .filter(group => group.items.length > 0),
+  [navigationGroups, modules, hasPermission, hasAnyPermission, isOwner])
 
   // Auto-expand group if it contains the active page
   useEffect(() => {

@@ -67,6 +67,28 @@ export const stripeCheckoutSchema = z.object({
   isYearly: z.boolean().optional(),
 })
 
+// ── /api/email/low-stock ─────────────────────────────────────────────
+export const emailLowStockSchema = z.object({
+  profileId: z.string().uuid(),
+  items: z.array(z.object({
+    brand: z.string().min(1).max(200),
+    flavor: z.string().min(1).max(200),
+    quantity: z.number(),
+    threshold: z.number(),
+  })).min(1).max(200),
+})
+
+// ── /api/email/order-status ──────────────────────────────────────────
+export const emailOrderStatusSchema = z.object({
+  profileId: z.string().uuid(),
+  orderId: z.string().min(1),
+  status: z.string().min(1).max(50),
+  supplierName: z.string().max(200).default(''),
+  orderNumber: z.string().max(100).default(''),
+  total: z.number().default(0),
+  estimatedDelivery: z.string().max(100).optional(),
+})
+
 // ── Helper ──────────────────────────────────────────────────────────────
 /**
  * Validates `body` against `schema`.

@@ -12,6 +12,13 @@ const MAX_RETRIES = 3
 // Maps temp offline IDs → real server IDs within a single sync batch
 let idMap: Map<string, string>
 
+/** Exponential backoff delay: min(1000 * 2^attempt, 30000) + jitter */
+function backoffDelay(retryCount: number): number {
+  const base = Math.min(1000 * Math.pow(2, retryCount), 30000)
+  const jitter = Math.random() * 500
+  return base + jitter
+}
+
 export async function processSyncQueue(
   supabase: SupabaseClient
 ): Promise<{ synced: number; failed: number }> {
@@ -22,6 +29,13 @@ export async function processSyncQueue(
 
   for (const entry of pending) {
     if (!entry.id) continue
+
+    // Exponential backoff: skip entries that aren't due for retry yet
+    if (entry.retryCount > 0) {
+      const delay = backoffDelay(entry.retryCount - 1)
+      const lastAttempt = new Date(entry.createdAt).getTime()
+      if (Date.now() - lastAttempt < delay) continue
+    }
 
     await updateMutationStatus(entry.id, 'syncing')
 
