@@ -5,10 +5,12 @@ export const nav = {
   defaultUser: 'Пользователь',
 
   // Groups
+  operationsGroup: 'ОПЕРАЦИИ',
   hookahGroup: 'КАЛЬЯННАЯ',
   barGroup: 'БАР',
-  managementGroup: 'УПРАВЛЕНИЕ',
-  otherGroup: 'ПРОЧЕЕ',
+  analyticsGroup: 'АНАЛИТИКА',
+  businessGroup: 'БИЗНЕС',
+  settingsGroup: 'НАСТРОЙКИ',
 
   // Items
   overview: 'Обзор',

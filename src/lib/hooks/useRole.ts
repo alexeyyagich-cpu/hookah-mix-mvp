@@ -86,6 +86,7 @@ const ORG_ROLE_PERMISSIONS: Record<OrgRole, Permission[]> = {
   ],
   cook: [
     'kds.kitchen',
+    'dashboard.view',
   ],
 }
 

@@ -23,7 +23,6 @@ import {
   IconLock,
   IconUsers,
   IconStar,
-  IconCalendar,
   IconBar,
   IconCocktail,
   IconMenuList,
@@ -39,7 +38,7 @@ interface NavItem {
   name: string
   href: string
   Icon: React.ComponentType<{ size?: number }>
-  permission: Permission
+  permission: Permission | Permission[]
   proOnly?: boolean
   ownerOnly?: boolean
   module?: AppModule
@@ -60,7 +59,7 @@ export function Sidebar() {
   const { profile, signOut } = useAuth()
   const { tier, isFreeTier } = useSubscription()
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
-  const { orgRole, hasPermission, isOwner } = useRole(contextOrgRole)
+  const { orgRole, hasPermission, hasAnyPermission, isOwner } = useRole(contextOrgRole)
   const { modules } = useModules()
 
   // Collapsible groups — persisted in localStorage
@@ -91,6 +90,15 @@ export function Sidebar() {
       ],
     },
     {
+      label: t.operationsGroup,
+      items: [
+        { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'floor.view' },
+        { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: ['sessions.create', 'kds.kitchen'] },
+        { name: t.waiter, href: '/waiter', Icon: IconWaiter, permission: 'sessions.create', proOnly: true },
+        { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },
+      ],
+    },
+    {
       label: t.hookahGroup,
       module: 'hookah',
       items: [
@@ -111,23 +119,23 @@ export function Sidebar() {
       ],
     },
     {
-      label: t.managementGroup,
+      label: t.analyticsGroup,
       items: [
-        { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'floor.view' },
-        { name: t.reservations, href: '/floor/reservations', Icon: IconCalendar, permission: 'reservations.view' },
-        { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: 'sessions.create' },
-        { name: t.waiter, href: '/waiter', Icon: IconWaiter, permission: 'sessions.create', proOnly: true },
-        { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },
-        { name: t.guestsCRM, href: '/guests', Icon: IconUsers, permission: 'sessions.view', proOnly: true },
-        { name: t.promotions, href: '/promotions', Icon: IconPercent, permission: 'sessions.view', proOnly: true },
         { name: t.statistics, href: '/statistics', Icon: IconChart, permission: 'statistics.view' },
         { name: t.pnlReports, href: '/reports', Icon: IconTrendUp, permission: 'statistics.view' },
+        { name: t.reviews, href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
       ],
     },
     {
-      label: t.otherGroup,
+      label: t.businessGroup,
       items: [
-        { name: t.reviews, href: '/reviews', Icon: IconStar, permission: 'dashboard.view' },
+        { name: t.guestsCRM, href: '/guests', Icon: IconUsers, permission: 'sessions.view', proOnly: true },
+        { name: t.promotions, href: '/promotions', Icon: IconPercent, permission: 'sessions.view', proOnly: true },
+      ],
+    },
+    {
+      label: t.settingsGroup,
+      items: [
         { name: t.team, href: '/settings/team', Icon: IconUsers, permission: 'team.view' },
         { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view' },
       ],
@@ -147,7 +155,10 @@ export function Sidebar() {
     .map(group => ({
       ...group,
       items: group.items.filter(item => {
-        if (!hasPermission(item.permission)) return false
+        const hasAccess = Array.isArray(item.permission)
+          ? hasAnyPermission(item.permission)
+          : hasPermission(item.permission)
+        if (!hasAccess) return false
         if (item.module && !modules.includes(item.module)) return false
         if (item.ownerOnly && !isOwner) return false
         if (item.href === '/settings/team' && !isOwner) return false

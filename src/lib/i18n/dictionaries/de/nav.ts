@@ -5,10 +5,12 @@ export const nav: typeof NavType = {
   defaultBusiness: 'Mein Lokal',
   defaultUser: 'Benutzer',
 
+  operationsGroup: 'BETRIEB',
   hookahGroup: 'SHISHA',
   barGroup: 'BAR',
-  managementGroup: 'VERWALTUNG',
-  otherGroup: 'SONSTIGES',
+  analyticsGroup: 'ANALYTIK',
+  businessGroup: 'GESCHÄFT',
+  settingsGroup: 'EINSTELLUNGEN',
 
   overview: 'Übersicht',
   bossDashboard: 'Boss',
