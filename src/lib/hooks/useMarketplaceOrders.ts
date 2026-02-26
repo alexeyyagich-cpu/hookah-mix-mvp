@@ -168,25 +168,30 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
     setLoading(true)
     setError(null)
 
-    // Fetch orders with supplier and items
-    const { data: ordersData, error: ordersError } = await supabase
-      .from('marketplace_orders')
-      .select(`
-        *,
-        supplier:suppliers(*),
-        order_items:marketplace_order_items(*)
-      `)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-      .order('created_at', { ascending: false })
+    try {
+      // Fetch orders with supplier and items
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('marketplace_orders')
+        .select(`
+          *,
+          supplier:suppliers(*),
+          order_items:marketplace_order_items(*)
+        `)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        .order('created_at', { ascending: false })
 
-    if (ordersError) {
-      setError(translateError(ordersError))
+      if (ordersError) {
+        setError(translateError(ordersError))
+        setOrders([])
+      } else {
+        setOrders(ordersData || [])
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load orders')
       setOrders([])
-    } else {
-      setOrders(ordersData || [])
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }, [user, supabase, organizationId])
 
   useEffect(() => {

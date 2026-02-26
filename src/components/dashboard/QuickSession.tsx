@@ -130,23 +130,28 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
       percentage: item.percent,
     }))
 
-    await onSave(sessionData, sessionItems, deductInventory)
+    try {
+      await onSave(sessionData, sessionItems, deductInventory)
 
-    // Loyalty: accrue bonus, redeem if used, record visit
-    if (selectedGuest) {
-      const price = sellingPrice ? parseFloat(sellingPrice) : 0
-      if (price > 0 && loyaltySettings.is_enabled) {
-        await accrueBonus(selectedGuest.id, price)
+      // Loyalty: accrue bonus, redeem if used, record visit
+      if (selectedGuest) {
+        const price = sellingPrice ? parseFloat(sellingPrice) : 0
+        if (price > 0 && loyaltySettings.is_enabled) {
+          await accrueBonus(selectedGuest.id, price)
+        }
+        if (useBonus && bonusAmount) {
+          const redeem = parseFloat(bonusAmount)
+          if (redeem > 0) await redeemBonus(selectedGuest.id, redeem)
+        }
+        await recordVisit(selectedGuest.id)
       }
-      if (useBonus && bonusAmount) {
-        const redeem = parseFloat(bonusAmount)
-        if (redeem > 0) await redeemBonus(selectedGuest.id, redeem)
-      }
-      await recordVisit(selectedGuest.id)
+
+      onClose()
+    } catch (err) {
+      console.error('Session save failed:', err)
+    } finally {
+      setSaving(false)
     }
-
-    setSaving(false)
-    onClose()
   }
 
   if (!isOpen) return null

@@ -91,10 +91,10 @@ export function useEmailSettings(): UseEmailSettingsReturn {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load email settings')
+    } finally {
+      clearTimeout(timeout)
+      setLoading(false)
     }
-
-    clearTimeout(timeout)
-    setLoading(false)
   }, [user, supabase])
 
   useEffect(() => {

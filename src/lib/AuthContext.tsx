@@ -99,10 +99,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     let didSettle = false
+    let isMounted = true
 
     // Safety timeout — never show spinner longer than 5s
     const timeout = setTimeout(() => {
-      if (!didSettle) {
+      if (!didSettle && isMounted) {
         // Safety fallback — stop loading spinner if auth takes too long
         didSettle = true
         setLoading(false)
@@ -113,17 +114,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
+        if (!isMounted) return
         setSession(session)
         setUser(session?.user ?? null)
 
         if (session?.user) {
           const profileData = await fetchProfile(session.user.id)
-          setProfile(profileData)
+          if (isMounted) setProfile(profileData)
         }
       } catch (error) {
         console.error('Failed to get initial session:', error)
       } finally {
-        if (!didSettle) {
+        if (!didSettle && isMounted) {
           didSettle = true
           setLoading(false)
         }
@@ -136,12 +138,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes — filter events to avoid transient null during token refresh
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
+        if (!isMounted) return
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED') {
           setSession(session)
           setUser(session?.user ?? null)
           if (session?.user) {
             // Don't await — prevents deadlock with Supabase session lock
-            fetchProfile(session.user.id).then(profileData => setProfile(profileData))
+            fetchProfile(session.user.id).then(profileData => {
+              if (isMounted) setProfile(profileData)
+            })
           }
           setLoading(false)
         } else if (event === 'SIGNED_OUT') {
@@ -154,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 
     return () => {
+      isMounted = false
       clearTimeout(timeout)
       subscription.unsubscribe()
     }
