@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
@@ -31,6 +31,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   const [brandFilter, setBrandFilter] = useState<string | null>(null)
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const isEditing = !!editingItem
 
@@ -39,11 +40,12 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
       setVisible(true)
       setIsClosing(false)
     }
+    return () => clearTimeout(closeTimerRef.current)
   }, [isOpen])
 
   const handleClose = useCallback(() => {
     setIsClosing(true)
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       setVisible(false)
       setIsClosing(false)
       onClose()

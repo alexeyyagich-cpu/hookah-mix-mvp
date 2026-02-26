@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
@@ -20,6 +20,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
   const [success, setSuccess] = useState(false)
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (isOpen) {
@@ -31,9 +32,11 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
     }
   }, [isOpen])
 
+  useEffect(() => () => clearTimeout(timerRef.current), [])
+
   const handleClose = useCallback(() => {
     setIsClosing(true)
-    setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setVisible(false)
       setIsClosing(false)
       onClose()
@@ -54,7 +57,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
       const result = await onConfirm(notes || undefined)
       if (result) {
         setSuccess(true)
-        setTimeout(() => {
+        timerRef.current = setTimeout(() => {
           handleClose()
         }, 2000)
       }

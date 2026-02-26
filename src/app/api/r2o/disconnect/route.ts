@@ -1,12 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/ready2order/crypto'
 import { deleteWebhook } from '@/lib/ready2order/client'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const rateCheck = await checkRateLimit(`${ip}:/api/r2o/disconnect`, rateLimits.strict)
+    if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
     // Verify authentication
     const cookieStore = await cookies()
     const supabase = createServerClient(

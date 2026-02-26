@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 // Create admin Supabase client (lazy init)
 let supabaseAdmin: SupabaseClient | null = null
@@ -21,6 +22,10 @@ function getSupabaseAdmin(): SupabaseClient {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const rateCheck = await checkRateLimit(`${ip}:/api/stripe/portal`, rateLimits.strict)
+    if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
     // Check if Stripe is configured
     if (!stripe) {
       return NextResponse.json(

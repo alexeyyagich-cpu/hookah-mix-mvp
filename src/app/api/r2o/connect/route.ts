@@ -3,9 +3,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { grantAccessToken } from '@/lib/ready2order/client'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request)
+    const rateCheck = await checkRateLimit(`${ip}:/api/r2o/connect`, rateLimits.strict)
+    if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
     const developerToken = process.env.R2O_DEVELOPER_TOKEN
     if (!developerToken) {
       return NextResponse.json(

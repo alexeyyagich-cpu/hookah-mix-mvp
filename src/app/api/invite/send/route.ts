@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { inviteSendSchema, validateBody } from '@/lib/validation'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -11,6 +12,10 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hookahtorus.com'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req)
+    const rateCheck = await checkRateLimit(`${ip}:/api/invite/send`, rateLimits.strict)
+    if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
     // Verify authentication
     const cookieStore = await cookies()
     const supabaseAuth = createServerClient(

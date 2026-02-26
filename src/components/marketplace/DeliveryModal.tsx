@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { MarketplaceOrderWithItems } from '@/types/database'
 import { IconClose, IconCheck, IconInventory } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
@@ -24,14 +24,16 @@ export function DeliveryModal({
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'confirm' | 'inventory' | 'success'>('confirm')
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Reset state when modal opens
+  // Reset state when modal opens + cleanup timer
   useEffect(() => {
     if (isOpen) {
       setSelectedItems(new Set(order.order_items.map(item => item.id)))
       setLoading(false)
       setStep('confirm')
     }
+    return () => clearTimeout(timerRef.current)
   }, [isOpen, order.order_items])
 
   // Close on escape key
@@ -65,7 +67,7 @@ export function DeliveryModal({
         setStep('inventory')
       } else {
         setStep('success')
-        setTimeout(onClose, 2000)
+        timerRef.current = setTimeout(onClose, 2000)
       }
     }
   }
@@ -88,12 +90,12 @@ export function DeliveryModal({
     await onAddToInventory(itemsToAdd)
     setLoading(false)
     setStep('success')
-    setTimeout(onClose, 2000)
+    timerRef.current = setTimeout(onClose, 2000)
   }
 
   const handleSkipInventory = () => {
     setStep('success')
-    setTimeout(onClose, 2000)
+    timerRef.current = setTimeout(onClose, 2000)
   }
 
   if (!isOpen) return null

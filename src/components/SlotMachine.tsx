@@ -220,8 +220,9 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
   const [reelItems, setReelItems] = useState<Tobacco[][]>([[], [], []]);
   const [results, setResults] = useState<(Tobacco | null)[]>([null, null, null]);
   const [showResult, setShowResult] = useState(false);
+  const spinTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Initialize reels
+  // Initialize reels + cleanup timers
   useEffect(() => {
     if (isOpen) {
       setReelItems([
@@ -232,6 +233,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
       setResults([null, null, null]);
       setShowResult(false);
     }
+    return () => { spinTimersRef.current.forEach(clearTimeout) };
   }, [isOpen]);
 
   const spin = useCallback(() => {
@@ -254,14 +256,18 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
 
     setIsSpinning(true);
 
+    // Clear any previous timers
+    spinTimersRef.current.forEach(clearTimeout);
     // Set results with delays
-    setTimeout(() => setResults((prev) => [finalResults[0], prev[1], prev[2]]), 1500);
-    setTimeout(() => setResults((prev) => [prev[0], finalResults[1], prev[2]]), 2300);
-    setTimeout(() => {
-      setResults([finalResults[0], finalResults[1], finalResults[2]]);
-      setIsSpinning(false);
-      setShowResult(true);
-    }, 3100);
+    spinTimersRef.current = [
+      setTimeout(() => setResults((prev) => [finalResults[0], prev[1], prev[2]]), 1500),
+      setTimeout(() => setResults((prev) => [prev[0], finalResults[1], prev[2]]), 2300),
+      setTimeout(() => {
+        setResults([finalResults[0], finalResults[1], finalResults[2]]);
+        setIsSpinning(false);
+        setShowResult(true);
+      }, 3100),
+    ];
   }, [isSpinning]);
 
   const handleConfirm = () => {

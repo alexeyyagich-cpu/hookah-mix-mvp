@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
@@ -143,6 +143,7 @@ export function useShifts(): UseShiftsReturn {
   const { user, profile, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+  const fetchIdRef = useRef(0)
 
   // Effective profile ID: staff uses owner's ID (legacy fallback)
   const effectiveProfileId = useMemo(() => {
@@ -164,6 +165,7 @@ export function useShifts(): UseShiftsReturn {
       return
     }
 
+    const fetchId = ++fetchIdRef.current
     setError(null)
 
     const { data, error: fetchError } = await supabase
@@ -172,6 +174,8 @@ export function useShifts(): UseShiftsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || effectiveProfileId)
       .order('opened_at', { ascending: false })
       .limit(50)
+
+    if (fetchId !== fetchIdRef.current) return // stale
 
     if (fetchError) {
       setError(translateError(fetchError))

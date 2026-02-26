@@ -30,6 +30,7 @@ export default function ProgressRing({
   const [isDragging, setIsDragging] = useState(false);
   const [targetValue, setTargetValue] = useState<number | null>(null);
   const prevValueRef = useRef(0);
+  const dragTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -140,7 +141,7 @@ export default function ProgressRing({
     const handleEnd = () => {
       setIsDragging(false);
       // Keep target visible briefly, then clear
-      setTimeout(() => {
+      dragTimerRef.current = setTimeout(() => {
         setTargetValue(null);
         onTargetChange?.(null);
       }, 2000);
@@ -158,6 +159,7 @@ export default function ProgressRing({
       window.removeEventListener("mouseup", handleEnd);
       window.removeEventListener("touchmove", handleMove);
       window.removeEventListener("touchend", handleEnd);
+      clearTimeout(dragTimerRef.current);
     };
   }, [isDragging, getAngleFromEvent, onTargetChange]);
 
