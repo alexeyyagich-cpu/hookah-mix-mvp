@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
@@ -119,6 +119,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+  const fetchIdRef = useRef(0)
 
   // Presets for quick selection
   const presets = useMemo(() => {
@@ -192,6 +193,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
       return
     }
 
+    const fetchId = ++fetchIdRef.current
     setLoading(true)
     setError(null)
 
@@ -211,6 +213,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
       const { data: dataA, error: errorA } = await queryA
 
       if (errorA) throw errorA
+      if (fetchId !== fetchIdRef.current) return // stale
       setSessionsA(dataA || [])
 
       // Fetch period B sessions
@@ -228,8 +231,10 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
       const { data: dataB, error: errorB } = await queryB
 
       if (errorB) throw errorB
+      if (fetchId !== fetchIdRef.current) return // stale
       setSessionsB(dataB || [])
     } catch (err) {
+      if (fetchId !== fetchIdRef.current) return // stale
       setError(err instanceof Error ? err.message : 'Failed to load data')
     }
 

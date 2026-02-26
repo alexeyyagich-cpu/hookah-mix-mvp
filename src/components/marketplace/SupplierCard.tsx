@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Supplier } from '@/types/database'
 import { IconTruck, IconChevronRight } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
@@ -20,10 +21,13 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
         {/* Logo */}
         <div className="w-12 h-12 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center flex-shrink-0 overflow-hidden">
           {supplier.logo_url ? (
-            <img
+            <Image
               src={supplier.logo_url}
               alt={supplier.name}
+              width={48}
+              height={48}
               className="w-full h-full object-cover"
+              unoptimized
             />
           ) : (
             <span className="text-lg font-bold text-[var(--color-primary)]">

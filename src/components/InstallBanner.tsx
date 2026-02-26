@@ -13,16 +13,18 @@ export function InstallBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (canInstall && localStorage.getItem(DISMISSED_KEY) !== 'true') {
-      setVisible(true)
-    }
+    try {
+      if (canInstall && localStorage.getItem(DISMISSED_KEY) !== 'true') {
+        setVisible(true)
+      }
+    } catch { /* Safari private browsing */ }
   }, [canInstall])
 
   if (!visible) return null
 
   const handleDismiss = () => {
     setVisible(false)
-    localStorage.setItem(DISMISSED_KEY, 'true')
+    try { localStorage.setItem(DISMISSED_KEY, 'true') } catch { /* Safari private browsing */ }
     dismiss()
   }
 

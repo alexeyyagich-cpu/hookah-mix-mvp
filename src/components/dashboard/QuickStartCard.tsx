@@ -39,7 +39,7 @@ export function QuickStartCard() {
 
   // Check localStorage on mount
   useEffect(() => {
-    setDismissed(localStorage.getItem(STORAGE_KEY) === 'true')
+    try { setDismissed(localStorage.getItem(STORAGE_KEY) === 'true') } catch { /* Safari private browsing */ }
   }, [])
 
   // Lightweight Supabase count queries
@@ -105,7 +105,7 @@ export function QuickStartCard() {
   }, [profile?.id, supabase, isDemoMode])
 
   const handleDismiss = () => {
-    localStorage.setItem(STORAGE_KEY, 'true')
+    try { localStorage.setItem(STORAGE_KEY, 'true') } catch { /* Safari private browsing */ }
     setDismissed(true)
   }
 

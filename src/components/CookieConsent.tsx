@@ -11,19 +11,21 @@ export default function CookieConsent() {
   const tc = useTranslation('common')
 
   useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY)
-    if (!consent) {
-      setVisible(true)
-    }
+    try {
+      const consent = localStorage.getItem(COOKIE_CONSENT_KEY)
+      if (!consent) {
+        setVisible(true)
+      }
+    } catch { /* Safari private browsing */ }
   }, [])
 
   const accept = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted')
+    try { localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted') } catch { /* Safari private browsing */ }
     setVisible(false)
   }
 
   const decline = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, 'declined')
+    try { localStorage.setItem(COOKIE_CONSENT_KEY, 'declined') } catch { /* Safari private browsing */ }
     setVisible(false)
   }
 

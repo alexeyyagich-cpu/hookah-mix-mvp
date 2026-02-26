@@ -7,8 +7,12 @@ import { DEFAULT_LOCALE, LOCALES } from '@/lib/i18n/types'
 
 function getLocale(): Locale {
   if (typeof localStorage === 'undefined') return DEFAULT_LOCALE
-  const saved = localStorage.getItem('hookah-locale') as Locale | null
-  return saved && LOCALES.includes(saved) ? saved : DEFAULT_LOCALE
+  try {
+    const saved = localStorage.getItem('hookah-locale') as Locale | null
+    return saved && LOCALES.includes(saved) ? saved : DEFAULT_LOCALE
+  } catch {
+    return DEFAULT_LOCALE
+  }
 }
 
 interface Props {

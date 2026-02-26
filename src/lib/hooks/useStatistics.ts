@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
@@ -230,6 +230,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+  const fetchIdRef = useRef(0)
 
   // Return demo data if in demo mode
   useEffect(() => {
@@ -247,6 +248,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       return
     }
 
+    const fetchId = ++fetchIdRef.current
     setLoading(true)
     setError(null)
 
@@ -271,6 +273,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       const { data: sessionsData, error: sessionsError } = await sessionsQuery
 
       if (sessionsError) throw sessionsError
+      if (fetchId !== fetchIdRef.current) return // stale
       setSessions((sessionsData || []) as unknown as SessionWithItems[])
 
       // Fetch inventory
@@ -286,6 +289,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       const { data: inventoryData, error: inventoryError } = await inventoryQuery
 
       if (inventoryError) throw inventoryError
+      if (fetchId !== fetchIdRef.current) return // stale
       setInventory(inventoryData || [])
 
       // Fetch recent transactions
@@ -303,8 +307,10 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       const { data: transactionsData, error: transactionsError } = await transactionsQuery
 
       if (transactionsError) throw transactionsError
+      if (fetchId !== fetchIdRef.current) return // stale
       setTransactions(transactionsData || [])
     } catch (err) {
+      if (fetchId !== fetchIdRef.current) return // stale
       setError(translateError(err as Error))
     }
 
