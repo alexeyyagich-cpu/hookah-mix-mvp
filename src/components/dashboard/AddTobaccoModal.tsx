@@ -180,7 +180,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder={t.searchPlaceholder}
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                      className="input"
                     />
                   </div>
 
@@ -270,7 +270,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       <select
                         value={brand}
                         onChange={(e) => setBrand(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                        className="input"
                         required
                       >
                         <option value="">{t.selectBrandOption}</option>
@@ -287,7 +287,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                         type="text"
                         value={flavor}
                         onChange={(e) => setFlavor(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                        className="input"
                         placeholder={t.flavorPlaceholder}
                         required
                       />
@@ -300,7 +300,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       <select
                         value={packageGrams}
                         onChange={(e) => setPackageGrams(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                        className="input"
                       >
                         <option value="25">25g</option>
                         <option value="100">100g</option>
@@ -316,7 +316,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                         inputMode="decimal"
                         value={packageCount}
                         onChange={(e) => setPackageCount(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                        className="input"
                         placeholder="1"
                         min="0.1"
                         step="0.5"
@@ -335,7 +335,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       inputMode="decimal"
                       value={purchasePrice}
                       onChange={(e) => setPurchasePrice(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                      className="input"
                       placeholder={t.purchasePricePlaceholder}
                       min="0"
                       step="0.01"
@@ -350,7 +350,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none resize-none"
+                      className="input resize-none"
                       placeholder={t.notesPlaceholder}
                       rows={3}
                     />

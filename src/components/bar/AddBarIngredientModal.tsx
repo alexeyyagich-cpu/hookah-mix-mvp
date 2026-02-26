@@ -173,7 +173,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                 value={catalogFilter}
                 onChange={e => setCatalogFilter(e.target.value)}
                 placeholder={t.searchIngredientPlaceholder}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                className="input"
               />
 
               {/* Category filter */}
@@ -239,7 +239,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   value={name}
                   onChange={e => setName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  className="input"
                   placeholder={t.namePlaceholderVodka}
                 />
               </div>
@@ -251,7 +251,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     type="text"
                     value={brand}
                     onChange={e => setBrand(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="Absolut"
                   />
                 </div>
@@ -261,7 +261,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   <select
                     value={category}
                     onChange={e => setCategory(e.target.value as BarIngredientCategory)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                   >
                     {CATEGORIES.map(cat => (
                       <option key={cat} value={cat}>
@@ -278,7 +278,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   <select
                     value={unitType}
                     onChange={e => setUnitType(e.target.value as BarUnitType)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                   >
                     <option value="ml">{t.mlUnit}</option>
                     <option value="g">{t.gUnit}</option>
@@ -295,7 +295,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     min="0"
                     value={quantity}
                     onChange={e => setQuantity(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="0"
                   />
                 </div>
@@ -309,7 +309,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     min="0"
                     value={minQuantity}
                     onChange={e => setMinQuantity(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="0"
                   />
                 </div>
@@ -325,7 +325,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     min="0"
                     value={purchasePrice}
                     onChange={e => setPurchasePrice(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="0.00"
                   />
                 </div>
@@ -339,7 +339,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     min="0"
                     value={packageSize}
                     onChange={e => setPackageSize(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="700"
                   />
                 </div>
@@ -351,7 +351,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                   type="text"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  className="input"
                   placeholder={t.notesPlaceholder}
                 />
               </div>

@@ -324,7 +324,7 @@ export default function OnboardingPage() {
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder={t.placeholderBusinessName}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  className="input"
                 />
               </div>
               <div>
@@ -334,7 +334,7 @@ export default function OnboardingPage() {
                   value={ownerName}
                   onChange={(e) => setOwnerName(e.target.value)}
                   placeholder={t.placeholderOwnerName}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  className="input"
                 />
               </div>
               <div className="flex gap-3 pt-4">
@@ -395,7 +395,7 @@ export default function OnboardingPage() {
                     <select
                       value={bowlBrand}
                       onChange={(e) => { setBowlBrand(e.target.value); setBowlModel(''); setIsCustomBowl(false); }}
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                      className="input"
                     >
                       {getBowlBrands().map(b => <option key={b} value={b}>{b}</option>)}
                     </select>
@@ -409,7 +409,7 @@ export default function OnboardingPage() {
                           value={bowlModel}
                           onChange={(e) => setBowlModel(e.target.value)}
                           placeholder={t.enterBowlName}
-                          className="flex-1 px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                          className="input flex-1"
                         />
                         <button
                           type="button"
@@ -430,7 +430,7 @@ export default function OnboardingPage() {
                             if (preset) setBowlCapacity(String(preset.capacity));
                           }
                         }}
-                        className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                        className="input"
                       >
                         <option value="">{t.selectModel}</option>
                         {getBowlsByBrand(bowlBrand).map(b => (
@@ -450,7 +450,7 @@ export default function OnboardingPage() {
                       min="5"
                       max="50"
                       step="1"
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                      className="input"
                     />
                   </div>
 
@@ -543,7 +543,7 @@ export default function OnboardingPage() {
                       onChange={(e) => setTobaccoQuantity(e.target.value)}
                       min="1"
                       step="1"
-                      className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                      className="input"
                     />
                   </div>
 

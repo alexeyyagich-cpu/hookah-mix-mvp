@@ -431,13 +431,9 @@ export default function FloorPage() {
         {hasPermission('floor.edit') && (
           <button type="button"
             onClick={() => setIsEditMode(!isEditMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors self-end ${
-              isEditMode ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''
+            className={`btn btn-sm self-end ${
+              isEditMode ? 'btn-primary ring-2 ring-offset-2 ring-[var(--color-primary)]' : 'btn-ghost'
             }`}
-            style={{
-              background: isEditMode ? 'var(--color-primary)' : 'var(--color-bgHover)',
-              color: isEditMode ? 'var(--color-bg)' : 'var(--color-text)',
-            }}
           >
             <IconSettings size={18} />
             {isEditMode ? tm.ready : tc.edit}
@@ -590,8 +586,7 @@ export default function FloorPage() {
               </div>
               <button type="button"
                 onClick={handleEndSession}
-                className="w-full px-3 py-2 rounded-xl text-sm font-medium transition-all"
-                style={{ background: 'var(--color-danger)', color: 'white' }}
+                className="btn btn-danger btn-sm w-full"
               >
                 {tm.endSessionBtn}
               </button>
@@ -658,11 +653,7 @@ export default function FloorPage() {
                     <button type="button"
                       onClick={handleConfirmServe}
                       disabled={serveStatus !== 'idle'}
-                      className="flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-60"
-                      style={{
-                        background: serveStatus === 'served' ? 'var(--color-success)' : 'var(--color-success)',
-                        color: 'white',
-                      }}
+                      className="btn btn-success btn-sm flex-1 disabled:opacity-60"
                     >
                       {serveStatus === 'serving' ? tm.serving :
                        serveStatus === 'served' ? tm.served :
@@ -670,8 +661,7 @@ export default function FloorPage() {
                     </button>
                     <Link
                       href="/mix"
-                      className="flex-1 px-3 py-2.5 rounded-xl text-sm font-medium text-center transition-all"
-                      style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                      className="btn btn-ghost btn-sm flex-1"
                     >
                       {tm.createNewMix}
                     </Link>
@@ -684,8 +674,7 @@ export default function FloorPage() {
                   </p>
                   <Link
                     href="/mix"
-                    className="block w-full px-3 py-2.5 rounded-xl text-sm font-medium text-center transition-all"
-                    style={{ background: 'var(--color-primary)', color: 'white' }}
+                    className="btn btn-primary btn-sm w-full"
                   >
                     {tm.createNewMix}
                   </Link>
@@ -780,15 +769,13 @@ export default function FloorPage() {
               <div className="flex gap-2">
                 <button type="button"
                   onClick={() => { setShowGuestPicker(false); setGuestSearch('') }}
-                  className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
-                  style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                  className="btn btn-ghost btn-sm flex-1"
                 >
                   {tm.cancelBtn}
                 </button>
                 <button type="button"
                   onClick={() => handleStartSession(guestSearch || '')}
-                  className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
-                  style={{ background: 'var(--color-primary)', color: 'white' }}
+                  className="btn btn-primary btn-sm flex-1"
                 >
                   {tm.startSessionBtn}
                 </button>
@@ -877,16 +864,14 @@ export default function FloorPage() {
                   <div className="flex gap-2">
                     <button type="button"
                       onClick={() => setShowQuickReserve(false)}
-                      className="flex-1 px-3 py-2 rounded-xl text-sm font-medium"
-                      style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                      className="btn btn-ghost btn-sm flex-1"
                     >
                       {tm.cancelBtn}
                     </button>
                     <button type="button"
                       onClick={handleQuickReserve}
                       disabled={quickReserving || !quickForm.guest_name || !quickForm.reservation_time}
-                      className="flex-1 px-3 py-2 rounded-xl text-sm font-medium disabled:opacity-50"
-                      style={{ background: 'var(--color-warning)', color: 'white' }}
+                      className="btn btn-warning btn-sm flex-1"
                     >
                       {quickReserving ? tm.reserving : tm.reserveBtn}
                     </button>

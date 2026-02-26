@@ -308,6 +308,38 @@ input[type="range"]::-moz-range-thumb {
   color: var(--color-bg) !important;
 }
 
+/* ========== INPUT ========== */
+.input {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--color-bgHover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+.input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+.input::placeholder {
+  color: var(--color-textMuted);
+}
+.input-compact {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--color-bgHover);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+.input-compact:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
 /* ========== BUTTON ========== */
 .btn {
   display: inline-flex;

@@ -378,7 +378,7 @@ export default function SettingsPage() {
             type="email"
             value={user?.email || ''}
             disabled
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-[var(--color-textMuted)] cursor-not-allowed"
+            className="input text-[var(--color-textMuted)] cursor-not-allowed"
           />
           <p className="text-xs text-[var(--color-textMuted)]">
             {ts.emailCannotChange}
@@ -392,7 +392,7 @@ export default function SettingsPage() {
               type="text"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              className="input"
               placeholder={ts.placeholderBusinessName}
             />
           </div>
@@ -403,7 +403,7 @@ export default function SettingsPage() {
               type="text"
               value={ownerName}
               onChange={(e) => setOwnerName(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              className="input"
               placeholder={ts.placeholderOwnerName}
             />
           </div>
@@ -415,7 +415,7 @@ export default function SettingsPage() {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+            className="input"
             placeholder={ts.placeholderPhone}
           />
         </div>
@@ -426,7 +426,7 @@ export default function SettingsPage() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+            className="input"
             placeholder={ts.placeholderAddress}
           />
         </div>

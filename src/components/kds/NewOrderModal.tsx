@@ -529,7 +529,7 @@ export function NewOrderModal({
                   onChange={e => setHookahDescription(e.target.value)}
                   placeholder={t.placeholderHookahMix}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm resize-none"
+                  className="input text-sm resize-none"
                 />
               ) : (
                 <div className="space-y-4">
@@ -707,7 +707,7 @@ export function NewOrderModal({
               onChange={e => setNotes(e.target.value)}
               placeholder={t.placeholderSpecialRequests}
               rows={2}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm resize-none"
+              className="input text-sm resize-none"
             />
           </div>
         </div>

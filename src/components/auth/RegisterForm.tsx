@@ -110,7 +110,7 @@ export function RegisterForm() {
             type="text"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            className="input transition-colors"
             placeholder={t.placeholderBusinessName}
           />
         </div>
@@ -124,7 +124,7 @@ export function RegisterForm() {
             type="text"
             value={ownerName}
             onChange={(e) => setOwnerName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            className="input transition-colors"
             placeholder={t.placeholderOwnerName}
           />
         </div>
@@ -138,7 +138,7 @@ export function RegisterForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            className="input transition-colors"
             placeholder={t.placeholderEmail}
             autoComplete="email"
             required
@@ -154,7 +154,7 @@ export function RegisterForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            className="input transition-colors"
             placeholder={t.passwordPlaceholder}
             autoComplete="new-password"
             minLength={6}
@@ -171,7 +171,7 @@ export function RegisterForm() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
+            className="input transition-colors"
             placeholder={t.repeatPasswordPlaceholder}
             autoComplete="new-password"
             minLength={6}

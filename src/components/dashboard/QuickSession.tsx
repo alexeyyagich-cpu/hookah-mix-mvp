@@ -361,7 +361,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                 const bowl = bowls.find(b => b.id === e.target.value)
                 if (bowl) setTotalGrams(bowl.capacity_grams.toString())
               }}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              className="input"
             >
               <option value="">{t.noBowlOption}</option>
               {bowls.map(bowl => (
@@ -380,7 +380,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
               inputMode="decimal"
               value={totalGrams}
               onChange={(e) => setTotalGrams(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              className="input"
               min="1"
               max="100"
             />
@@ -394,7 +394,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
               inputMode="decimal"
               value={sellingPrice}
               onChange={(e) => setSellingPrice(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+              className="input"
               placeholder={t.sellingPricePlaceholder}
               min="0"
               step="0.5"
@@ -465,7 +465,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none resize-none"
+              className="input resize-none"
               placeholder={t.sessionNotePlaceholder}
               rows={2}
             />

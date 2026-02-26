@@ -258,7 +258,7 @@ export default function BowlsPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  className="input"
                   placeholder={t.bowlNamePlaceholder}
                   required
                 />
@@ -271,7 +271,7 @@ export default function BowlsPage() {
                   inputMode="numeric"
                   value={capacity}
                   onChange={(e) => setCapacity(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                  className="input"
                   placeholder="20"
                   min="5"
                   max="50"

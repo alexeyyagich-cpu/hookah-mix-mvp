@@ -270,7 +270,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 value={presetFilter}
                 onChange={e => setPresetFilter(e.target.value)}
                 placeholder={t.searchCocktail}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                className="input"
               />
               {/* Category filter */}
               <div className="flex flex-wrap gap-1.5">
@@ -328,7 +328,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   <label className="block text-sm font-medium">{t.nameRequired}</label>
                   <input
                     type="text" value={name} onChange={e => setName(e.target.value)} required
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="Mojito"
                   />
                 </div>
@@ -336,7 +336,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   <label className="block text-sm font-medium">English name</label>
                   <input
                     type="text" value={nameEn} onChange={e => setNameEn(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="Mojito"
                   />
                 </div>
@@ -346,7 +346,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 <div className="space-y-2">
                   <label className="block text-sm font-medium">{t.methodLabel}</label>
                   <select value={method} onChange={e => setMethod(e.target.value as CocktailMethod)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                   >
                     {METHODS.map(m => <option key={m} value={m}>{METHOD_LABELS[m]}</option>)}
                   </select>
@@ -354,7 +354,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 <div className="space-y-2">
                   <label className="block text-sm font-medium">{t.glassLabel}</label>
                   <select value={glass} onChange={e => setGlass(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                   >
                     {GLASS_KEYS.map(g => <option key={g} value={g}>{GLASS_LABELS[g]}</option>)}
                   </select>
@@ -362,7 +362,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 <div className="space-y-2">
                   <label className="block text-sm font-medium">{t.difficultyLabel}</label>
                   <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                   >
                     <option value="1">{t.easy}</option>
                     <option value="2">{t.medium}</option>
@@ -376,7 +376,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   <label className="block text-sm font-medium">{t.menuPriceEur}</label>
                   <input
                     type="number" inputMode="decimal" step="0.01" min="0" value={menuPrice} onChange={e => setMenuPrice(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder="12.00"
                   />
                 </div>
@@ -384,7 +384,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   <label className="block text-sm font-medium">{t.garnishLabel}</label>
                   <input
                     type="text" value={garnish} onChange={e => setGarnish(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+                    className="input"
                     placeholder={t.garnishPlaceholder}
                   />
                 </div>

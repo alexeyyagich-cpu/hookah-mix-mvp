@@ -265,7 +265,7 @@ export default function ShiftsPage() {
                   placeholder="0"
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
+                  className="input text-sm"
                 />
               </div>
               <div>
@@ -274,7 +274,7 @@ export default function ShiftsPage() {
                   value={openNotes}
                   onChange={e => setOpenNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm resize-none"
+                  className="input text-sm resize-none"
                 />
               </div>
             </div>
@@ -282,16 +282,14 @@ export default function ShiftsPage() {
             <div className="flex gap-3 mt-6">
               <button type="button"
                 onClick={() => setShowOpenModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium"
-                style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                className="btn btn-ghost btn-sm flex-1"
               >
                 {tm.cancelBtn}
               </button>
               <button type="button"
                 onClick={handleOpenShift}
                 disabled={submitting}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-                style={{ background: 'var(--color-success)' }}
+                className="btn btn-success btn-sm flex-1"
               >
                 {submitting ? tm.openingShift : tm.openShift}
               </button>
@@ -334,7 +332,7 @@ export default function ShiftsPage() {
                   placeholder={String(Math.round(closeReconciliation.cash.expectedCash))}
                   min="0"
                   step="0.01"
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
+                  className="input text-sm"
                 />
               </div>
               <div>
@@ -343,7 +341,7 @@ export default function ShiftsPage() {
                   value={closeNotes}
                   onChange={e => setCloseNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm resize-none"
+                  className="input text-sm resize-none"
                 />
               </div>
             </div>
@@ -351,16 +349,14 @@ export default function ShiftsPage() {
             <div className="flex gap-3 mt-6">
               <button type="button"
                 onClick={() => setShowCloseModal(false)}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium"
-                style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
+                className="btn btn-ghost btn-sm flex-1"
               >
                 {tm.cancelBtn}
               </button>
               <button type="button"
                 onClick={handleCloseShift}
                 disabled={submitting}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50"
-                style={{ background: 'var(--color-danger)' }}
+                className="btn btn-danger btn-sm flex-1"
               >
                 {submitting ? tm.closingShift : tm.closeShift}
               </button>
