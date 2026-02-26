@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { IconShop, IconCart, IconTruck } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { SupplierCard } from '@/components/marketplace/SupplierCard'
 import { CartDrawer } from '@/components/marketplace/CartDrawer'
 import { useSuppliers } from '@/lib/hooks/useSuppliers'
@@ -63,15 +64,11 @@ export default function MarketplacePage() {
           ))}
         </div>
       ) : (
-        <div className="card p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center mx-auto mb-4">
-            <IconTruck size={32} className="text-[var(--color-primary)]" />
-          </div>
-          <h2 className="text-lg font-semibold mb-2">{t.noSuppliersAvailable}</h2>
-          <p className="text-[var(--color-textMuted)] max-w-md mx-auto">
-            {t.orderFromSuppliers}
-          </p>
-        </div>
+        <EmptyState
+          icon={<IconTruck size={32} />}
+          title={t.noSuppliersAvailable}
+          description={t.orderFromSuppliers}
+        />
       )}
 
       <CartDrawer

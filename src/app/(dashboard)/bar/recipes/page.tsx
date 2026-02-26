@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { IconCocktail } from '@/components/Icons'
 import { RecipeCard } from '@/components/bar/RecipeCard'
 import { CostCalculator } from '@/components/bar/CostCalculator'
 import { AddRecipeModal } from '@/components/bar/AddRecipeModal'
@@ -190,23 +192,12 @@ export default function BarRecipesPage() {
           <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
         </div>
       ) : filteredRecipes.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">🍹</div>
-          <h3 className="text-lg font-semibold mb-2">
-            {recipes.length === 0 ? tb.noRecipes : tb.nothingFound}
-          </h3>
-          <p className="text-[var(--color-textMuted)] max-w-md mx-auto mb-4">
-            {recipes.length === 0
-              ? tb.createFirstOrImport
-              : tb.tryChangingFilters
-            }
-          </p>
-          {recipes.length === 0 && (
-            <button type="button" onClick={() => setModalOpen(true)} className="btn btn-primary">
-              + {tb.createRecipe}
-            </button>
-          )}
-        </div>
+        <EmptyState
+          icon={<IconCocktail size={32} />}
+          title={recipes.length === 0 ? tb.noRecipes : tb.nothingFound}
+          description={recipes.length === 0 ? tb.createFirstOrImport : tb.tryChangingFilters}
+          action={recipes.length === 0 ? { label: `+ ${tb.createRecipe}`, onClick: () => setModalOpen(true) } : undefined}
+        />
       ) : (
         <div className="flex gap-6">
           {/* Recipe Grid */}

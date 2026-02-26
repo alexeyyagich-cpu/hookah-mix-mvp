@@ -7,7 +7,8 @@ import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
-import { IconSettings, IconCalendar } from '@/components/Icons'
+import { IconSettings, IconCalendar, IconFloor } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatTime } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
@@ -353,7 +354,7 @@ export default function FloorPage() {
       {/* Today's Reservations Widget */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold flex items-center gap-2">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
             <IconCalendar size={18} className="text-[var(--color-primary)]" />
             {tm.todayReservations}
           </h2>
@@ -444,16 +445,12 @@ export default function FloorPage() {
         )}
       </div>
       {tables.length === 0 && !loading && !isEditMode ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">🪑</div>
-          <h3 className="text-lg font-semibold mb-2">{tm.noTables}</h3>
-          <p className="text-[var(--color-textMuted)] mb-4">{tm.noTablesHint}</p>
-          {hasPermission('floor.edit') && (
-            <button type="button" onClick={() => setIsEditMode(true)} className="btn btn-primary">
-              {tm.enableEditMode}
-            </button>
-          )}
-        </div>
+        <EmptyState
+          icon={<IconFloor size={32} />}
+          title={tm.noTables}
+          description={tm.noTablesHint}
+          action={hasPermission('floor.edit') ? { label: tm.enableEditMode, onClick: () => setIsEditMode(true) } : undefined}
+        />
       ) : (
         <div className="card p-6">
           <FloorPlan

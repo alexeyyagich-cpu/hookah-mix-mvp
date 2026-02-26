@@ -13,6 +13,7 @@ import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
 import { getHeatRecommendation } from '@/logic/quickRepeatEngine'
 import { IconWaiter, IconLock } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { BarRecipeWithIngredients, KdsOrderItem, KdsHookahData, StrengthPreference } from '@/types/database'
 
@@ -215,16 +216,12 @@ export default function WaiterPage() {
   if (isFreeTier) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="card p-8 text-center max-w-md">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/20 to-purple-500/20 flex items-center justify-center">
-            <IconLock size={32} className="text-[var(--color-primary)]" />
-          </div>
-          <h2 className="text-xl font-bold mb-2">{tm.waiterProRequired}</h2>
-          <p className="text-[var(--color-textMuted)] mb-4">{tm.waiterProRequiredDesc}</p>
-          <Link href="/pricing" className="btn btn-primary">
-            Upgrade to Pro
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconLock size={32} />}
+          title={tm.waiterProRequired}
+          description={tm.waiterProRequiredDesc}
+          action={{ label: 'Upgrade to Pro', href: '/pricing' }}
+        />
       </div>
     )
   }

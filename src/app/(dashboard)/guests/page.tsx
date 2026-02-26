@@ -9,6 +9,7 @@ import { GuestDetailModal } from '@/components/dashboard/GuestDetailModal'
 import { LoyaltySettingsPanel } from '@/components/dashboard/LoyaltySettingsPanel'
 import { useTranslation } from '@/lib/i18n'
 import { IconSearch, IconPlus, IconUsers, IconSettings, IconLock } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { Guest, LoyaltyTier } from '@/types/database'
 
@@ -73,16 +74,12 @@ export default function GuestsPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.guestsTitle}</h1>
-        <div className="card p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center mx-auto mb-4">
-            <IconLock size={32} className="text-[var(--color-primary)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{tm.guestsProOnly}</h3>
-          <p className="text-[var(--color-textMuted)] mb-4">{tm.guestsProOnlyDesc}</p>
-          <Link href="/pricing" className="btn btn-primary">
-            {tm.upgradePlan}
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconLock size={32} />}
+          title={tm.guestsProOnly}
+          description={tm.guestsProOnlyDesc}
+          action={{ label: tm.upgradePlan, href: '/pricing' }}
+        />
       </div>
     )
   }
@@ -195,13 +192,11 @@ export default function GuestsPage() {
           <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filteredGuests.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-            <IconUsers size={32} className="text-[var(--color-textMuted)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{tm.noGuests}</h3>
-          <p className="text-[var(--color-textMuted)]">{tm.noGuestsDesc}</p>
-        </div>
+        <EmptyState
+          icon={<IconUsers size={32} />}
+          title={tm.noGuests}
+          description={tm.noGuestsDesc}
+        />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredGuests.map(guest => (

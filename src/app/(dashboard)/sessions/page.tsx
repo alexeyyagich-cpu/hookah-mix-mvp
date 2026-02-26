@@ -6,6 +6,7 @@ import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
 import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus, IconExport, IconLock, IconChart } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { exportSessionsCSV, exportSessionsPDF } from '@/lib/utils/exportReport'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
@@ -149,7 +150,7 @@ export default function SessionsPage() {
               <IconCalendar size={20} />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">{t.limitedHistory}</h3>
+              <h3 className="text-base font-semibold">{t.limitedHistory}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {t.limitedHistoryDesc}
               </p>
@@ -194,25 +195,12 @@ export default function SessionsPage() {
           <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingSessions}</p>
         </div>
       ) : filteredSessions.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-            <IconSmoke size={32} className="text-[var(--color-textMuted)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">
-            {filter ? t.noResults : t.noSessions}
-          </h3>
-          <p className="text-[var(--color-textMuted)] mb-4">
-            {filter
-              ? t.tryDifferentSearch
-              : t.startFirstSession
-            }
-          </p>
-          {!filter && (
-            <Link href="/mix" className="btn btn-primary">
-              {t.createMix}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          icon={<IconSmoke size={32} />}
+          title={filter ? t.noResults : t.noSessions}
+          description={filter ? t.tryDifferentSearch : t.startFirstSession}
+          action={!filter ? { label: t.createMix, href: '/mix' } : undefined}
+        />
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredSessions.map((session) => (
@@ -257,7 +245,7 @@ export default function SessionsPage() {
 
               {/* Mix Items */}
               <div className="space-y-3">
-                <h3 className="font-semibold">{t.mixComposition}</h3>
+                <h3 className="text-base font-semibold">{t.mixComposition}</h3>
                 {selectedSession.session_items?.map((item, index) => (
                   <div
                     key={index}

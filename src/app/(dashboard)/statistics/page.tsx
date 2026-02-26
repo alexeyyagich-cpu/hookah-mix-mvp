@@ -25,6 +25,7 @@ import {
   IconExport,
   IconWarning,
 } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
@@ -240,7 +241,7 @@ export default function StatisticsPage() {
               <IconTrendUp size={22} />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">{tm.advancedAnalytics}</h3>
+              <h3 className="text-base font-semibold">{tm.advancedAnalytics}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {tm.advancedAnalyticsDesc}
               </p>
@@ -302,15 +303,11 @@ export default function StatisticsPage() {
               <p className="mt-4 text-[var(--color-textMuted)]">{tm.loadingComparison}</p>
             </div>
           ) : !periodA || !periodB || !comparison ? (
-            <div className="card p-12 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-                <IconChart size={32} className="text-[var(--color-textMuted)]" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{tm.insufficientData}</h3>
-              <p className="text-[var(--color-textMuted)]">
-                {tm.insufficientDataDesc}
-              </p>
-            </div>
+            <EmptyState
+              icon={<IconChart size={32} />}
+              title={tm.insufficientData}
+              description={tm.insufficientDataDesc}
+            />
           ) : (
             <>
               {/* Comparison Cards */}
@@ -407,18 +404,12 @@ export default function StatisticsPage() {
           <p className="mt-4 text-[var(--color-textMuted)]">{tm.loadingStats}</p>
         </div>
       ) : viewMode === 'overview' && !statistics ? (
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-            <IconChart size={32} className="text-[var(--color-textMuted)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{tm.noData}</h3>
-          <p className="text-[var(--color-textMuted)]">
-            {tm.createSessionsHint}
-          </p>
-          <Link href="/mix" className="btn btn-primary mt-4">
-            {tm.goToMixCalculator}
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconChart size={32} />}
+          title={tm.noData}
+          description={tm.createSessionsHint}
+          action={{ label: tm.goToMixCalculator, href: '/mix' }}
+        />
       ) : viewMode === 'overview' && statistics ? (
         <>
           {/* Stats Grid */}

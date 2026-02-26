@@ -5,6 +5,7 @@ import { usePromotions } from '@/lib/hooks/usePromotions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus, IconLock, IconPercent, IconEdit, IconTrash, IconClose } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { Promotion, PromoType, PromoRules } from '@/types/database'
 
@@ -37,16 +38,12 @@ export default function PromotionsPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.promosTitle}</h1>
-        <div className="card p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center mx-auto mb-4">
-            <IconLock size={32} className="text-[var(--color-primary)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{tm.promosProOnly}</h3>
-          <p className="text-[var(--color-textMuted)] mb-4">{tm.promosProOnlyDesc}</p>
-          <Link href="/pricing" className="btn btn-primary">
-            {tm.upgradePlan}
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconLock size={32} />}
+          title={tm.promosProOnly}
+          description={tm.promosProOnlyDesc}
+          action={{ label: tm.upgradePlan, href: '/pricing' }}
+        />
       </div>
     )
   }
@@ -119,7 +116,7 @@ export default function PromotionsPage() {
       {showForm && (
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">{editingPromo ? tm.editPromo : tm.createPromo}</h3>
+            <h3 className="text-base font-semibold">{editingPromo ? tm.editPromo : tm.createPromo}</h3>
             <button type="button" onClick={resetForm} className="btn btn-ghost p-2" aria-label="Close"><IconClose size={18} /></button>
           </div>
 
@@ -243,13 +240,11 @@ export default function PromotionsPage() {
           <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : promotions.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-            <IconPercent size={32} className="text-[var(--color-textMuted)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{tm.noPromos}</h3>
-          <p className="text-[var(--color-textMuted)]">{tm.noPromosDesc}</p>
-        </div>
+        <EmptyState
+          icon={<IconPercent size={32} />}
+          title={tm.noPromos}
+          description={tm.noPromosDesc}
+        />
       ) : (
         <div className="space-y-3">
           {promotions.map(promo => (

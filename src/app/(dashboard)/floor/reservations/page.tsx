@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconTrash } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useRole } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
@@ -126,13 +127,11 @@ export default function ReservationsPage() {
 
       {/* Reservations List */}
       {filteredReservations.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">📅</div>
-          <h3 className="text-lg font-semibold mb-2">{tm.noReservations}</h3>
-          <p className="text-[var(--color-textMuted)] text-sm">
-            {tm.noReservationsForDate}
-          </p>
-        </div>
+        <EmptyState
+          icon={<IconCalendar size={32} />}
+          title={tm.noReservations}
+          description={tm.noReservationsForDate}
+        />
       ) : (
         <div className="space-y-4">
           {filteredReservations.map((reservation) => {

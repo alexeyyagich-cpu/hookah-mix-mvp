@@ -8,6 +8,7 @@ import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
 import { CartSummary } from '@/components/marketplace/CartSummary'
 import { CheckoutModal } from '@/components/marketplace/CheckoutModal'
 import { IconChevronLeft, IconCart, IconPlus, IconMinus, IconTrash } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
 export default function CartPage() {
@@ -42,16 +43,12 @@ export default function CartPage() {
           {tmk.backToMarketplace}
         </Link>
 
-        <div className="card p-8 text-center">
-          <IconCart size={48} className="text-[var(--color-textMuted)] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">{tmk.cartEmptyTitle}</h2>
-          <p className="text-[var(--color-textMuted)] mb-6">
-            {tmk.addItemsForOrder}
-          </p>
-          <Link href="/marketplace" className="btn btn-primary">
-            {tmk.goToSuppliers}
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconCart size={32} />}
+          title={tmk.cartEmptyTitle}
+          description={tmk.addItemsForOrder}
+          action={{ label: tmk.goToSuppliers, href: '/marketplace' }}
+        />
       </div>
     )
   }

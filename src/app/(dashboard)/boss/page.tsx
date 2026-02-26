@@ -15,7 +15,8 @@ import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { useTips } from '@/lib/hooks/useTips'
 import { useTranslation, useLocale, formatTime } from '@/lib/i18n'
-import { IconCrown, IconRefresh } from '@/components/Icons'
+import { IconCrown, IconRefresh, IconLock } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import Link from 'next/link'
 import type { ShiftReconciliation } from '@/types/database'
@@ -106,16 +107,12 @@ export default function BossPage() {
   if (isFreeTier) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="card p-8 text-center max-w-md">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[var(--color-primary)]/20 to-purple-500/20 flex items-center justify-center">
-            <IconCrown size={32} className="text-[var(--color-primary)]" />
-          </div>
-          <h2 className="text-xl font-bold mb-2">{tm.bossProRequired}</h2>
-          <p className="text-[var(--color-textMuted)] mb-4">{tm.bossProRequiredDesc}</p>
-          <Link href="/pricing" className="btn btn-primary">
-            Upgrade to Pro
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconLock size={32} />}
+          title={tm.bossProRequired}
+          description={tm.bossProRequiredDesc}
+          action={{ label: 'Upgrade to Pro', href: '/pricing' }}
+        />
       </div>
     )
   }

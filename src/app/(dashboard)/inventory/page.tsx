@@ -275,7 +275,7 @@ export default function InventoryPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔒</span>
             <div className="flex-1">
-              <h3 className="font-semibold">{t.limitReached}</h3>
+              <h3 className="text-base font-semibold">{t.limitReached}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {t.freeTierLimit(itemsLimit!)}
               </p>

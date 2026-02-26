@@ -5,6 +5,7 @@ import { useShifts } from '@/lib/hooks/useShifts'
 import { useModules } from '@/lib/hooks/useModules'
 import { useTranslation, useLocale, formatCurrency, formatDate, formatTime } from '@/lib/i18n'
 import { IconTimer, IconPlus, IconClose, IconCoin, IconBowl, IconCocktail, IconMenuList } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 
 function formatDuration(ms: number, t: { hoursShort: string; minutesShort: string }): string {
@@ -170,19 +171,12 @@ export default function ShiftsPage() {
               )}
             </div>
           ) : shifts.length === 0 ? (
-            <div className="card p-12 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-                <IconTimer size={32} className="text-[var(--color-textMuted)]" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">{tm.noShifts}</h3>
-              <p className="text-[var(--color-textMuted)] mb-4">{tm.noShiftsHint}</p>
-              <button type="button"
-                onClick={() => setShowOpenModal(true)}
-                className="btn btn-primary"
-              >
-                {tm.openShift}
-              </button>
-            </div>
+            <EmptyState
+              icon={<IconTimer size={32} />}
+              title={tm.noShifts}
+              description={tm.noShiftsHint}
+              action={{ label: tm.openShift, onClick: () => setShowOpenModal(true) }}
+            />
           ) : (
             <div className="card p-6 border-dashed border-2 border-[var(--color-border)] text-center">
               <p className="text-[var(--color-textMuted)] mb-3">{tm.noActiveShift}</p>

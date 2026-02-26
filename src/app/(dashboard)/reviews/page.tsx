@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 type Filter = 'all' | 'published' | 'hidden'
 
@@ -85,15 +86,11 @@ export default function ReviewsPage() {
 
       {/* Reviews List */}
       {filteredReviews.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">💬</div>
-          <h3 className="text-lg font-semibold mb-2">
-            {filter === 'all' ? tm.noReviewsYet : filter === 'published' ? tm.noPublishedReviews : tm.noHiddenReviews}
-          </h3>
-          <p className="text-[var(--color-textMuted)] text-sm">
-            {tm.sharePageHint}
-          </p>
-        </div>
+        <EmptyState
+          icon={<IconStar size={32} />}
+          title={filter === 'all' ? tm.noReviewsYet : filter === 'published' ? tm.noPublishedReviews : tm.noHiddenReviews}
+          description={tm.sharePageHint}
+        />
       ) : (
         <div className="space-y-4">
           {filteredReviews.map((review) => (

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
 import { OrderCard } from '@/components/marketplace/OrderCard'
 import { IconChevronLeft, IconPackage, IconShop } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation } from '@/lib/i18n'
 import type { OrderStatus } from '@/types/database'
 
@@ -111,23 +112,12 @@ export default function OrdersPage() {
           ))}
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="card p-8 text-center">
-          <IconPackage size={48} className="text-[var(--color-textMuted)] mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">
-            {statusFilter === 'all' ? tmk.noOrders : tmk.noOrdersWithStatus}
-          </h2>
-          <p className="text-[var(--color-textMuted)] mb-6">
-            {statusFilter === 'all'
-              ? tmk.placeFirstOrder
-              : tmk.tryDifferentFilter
-            }
-          </p>
-          {statusFilter === 'all' && (
-            <Link href="/marketplace" className="btn btn-primary">
-              {tmk.goToSuppliers}
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          icon={<IconPackage size={32} />}
+          title={statusFilter === 'all' ? tmk.noOrders : tmk.noOrdersWithStatus}
+          description={statusFilter === 'all' ? tmk.placeFirstOrder : tmk.tryDifferentFilter}
+          action={statusFilter === 'all' ? { label: tmk.goToSuppliers, href: '/marketplace' } : undefined}
+        />
       ) : (
         <div className="space-y-4">
           {filteredOrders.map(order => (

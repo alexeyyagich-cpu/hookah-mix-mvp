@@ -8,6 +8,8 @@ import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
+import { IconBowl } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
@@ -156,7 +158,7 @@ export default function BowlsPage() {
           <div className="flex items-center gap-3">
             <span className="text-2xl">🔒</span>
             <div className="flex-1">
-              <h3 className="font-semibold">{t.limitReached}</h3>
+              <h3 className="text-base font-semibold">{t.limitReached}</h3>
               <p className="text-sm text-[var(--color-textMuted)]">
                 {t.bowlsFreeTierLimit(bowlsLimit!)}
               </p>
@@ -185,16 +187,12 @@ export default function BowlsPage() {
           <p className="mt-4 text-[var(--color-textMuted)]">{tc.loading}</p>
         </div>
       ) : bowls.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-5xl mb-4">🥣</div>
-          <h3 className="text-lg font-semibold mb-2">{t.noBowls}</h3>
-          <p className="text-[var(--color-textMuted)] mb-4">
-            {t.noBowlsDesc}
-          </p>
-          <button type="button" onClick={() => openModal()} className="btn btn-primary">
-            + {t.addBowl}
-          </button>
-        </div>
+        <EmptyState
+          icon={<IconBowl size={32} />}
+          title={t.noBowls}
+          description={t.noBowlsDesc}
+          action={{ label: `+ ${t.addBowl}`, onClick: () => openModal() }}
+        />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {bowls.map((bowl) => (
@@ -212,7 +210,7 @@ export default function BowlsPage() {
       {/* Preset Suggestions */}
       {bowls.length === 0 && (
         <div className="card p-6">
-          <h3 className="font-semibold mb-4">{t.bowlPresets}</h3>
+          <h3 className="text-base font-semibold mb-4">{t.bowlPresets}</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {BOWL_PRESETS.slice(0, 8).map((preset) => (
               <button type="button"

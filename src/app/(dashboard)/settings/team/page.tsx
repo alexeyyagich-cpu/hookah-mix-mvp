@@ -146,7 +146,7 @@ export default function TeamPage() {
       {/* Members List */}
       <div className="card">
         <div className="p-4 border-b border-[var(--color-border)]">
-          <h2 className="font-semibold">{tm.staffTitle(members.length)}</h2>
+          <h2 className="text-lg font-semibold">{tm.staffTitle(members.length)}</h2>
         </div>
 
         {members.length === 0 ? (
@@ -250,7 +250,7 @@ export default function TeamPage() {
       {invitations.length > 0 && (
         <div className="card">
           <div className="p-4 border-b border-[var(--color-border)]">
-            <h2 className="font-semibold">{tm.pendingInvitations(invitations.length)}</h2>
+            <h2 className="text-lg font-semibold">{tm.pendingInvitations(invitations.length)}</h2>
           </div>
 
           <div className="divide-y divide-[var(--color-border)]">
@@ -314,7 +314,7 @@ export default function TeamPage() {
       {/* QR Tips Section */}
       <div className="card">
         <div className="p-4 border-b border-[var(--color-border)]">
-          <h2 className="font-semibold">{ts.tipSection}</h2>
+          <h2 className="text-lg font-semibold">{ts.tipSection}</h2>
           <p className="text-sm text-[var(--color-textMuted)] mt-1">{ts.tipSectionDesc}</p>
         </div>
 

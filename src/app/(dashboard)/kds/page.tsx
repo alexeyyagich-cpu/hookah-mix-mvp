@@ -12,6 +12,7 @@ import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
 import { IconPlus, IconMenuList } from '@/components/Icons'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation } from '@/lib/i18n'
 import type { KdsOrderStatus } from '@/types/database'
 
@@ -117,22 +118,12 @@ export default function KdsPage() {
           <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
         </div>
       ) : filteredOrders.length === 0 ? (
-        /* Empty state */
-        <div className="card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[var(--color-bgHover)] flex items-center justify-center">
-            <IconMenuList size={32} className="text-[var(--color-textMuted)]" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">{tm.noActiveOrders}</h3>
-          <p className="text-[var(--color-textMuted)] mb-4">
-            {tm.createOrderDesc}
-          </p>
-          <button type="button"
-            onClick={() => setModalOpen(true)}
-            className="btn btn-primary"
-          >
-            {tm.createOrder}
-          </button>
-        </div>
+        <EmptyState
+          icon={<IconMenuList size={32} />}
+          title={tm.noActiveOrders}
+          description={tm.createOrderDesc}
+          action={{ label: tm.createOrder, onClick: () => setModalOpen(true) }}
+        />
       ) : (
         <>
           {/* Desktop: 3-column Kanban */}
@@ -142,7 +133,7 @@ export default function KdsPage() {
                 {/* Column header */}
                 <div className="flex items-center gap-2 mb-4">
                   <span className={`w-2.5 h-2.5 rounded-full ${col.dot}`} />
-                  <h2 className="font-semibold">{col.label}</h2>
+                  <h2 className="text-lg font-semibold">{col.label}</h2>
                   <span className="text-xs font-medium text-[var(--color-textMuted)] bg-[var(--color-bgHover)] px-2 py-0.5 rounded-full">
                     {col.orders.length}
                   </span>

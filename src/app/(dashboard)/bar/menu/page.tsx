@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
+import { IconMenuList } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
@@ -144,16 +146,12 @@ export default function BarMenuPage() {
           <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
         </div>
       ) : menuRecipes.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-3">📋</div>
-          <h3 className="text-lg font-semibold mb-2">{tb.menuEmpty}</h3>
-          <p className="text-[var(--color-textMuted)] max-w-md mx-auto">
-            {tb.menuEmptyGoToRecipes}
-          </p>
-          <Link href="/bar/recipes" className="btn btn-primary mt-4">
-            {tb.goToRecipes}
-          </Link>
-        </div>
+        <EmptyState
+          icon={<IconMenuList size={32} />}
+          title={tb.menuEmpty}
+          description={tb.menuEmptyGoToRecipes}
+          action={{ label: tb.goToRecipes, href: '/bar/recipes' }}
+        />
       ) : (
         <div className="space-y-6">
           {Object.entries(grouped).map(([method, items]) => (
