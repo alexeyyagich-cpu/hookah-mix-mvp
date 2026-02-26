@@ -10,7 +10,7 @@ import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
 import type { BarSale, BarAnalytics, BarRecipeWithIngredients } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo sales data (past 7 days)
 function generateDemoSales(): BarSale[] {
   const now = new Date()
@@ -117,7 +117,7 @@ export function useBarSales(): UseBarSalesReturn {
         .limit(500)
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setSales([]) }
+        if (!cached) { setError(translateError(fetchError)); setSales([]) }
       } else {
         setSales(data || [])
         await setCachedData('bar_sales', user.id, data || [])
@@ -190,7 +190,7 @@ export function useBarSales(): UseBarSalesReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -229,7 +229,7 @@ export function useBarSales(): UseBarSalesReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 

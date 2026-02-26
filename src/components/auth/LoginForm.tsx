@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
 import { useTranslation } from '@/lib/i18n'
+import { translateError } from '@/lib/utils/translateError'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -25,9 +26,8 @@ export function LoginForm() {
     const { error: signInError } = await signIn(email, password)
 
     if (signInError) {
-      setError(signInError.message === 'Invalid login credentials'
-        ? t.invalidCredentials
-        : signInError.message)
+      const translated = translateError(signInError)
+      setError(translated === 'invalid_credentials' ? t.invalidCredentials : translated)
       setLoading(false)
       return
     }

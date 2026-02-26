@@ -9,7 +9,7 @@ import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { enqueueOfflineMutation } from '@/lib/offline/offlineMutation'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo data for testing (prices in EUR, package_grams = 100g default)
 const _D = 24 * 60 * 60 * 1000
 const DEMO_INVENTORY: TobaccoInventory[] = [
@@ -86,7 +86,7 @@ export function useInventory(): UseInventoryReturn {
         .order('flavor', { ascending: true })
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setInventory([]) }
+        if (!cached) { setError(translateError(fetchError)); setInventory([]) }
       } else {
         setInventory(data || [])
         await setCachedData('inventory', user.id, data || [])
@@ -150,7 +150,7 @@ export function useInventory(): UseInventoryReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -193,7 +193,7 @@ export function useInventory(): UseInventoryReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 
@@ -224,7 +224,7 @@ export function useInventory(): UseInventoryReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 
@@ -317,7 +317,7 @@ export function useInventory(): UseInventoryReturn {
     })
 
     if (rpcError) {
-      setError(rpcError.message)
+      setError(translateError(rpcError))
       return false
     }
 
@@ -335,7 +335,7 @@ export function useInventory(): UseInventoryReturn {
       .order('created_at', { ascending: false })
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       return []
     }
 

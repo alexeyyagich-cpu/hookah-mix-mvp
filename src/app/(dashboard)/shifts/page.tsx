@@ -245,7 +245,7 @@ export default function ShiftsPage() {
       {/* Open Shift Modal */}
       {showOpenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" role="button" tabIndex={-1} aria-label="Close" onClick={() => setShowOpenModal(false)} onKeyDown={(e) => e.key === 'Escape' && setShowOpenModal(false)} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowOpenModal(false)} />
           <div className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{tm.openShift}</h2>
@@ -301,7 +301,7 @@ export default function ShiftsPage() {
       {/* Close Shift Modal */}
       {showCloseModal && activeShift && closeReconciliation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" role="button" tabIndex={-1} aria-label="Close" onClick={() => setShowCloseModal(false)} onKeyDown={(e) => e.key === 'Escape' && setShowCloseModal(false)} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowCloseModal(false)} />
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{tm.closeShift}</h2>
@@ -368,7 +368,7 @@ export default function ShiftsPage() {
       {/* Past Shift Reconciliation Modal */}
       {selectedShift && selectedReconciliation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" role="button" tabIndex={-1} aria-label="Close" onClick={() => setSelectedShift(null)} onKeyDown={(e) => e.key === 'Escape' && setSelectedShift(null)} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setSelectedShift(null)} />
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div>

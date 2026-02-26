@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { Guest, MixSnapshot, StrengthPreference, FlavorProfile } from '@/types/database'
+import { translateError } from '@/lib/utils/translateError'
 import {
   cacheGuestsLocally,
   getCachedGuests,
@@ -263,7 +264,7 @@ export function useGuests(): UseGuestsReturn {
             setGuests(lsCached)
             setIsOffline(true)
           } else {
-            setError(fetchError.message)
+            setError(translateError(fetchError))
             setGuests([])
           }
         }
@@ -375,7 +376,7 @@ export function useGuests(): UseGuestsReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -417,7 +418,7 @@ export function useGuests(): UseGuestsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       await fetchGuests() // Revert on error
       return false
     }
@@ -440,7 +441,7 @@ export function useGuests(): UseGuestsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 
@@ -489,7 +490,7 @@ export function useGuests(): UseGuestsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       await fetchGuests()
       return false
     }
@@ -533,7 +534,7 @@ export function useGuests(): UseGuestsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       await fetchGuests()
       return false
     }

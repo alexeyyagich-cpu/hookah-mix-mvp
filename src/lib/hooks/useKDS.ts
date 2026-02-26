@@ -8,7 +8,7 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { enqueueOfflineMutation, generateTempId } from '@/lib/offline/offlineMutation'
 import type { KdsOrder, KdsOrderStatus, KdsOrderType, KdsOrderItem } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo KDS orders
 const DEMO_KDS_ORDERS: KdsOrder[] = [
   {
@@ -242,7 +242,7 @@ export function useKDS(): UseKDSReturn {
         .order('created_at', { ascending: true })
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setOrders([]) }
+        if (!cached) { setError(translateError(fetchError)); setOrders([]) }
       } else {
         const newOrders = data || []
         const newCount = newOrders.filter(o => o.status === 'new').length
@@ -354,7 +354,7 @@ export function useKDS(): UseKDSReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -432,7 +432,7 @@ export function useKDS(): UseKDSReturn {
       .eq('id', orderId)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 

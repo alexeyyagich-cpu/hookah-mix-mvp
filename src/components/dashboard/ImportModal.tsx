@@ -95,7 +95,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" role="button" tabIndex={-1} aria-label="Close" onClick={handleClose} onKeyDown={(e) => e.key === 'Escape' && handleClose()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" aria-hidden="true" onClick={handleClose}>
       <div
         className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
         onClick={e => e.stopPropagation()}

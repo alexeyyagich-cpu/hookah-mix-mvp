@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
 import { useTranslation } from '@/lib/i18n'
+import { translateError } from '@/lib/utils/translateError'
 
 export function RegisterForm() {
   const [email, setEmail] = useState('')
@@ -41,7 +42,7 @@ export function RegisterForm() {
     })
 
     if (signUpError) {
-      setError(signUpError.message)
+      setError(translateError(signUpError))
       setLoading(false)
       return
     }

@@ -12,7 +12,7 @@ import type {
 } from '@/types/database'
 
 import { isSupabaseConfigured } from '@/lib/config'
-
+import { translateError } from '@/lib/utils/translateError'
 // Generate order number
 function generateOrderNumber(): string {
   const date = new Date()
@@ -180,7 +180,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
       .order('created_at', { ascending: false })
 
     if (ordersError) {
-      setError(ordersError.message)
+      setError(translateError(ordersError))
       setOrders([])
     } else {
       setOrders(ordersData || [])
@@ -261,7 +261,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
       .single()
 
     if (orderError) {
-      setError(orderError.message)
+      setError(translateError(orderError))
       return null
     }
 
@@ -283,7 +283,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
       .insert(orderItems)
 
     if (itemsError) {
-      setError(itemsError.message)
+      setError(translateError(itemsError))
       // Note: Order was created but items failed - should handle rollback
     }
 
@@ -322,7 +322,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 

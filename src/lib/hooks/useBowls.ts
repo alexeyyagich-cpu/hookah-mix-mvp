@@ -8,7 +8,7 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BowlType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo data for testing
 const DEMO_BOWLS: BowlType[] = [
   { id: '1', profile_id: 'demo', name: 'Phunnel Large', capacity_grams: 20, is_default: true, created_at: new Date().toISOString() },
@@ -75,7 +75,7 @@ export function useBowls(): UseBowlsReturn {
         .order('name', { ascending: true })
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setBowls([]) }
+        if (!cached) { setError(translateError(fetchError)); setBowls([]) }
       } else {
         setBowls(data || [])
         await setCachedData('bowls', user.id, data || [])
@@ -148,7 +148,7 @@ export function useBowls(): UseBowlsReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -171,7 +171,7 @@ export function useBowls(): UseBowlsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 
@@ -197,7 +197,7 @@ export function useBowls(): UseBowlsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 
@@ -238,7 +238,7 @@ export function useBowls(): UseBowlsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 

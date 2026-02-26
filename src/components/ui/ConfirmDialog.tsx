@@ -62,11 +62,8 @@ export function ConfirmDialog({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div
         className={`absolute inset-0 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : 'animate-fadeInUp'}`}
-        role="button"
-        tabIndex={-1}
-        aria-label="Close"
+        aria-hidden="true"
         onClick={handleClose}
-        onKeyDown={(e) => e.key === 'Escape' && handleClose()}
       />
       <div role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message" className={`relative w-full max-w-sm rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6 ${
         isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'

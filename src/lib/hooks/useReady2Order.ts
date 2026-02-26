@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { R2OConnectionStatus } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 interface R2OConnectionInfo {
   status: R2OConnectionStatus
   webhook_registered: boolean
@@ -89,7 +89,7 @@ export function useReady2Order(): UseReady2OrderReturn {
       setConnection(data || null)
     } catch (err) {
       if (err instanceof Error && err.message !== 'timeout') {
-        setError(err.message)
+        setError(translateError(err))
       }
     }
 

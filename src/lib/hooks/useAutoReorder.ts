@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { AutoReorderRule, TobaccoInventory, SupplierProduct } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Extended rule type with related data
 export interface AutoReorderRuleWithDetails extends AutoReorderRule {
   tobacco?: TobaccoInventory
@@ -96,7 +96,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       .order('created_at', { ascending: false })
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       setRules([])
     } else {
       setRules(data || [])
@@ -140,7 +140,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -166,7 +166,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 
@@ -190,7 +190,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 

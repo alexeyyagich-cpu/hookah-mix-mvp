@@ -8,7 +8,7 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BarInventoryItem, BarTransaction, BarTransactionType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo bar inventory — Leipzig hookah lounge
 const t = new Date().toISOString()
 const bi = (id: string, name: string, brand: string, cat: BarInventoryItem['category'], unit: string, qty: number, min: number, price: number, pkg: number, notes: string | null = null): BarInventoryItem => ({
@@ -114,7 +114,7 @@ export function useBarInventory(): UseBarInventoryReturn {
         .order('name', { ascending: true })
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setInventory([]) }
+        if (!cached) { setError(translateError(fetchError)); setInventory([]) }
       } else {
         setInventory(data || [])
         await setCachedData('bar_inventory', user.id, data || [])
@@ -170,7 +170,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -209,7 +209,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 
@@ -237,7 +237,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 
@@ -289,7 +289,7 @@ export function useBarInventory(): UseBarInventoryReturn {
     })
 
     if (rpcError) {
-      setError(rpcError.message)
+      setError(translateError(rpcError))
       return false
     }
 
@@ -307,7 +307,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       .order('created_at', { ascending: false })
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       return []
     }
 

@@ -531,7 +531,7 @@ function MixPageInner() {
               </button>
               {isMixesMenuOpen && (
                 <>
-                  <div className="fixed inset-0 z-40" role="button" tabIndex={-1} aria-label="Close" onClick={() => setIsMixesMenuOpen(false)} onKeyDown={(e) => e.key === 'Escape' && setIsMixesMenuOpen(false)} />
+                  <div className="fixed inset-0 z-40" aria-hidden="true" onClick={() => setIsMixesMenuOpen(false)} />
                   <div
                     className="absolute top-full left-0 mt-2 w-48 rounded-xl overflow-hidden z-50 shadow-xl"
                     style={{

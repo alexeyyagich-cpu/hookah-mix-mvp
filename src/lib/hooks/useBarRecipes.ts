@@ -8,6 +8,7 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
+import { translateError } from '@/lib/utils/translateError'
 import type {
   BarInventoryItem,
   BarRecipe,
@@ -235,7 +236,7 @@ export function useBarRecipes(inventoryOverride?: BarInventoryItem[]): UseBarRec
         .order('name', { ascending: true })
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setRecipes([]) }
+        if (!cached) { setError(translateError(fetchError)); setRecipes([]) }
         setLoading(false)
         return
       }
@@ -348,7 +349,7 @@ export function useBarRecipes(inventoryOverride?: BarInventoryItem[]): UseBarRec
       .single()
 
     if (insertError) {
-      setError(insertError.message)
+      setError(translateError(insertError))
       return null
     }
 
@@ -397,7 +398,7 @@ export function useBarRecipes(inventoryOverride?: BarInventoryItem[]): UseBarRec
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 
@@ -439,7 +440,7 @@ export function useBarRecipes(inventoryOverride?: BarInventoryItem[]): UseBarRec
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 

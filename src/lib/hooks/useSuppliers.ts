@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { Supplier, SupplierWithProducts } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo data for testing
 const DEMO_SUPPLIERS: Supplier[] = [
   {
@@ -96,7 +96,7 @@ export function useSuppliers(): UseSuppliersReturn {
       .order('name', { ascending: true })
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       setSuppliers([])
     } else {
       setSuppliers(data || [])
@@ -135,7 +135,7 @@ export function useSuppliers(): UseSuppliersReturn {
       .order('flavor', { ascending: true })
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       return { ...supplier, products: [] }
     }
 

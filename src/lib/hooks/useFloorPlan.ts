@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { FloorTable, TableStatus } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Strip fields that may not exist in the database yet (e.g. zone before migration)
 // This prevents Supabase from rejecting the entire update due to unknown columns
 const DB_KNOWN_COLUMNS = new Set([
@@ -182,7 +182,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
         .order('created_at', { ascending: true })
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setTables([]) }
+        if (!cached) { setError(translateError(fetchError)); setTables([]) }
       } else {
         setTables(data || [])
         await setCachedData('floor_tables', user.id, data || [])

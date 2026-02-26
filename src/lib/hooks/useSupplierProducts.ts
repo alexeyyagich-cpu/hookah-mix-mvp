@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { SupplierProduct } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo products - exported for use in useSuppliers
 export const DEMO_PRODUCTS: SupplierProduct[] = [
   // Supplier 1: Tobacco Wholesale EU
@@ -117,7 +117,7 @@ export function useSupplierProducts(options: UseSupplierProductsOptions = {}): U
     const { data, error: fetchError } = await query
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       setProducts([])
     } else {
       let result = data || []

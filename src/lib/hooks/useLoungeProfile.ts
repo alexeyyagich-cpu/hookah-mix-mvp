@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import type { LoungeProfile, PublicMix, PublicBarRecipe } from '@/types/lounge'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo lounge profile
 const DEMO_LOUNGE: LoungeProfile = {
   id: 'demo-lounge-1',
@@ -156,7 +156,7 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
         if (!mounted) return
 
         if (fetchErr) {
-          setError(fetchErr.message)
+          setError(translateError(fetchErr))
           setLoading(false)
           return
         }
@@ -233,7 +233,7 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
 
     if (updateErr) {
       setLounge(prev)
-      setError(updateErr.message)
+      setError(translateError(updateErr))
     }
   }, [lounge, supabase, isDemoMode])
 
@@ -388,7 +388,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
     // Fetch real venue from public API
     fetch(`/api/public/menu/${slug}`)
       .then(res => {
-        if (!res.ok) throw new Error('Venue not found')
+        if (!res.ok) throw new Error(res.status === 404 ? 'not_found' : 'fetch_error')
         return res.json()
       })
       .then(data => {
@@ -437,9 +437,9 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
         setTables(data.tables || [])
         setLoading(false)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!mounted) return
-        setError('Venue not found')
+        setError(err?.message === 'not_found' ? 'Venue not found' : translateError(err))
         setLoading(false)
       })
 

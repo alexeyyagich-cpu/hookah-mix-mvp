@@ -19,21 +19,7 @@ export function OfflineIndicator() {
   const isOffline = !isOnline
   const isFailed = failedSyncCount > 0 && !isSyncing && isOnline
 
-  const bg = isOffline
-    ? 'rgba(245, 158, 11, 0.15)'
-    : isFailed
-      ? 'rgba(239, 68, 68, 0.15)'
-      : 'rgba(59, 130, 246, 0.15)'
-  const border = isOffline
-    ? 'rgba(245, 158, 11, 0.3)'
-    : isFailed
-      ? 'rgba(239, 68, 68, 0.3)'
-      : 'rgba(59, 130, 246, 0.3)'
-  const color = isOffline
-    ? 'rgb(245, 158, 11)'
-    : isFailed
-      ? 'rgb(248, 113, 113)'
-      : 'rgb(96, 165, 250)'
+  const statusColor = isOffline ? 'var(--color-warning)' : isFailed ? 'var(--color-danger)' : 'var(--color-primary)'
 
   const handleFailedClick = async () => {
     if (failedSyncCount > 0) {
@@ -90,9 +76,9 @@ export function OfflineIndicator() {
       {showFailed && failedItems.length > 0 && (
         <div
           className="w-72 max-h-64 overflow-y-auto rounded-xl border shadow-xl backdrop-blur-md text-xs"
-          style={{ background: 'rgba(15, 15, 25, 0.95)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+          style={{ background: 'var(--color-bgCard)', borderColor: `color-mix(in srgb, var(--color-danger) 20%, transparent)` }}
         >
-          <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center justify-between px-3 py-2 border-b" style={{ borderColor: 'var(--color-border)' }}>
             <span className="text-[var(--color-error)] font-medium">
               {tc.offline.syncFailed(String(failedItems.length))}
             </span>
@@ -110,7 +96,7 @@ export function OfflineIndicator() {
             <div
               key={item.id}
               className="flex items-center justify-between px-3 py-2 border-b last:border-b-0"
-              style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+              style={{ borderColor: 'var(--color-border)' }}
             >
               <div className="flex-1 min-w-0">
                 <div className="text-[var(--color-text)] truncate">
@@ -152,7 +138,7 @@ export function OfflineIndicator() {
       <button type="button"
         onClick={isFailed ? handleFailedClick : undefined}
         className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium shadow-lg border backdrop-blur-sm"
-        style={{ background: bg, borderColor: border, color, cursor: isFailed ? 'pointer' : 'default' }}
+        style={{ background: `color-mix(in srgb, ${statusColor} 15%, transparent)`, borderColor: `color-mix(in srgb, ${statusColor} 30%, transparent)`, color: statusColor, cursor: isFailed ? 'pointer' : 'default' }}
       >
         {isOffline ? (
           <>

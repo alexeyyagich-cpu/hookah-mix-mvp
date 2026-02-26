@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Shift, ShiftReconciliation } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo shifts — realistic week of data
 const H = 60 * 60 * 1000
 const D = 24 * H
@@ -174,7 +174,7 @@ export function useShifts(): UseShiftsReturn {
       .limit(50)
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       setShifts([])
       setLoading(false)
       return
@@ -240,7 +240,7 @@ export function useShifts(): UseShiftsReturn {
       if (insertError.code === '23505') {
         setError('shiftAlreadyOpen')
       } else {
-        setError(insertError.message)
+        setError(translateError(insertError))
       }
       return null
     }
@@ -273,7 +273,7 @@ export function useShifts(): UseShiftsReturn {
       .eq('id', shiftId)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 

@@ -8,7 +8,7 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { getCachedData, setCachedData } from '@/lib/offline/db'
 import { enqueueOfflineMutation, generateTempId } from '@/lib/offline/offlineMutation'
 import type { Session, SessionItem, SessionWithItems } from '@/types/database'
-
+import { translateError } from '@/lib/utils/translateError'
 // Demo bowls for sessions
 const D = 24 * 60 * 60 * 1000
 const H = 60 * 60 * 1000
@@ -208,7 +208,7 @@ export function useSessions(): UseSessionsReturn {
       const { data, error: fetchError } = await query
 
       if (fetchError) {
-        if (!cached) { setError(fetchError.message); setSessions([]) }
+        if (!cached) { setError(translateError(fetchError)); setSessions([]) }
       } else {
         setSessions(data || [])
         await setCachedData('sessions', user.id, data || [])
@@ -339,7 +339,7 @@ export function useSessions(): UseSessionsReturn {
       .single()
 
     if (sessionError) {
-      setError(sessionError.message)
+      setError(translateError(sessionError))
       return null
     }
 
@@ -354,7 +354,7 @@ export function useSessions(): UseSessionsReturn {
       .insert(sessionItems)
 
     if (itemsError) {
-      setError(itemsError.message)
+      setError(translateError(itemsError))
       // Rollback session
       await supabase.from('sessions').delete().eq('id', session.id)
       return null
@@ -403,7 +403,7 @@ export function useSessions(): UseSessionsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (updateError) {
-      setError(updateError.message)
+      setError(translateError(updateError))
       return false
     }
 
@@ -457,7 +457,7 @@ export function useSessions(): UseSessionsReturn {
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
     if (deleteError) {
-      setError(deleteError.message)
+      setError(translateError(deleteError))
       return false
     }
 
@@ -480,7 +480,7 @@ export function useSessions(): UseSessionsReturn {
       .single()
 
     if (fetchError) {
-      setError(fetchError.message)
+      setError(translateError(fetchError))
       return null
     }
 
