@@ -36,18 +36,23 @@ export function RegisterForm() {
 
     setLoading(true)
 
-    const { error: signUpError } = await signUp(email, password, {
-      business_name: businessName,
-      owner_name: ownerName,
-    })
+    try {
+      const { error: signUpError } = await signUp(email, password, {
+        business_name: businessName,
+        owner_name: ownerName,
+      })
 
-    if (signUpError) {
-      setError(translateError(signUpError))
+      if (signUpError) {
+        setError(translateError(signUpError))
+        return
+      }
+
+      setSuccess(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed')
+    } finally {
       setLoading(false)
-      return
     }
-
-    setSuccess(true)
   }
 
   if (success) {

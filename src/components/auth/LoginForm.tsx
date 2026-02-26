@@ -25,16 +25,21 @@ export function LoginForm() {
     setError('')
     setLoading(true)
 
-    const { error: signInError } = await signIn(email, password)
+    try {
+      const { error: signInError } = await signIn(email, password)
 
-    if (signInError) {
-      const translated = translateError(signInError)
-      setError(translated === 'invalid_credentials' ? t.invalidCredentials : translated)
+      if (signInError) {
+        const translated = translateError(signInError)
+        setError(translated === 'invalid_credentials' ? t.invalidCredentials : translated)
+        return
+      }
+
+      router.push(redirect)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed')
+    } finally {
       setLoading(false)
-      return
     }
-
-    router.push(redirect)
   }
 
   const handleDemoLogin = () => {

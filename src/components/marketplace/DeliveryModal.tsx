@@ -59,16 +59,20 @@ export function DeliveryModal({
 
   const handleConfirmDelivery = async () => {
     setLoading(true)
-    const result = await onConfirmDelivery()
-    setLoading(false)
-
-    if (result) {
-      if (onAddToInventory && selectedItems.size > 0) {
-        setStep('inventory')
-      } else {
-        setStep('success')
-        timerRef.current = setTimeout(onClose, 2000)
+    try {
+      const result = await onConfirmDelivery()
+      if (result) {
+        if (onAddToInventory && selectedItems.size > 0) {
+          setStep('inventory')
+        } else {
+          setStep('success')
+          timerRef.current = setTimeout(onClose, 2000)
+        }
       }
+    } catch (err) {
+      console.error('Delivery confirmation failed:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -76,21 +80,25 @@ export function DeliveryModal({
     if (!onAddToInventory) return
 
     setLoading(true)
+    try {
+      const itemsToAdd = order.order_items
+        .filter(item => selectedItems.has(item.id))
+        .map(item => ({
+          tobacco_id: item.tobacco_id,
+          brand: item.brand,
+          flavor: item.flavor,
+          quantity: item.quantity,
+          package_grams: item.package_grams,
+        }))
 
-    const itemsToAdd = order.order_items
-      .filter(item => selectedItems.has(item.id))
-      .map(item => ({
-        tobacco_id: item.tobacco_id,
-        brand: item.brand,
-        flavor: item.flavor,
-        quantity: item.quantity,
-        package_grams: item.package_grams,
-      }))
-
-    await onAddToInventory(itemsToAdd)
-    setLoading(false)
-    setStep('success')
-    timerRef.current = setTimeout(onClose, 2000)
+      await onAddToInventory(itemsToAdd)
+      setStep('success')
+      timerRef.current = setTimeout(onClose, 2000)
+    } catch (err) {
+      console.error('Add to inventory failed:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleSkipInventory = () => {
