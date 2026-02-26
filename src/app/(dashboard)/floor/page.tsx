@@ -326,7 +326,7 @@ export default function FloorPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className={`grid grid-cols-2 ${longSessionCount > 0 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4`}>
+      <div className={`grid grid-cols-2 ${longSessionCount > 0 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4 stagger-children`}>
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{tm.totalTables}</div>
           <div className="text-2xl font-bold mt-1">{stats.total}</div>

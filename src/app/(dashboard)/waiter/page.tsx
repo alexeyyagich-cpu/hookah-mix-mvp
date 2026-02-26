@@ -215,12 +215,13 @@ export default function WaiterPage() {
   // Pro guard
   if (isFreeTier) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">{tm.waiterProRequired}</h1>
         <EmptyState
           icon={<IconLock size={32} />}
           title={tm.waiterProRequired}
           description={tm.waiterProRequiredDesc}
-          action={{ label: 'Upgrade to Pro', href: '/pricing' }}
+          action={{ label: tm.upgradePlan, href: '/pricing' }}
         />
       </div>
     )

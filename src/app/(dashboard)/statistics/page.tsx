@@ -413,7 +413,7 @@ export default function StatisticsPage() {
       ) : viewMode === 'overview' && statistics ? (
         <>
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 stagger-children">
             <StatsCard
               icon={<IconSmoke size={20} />}
               label={tm.labelSessions}

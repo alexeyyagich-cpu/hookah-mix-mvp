@@ -157,7 +157,7 @@ export default function ReportsPage() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         <StatsCard
           icon={<IconCoin size={20} />}
           label={tm.labelRevenue}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
@@ -62,6 +62,25 @@ export function Sidebar() {
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
   const { orgRole, hasPermission, isOwner } = useRole(contextOrgRole)
   const { modules } = useModules()
+
+  // Collapsible groups — persisted in localStorage
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set()
+    try {
+      const stored = localStorage.getItem('sidebar-collapsed')
+      return stored ? new Set(JSON.parse(stored)) : new Set()
+    } catch { return new Set() }
+  })
+
+  const toggleGroup = useCallback((label: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(label)) next.delete(label)
+      else next.add(label)
+      try { localStorage.setItem('sidebar-collapsed', JSON.stringify([...next])) } catch {}
+      return next
+    })
+  }, [])
 
   const navigationGroups: NavGroup[] = [
     {
@@ -138,6 +157,24 @@ export function Sidebar() {
     }))
     .filter(group => group.items.length > 0)
 
+  // Auto-expand group if it contains the active page
+  useEffect(() => {
+    for (const group of filteredGroups) {
+      if (!group.label) continue
+      const hasActive = group.items.some(item =>
+        pathname === item.href || pathname.startsWith(item.href + '/')
+      )
+      if (hasActive && collapsedGroups.has(group.label)) {
+        setCollapsedGroups(prev => {
+          const next = new Set(prev)
+          next.delete(group.label!)
+          try { localStorage.setItem('sidebar-collapsed', JSON.stringify([...next])) } catch {}
+          return next
+        })
+      }
+    }
+  }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const roleLabels = ORG_ROLE_LABELS[orgRole]
   const roleName = roleLabels ? (locale === 'de' ? roleLabels.de : roleLabels.label) : orgRole
 
@@ -199,14 +236,32 @@ export function Sidebar() {
 
       {/* Navigation - grouped by section */}
       <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
-        {filteredGroups.map((group, gi) => (
+        {filteredGroups.map((group, gi) => {
+          const isCollapsed = group.label ? collapsedGroups.has(group.label) : false
+          return (
           <div key={group.label || gi}>
             {group.label && (
-              <div className="px-4 pt-2 pb-1 text-[10px] font-semibold text-[var(--color-textMuted)] uppercase tracking-widest">
+              <button
+                type="button"
+                onClick={() => toggleGroup(group.label!)}
+                className="w-full flex items-center justify-between px-4 pt-2 pb-1 text-[10px] font-semibold text-[var(--color-textMuted)] uppercase tracking-widest hover:text-[var(--color-text)] transition-colors"
+              >
                 {group.label}
-              </div>
+                <svg
+                  className={`w-3 h-3 transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             )}
-            <div className="space-y-0.5">
+            <div
+              className="space-y-0.5 overflow-hidden transition-all duration-200"
+              style={{ maxHeight: isCollapsed ? 0 : '500px', opacity: isCollapsed ? 0 : 1 }}
+            >
               {group.items.map((item) => {
                 const isActive = pathname === item.href ||
                   (pathname.startsWith(item.href + '/') &&
@@ -249,7 +304,8 @@ export function Sidebar() {
               })}
             </div>
           </div>
-        ))}
+          )
+        })}
       </nav>
 
       {/* Upgrade Banner */}

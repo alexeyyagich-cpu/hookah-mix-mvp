@@ -86,7 +86,7 @@ export default function BarInventoryPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         <div className="card p-4">
           <div className="text-sm text-[var(--color-textMuted)]">{t.totalItems}</div>
           <div className="text-2xl font-bold mt-1">{totalItems}</div>

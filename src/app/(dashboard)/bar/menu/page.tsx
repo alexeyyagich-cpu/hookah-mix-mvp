@@ -112,7 +112,7 @@ export default function BarMenuPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
         <div className="card p-4" style={{ borderLeft: '3px solid var(--color-primary)' }}>
           <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.onMenu}</div>
           <div className="text-2xl font-bold tabular-nums mt-1">{menuRecipes.length}</div>
