@@ -180,4 +180,5 @@ export const settings: typeof SettingsType = {
   deleteError: 'Konto konnte nicht gelöscht werden',
   portalError: 'Portal konnte nicht geöffnet werden',
   portalOpenError: 'Fehler beim Öffnen des Abonnementportals',
+  qrDownloadError: 'QR-Code konnte nicht heruntergeladen werden',
 } as const

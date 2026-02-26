@@ -190,4 +190,5 @@ export const settings = {
   deleteError: 'Не удалось удалить аккаунт',
   portalError: 'Не удалось открыть портал',
   portalOpenError: 'Ошибка при открытии портала подписки',
+  qrDownloadError: 'Не удалось скачать QR-код',
 }

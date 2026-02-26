@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     const { data: authUser, error: getUserError } = await supabase.auth.admin.getUserById(profileId)
 
     if (getUserError || !authUser?.user?.email) {
-      return NextResponse.json({ error: 'User email not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Unable to send email' }, { status: 400 })
     }
 
     // Check email settings

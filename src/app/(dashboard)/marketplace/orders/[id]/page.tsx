@@ -55,8 +55,11 @@ export default function OrderDetailPage() {
     }
 
     setUpdating(true)
-    await updateOrderStatus(order.id, newStatus)
-    setUpdating(false)
+    try {
+      await updateOrderStatus(order.id, newStatus)
+    } finally {
+      setUpdating(false)
+    }
   }
 
   const handleConfirmDelivery = async (): Promise<boolean> => {
@@ -71,34 +74,38 @@ export default function OrderDetailPage() {
     quantity: number
     package_grams: number
   }[]): Promise<boolean> => {
-    for (const item of items) {
-      const totalGrams = item.quantity * item.package_grams
+    try {
+      for (const item of items) {
+        const totalGrams = item.quantity * item.package_grams
 
-      // Check if tobacco already exists in inventory
-      const existingItem = inventory.find(inv =>
-        inv.brand.toLowerCase() === item.brand.toLowerCase() &&
-        inv.flavor.toLowerCase() === item.flavor.toLowerCase()
-      )
+        // Check if tobacco already exists in inventory
+        const existingItem = inventory.find(inv =>
+          inv.brand.toLowerCase() === item.brand.toLowerCase() &&
+          inv.flavor.toLowerCase() === item.flavor.toLowerCase()
+        )
 
-      if (existingItem) {
-        // Add to existing
-        await adjustQuantity(existingItem.id, totalGrams, 'purchase', t.supplyNote(order?.order_number || ''))
-      } else {
-        // Create new inventory item
-        await addTobacco({
-          tobacco_id: item.tobacco_id,
-          brand: item.brand,
-          flavor: item.flavor,
-          quantity_grams: totalGrams,
-          purchase_price: null,
-          package_grams: item.package_grams,
-          purchase_date: new Date().toISOString().slice(0, 10),
-          expiry_date: null,
-          notes: t.addedFromOrder(order?.order_number || ''),
-        })
+        if (existingItem) {
+          // Add to existing
+          await adjustQuantity(existingItem.id, totalGrams, 'purchase', t.supplyNote(order?.order_number || ''))
+        } else {
+          // Create new inventory item
+          await addTobacco({
+            tobacco_id: item.tobacco_id,
+            brand: item.brand,
+            flavor: item.flavor,
+            quantity_grams: totalGrams,
+            purchase_price: null,
+            package_grams: item.package_grams,
+            purchase_date: new Date().toISOString().slice(0, 10),
+            expiry_date: null,
+            notes: t.addedFromOrder(order?.order_number || ''),
+          })
+        }
       }
+      return true
+    } catch {
+      return false
     }
-    return true
   }
 
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
@@ -112,8 +119,11 @@ export default function OrderDetailPage() {
     setShowCancelConfirm(false)
     if (!order) return
     setUpdating(true)
-    await updateOrderStatus(order.id, 'cancelled')
-    setUpdating(false)
+    try {
+      await updateOrderStatus(order.id, 'cancelled')
+    } finally {
+      setUpdating(false)
+    }
   }
 
   const fmtDateTime = (dateStr: string) => formatDateTime(dateStr, locale)

@@ -3,8 +3,16 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { stripe } from '@/lib/stripe'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
+  // Rate limiting - strict for destructive operations
+  const ip = getClientIp(request)
+  const rateCheck = await checkRateLimit(`${ip}:/api/account/delete`, rateLimits.strict)
+  if (!rateCheck.success) {
+    return rateLimitExceeded(rateCheck.resetIn)
+  }
+
   try {
     // Verify authentication
     const cookieStore = await cookies()

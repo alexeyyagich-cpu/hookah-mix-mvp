@@ -180,4 +180,5 @@ export const settings: typeof SettingsType = {
   deleteError: 'Failed to delete account',
   portalError: 'Could not open portal',
   portalOpenError: 'Error opening subscription portal',
+  qrDownloadError: 'Failed to download QR code',
 } as const

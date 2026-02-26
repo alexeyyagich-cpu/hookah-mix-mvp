@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useKDS } from '@/lib/hooks/useKDS'
@@ -39,6 +39,7 @@ function getStrengthFromAvg(avgStrength: number): StrengthPreference {
 
 export default function WaiterPage() {
   const tm = useTranslation('manage')
+  const th = useTranslation('hookah')
   const { locale } = useLocale()
   const { isFreeTier } = useSubscription()
   const { tables } = useFloorPlan()
@@ -63,6 +64,8 @@ export default function WaiterPage() {
   const [totalGrams, setTotalGrams] = useState(20)
   const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const selectedTable = tables.find(t => t.id === selectedTableId)
 
@@ -116,6 +119,8 @@ export default function WaiterPage() {
   const handleSubmit = useCallback(async () => {
     if (!selectedTableId) return
     setSubmitting(true)
+
+    setSubmitError(null)
 
     try {
       const table = tables.find(t => t.id === selectedTableId)
@@ -209,10 +214,14 @@ export default function WaiterPage() {
       setCartExpanded(false)
       setSent(true)
       setTimeout(() => setSent(false), 2000)
+    } catch {
+      setSubmitError(th.orderError)
+      clearTimeout(errorTimerRef.current ?? undefined)
+      errorTimerRef.current = setTimeout(() => setSubmitError(null), 4000)
     } finally {
       setSubmitting(false)
     }
-  }, [selectedTableId, barItems, selectedTobaccos, hookahMode, hookahDescription, notes, guestName, tables, createOrder, recordSale, bowls, selectedBowlId, totalGrams])
+  }, [selectedTableId, barItems, selectedTobaccos, hookahMode, hookahDescription, notes, guestName, tables, createOrder, recordSale, bowls, selectedBowlId, totalGrams, th.orderError])
 
   // Pro guard
   if (isFreeTier) {
@@ -306,6 +315,13 @@ export default function WaiterPage() {
             tm={tm as unknown as Record<string, unknown>}
           />
         </>
+      )}
+
+      {/* Error toast */}
+      {submitError && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[var(--color-danger)] text-white text-sm font-medium shadow-lg animate-fadeInUp">
+          {submitError}
+        </div>
       )}
 
       {/* Cart */}

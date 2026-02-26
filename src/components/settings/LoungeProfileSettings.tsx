@@ -152,20 +152,28 @@ export default function LoungeProfileSettings() {
     const svgData = new XMLSerializer().serializeToString(svg)
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
     const img = new Image()
 
     img.onload = () => {
       canvas.width = img.width
       canvas.height = img.height
-      ctx?.drawImage(img, 0, 0)
+      ctx.drawImage(img, 0, 0)
       const link = document.createElement('a')
       link.download = `menu-qr-${lounge?.slug}.png`
       link.href = canvas.toDataURL('image/png')
       link.click()
     }
 
+    img.onerror = () => {
+      setMessage(ts.qrDownloadError || tc.errorGeneric)
+      clearTimeout(messageTimerRef.current)
+      messageTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+    }
+
     img.src = 'data:image/svg+xml;base64,' + btoa(svgData)
-  }, [lounge?.slug])
+  }, [lounge?.slug, ts.qrDownloadError, tc.errorGeneric])
 
   if (loading) {
     return (
