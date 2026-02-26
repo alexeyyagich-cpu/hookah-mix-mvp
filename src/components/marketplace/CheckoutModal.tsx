@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
@@ -18,24 +18,35 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
 
-  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
+      setVisible(true)
+      setIsClosing(false)
       setNotes('')
       setLoading(false)
       setSuccess(false)
     }
   }, [isOpen])
 
-  // Close on escape key
+  const handleClose = useCallback(() => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setVisible(false)
+      setIsClosing(false)
+      onClose()
+    }, 200)
+  }, [onClose])
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !loading) onClose()
+      if (e.key === 'Escape' && !loading) handleClose()
     }
     window.addEventListener('keydown', handleEscape)
     return () => window.removeEventListener('keydown', handleEscape)
-  }, [onClose, loading])
+  }, [handleClose, loading])
 
   const handleConfirm = async () => {
     setLoading(true)
@@ -44,14 +55,13 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
 
     if (result) {
       setSuccess(true)
-      // Auto close after success
       setTimeout(() => {
-        onClose()
+        handleClose()
       }, 2000)
     }
   }
 
-  if (!isOpen) return null
+  if (!visible) return null
 
   const estimatedDelivery = new Date()
   estimatedDelivery.setDate(estimatedDelivery.getDate() + cart.supplier.delivery_days_max)
@@ -60,19 +70,19 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-40"
-        onClick={() => !loading && onClose()}
+        className={`fixed inset-0 bg-black/50 z-40 ${isClosing ? 'animate-backdropFadeOut' : ''}`}
+        onClick={() => !loading && handleClose()}
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl animate-fadeInUp">
+        <div className={`w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
             <h2 className="font-semibold text-lg">{t.orderConfirmation}</h2>
             {!loading && !success && (
               <button type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
                 aria-label="Close"
               >
@@ -153,7 +163,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
           {!success && (
             <div className="p-4 border-t border-[var(--color-border)] flex gap-3">
               <button type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 disabled={loading}
                 className="btn btn-ghost flex-1"
               >

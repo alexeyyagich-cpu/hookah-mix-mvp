@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -23,7 +23,16 @@ export default function SessionsPage() {
   const [filter, setFilter] = useState('')
   const [selectedSession, setSelectedSession] = useState<SessionWithItems | null>(null)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const [closingModal, setClosingModal] = useState(false)
   const exportMenuRef = useRef<HTMLDivElement>(null)
+
+  const closeModal = useCallback(() => {
+    setClosingModal(true)
+    setTimeout(() => {
+      setSelectedSession(null)
+      setClosingModal(false)
+    }, 200)
+  }, [])
 
   // Background portal
   const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
@@ -217,12 +226,12 @@ export default function SessionsPage() {
 
       {/* Session Detail Modal */}
       {selectedSession && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ${closingModal ? 'animate-backdropFadeOut' : ''}`}>
+          <div className={`w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] ${closingModal ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 className="text-xl font-bold">{t.sessionDetails}</h2>
               <button type="button"
-                onClick={() => setSelectedSession(null)}
+                onClick={closeModal}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
                 ✕
@@ -298,7 +307,7 @@ export default function SessionsPage() {
 
             <div className="p-6 border-t border-[var(--color-border)] flex justify-end">
               <button type="button"
-                onClick={() => setSelectedSession(null)}
+                onClick={closeModal}
                 className="btn btn-ghost"
               >
                 {tc.close}

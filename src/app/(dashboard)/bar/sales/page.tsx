@@ -119,23 +119,23 @@ export default function BarSalesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.revenue}</div>
-          <div className="text-2xl font-bold mt-1">{formatCurrency(analytics.totalRevenue, locale)}</div>
+        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-primary)' }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.revenue}</div>
+          <div className="text-2xl font-bold tabular-nums mt-1">{formatCurrency(analytics.totalRevenue, locale)}</div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.profit}</div>
-          <div className="text-2xl font-bold text-[var(--color-success)] mt-1">
+        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-success)' }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.profit}</div>
+          <div className="text-2xl font-bold tabular-nums text-[var(--color-success)] mt-1">
             {formatCurrency(analytics.totalProfit, locale)}
           </div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.portionsSold}</div>
-          <div className="text-2xl font-bold mt-1">{analytics.totalSales}</div>
+        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-warning)' }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.portionsSold}</div>
+          <div className="text-2xl font-bold tabular-nums mt-1">{analytics.totalSales}</div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.margin}</div>
-          <div className={`text-2xl font-bold mt-1 ${
+        <div className="card p-4" style={{ borderLeft: `3px solid var(--color-${analytics.avgMargin !== null ? (analytics.avgMargin >= 60 ? 'success' : analytics.avgMargin >= 40 ? 'warning' : 'danger') : 'primary'})` }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.margin}</div>
+          <div className={`text-2xl font-bold tabular-nums mt-1 ${
             analytics.avgMargin !== null
               ? analytics.avgMargin >= 60 ? 'text-[var(--color-success)]' : analytics.avgMargin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
               : ''

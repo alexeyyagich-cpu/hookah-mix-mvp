@@ -106,17 +106,17 @@ export function ControlDashboard() {
       {/* Row 2: Revenue breakdown */}
       {isHookahActive && isBarActive && (
         <div className="grid grid-cols-2 gap-4">
-          <div className="card p-4">
-            <div className="text-sm text-[var(--color-textMuted)] mb-1">{t.controlHookahRevenue}</div>
-            <div className="text-2xl font-bold">{formatCurrency(revenue_snapshot.hookah_revenue_today, locale)}</div>
+          <div className="card p-4" style={{ borderLeft: '3px solid var(--color-primary)' }}>
+            <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)] mb-1">{t.controlHookahRevenue}</div>
+            <div className="text-2xl font-bold tabular-nums">{formatCurrency(revenue_snapshot.hookah_revenue_today, locale)}</div>
             <div className="text-xs text-[var(--color-textMuted)]">
               {t.controlCostLabel}: {formatCurrency(revenue_snapshot.hookah_cost_today, locale)}
               {revenue_snapshot.hookah_margin_pct !== null && ` · ${t.controlMargin}: ${revenue_snapshot.hookah_margin_pct}%`}
             </div>
           </div>
-          <div className="card p-4">
-            <div className="text-sm text-[var(--color-textMuted)] mb-1">{t.controlBarRevenue}</div>
-            <div className="text-2xl font-bold">{formatCurrency(revenue_snapshot.bar_revenue_today, locale)}</div>
+          <div className="card p-4" style={{ borderLeft: '3px solid var(--color-success)' }}>
+            <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)] mb-1">{t.controlBarRevenue}</div>
+            <div className="text-2xl font-bold tabular-nums">{formatCurrency(revenue_snapshot.bar_revenue_today, locale)}</div>
             <div className="text-xs text-[var(--color-textMuted)]">
               {t.controlCostLabel}: {formatCurrency(revenue_snapshot.bar_cost_today, locale)}
               {revenue_snapshot.bar_margin_pct !== null && ` · ${t.controlMargin}: ${revenue_snapshot.bar_margin_pct}%`}

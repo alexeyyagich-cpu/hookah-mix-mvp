@@ -189,6 +189,24 @@ input[type="range"]::-moz-range-thumb {
   to { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes fadeOutDown {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(12px) scale(0.98); }
+}
+
+@keyframes backdropFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.animate-fadeOutDown {
+  animation: fadeOutDown 0.2s ease forwards;
+}
+
+.animate-backdropFadeOut {
+  animation: backdropFadeOut 0.2s ease forwards;
+}
+
 .animate-fadeInUp {
   animation: fadeInUp 0.4s ease forwards;
 }

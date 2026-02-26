@@ -112,19 +112,19 @@ export default function BarMenuPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.onMenu}</div>
-          <div className="text-2xl font-bold mt-1">{menuRecipes.length}</div>
+        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-primary)' }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.onMenu}</div>
+          <div className="text-2xl font-bold tabular-nums mt-1">{menuRecipes.length}</div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.avgPriceCard}</div>
-          <div className="text-2xl font-bold mt-1">
+        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-primary)' }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.avgPriceCard}</div>
+          <div className="text-2xl font-bold tabular-nums mt-1">
             {avgPrice !== null ? formatCurrency(avgPrice, locale) : '—'}
           </div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.avgMargin}</div>
-          <div className={`text-2xl font-bold mt-1 ${
+        <div className="card p-4" style={{ borderLeft: `3px solid var(--color-${avgMargin !== null ? (avgMargin >= 60 ? 'success' : avgMargin >= 40 ? 'warning' : 'danger') : 'primary'})` }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.avgMargin}</div>
+          <div className={`text-2xl font-bold tabular-nums mt-1 ${
             avgMargin !== null
               ? avgMargin >= 60 ? 'text-[var(--color-success)]' : avgMargin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
               : ''
@@ -132,9 +132,9 @@ export default function BarMenuPage() {
             {avgMargin !== null ? `${avgMargin.toFixed(0)}%` : '—'}
           </div>
         </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{tb.revenuePotential}</div>
-          <div className="text-2xl font-bold mt-1">
+        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-success)' }}>
+          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.revenuePotential}</div>
+          <div className="text-2xl font-bold tabular-nums mt-1">
             {totalRevenuePotential > 0 ? formatCurrency(totalRevenuePotential, locale) : '—'}
           </div>
         </div>

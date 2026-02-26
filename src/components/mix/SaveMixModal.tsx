@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 interface SaveMixModalProps {
@@ -15,14 +15,26 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
   const [name, setName] = useState(defaultName)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [visible, setVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
 
-  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
+      setVisible(true)
+      setIsClosing(false)
       setName(defaultName)
       setError('')
     }
   }, [isOpen, defaultName])
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setVisible(false)
+      setIsClosing(false)
+      onClose()
+    }, 200)
+  }, [onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,7 +49,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
 
     try {
       await onSave(name.trim())
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : t.mixSaveError)
     }
@@ -45,20 +57,20 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
     setSaving(false)
   }
 
-  if (!isOpen) return null
+  if (!visible) return null
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-[60] backdrop-blur-sm"
-        onClick={onClose}
+        className={`fixed inset-0 bg-black/50 z-[60] backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`}
+        onClick={handleClose}
       />
 
       {/* Modal */}
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[70]">
         <div
-          className="rounded-2xl p-6 animate-fadeInUp"
+          className={`rounded-2xl p-6 ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}
           style={{
             background: 'var(--color-bgCard)',
             border: '1px solid var(--color-border)',
@@ -70,7 +82,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
               {t.mixSaveTitle}
             </h2>
             <button type="button"
-              onClick={onClose}
+              onClick={handleClose}
               aria-label={t.mixSaveClose}
               className="icon-btn icon-btn-sm icon-btn-ghost"
             >
@@ -114,7 +126,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="flex-1 px-4 py-3 rounded-xl font-medium transition-colors"
                   style={{
                     background: 'var(--color-bgHover)',

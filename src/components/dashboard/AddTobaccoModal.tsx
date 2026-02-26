@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
@@ -29,8 +29,26 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   const [searchQuery, setSearchQuery] = useState('')
   const [showCatalog, setShowCatalog] = useState(true)
   const [brandFilter, setBrandFilter] = useState<string | null>(null)
+  const [visible, setVisible] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
 
   const isEditing = !!editingItem
+
+  useEffect(() => {
+    if (isOpen) {
+      setVisible(true)
+      setIsClosing(false)
+    }
+  }, [isOpen])
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true)
+    setTimeout(() => {
+      setVisible(false)
+      setIsClosing(false)
+      onClose()
+    }, 200)
+  }, [onClose])
 
   useEffect(() => {
     if (editingItem) {
@@ -115,22 +133,22 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     })
 
     setSaving(false)
-    onClose()
+    handleClose()
     resetForm()
   }
 
-  if (!isOpen) return null
+  if (!visible) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ${isClosing ? 'animate-backdropFadeOut' : ''}`}>
+      <div className={`w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col ${isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
         {/* Header */}
         <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
           <h2 className="text-xl font-bold">
             {isEditing ? t.editTobaccoTitle : t.addTobaccoTitle}
           </h2>
           <button type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
           >
             ✕
@@ -348,7 +366,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
           <div className="p-6 border-t border-[var(--color-border)] flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="btn btn-ghost"
             >
               {tc.cancel}
