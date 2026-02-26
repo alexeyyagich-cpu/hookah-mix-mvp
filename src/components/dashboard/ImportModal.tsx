@@ -68,9 +68,15 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
 
   const handleImport = async () => {
     setImporting(true)
-    await onImport(validRows)
-    setImporting(false)
-    setStep('done')
+    try {
+      await onImport(validRows)
+      setStep('done')
+    } catch (err) {
+      console.error('Import failed:', err)
+      setError(err instanceof Error ? err.message : 'Import failed')
+    } finally {
+      setImporting(false)
+    }
   }
 
   const reset = () => {

@@ -24,17 +24,22 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
 
   const handleSave = async () => {
     setSaving(true)
-    await onUpdate({
-      bonus_accrual_percent: parseFloat(accrualPercent) || 0,
-      bonus_max_redemption_percent: parseFloat(maxRedemption) || 0,
-      tier_silver_threshold: parseFloat(silverThreshold) || 0,
-      tier_gold_threshold: parseFloat(goldThreshold) || 0,
-      tier_silver_discount: parseFloat(silverDiscount) || 0,
-      tier_gold_discount: parseFloat(goldDiscount) || 0,
-      is_enabled: isEnabled,
-    })
-    setSaving(false)
-    onClose()
+    try {
+      await onUpdate({
+        bonus_accrual_percent: parseFloat(accrualPercent) || 0,
+        bonus_max_redemption_percent: parseFloat(maxRedemption) || 0,
+        tier_silver_threshold: parseFloat(silverThreshold) || 0,
+        tier_gold_threshold: parseFloat(goldThreshold) || 0,
+        tier_silver_discount: parseFloat(silverDiscount) || 0,
+        tier_gold_discount: parseFloat(goldDiscount) || 0,
+        is_enabled: isEnabled,
+      })
+      onClose()
+    } catch (err) {
+      console.error('Loyalty settings save failed:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (

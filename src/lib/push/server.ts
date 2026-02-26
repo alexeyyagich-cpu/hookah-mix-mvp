@@ -35,8 +35,11 @@ export async function sendPushToUser(profileId: string, payload: PushPayload): P
 
   if (!subscriptions || subscriptions.length === 0) return 0
 
+  const valid = subscriptions.filter(sub => sub.endpoint && sub.p256dh && sub.auth)
+  if (valid.length === 0) return 0
+
   let sent = 0
-  for (const sub of subscriptions) {
+  for (const sub of valid) {
     try {
       await webpush.sendNotification(
         {

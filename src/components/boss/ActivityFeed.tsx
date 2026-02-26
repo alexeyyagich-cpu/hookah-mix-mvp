@@ -30,7 +30,9 @@ interface ActivityEvent {
 }
 
 function timeAgo(isoDate: string, tm: Dictionary['manage']): string {
-  const diff = Date.now() - new Date(isoDate).getTime()
+  const date = new Date(isoDate)
+  if (isNaN(date.getTime())) return '—'
+  const diff = Date.now() - date.getTime()
   const minutes = Math.floor(diff / 60000)
   if (minutes < 1) return tm.bossTimeAgo(0, 'm')
   if (minutes < 60) return tm.bossTimeAgo(minutes, 'm')

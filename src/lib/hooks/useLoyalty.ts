@@ -94,32 +94,37 @@ export function useLoyalty(): UseLoyaltyReturn {
       return
     }
 
+    let isMounted = true
+
     const fetchSettings = async () => {
-      const { data } = await supabase
-        .from('loyalty_settings')
-        .select('id, profile_id, bonus_accrual_percent, bonus_max_redemption_percent, tier_silver_threshold, tier_gold_threshold, tier_silver_discount, tier_gold_discount, is_enabled, created_at, updated_at')
-        .eq('profile_id', user.id)
-        .single()
+      try {
+        const { data } = await supabase
+          .from('loyalty_settings')
+          .select('id, profile_id, bonus_accrual_percent, bonus_max_redemption_percent, tier_silver_threshold, tier_gold_threshold, tier_silver_discount, tier_gold_discount, is_enabled, created_at, updated_at')
+          .eq('profile_id', user.id)
+          .single()
 
-      if (data) {
-        setSettings(data)
+        if (!isMounted) return
+        if (data) setSettings(data)
+
+        const { data: txData } = await supabase
+          .from('bonus_transactions')
+          .select('id, guest_id, profile_id, type, amount, balance_after, related_session_id, description, created_at')
+          .eq('profile_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(100)
+
+        if (!isMounted) return
+        if (txData) setTransactions(txData)
+      } catch (err) {
+        console.error('Failed to load loyalty settings:', err)
+      } finally {
+        if (isMounted) setLoading(false)
       }
-
-      const { data: txData } = await supabase
-        .from('bonus_transactions')
-        .select('id, guest_id, profile_id, type, amount, balance_after, related_session_id, description, created_at')
-        .eq('profile_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(100)
-
-      if (txData) {
-        setTransactions(txData)
-      }
-
-      setLoading(false)
     }
 
     fetchSettings()
+    return () => { isMounted = false }
   }, [user, isDemoMode, supabase])
 
   const updateSettings = useCallback(async (updates: Partial<LoyaltySettings>): Promise<boolean> => {
