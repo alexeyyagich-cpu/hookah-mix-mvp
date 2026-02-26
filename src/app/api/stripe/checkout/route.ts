@@ -3,6 +3,7 @@ import { stripe, STRIPE_PRICES } from '@/lib/stripe'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { stripeCheckoutSchema, validateBody } from '@/lib/validation'
 
 // Create admin Supabase client for server-side operations (lazy init)
 let supabaseAdmin: SupabaseClient | null = null
@@ -52,15 +53,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const body = await request.json()
-    const { priceId, userId, email, isYearly } = body
-
-    if (!priceId || !userId || !email) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
+
+    const validation = validateBody(stripeCheckoutSchema, rawBody)
+    if ('error' in validation) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { priceId, userId, email, isYearly } = validation.data
 
     // SECURITY: Verify userId matches authenticated user
     if (user.id !== userId) {

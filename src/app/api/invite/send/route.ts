@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { inviteSendSchema, validateBody } from '@/lib/validation'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -29,11 +30,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { email, role, organizationId } = await req.json()
-
-    if (!email || !role || !organizationId) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+    let body: unknown
+    try {
+      body = await req.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
+
+    const validation = validateBody(inviteSendSchema, body)
+    if ('error' in validation) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { email, role, organizationId } = validation.data
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 

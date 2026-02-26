@@ -104,8 +104,8 @@ export function useTips(): UseTipsReturn {
 
     const fetch = async () => {
       const [{ data: profiles }, { data: tipsData }] = await Promise.all([
-        supabase.from('staff_profiles').select('*').eq('profile_id', user.id),
-        supabase.from('tips').select('*').in(
+        supabase.from('staff_profiles').select('id, profile_id, org_member_id, display_name, photo_url, tip_slug, is_tip_enabled, created_at, updated_at').eq('profile_id', user.id),
+        supabase.from('tips').select('id, staff_profile_id, amount, currency, stripe_payment_intent_id, status, payer_name, message, created_at').in(
           'staff_profile_id',
           (await supabase.from('staff_profiles').select('id').eq('profile_id', user.id)).data?.map(p => p.id) || []
         ).order('created_at', { ascending: false }).limit(100),

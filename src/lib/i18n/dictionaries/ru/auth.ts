@@ -205,4 +205,21 @@ export const auth = {
 
   // Pricing page — Contact
   contactCta: 'Есть вопросы? Напишите нам',
+
+  // Join / Invite page
+  invalidLink: 'Недействительная ссылка',
+  inviteEmailMismatch: (email: string) => `Это приглашение отправлено на ${email}. Войдите с этим адресом.`,
+  inviteAcceptFailed: 'Не удалось принять приглашение',
+  loadingInvite: 'Загрузка приглашения...',
+  inviteExpired: 'Приглашение истекло',
+  inviteExpiredDesc: 'Эта ссылка истекла или уже была использована. Попросите владельца отправить новую.',
+  goToLogin: 'Перейти к входу',
+  joinOrg: (name: string) => `Присоединиться к ${name}`,
+  inviteDescription: (role: string) => `Вы приглашены как ${role}.`,
+  inviteDescriptionLogin: (role: string) => `Вы приглашены как ${role}. Войдите или создайте аккаунт.`,
+  acceptInvite: 'Принять приглашение',
+  joiningTeam: 'Присоединение...',
+  welcomeToTeam: 'Добро пожаловать в команду!',
+  redirectingDashboard: 'Перенаправление...',
+  error: 'Ошибка',
 }

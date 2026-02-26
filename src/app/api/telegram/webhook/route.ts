@@ -84,7 +84,7 @@ function mainMenuText(businessName: string) {
 async function getConnection(supabase: SupabaseClient, chatId: number): Promise<TelegramConnection | null> {
   const { data } = await supabase
     .from('telegram_connections')
-    .select('*, profiles(business_name)')
+    .select('id, profile_id, telegram_user_id, telegram_username, chat_id, is_active, notifications_enabled, low_stock_alerts, session_reminders, daily_summary, updated_at, profiles(business_name)')
     .eq('chat_id', chatId)
     .single()
   return data as TelegramConnection | null
@@ -151,7 +151,7 @@ async function fetchStockText(supabase: SupabaseClient, profileId: string) {
 
 async function fetchShiftText(supabase: SupabaseClient, profileId: string) {
   const shiftsRes = await supabase
-    .from('shifts').select('*')
+    .from('shifts').select('id, profile_id, opened_by, opened_by_name, opened_at, closed_at, starting_cash, closing_cash, status')
     .eq('profile_id', profileId).order('opened_at', { ascending: false }).limit(1)
 
   const shift: Shift | undefined = (shiftsRes.data as Shift[] | null)?.[0]

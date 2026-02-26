@@ -201,4 +201,21 @@ export const auth: typeof AuthType = {
 
   // Pricing page — Contact
   contactCta: 'Haben Sie Fragen? Kontaktieren Sie uns',
+
+  // Join / Invite page
+  invalidLink: 'Ungültiger Link',
+  inviteEmailMismatch: (email: string) => `Diese Einladung wurde an ${email} gesendet. Bitte melden Sie sich mit dieser E-Mail an.`,
+  inviteAcceptFailed: 'Einladung konnte nicht angenommen werden',
+  loadingInvite: 'Einladung wird geladen...',
+  inviteExpired: 'Einladung abgelaufen',
+  inviteExpiredDesc: 'Dieser Einladungslink ist abgelaufen oder wurde bereits verwendet. Bitten Sie den Inhaber, eine neue zu senden.',
+  goToLogin: 'Zum Login',
+  joinOrg: (name: string) => `Beitreten: ${name}`,
+  inviteDescription: (role: string) => `Sie wurden als ${role} eingeladen.`,
+  inviteDescriptionLogin: (role: string) => `Sie wurden als ${role} eingeladen. Melden Sie sich an oder erstellen Sie ein Konto.`,
+  acceptInvite: 'Einladung annehmen',
+  joiningTeam: 'Beitritt...',
+  welcomeToTeam: 'Willkommen im Team!',
+  redirectingDashboard: 'Weiterleitung...',
+  error: 'Fehler',
 }

@@ -51,7 +51,7 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
     try {
       const { data, error: fetchError } = await supabase
         .from('notification_settings')
-        .select('*')
+        .select('id, profile_id, low_stock_enabled, low_stock_threshold, created_at')
         .eq('profile_id', user.id)
         .single()
 

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { pushSubscribeSchema, pushUnsubscribeSchema, validateBody } from '@/lib/validation'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -36,11 +37,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { subscription, profileId } = await request.json()
-
-    if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth || !profileId) {
-      return NextResponse.json({ error: 'Invalid subscription data' }, { status: 400 })
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
+
+    const validation = validateBody(pushSubscribeSchema, rawBody)
+    if ('error' in validation) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { subscription, profileId } = validation.data
 
     // SECURITY: Verify profileId matches authenticated user
     if (user.id !== profileId) {
@@ -75,11 +84,19 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { endpoint, profileId } = await request.json()
-
-    if (!endpoint || !profileId) {
-      return NextResponse.json({ error: 'Missing data' }, { status: 400 })
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
+
+    const validation = validateBody(pushUnsubscribeSchema, rawBody)
+    if ('error' in validation) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { endpoint, profileId } = validation.data
 
     // SECURITY: Verify profileId matches authenticated user
     if (user.id !== profileId) {

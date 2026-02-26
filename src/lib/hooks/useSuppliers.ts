@@ -91,7 +91,7 @@ export function useSuppliers(): UseSuppliersReturn {
 
     const { data, error: fetchError } = await supabase
       .from('suppliers')
-      .select('*')
+      .select('id, name, contact_email, contact_phone, website, logo_url, description, min_order_amount, delivery_days_min, delivery_days_max, is_active, created_at, updated_at')
       .eq('is_active', true)
       .order('name', { ascending: true })
 
@@ -128,7 +128,7 @@ export function useSuppliers(): UseSuppliersReturn {
 
     const { data: products, error: fetchError } = await supabase
       .from('supplier_products')
-      .select('*')
+      .select('id, supplier_id, tobacco_id, brand, flavor, sku, price, package_grams, in_stock, created_at')
       .eq('supplier_id', id)
       .eq('in_stock', true)
       .order('brand', { ascending: true })

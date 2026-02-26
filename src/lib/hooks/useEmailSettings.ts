@@ -59,7 +59,7 @@ export function useEmailSettings(): UseEmailSettingsReturn {
     try {
       const { data, error: fetchError } = await supabase
         .from('email_settings')
-        .select('*')
+        .select('id, profile_id, email_notifications_enabled, low_stock_email, order_updates_email, daily_summary_email, marketing_email, created_at, updated_at')
         .eq('profile_id', user.id)
         .single()
 

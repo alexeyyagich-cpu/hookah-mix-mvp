@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/AuthContext'
 import { isSupabaseConfigured } from '@/lib/config'
+import { useTranslation } from '@/lib/i18n'
 import { ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import type { OrgRole } from '@/types/database'
 
@@ -24,6 +25,7 @@ export default function JoinPage() {
   const params = useParams()
   const router = useRouter()
   const { user } = useAuth()
+  const t = useTranslation('auth')
   const token = params.token as string
 
   const [state, setState] = useState<InviteState>('loading')
@@ -33,7 +35,7 @@ export default function JoinPage() {
   useEffect(() => {
     if (!isSupabaseConfigured || !token) {
       setState('error')
-      setErrorMsg('Invalid link')
+      setErrorMsg(t.invalidLink)
       return
     }
 
@@ -82,7 +84,7 @@ export default function JoinPage() {
     // Client-side email check (server also validates)
     if (user.email?.toLowerCase() !== invite.email.toLowerCase()) {
       setState('error')
-      setErrorMsg(`This invite was sent to ${invite.email}. Please log in with that email address.`)
+      setErrorMsg(t.inviteEmailMismatch(invite.email))
       return
     }
 
@@ -94,7 +96,7 @@ export default function JoinPage() {
       const { data, error } = await supabase.rpc('accept_invite', { p_token: token })
 
       if (error) throw error
-      if (!data?.success) throw new Error('Failed to accept invite')
+      if (!data?.success) throw new Error(t.inviteAcceptFailed)
 
       setState('success')
 
@@ -102,7 +104,7 @@ export default function JoinPage() {
       redirectTimerRef.current = setTimeout(() => router.push('/dashboard'), 2000)
     } catch (err) {
       setState('error')
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to accept invite')
+      setErrorMsg(err instanceof Error ? err.message : t.inviteAcceptFailed)
     }
   }
 
@@ -114,7 +116,7 @@ export default function JoinPage() {
         {state === 'loading' && (
           <div className="space-y-4">
             <div className="animate-spin w-12 h-12 mx-auto border-3 border-[var(--color-primary)] border-t-transparent rounded-full" />
-            <p className="text-[var(--color-textMuted)]">Loading invite...</p>
+            <p className="text-[var(--color-textMuted)]">{t.loadingInvite}</p>
           </div>
         )}
 
@@ -123,12 +125,12 @@ export default function JoinPage() {
             <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-danger)]/10 flex items-center justify-center text-3xl">
               ⏰
             </div>
-            <h2 className="text-xl font-bold">Invite Expired</h2>
+            <h2 className="text-xl font-bold">{t.inviteExpired}</h2>
             <p className="text-[var(--color-textMuted)]">
-              This invitation link has expired or has already been used. Ask the venue owner to send a new one.
+              {t.inviteExpiredDesc}
             </p>
             <button type="button" onClick={() => router.push('/login')} className="btn btn-primary w-full">
-              Go to Login
+              {t.goToLogin}
             </button>
           </div>
         )}
@@ -138,10 +140,9 @@ export default function JoinPage() {
             <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-3xl">
               {roleLabel?.emoji || '🔑'}
             </div>
-            <h2 className="text-xl font-bold">Join {invite.org_name}</h2>
+            <h2 className="text-xl font-bold">{t.joinOrg(invite.org_name || '')}</h2>
             <p className="text-[var(--color-textMuted)]">
-              You&apos;ve been invited as <strong>{roleLabel?.label || invite.role}</strong>.
-              Log in or create an account to accept.
+              {t.inviteDescriptionLogin(roleLabel?.label || invite.role)}
             </p>
             <div className="flex flex-col gap-3">
               <button
@@ -149,14 +150,14 @@ export default function JoinPage() {
                 onClick={() => router.push(`/login?redirect=/join/${token}`)}
                 className="btn btn-primary w-full"
               >
-                Log In
+                {t.login}
               </button>
               <button
                 type="button"
                 onClick={() => router.push(`/register?invite=${token}`)}
                 className="btn btn-ghost w-full"
               >
-                Create Account
+                {t.register}
               </button>
             </div>
           </div>
@@ -167,12 +168,12 @@ export default function JoinPage() {
             <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-3xl">
               {roleLabel?.emoji || '🔑'}
             </div>
-            <h2 className="text-xl font-bold">Join {invite.org_name}</h2>
+            <h2 className="text-xl font-bold">{t.joinOrg(invite.org_name || '')}</h2>
             <p className="text-[var(--color-textMuted)]">
-              You&apos;ve been invited as <strong>{roleLabel?.label || invite.role}</strong>.
+              {t.inviteDescription(roleLabel?.label || invite.role)}
             </p>
             <button type="button" onClick={handleAccept} className="btn btn-primary w-full">
-              Accept Invitation
+              {t.acceptInvite}
             </button>
           </div>
         )}
@@ -180,7 +181,7 @@ export default function JoinPage() {
         {state === 'accepting' && (
           <div className="space-y-4">
             <div className="animate-spin w-12 h-12 mx-auto border-3 border-[var(--color-primary)] border-t-transparent rounded-full" />
-            <p className="text-[var(--color-textMuted)]">Joining team...</p>
+            <p className="text-[var(--color-textMuted)]">{t.joiningTeam}</p>
           </div>
         )}
 
@@ -189,9 +190,9 @@ export default function JoinPage() {
             <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-success)]/10 flex items-center justify-center text-3xl">
               ✅
             </div>
-            <h2 className="text-xl font-bold">Welcome to the team!</h2>
+            <h2 className="text-xl font-bold">{t.welcomeToTeam}</h2>
             <p className="text-[var(--color-textMuted)]">
-              Redirecting to dashboard...
+              {t.redirectingDashboard}
             </p>
           </div>
         )}
@@ -201,10 +202,10 @@ export default function JoinPage() {
             <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-danger)]/10 flex items-center justify-center text-3xl">
               ❌
             </div>
-            <h2 className="text-xl font-bold">Error</h2>
+            <h2 className="text-xl font-bold">{t.error}</h2>
             <p className="text-[var(--color-textMuted)]">{errorMsg}</p>
             <button type="button" onClick={() => router.push('/login')} className="btn btn-primary w-full">
-              Go to Login
+              {t.goToLogin}
             </button>
           </div>
         )}

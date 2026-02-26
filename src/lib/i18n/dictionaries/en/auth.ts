@@ -201,4 +201,21 @@ export const auth: typeof AuthType = {
 
   // Pricing page — Contact
   contactCta: 'Have questions? Contact us',
+
+  // Join / Invite page
+  invalidLink: 'Invalid link',
+  inviteEmailMismatch: (email: string) => `This invite was sent to ${email}. Please log in with that email address.`,
+  inviteAcceptFailed: 'Failed to accept invite',
+  loadingInvite: 'Loading invite...',
+  inviteExpired: 'Invite Expired',
+  inviteExpiredDesc: 'This invitation link has expired or has already been used. Ask the venue owner to send a new one.',
+  goToLogin: 'Go to Login',
+  joinOrg: (name: string) => `Join ${name}`,
+  inviteDescription: (role: string) => `You've been invited as ${role}.`,
+  inviteDescriptionLogin: (role: string) => `You've been invited as ${role}. Log in or create an account to accept.`,
+  acceptInvite: 'Accept Invitation',
+  joiningTeam: 'Joining team...',
+  welcomeToTeam: 'Welcome to the team!',
+  redirectingDashboard: 'Redirecting to dashboard...',
+  error: 'Error',
 }

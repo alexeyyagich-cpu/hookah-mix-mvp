@@ -27,7 +27,7 @@ export async function GET(
     // Try finding by lounge_profiles slug as fallback
     const { data: loungeBySlug } = await supabase
       .from('lounge_profiles')
-      .select('*, profiles!lounge_profiles_profile_id_fkey(id, business_name, business_type, logo_url, venue_slug)')
+      .select('id, profile_id, slug, name, description, logo_url, cover_image_url, city, address, latitude, longitude, phone, email, website, instagram, telegram, working_hours, features, is_published, show_menu, show_prices, show_popular_mixes, rating, reviews_count, created_at, updated_at, profiles!lounge_profiles_profile_id_fkey(id, business_name, business_type, logo_url, venue_slug)')
       .eq('slug', slug)
       .eq('is_published', true)
       .maybeSingle()
@@ -154,7 +154,7 @@ export async function GET(
   // Fetch lounge profile if exists
   const { data: loungeProfile } = await supabase
     .from('lounge_profiles')
-    .select('*')
+    .select('id, profile_id, slug, name, description, logo_url, cover_image_url, city, address, latitude, longitude, phone, email, website, instagram, telegram, working_hours, features, is_published, show_menu, show_prices, show_popular_mixes, rating, reviews_count, created_at, updated_at')
     .eq('profile_id', profile.id)
     .eq('is_published', true)
     .maybeSingle()

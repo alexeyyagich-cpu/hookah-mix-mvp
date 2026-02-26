@@ -147,7 +147,7 @@ export function useTeam(): UseTeamReturn {
       // Load org members (excluding current user)
       const { data: memberData, error: memberErr } = await supabase
         .from('org_members')
-        .select('*')
+        .select('id, organization_id, location_id, user_id, role, display_name, is_active, hourly_rate, sales_commission_percent, created_at, updated_at')
         .eq('organization_id', organizationId)
         .eq('is_active', true)
         .neq('user_id', user.id)
@@ -158,7 +158,7 @@ export function useTeam(): UseTeamReturn {
       // Load pending invitations
       const { data: invData, error: invErr } = await supabase
         .from('invite_tokens')
-        .select('*')
+        .select('id, organization_id, location_id, email, role, token, invited_by, expires_at, accepted_at, accepted_by, created_at')
         .eq('organization_id', organizationId)
         .is('accepted_at', null)
         .gt('expires_at', new Date().toISOString())

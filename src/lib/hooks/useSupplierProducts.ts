@@ -98,7 +98,7 @@ export function useSupplierProducts(options: UseSupplierProductsOptions = {}): U
     // Build query
     let query = supabase
       .from('supplier_products')
-      .select('*')
+      .select('id, supplier_id, tobacco_id, brand, flavor, sku, price, package_grams, in_stock, created_at')
 
     if (supplierId) {
       query = query.eq('supplier_id', supplierId)

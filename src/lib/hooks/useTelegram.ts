@@ -78,7 +78,7 @@ export function useTelegram(): UseTelegramReturn {
     try {
       const { data, error: fetchError } = await supabase
         .from('telegram_connections')
-        .select('*')
+        .select('id, profile_id, telegram_user_id, telegram_username, chat_id, is_active, notifications_enabled, low_stock_alerts, session_reminders, daily_summary, created_at, updated_at')
         .eq('profile_id', user.id)
         .single()
 

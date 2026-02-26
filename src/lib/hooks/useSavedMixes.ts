@@ -96,7 +96,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
     try {
       const { data, error: fetchError } = await supabase
         .from('saved_mixes')
-        .select('*')
+        .select('id, profile_id, name, tobaccos, compatibility_score, is_favorite, usage_count, rating, notes, created_at')
         .eq('profile_id', user.id)
         .order('created_at', { ascending: false })
 

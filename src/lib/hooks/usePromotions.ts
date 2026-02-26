@@ -97,7 +97,7 @@ export function usePromotions(): UsePromotionsReturn {
     const fetch = async () => {
       const { data } = await supabase
         .from('promotions')
-        .select('*')
+        .select('id, profile_id, name, type, rules, is_active, valid_from, valid_until, usage_count, max_uses, created_at, updated_at')
         .eq('profile_id', user.id)
         .order('created_at', { ascending: false })
 

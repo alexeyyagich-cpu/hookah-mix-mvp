@@ -168,7 +168,7 @@ export function useShifts(): UseShiftsReturn {
 
     const { data, error: fetchError } = await supabase
       .from('shifts')
-      .select('*')
+      .select('id, profile_id, organization_id, location_id, opened_by, opened_by_name, opened_at, closed_at, starting_cash, closing_cash, open_notes, close_notes, status, created_at, updated_at')
       .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || effectiveProfileId)
       .order('opened_at', { ascending: false })
       .limit(50)
@@ -367,9 +367,9 @@ export function useShifts(): UseShiftsReturn {
 
     // Fetch all needed data in parallel — includes ALL statuses for KDS
     const [sessionsRes, salesRes, kdsRes, inventoryRes, teamRes] = await Promise.all([
-      supabase.from('sessions').select('*').eq(ownerFilter.key, ownerFilter.value).gte('session_date', start).lte('session_date', end),
-      supabase.from('bar_sales').select('*').eq(ownerFilter.key, ownerFilter.value).gte('sold_at', start).lte('sold_at', end),
-      supabase.from('kds_orders').select('*').eq(ownerFilter.key, ownerFilter.value).gte('created_at', start).lte('created_at', end),
+      supabase.from('sessions').select('id, profile_id, selling_price, total_grams, compatibility_score, session_date, session_items(tobacco_id, brand, flavor, grams_used)').eq(ownerFilter.key, ownerFilter.value).gte('session_date', start).lte('session_date', end),
+      supabase.from('bar_sales').select('id, profile_id, recipe_name, quantity, total_revenue, total_cost, margin_percent, sold_at').eq(ownerFilter.key, ownerFilter.value).gte('sold_at', start).lte('sold_at', end),
+      supabase.from('kds_orders').select('id, status, created_at, completed_at').eq(ownerFilter.key, ownerFilter.value).gte('created_at', start).lte('created_at', end),
       supabase.from('tobacco_inventory').select('tobacco_id, purchase_price, package_grams').eq(ownerFilter.key, ownerFilter.value),
       supabase.from('org_members').select('user_id, display_name, hourly_rate, sales_commission_percent').eq('organization_id', organizationId || ''),
     ])

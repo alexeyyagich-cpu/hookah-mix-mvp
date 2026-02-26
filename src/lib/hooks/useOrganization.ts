@@ -126,7 +126,7 @@ export function useOrganization(): UseOrganizationReturn {
       // 1. Get user's org membership (active only)
       const { data: memberData, error: memberErr } = await supabase
         .from('org_members')
-        .select('*')
+        .select('id, organization_id, location_id, user_id, role, display_name, is_active, hourly_rate, sales_commission_percent, created_at, updated_at')
         .eq('user_id', user.id)
         .eq('is_active', true)
         .limit(1)
@@ -148,7 +148,7 @@ export function useOrganization(): UseOrganizationReturn {
       // 2. Load organization
       const { data: orgData, error: orgErr } = await supabase
         .from('organizations')
-        .select('*')
+        .select('id, name, slug, logo_url, subscription_tier, subscription_expires_at, stripe_customer_id, stripe_subscription_id, created_at, updated_at')
         .eq('id', memberData.organization_id)
         .single()
 
@@ -158,7 +158,7 @@ export function useOrganization(): UseOrganizationReturn {
       // 3. Load all locations for this org
       const { data: locData, error: locErr } = await supabase
         .from('locations')
-        .select('*')
+        .select('id, organization_id, name, slug, address, phone, locale, timezone, active_modules, business_type, created_at, updated_at')
         .eq('organization_id', memberData.organization_id)
         .order('created_at', { ascending: true })
 

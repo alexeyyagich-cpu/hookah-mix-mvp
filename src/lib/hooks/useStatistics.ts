@@ -254,8 +254,9 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       let sessionsQuery = supabase
         .from('sessions')
         .select(`
-          *,
-          session_items (*)
+          id, profile_id, created_by, guest_id, bowl_type_id, session_date, total_grams, compatibility_score, notes, rating, duration_minutes, selling_price,
+          session_items (id, session_id, tobacco_inventory_id, tobacco_id, brand, flavor, grams_used, percentage),
+          bowl_type:bowl_types (id, profile_id, name, capacity_grams, is_default, created_at)
         `)
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .gte('session_date', dateRange.start.toISOString())
@@ -269,12 +270,12 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       const { data: sessionsData, error: sessionsError } = await sessionsQuery
 
       if (sessionsError) throw sessionsError
-      setSessions(sessionsData || [])
+      setSessions((sessionsData || []) as unknown as SessionWithItems[])
 
       // Fetch inventory
       let inventoryQuery = supabase
         .from('tobacco_inventory')
-        .select('*')
+        .select('id, profile_id, tobacco_id, brand, flavor, quantity_grams, purchase_price, package_grams, purchase_date, expiry_date, notes, created_at, updated_at')
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (organizationId && locationId) {
@@ -289,7 +290,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       // Fetch recent transactions
       let transactionsQuery = supabase
         .from('inventory_transactions')
-        .select('*')
+        .select('id, profile_id, tobacco_inventory_id, type, quantity_grams, session_id, notes, idempotency_key, created_at')
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('created_at', { ascending: false })
         .limit(50)

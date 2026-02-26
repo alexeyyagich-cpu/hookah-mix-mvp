@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { tipCreateSessionSchema, validateBody } from '@/lib/validation'
 
 let supabaseAdmin: SupabaseClient | null = null
 
@@ -17,9 +18,6 @@ function getSupabaseAdmin(): SupabaseClient {
   return supabaseAdmin
 }
 
-const ALLOWED_CURRENCIES = ['eur', 'usd', 'gbp', 'chf', 'pln', 'czk']
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
 export async function POST(request: NextRequest) {
   // Rate limit: strict (10/min per IP) for payment session creation
   const ip = getClientIp(request)
@@ -27,47 +25,30 @@ export async function POST(request: NextRequest) {
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   try {
-    const body = await request.json()
-    const { staffProfileId, amount, currency, payerName, message, slug } = body
-
-    if (!staffProfileId || !amount || amount <= 0) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
 
-    if (!UUID_REGEX.test(staffProfileId)) {
-      return NextResponse.json(
-        { error: 'Invalid staff profile ID' },
-        { status: 400 }
-      )
+    const validation = validateBody(tipCreateSessionSchema, rawBody)
+    if ('error' in validation) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
     }
 
-    if (amount > 500) {
-      return NextResponse.json(
-        { error: 'Amount too large' },
-        { status: 400 }
-      )
-    }
+    const { staffProfileId, amount, currency, payerName, message, slug } = validation.data
 
-    if (currency && !ALLOWED_CURRENCIES.includes(currency.toLowerCase())) {
-      return NextResponse.json(
-        { error: 'Unsupported currency' },
-        { status: 400 }
-      )
-    }
-
-    // Truncate user-supplied strings
-    const safeName = payerName ? String(payerName).slice(0, 100) : ''
-    const safeMessage = message ? String(message).slice(0, 500) : ''
+    // Zod already enforces max lengths; keep safeName/safeMessage for downstream use
+    const safeName = payerName || ''
+    const safeMessage = message || ''
 
     const supabase = getSupabaseAdmin()
 
     // Verify staff profile exists and is enabled
     const { data: staffProfile, error: profileError } = await supabase
       .from('staff_profiles')
-      .select('*')
+      .select('id, display_name, is_tip_enabled')
       .eq('id', staffProfileId)
       .eq('is_tip_enabled', true)
       .single()

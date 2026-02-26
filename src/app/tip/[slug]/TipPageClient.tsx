@@ -34,7 +34,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
       const supabase = createClient()
       const { data, error: fetchError } = await supabase
         .from('staff_profiles')
-        .select('*')
+        .select('id, profile_id, org_member_id, display_name, photo_url, tip_slug, is_tip_enabled, created_at, updated_at')
         .eq('tip_slug', slug)
         .eq('is_tip_enabled', true)
         .single()

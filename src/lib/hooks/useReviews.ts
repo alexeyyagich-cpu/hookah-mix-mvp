@@ -90,7 +90,7 @@ export function useReviews(): UseReviewsReturn {
     try {
       const { data, error: fetchError } = await supabase
         .from('reviews')
-        .select('*')
+        .select('id, profile_id, author_name, rating, text, is_published, created_at')
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('created_at', { ascending: false })
 
@@ -204,7 +204,7 @@ export function usePublicReviews(profileId: string | undefined, orgId?: string):
       try {
         const { data, error: fetchError } = await supabase
           .from('reviews')
-          .select('*')
+          .select('id, profile_id, author_name, rating, text, is_published, created_at')
           .eq(orgId ? 'organization_id' : 'profile_id', orgId || profileId!)
           .eq('is_published', true)
           .order('created_at', { ascending: false })

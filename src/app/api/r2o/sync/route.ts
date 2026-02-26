@@ -34,7 +34,7 @@ export async function POST() {
 
     const { data: connection } = await supabaseAdmin
       .from('r2o_connections')
-      .select('*')
+      .select('id, profile_id, encrypted_token, token_iv, product_group_id, status')
       .eq('profile_id', user.id)
       .eq('status', 'connected')
       .single()
@@ -69,7 +69,7 @@ export async function POST() {
     // Get existing product mappings
     const { data: existingMappings } = await supabase
       .from('r2o_product_mappings')
-      .select('*')
+      .select('id, profile_id, tobacco_inventory_id, r2o_product_id, r2o_product_name, sync_status, last_synced_at')
       .eq('profile_id', user.id)
 
     const mappingsByInventoryId = new Map(

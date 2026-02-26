@@ -1,22 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { publicOrderSchema, validateBody } from '@/lib/validation'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-interface OrderItem {
-  name: string
-  quantity: number
-  details: string | null
-}
-
-interface OrderBody {
-  table_id: string
-  guest_name?: string | null
-  type: 'bar' | 'hookah'
-  items: OrderItem[]
-  notes?: string | null
-}
 
 export async function POST(
   request: Request,
@@ -28,51 +15,19 @@ export async function POST(
     return NextResponse.json({ error: 'Not configured' }, { status: 500 })
   }
 
-  let body: OrderBody
+  let body: unknown
   try {
     body = await request.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { table_id, guest_name, type, items, notes } = body
-
-  // Validate required fields
-  if (!table_id || !type || !items || !Array.isArray(items) || items.length === 0) {
-    return NextResponse.json({ error: 'Missing required fields: table_id, type, items' }, { status: 400 })
+  const validation = validateBody(publicOrderSchema, body)
+  if ('error' in validation) {
+    return NextResponse.json({ error: validation.error }, { status: 400 })
   }
 
-  if (type !== 'bar' && type !== 'hookah') {
-    return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
-  }
-
-  if (items.length > 50) {
-    return NextResponse.json({ error: 'Too many items (max 50)' }, { status: 400 })
-  }
-
-  // Validate and sanitize string lengths
-  if (guest_name && String(guest_name).length > 100) {
-    return NextResponse.json({ error: 'Guest name too long (max 100)' }, { status: 400 })
-  }
-  if (notes && String(notes).length > 500) {
-    return NextResponse.json({ error: 'Notes too long (max 500)' }, { status: 400 })
-  }
-
-  // Validate items
-  for (const item of items) {
-    if (!item.name || typeof item.quantity !== 'number' || item.quantity < 1) {
-      return NextResponse.json({ error: 'Invalid item: name and quantity required' }, { status: 400 })
-    }
-    if (item.quantity > 100) {
-      return NextResponse.json({ error: 'Item quantity too large (max 100)' }, { status: 400 })
-    }
-    if (String(item.name).length > 200) {
-      return NextResponse.json({ error: 'Item name too long (max 200)' }, { status: 400 })
-    }
-    if (item.details && String(item.details).length > 500) {
-      return NextResponse.json({ error: 'Item details too long (max 500)' }, { status: 400 })
-    }
-  }
+  const { table_id, guest_name, type, items, notes } = validation.data
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
