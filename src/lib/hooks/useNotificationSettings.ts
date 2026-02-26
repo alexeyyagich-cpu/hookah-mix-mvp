@@ -78,9 +78,9 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load settings')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }, [user, supabase])
 
   useEffect(() => {

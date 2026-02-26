@@ -20,7 +20,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json() as R2OWebhookEvent
+    let body: R2OWebhookEvent
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
 
     if (!body.event || !body.accountId) {
       return NextResponse.json({ error: 'Invalid webhook payload' }, { status: 400 })

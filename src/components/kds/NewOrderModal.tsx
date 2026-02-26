@@ -327,6 +327,8 @@ export function NewOrderModal({
 
       resetForm()
       onClose()
+    } catch (err) {
+      console.error('Order creation failed:', err)
     } finally {
       setSaving(false)
     }

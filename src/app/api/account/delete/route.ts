@@ -34,7 +34,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Require confirmation phrase
-    const body = await request.json()
+    let body: Record<string, unknown>
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
     if (body.confirmation !== 'DELETE') {
       return NextResponse.json({ error: 'Invalid confirmation' }, { status: 400 })
     }

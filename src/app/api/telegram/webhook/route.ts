@@ -214,9 +214,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
   }
 
+  let update: TelegramUpdate
   try {
-    const update: TelegramUpdate = await request.json()
+    update = await request.json()
+  } catch {
+    return NextResponse.json({ ok: false, error: 'Invalid JSON' }, { status: 400 })
+  }
 
+  try {
     // --- Handle callback queries (button presses) ---
     if (update.callback_query) {
       const cq = update.callback_query

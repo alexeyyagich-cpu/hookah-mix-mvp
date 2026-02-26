@@ -213,9 +213,9 @@ export function useReady2Order(): UseReady2OrderReturn {
       setConnection(prev => prev ? { ...prev, last_sync_at: new Date().toISOString() } : null)
     } catch (err) {
       setError(translateError(err as Error))
+    } finally {
+      setSyncing(false)
     }
-
-    setSyncing(false)
   }, [isDemoMode])
 
   return {
