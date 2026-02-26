@@ -15,7 +15,6 @@ export function useInstallPrompt() {
     // Check if already installed (standalone mode)
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true)
-      return
     }
 
     const handler = (e: Event) => {

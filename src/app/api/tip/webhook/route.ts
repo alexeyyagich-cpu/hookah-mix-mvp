@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
       }
 
       const staffProfileId = session.metadata.staff_profile_id
-      const payerName = session.metadata.payer_name || null
-      const message = session.metadata.message || null
+      const payerName = session.metadata.payer_name?.slice(0, 100) || null
+      const message = session.metadata.message?.slice(0, 500) || null
       const amountTotal = session.amount_total
 
       if (!staffProfileId || !amountTotal) {

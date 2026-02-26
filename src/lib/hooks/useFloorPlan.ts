@@ -200,12 +200,18 @@ export function useFloorPlan(): UseFloorPlanReturn {
     }
   }, [fetchTables, isDemoMode])
 
-  // Refetch after reconnect
+  // Refetch after reconnect or offline discard
   useEffect(() => {
     let tid: ReturnType<typeof setTimeout>
     const handleOnline = () => { tid = setTimeout(fetchTables, 3000) }
+    const handleReconcile = () => fetchTables()
     window.addEventListener('online', handleOnline)
-    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
+    window.addEventListener('offline-discard-reconcile', handleReconcile)
+    return () => {
+      clearTimeout(tid)
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline-discard-reconcile', handleReconcile)
+    }
   }, [fetchTables])
 
   // Supabase Realtime subscription — live sync across devices
