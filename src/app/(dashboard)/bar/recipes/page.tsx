@@ -7,6 +7,7 @@ import { IconCocktail } from '@/components/Icons'
 import { RecipeCard } from '@/components/bar/RecipeCard'
 import { CostCalculator } from '@/components/bar/CostCalculator'
 import { AddRecipeModal } from '@/components/bar/AddRecipeModal'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useTranslation } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, CocktailMethod } from '@/types/database'
 
@@ -200,6 +201,7 @@ export default function BarRecipesPage() {
           action={recipes.length === 0 ? { label: `+ ${tb.createRecipe}`, onClick: () => setModalOpen(true) } : undefined}
         />
       ) : (
+        <ErrorBoundary sectionName="Recipes">
         <div className="flex gap-6">
           {/* Recipe Grid */}
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,6 +237,7 @@ export default function BarRecipesPage() {
             </div>
           )}
         </div>
+        </ErrorBoundary>
       )}
 
       {/* Cost Calculator — mobile bottom sheet */}

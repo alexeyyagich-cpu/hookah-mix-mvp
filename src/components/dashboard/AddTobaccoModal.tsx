@@ -290,6 +290,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                         className="input"
                         placeholder={t.flavorPlaceholder}
                         required
+                        maxLength={80}
                       />
                     </div>
                   </div>

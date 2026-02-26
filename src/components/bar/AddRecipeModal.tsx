@@ -330,6 +330,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                     type="text" value={name} onChange={e => setName(e.target.value)} required
                     className="input"
                     placeholder="Mojito"
+                    maxLength={100}
                   />
                 </div>
                 <div className="space-y-2">
@@ -338,6 +339,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                     type="text" value={nameEn} onChange={e => setNameEn(e.target.value)}
                     className="input"
                     placeholder="Mojito"
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -386,6 +388,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                     type="text" value={garnish} onChange={e => setGarnish(e.target.value)}
                     className="input"
                     placeholder={t.garnishPlaceholder}
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -470,8 +473,9 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 <button
                   type="submit"
                   disabled={saving || !name.trim() || ingredients.length === 0}
-                  className="btn btn-primary flex-1 disabled:opacity-50"
+                  className="btn btn-primary flex-1 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
+                  {saving && <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />}
                   {saving ? t.saving : editingRecipe ? t.save : t.createRecipeBtn}
                 </button>
               </div>

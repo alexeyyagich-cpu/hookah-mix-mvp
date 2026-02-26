@@ -14,6 +14,7 @@ const DAYS: (keyof WorkingHours)[] = [
 
 export default function LoungeProfileSettings() {
   const ts = useTranslation('settings')
+  const tc = useTranslation('common')
   const { lounge, loading, updateLounge } = useLoungeProfile()
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -415,9 +416,10 @@ export default function LoungeProfileSettings() {
         <button type="button"
           onClick={handleSave}
           disabled={saving}
-          className="btn btn-primary"
+          className="btn btn-primary flex items-center gap-2"
         >
-          {saving ? '...' : ts.saveSlug}
+          {saving && <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />}
+          {saving ? tc.saving : ts.saveSlug}
         </button>
         {message && (
           <span role="status" aria-live="polite" className="text-sm text-[var(--color-success)]">{message}</span>

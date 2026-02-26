@@ -325,6 +325,7 @@ export default function OnboardingPage() {
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder={t.placeholderBusinessName}
                   className="input"
+                  maxLength={100}
                 />
               </div>
               <div>
@@ -335,6 +336,7 @@ export default function OnboardingPage() {
                   onChange={(e) => setOwnerName(e.target.value)}
                   placeholder={t.placeholderOwnerName}
                   className="input"
+                  maxLength={100}
                 />
               </div>
               <div className="flex gap-3 pt-4">

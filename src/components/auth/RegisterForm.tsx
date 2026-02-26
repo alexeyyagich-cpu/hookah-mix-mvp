@@ -103,7 +103,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <label htmlFor="businessName" className="block text-sm font-medium">
-            {t.businessName}
+            {t.businessName} <span className="text-[var(--color-danger)]">*</span>
           </label>
           <input
             id="businessName"
@@ -112,12 +112,14 @@ export function RegisterForm() {
             onChange={(e) => setBusinessName(e.target.value)}
             className="input transition-colors"
             placeholder={t.placeholderBusinessName}
+            required
+            maxLength={100}
           />
         </div>
 
         <div className="space-y-2">
           <label htmlFor="ownerName" className="block text-sm font-medium">
-            {t.ownerName}
+            {t.ownerName} <span className="text-[var(--color-danger)]">*</span>
           </label>
           <input
             id="ownerName"
@@ -126,6 +128,8 @@ export function RegisterForm() {
             onChange={(e) => setOwnerName(e.target.value)}
             className="input transition-colors"
             placeholder={t.placeholderOwnerName}
+            required
+            maxLength={100}
           />
         </div>
 

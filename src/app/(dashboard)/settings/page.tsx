@@ -422,6 +422,8 @@ export default function SettingsPage() {
               onChange={(e) => setBusinessName(e.target.value)}
               className="input"
               placeholder={ts.placeholderBusinessName}
+              maxLength={100}
+              disabled={saving}
             />
           </div>
 
@@ -433,6 +435,8 @@ export default function SettingsPage() {
               onChange={(e) => setOwnerName(e.target.value)}
               className="input"
               placeholder={ts.placeholderOwnerName}
+              maxLength={100}
+              disabled={saving}
             />
           </div>
         </div>
@@ -445,6 +449,8 @@ export default function SettingsPage() {
             onChange={(e) => setPhone(e.target.value)}
             className="input"
             placeholder={ts.placeholderPhone}
+            maxLength={30}
+            disabled={saving}
           />
         </div>
 
@@ -456,6 +462,8 @@ export default function SettingsPage() {
             onChange={(e) => setAddress(e.target.value)}
             className="input"
             placeholder={ts.placeholderAddress}
+            maxLength={200}
+            disabled={saving}
           />
         </div>
 
