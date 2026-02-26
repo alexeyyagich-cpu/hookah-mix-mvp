@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { IconCocktail } from '@/components/Icons'
@@ -16,6 +17,7 @@ type FilterMenu = 'all' | 'on_menu' | 'favorites'
 
 export default function BarRecipesPage() {
   const tb = useTranslation('bar')
+  const tc = useTranslation('common')
 
   const METHOD_LABELS: Record<string, string> = {
     build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
@@ -77,8 +79,9 @@ export default function BarRecipesPage() {
         await addRecipe(recipe, ingredients)
       }
       setEditingRecipe(null)
+      toast.success(tc.saved)
     } catch {
-      // Error displayed by hook
+      toast.error(tc.errorSaving)
     }
   }
 
@@ -91,8 +94,9 @@ export default function BarRecipesPage() {
     try {
       await deleteRecipe(id)
       if (selectedRecipe === id) setSelectedRecipe(null)
+      toast.success(tc.deleted)
     } catch {
-      // Error displayed by hook
+      toast.error(tc.errorDeleting)
     }
   }
 

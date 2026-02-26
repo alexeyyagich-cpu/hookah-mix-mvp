@@ -16,6 +16,7 @@ interface InvoiceScanModalProps {
 
 export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModalProps) {
   const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const fileRef = useRef<HTMLInputElement>(null)
   const [step, setStep] = useState<Step>('upload')
   const [items, setItems] = useState<ExtractedItem[]>([])
@@ -101,7 +102,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
             <IconScan size={20} />
             {t.ocrTitle}
           </h2>
-          <button type="button" onClick={handleClose} className="btn btn-ghost p-2" aria-label="Close"><IconClose size={18} /></button>
+          <button type="button" onClick={handleClose} className="btn btn-ghost p-2" aria-label={tc.close}><IconClose size={18} /></button>
         </div>
 
         <div className="p-4 space-y-4">

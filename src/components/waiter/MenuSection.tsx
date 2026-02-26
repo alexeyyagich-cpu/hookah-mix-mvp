@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { IconSearch, IconPlus, IconMinus } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
-import { getLocaleName, useLocale, formatCurrency } from '@/lib/i18n'
+import { getLocaleName, useLocale, formatCurrency, type Dictionary } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, BowlType, TobaccoInventory } from '@/types/database'
 
 interface BarItemEntry {
@@ -35,7 +35,7 @@ interface MenuSectionProps {
   hookahDescription: string
   onSetHookahMode: (mode: 'structured' | 'freetext') => void
   onSetHookahDescription: (desc: string) => void
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 export function MenuSection({

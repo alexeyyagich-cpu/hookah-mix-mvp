@@ -21,6 +21,7 @@ export function DeliveryModal({
   onAddToInventory,
 }: DeliveryModalProps) {
   const t = useTranslation('market')
+  const tc = useTranslation('common')
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'confirm' | 'inventory' | 'success'>('confirm')
@@ -130,7 +131,7 @@ export function DeliveryModal({
               <button type="button"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
-                aria-label="Close"
+                aria-label={tc.close}
               >
                 <IconClose size={20} />
               </button>

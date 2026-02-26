@@ -2,7 +2,40 @@
 
 import type { TobaccoInventory, SessionWithItems, BarSale, BarAnalytics } from '@/types/database'
 import type { Locale } from '@/lib/i18n/types'
+import type { Dictionary } from '@/lib/i18n'
 import { formatCurrency } from '@/lib/i18n/format'
+
+type ExportLabels = Dictionary['manage']
+
+const DEFAULT_LABELS = {
+  exportBrand: 'Brand', exportFlavor: 'Flavor', exportRemainingG: 'Remaining (g)',
+  exportPrice: 'Price', exportStatus: 'Status', exportDate: 'Date', exportDateTime: 'Date/Time',
+  exportMix: 'Mix', exportTotalG: 'Total (g)', exportCompat: 'Compatibility',
+  exportRating: 'Rating', exportNotes: 'Notes', exportQty: 'Qty',
+  exportRevenue: 'Revenue', exportCost: 'Cost', exportProfit: 'Profit',
+  exportExpenses: 'Expenses', exportMargin: 'Margin', exportSales: 'Sales',
+  exportMetric: 'Metric', exportValue: 'Value',
+  exportOverview: 'Overview', exportSessions: 'Sessions',
+  exportUsageByBrand: 'Usage by Brand', exportPopularFlavors: 'Popular Flavors',
+  exportPopularMixes: 'Popular Mixes', exportTimesUsed: 'Times used',
+  exportDailyConsumption: 'Daily Consumption', exportUsageG: 'Usage (g)',
+  exportLowStockItems: 'Low Stock Items', exportSalesLog: 'Sales Log',
+  exportPopularCocktails: 'Popular Cocktails', exportCocktail: 'Cocktail',
+  exportSummary: 'Summary',
+  exportTotalSessions: 'Total sessions', exportTobaccoUsed: 'Tobacco used',
+  exportAvgPerSession: 'Average per session', exportAvgCompat: 'Average compatibility',
+  exportAvgRating: 'Average rating', exportAvgMargin: 'Average margin',
+  exportOutOfStock: 'Out of stock', exportLow: 'Low', exportInStock: 'In stock',
+  exportPeriod: 'Period',
+  exportReportTitle: 'Hookah Torus — Report',
+  exportInventoryTitle: 'Hookah Torus — Inventory',
+  exportBarSalesTitle: 'Hookah Torus — Bar Sales',
+  exportSessionsTitle: 'Hookah Torus — Session History',
+  exportGenerated: 'Generated',
+  exportPage: (i: number, total: number) => `Page ${i} of ${total}`,
+  exportTotal: (count: number, grams: string) => `Total: ${count} items | ${grams}g in stock`,
+  exportLowStockCount: (low: number, out: number) => `Low stock: ${low} | Out of stock: ${out}`,
+}
 
 interface Statistics {
   totalSessions: number
@@ -36,10 +69,11 @@ function getDateString() {
 // CSV EXPORTS
 // ========================================
 
-export function exportInventoryCSV(inventory: TobaccoInventory[], lowStockThreshold: number = 50) {
-  const headers = ['Brand', 'Flavor', 'Remaining (g)', 'Price', 'Status']
+export function exportInventoryCSV(inventory: TobaccoInventory[], lowStockThreshold: number = 50, labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
+  const headers = [l.exportBrand, l.exportFlavor, l.exportRemainingG, l.exportPrice, l.exportStatus]
   const rows = inventory.map(item => {
-    const status = item.quantity_grams <= 0 ? 'Out of stock' : item.quantity_grams < lowStockThreshold ? 'Low' : 'In stock'
+    const status = item.quantity_grams <= 0 ? l.exportOutOfStock : item.quantity_grams < lowStockThreshold ? l.exportLow : l.exportInStock
     return [
       item.brand,
       item.flavor,
@@ -54,8 +88,9 @@ export function exportInventoryCSV(inventory: TobaccoInventory[], lowStockThresh
   downloadFile(blob, `hookah-inventory-${getDateString()}.csv`)
 }
 
-export function exportSessionsCSV(sessions: SessionWithItems[]) {
-  const headers = ['Date', 'Mix', 'Total (g)', 'Compatibility', 'Rating', 'Notes']
+export function exportSessionsCSV(sessions: SessionWithItems[], labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
+  const headers = [l.exportDate, l.exportMix, l.exportTotalG, l.exportCompat, l.exportRating, l.exportNotes]
   const rows = sessions.map(session => {
     const mix = session.session_items?.map(i => `${i.flavor} (${i.percentage}%)`).join(' + ') || '-'
     return [
@@ -73,45 +108,46 @@ export function exportSessionsCSV(sessions: SessionWithItems[]) {
   downloadFile(blob, `hookah-sessions-${getDateString()}.csv`)
 }
 
-export function exportStatisticsCSV(statistics: Statistics) {
+export function exportStatisticsCSV(statistics: Statistics, labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const lines: string[] = []
 
   // Overview section
-  lines.push('=== OVERVIEW ===')
-  lines.push(`Total sessions,${statistics.totalSessions}`)
-  lines.push(`Tobacco used (g),${statistics.totalGramsUsed}`)
-  lines.push(`Average per session (g),${statistics.averageSessionGrams}`)
-  lines.push(`Average compatibility,${statistics.averageCompatibilityScore}%`)
-  lines.push(`Average rating,${statistics.averageRating}/5`)
+  lines.push(`=== ${l.exportOverview.toUpperCase()} ===`)
+  lines.push(`${l.exportTotalSessions},${statistics.totalSessions}`)
+  lines.push(`${l.exportTobaccoUsed} (g),${statistics.totalGramsUsed}`)
+  lines.push(`${l.exportAvgPerSession} (g),${statistics.averageSessionGrams}`)
+  lines.push(`${l.exportAvgCompat},${statistics.averageCompatibilityScore}%`)
+  lines.push(`${l.exportAvgRating},${statistics.averageRating}/5`)
   lines.push('')
 
   // Daily consumption
-  lines.push('=== DAILY CONSUMPTION ===')
-  lines.push('Date,Sessions,Usage (g)')
+  lines.push(`=== ${l.exportDailyConsumption.toUpperCase()} ===`)
+  lines.push(`${l.exportDate},${l.exportSessions},${l.exportUsageG}`)
   statistics.dailyConsumption.forEach(d => {
     lines.push(`${d.date},${d.sessions},${d.grams}`)
   })
   lines.push('')
 
   // By brand
-  lines.push('=== USAGE BY BRAND ===')
-  lines.push('Brand,Sessions,Usage (g)')
+  lines.push(`=== ${l.exportUsageByBrand.toUpperCase()} ===`)
+  lines.push(`${l.exportBrand},${l.exportSessions},${l.exportUsageG}`)
   statistics.consumptionByBrand.forEach(b => {
     lines.push(`${b.brand},${b.sessions},${b.grams}`)
   })
   lines.push('')
 
   // By flavor
-  lines.push('=== POPULAR FLAVORS ===')
-  lines.push('Brand,Flavor,Sessions,Usage (g)')
+  lines.push(`=== ${l.exportPopularFlavors.toUpperCase()} ===`)
+  lines.push(`${l.exportBrand},${l.exportFlavor},${l.exportSessions},${l.exportUsageG}`)
   statistics.consumptionByFlavor.forEach(f => {
     lines.push(`${f.brand},${f.flavor},${f.sessions},${f.grams}`)
   })
   lines.push('')
 
   // Top mixes
-  lines.push('=== POPULAR MIXES ===')
-  lines.push('Mix,Times used')
+  lines.push(`=== ${l.exportPopularMixes.toUpperCase()} ===`)
+  lines.push(`${l.exportMix},${l.exportTimesUsed}`)
   statistics.topMixes.forEach(m => {
     const mix = m.items.map(i => i.flavor).join(' + ')
     lines.push(`"${mix}",${m.count}`)
@@ -128,37 +164,39 @@ export function exportStatisticsCSV(statistics: Statistics) {
 
 export async function exportStatisticsPDF(
   statistics: Statistics,
-  dateRange: { start: Date; end: Date }
+  dateRange: { start: Date; end: Date },
+  labels?: ExportLabels
 ) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const { default: jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title
   doc.setFontSize(20)
-  doc.text('Hookah Torus - Report', 105, 20, { align: 'center' })
+  doc.text(l.exportReportTitle, 105, 20, { align: 'center' })
 
   // Date range
   doc.setFontSize(10)
   doc.setTextColor(100)
   const startStr = dateRange.start.toLocaleDateString('en-US')
   const endStr = dateRange.end.toLocaleDateString('en-US')
-  doc.text(`Period: ${startStr} - ${endStr}`, 105, 28, { align: 'center' })
+  doc.text(`${l.exportPeriod}: ${startStr} - ${endStr}`, 105, 28, { align: 'center' })
 
   // Overview
   doc.setFontSize(14)
   doc.setTextColor(0)
-  doc.text('Overview', 14, 42)
+  doc.text(l.exportOverview, 14, 42)
 
   autoTable(doc, {
     startY: 46,
-    head: [['Metric', 'Value']],
+    head: [[l.exportMetric, l.exportValue]],
     body: [
-      ['Total sessions', statistics.totalSessions.toString()],
-      ['Tobacco used', `${statistics.totalGramsUsed} g`],
-      ['Average per session', `${statistics.averageSessionGrams} g`],
-      ['Average compatibility', `${statistics.averageCompatibilityScore}%`],
-      ['Average rating', `${statistics.averageRating}/5`],
+      [l.exportTotalSessions, statistics.totalSessions.toString()],
+      [l.exportTobaccoUsed, `${statistics.totalGramsUsed} g`],
+      [l.exportAvgPerSession, `${statistics.averageSessionGrams} g`],
+      [l.exportAvgCompat, `${statistics.averageCompatibilityScore}%`],
+      [l.exportAvgRating, `${statistics.averageRating}/5`],
     ],
     theme: 'striped',
     headStyles: { fillColor: [99, 102, 241] },
@@ -170,11 +208,11 @@ export async function exportStatisticsPDF(
   // Consumption by brand
   if (statistics.consumptionByBrand.length > 0) {
     doc.setFontSize(14)
-    doc.text('Usage by Brand', 14, currentY)
+    doc.text(l.exportUsageByBrand, 14, currentY)
 
     autoTable(doc, {
       startY: currentY + 4,
-      head: [['Brand', 'Sessions', 'Usage (g)']],
+      head: [[l.exportBrand, l.exportSessions, l.exportUsageG]],
       body: statistics.consumptionByBrand.map(b => [b.brand, b.sessions.toString(), b.grams.toString()]),
       theme: 'striped',
       headStyles: { fillColor: [99, 102, 241] },
@@ -192,11 +230,11 @@ export async function exportStatisticsPDF(
   // Top mixes
   if (statistics.topMixes.length > 0) {
     doc.setFontSize(14)
-    doc.text('Popular Mixes', 14, currentY)
+    doc.text(l.exportPopularMixes, 14, currentY)
 
     autoTable(doc, {
       startY: currentY + 4,
-      head: [['Mix', 'Times Used']],
+      head: [[l.exportMix, l.exportTimesUsed]],
       body: statistics.topMixes.map(m => [
         m.items.map(i => i.flavor).join(' + '),
         m.count.toString(),
@@ -216,11 +254,11 @@ export async function exportStatisticsPDF(
     }
 
     doc.setFontSize(14)
-    doc.text('Low Stock Items', 14, currentY)
+    doc.text(l.exportLowStockItems, 14, currentY)
 
     autoTable(doc, {
       startY: currentY + 4,
-      head: [['Brand', 'Flavor', 'Remaining (g)']],
+      head: [[l.exportBrand, l.exportFlavor, l.exportRemainingG]],
       body: statistics.lowStockItems.map(item => [
         item.brand,
         item.flavor,
@@ -238,7 +276,7 @@ export async function exportStatisticsPDF(
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.text(
-      `Hookah Torus | Generated: ${new Date().toLocaleString('en-US')} | Page ${i} of ${pageCount}`,
+      `Hookah Torus | ${l.exportGenerated}: ${new Date().toLocaleString('en-US')} | ${l.exportPage(i, pageCount)}`,
       105,
       290,
       { align: 'center' }
@@ -248,19 +286,20 @@ export async function exportStatisticsPDF(
   doc.save(`hookah-report-${getDateString()}.pdf`)
 }
 
-export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThreshold: number = 50) {
+export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStockThreshold: number = 50, labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const { default: jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title
   doc.setFontSize(20)
-  doc.text('Hookah Torus - Inventory', 105, 20, { align: 'center' })
+  doc.text(l.exportInventoryTitle, 105, 20, { align: 'center' })
 
   // Date
   doc.setFontSize(10)
   doc.setTextColor(100)
-  doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, 105, 28, { align: 'center' })
+  doc.text(`${l.exportDate}: ${new Date().toLocaleDateString('en-US')}`, 105, 28, { align: 'center' })
 
   // Summary
   const totalGrams = inventory.reduce((sum, item) => sum + item.quantity_grams, 0)
@@ -269,15 +308,15 @@ export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStock
 
   doc.setFontSize(12)
   doc.setTextColor(0)
-  doc.text(`Total: ${inventory.length} items | ${totalGrams.toFixed(0)}g in stock`, 14, 42)
-  doc.text(`Low stock: ${lowStock} | Out of stock: ${outOfStock}`, 14, 50)
+  doc.text(l.exportTotal(inventory.length, totalGrams.toFixed(0)), 14, 42)
+  doc.text(l.exportLowStockCount(lowStock, outOfStock), 14, 50)
 
   // Table
   autoTable(doc, {
     startY: 58,
-    head: [['Brand', 'Flavor', 'Remaining (g)', 'Price', 'Status']],
+    head: [[l.exportBrand, l.exportFlavor, l.exportRemainingG, l.exportPrice, l.exportStatus]],
     body: inventory.map(item => {
-      const status = item.quantity_grams <= 0 ? 'Out of stock' : item.quantity_grams < lowStockThreshold ? 'Low' : 'In stock'
+      const status = item.quantity_grams <= 0 ? l.exportOutOfStock : item.quantity_grams < lowStockThreshold ? l.exportLow : l.exportInStock
       return [
         item.brand,
         item.flavor,
@@ -292,10 +331,10 @@ export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStock
       // Color code status column
       if (data.column.index === 4 && data.section === 'body') {
         const status = data.cell.raw as string
-        if (status === 'Out of stock') {
+        if (status === l.exportOutOfStock) {
           data.cell.styles.textColor = [239, 68, 68]
           data.cell.styles.fontStyle = 'bold'
-        } else if (status === 'Low') {
+        } else if (status === l.exportLow) {
           data.cell.styles.textColor = [245, 158, 11]
         }
       }
@@ -309,7 +348,7 @@ export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStock
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.text(
-      `Hookah Torus | Generated: ${new Date().toLocaleString('en-US')} | Page ${i} of ${pageCount}`,
+      `Hookah Torus | ${l.exportGenerated}: ${new Date().toLocaleString('en-US')} | ${l.exportPage(i, pageCount)}`,
       105,
       290,
       { align: 'center' }
@@ -323,8 +362,9 @@ export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStock
 // BAR SALES EXPORTS
 // ========================================
 
-export function exportBarSalesCSV(sales: BarSale[], locale: Locale = 'en') {
-  const headers = ['Date/Time', 'Cocktail', 'Qty', 'Revenue (EUR)', 'Cost (EUR)', 'Margin (%)']
+export function exportBarSalesCSV(sales: BarSale[], locale: Locale = 'en', labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
+  const headers = [l.exportDateTime, l.exportCocktail, l.exportQty, l.exportRevenue, l.exportCost, l.exportMargin]
   const rows = sales.map(sale => [
     new Date(sale.sold_at).toLocaleString('en-US'),
     `"${sale.recipe_name}"`,
@@ -339,7 +379,8 @@ export function exportBarSalesCSV(sales: BarSale[], locale: Locale = 'en') {
   downloadFile(blob, `bar-sales-${getDateString()}.csv`)
 }
 
-export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number, locale: Locale = 'en') {
+export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytics, period: number, locale: Locale = 'en', labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const fc = (v: number) => formatCurrency(v, locale)
   const { default: jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
@@ -347,27 +388,27 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
 
   // Title
   doc.setFontSize(20)
-  doc.text('Hookah Torus — Bar Sales', 105, 20, { align: 'center' })
+  doc.text(l.exportBarSalesTitle, 105, 20, { align: 'center' })
 
   // Subtitle
   doc.setFontSize(10)
   doc.setTextColor(100)
-  doc.text(`Period: last ${period} days | Date: ${new Date().toLocaleDateString('en-US')}`, 105, 28, { align: 'center' })
+  doc.text(`${l.exportPeriod}: last ${period} days | ${l.exportDate}: ${new Date().toLocaleDateString('en-US')}`, 105, 28, { align: 'center' })
 
   // Summary
   doc.setFontSize(14)
   doc.setTextColor(0)
-  doc.text('Summary', 14, 42)
+  doc.text(l.exportSummary, 14, 42)
 
   autoTable(doc, {
     startY: 46,
-    head: [['Metric', 'Value']],
+    head: [[l.exportMetric, l.exportValue]],
     body: [
-      ['Revenue', fc(analytics.totalRevenue)],
-      ['Cost', fc(analytics.totalCost)],
-      ['Profit', fc(analytics.totalProfit)],
-      ['Sales', `${analytics.totalSales}`],
-      ['Average margin', analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(1)}%` : '—'],
+      [l.exportRevenue, fc(analytics.totalRevenue)],
+      [l.exportCost, fc(analytics.totalCost)],
+      [l.exportProfit, fc(analytics.totalProfit)],
+      [l.exportSales, `${analytics.totalSales}`],
+      [l.exportAvgMargin, analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(1)}%` : '—'],
     ],
     theme: 'striped',
     headStyles: { fillColor: [99, 102, 241] },
@@ -378,11 +419,11 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
   // Top cocktails
   if (analytics.topCocktails.length > 0) {
     doc.setFontSize(14)
-    doc.text('Popular Cocktails', 14, currentY)
+    doc.text(l.exportPopularCocktails, 14, currentY)
 
     autoTable(doc, {
       startY: currentY + 4,
-      head: [['Cocktail', 'Sales', 'Revenue']],
+      head: [[l.exportCocktail, l.exportSales, l.exportRevenue]],
       body: analytics.topCocktails.map(c => [c.name, c.count.toString(), fc(c.revenue)]),
       theme: 'striped',
       headStyles: { fillColor: [99, 102, 241] },
@@ -399,11 +440,11 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
     }
 
     doc.setFontSize(14)
-    doc.text('Sales Log', 14, currentY)
+    doc.text(l.exportSalesLog, 14, currentY)
 
     autoTable(doc, {
       startY: currentY + 4,
-      head: [['Date/Time', 'Cocktail', 'Qty', 'Revenue', 'Cost', 'Margin']],
+      head: [[l.exportDateTime, l.exportCocktail, l.exportQty, l.exportRevenue, l.exportCost, l.exportMargin]],
       body: sales.map(sale => [
         new Date(sale.sold_at).toLocaleString('en-US', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
         sale.recipe_name,
@@ -424,7 +465,7 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.text(
-      `Hookah Torus | Generated: ${new Date().toLocaleString('en-US')} | Page ${i} of ${pageCount}`,
+      `Hookah Torus | ${l.exportGenerated}: ${new Date().toLocaleString('en-US')} | ${l.exportPage(i, pageCount)}`,
       105,
       290,
       { align: 'center' }
@@ -438,28 +479,29 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
 // SESSIONS PDF EXPORT
 // ========================================
 
-export async function exportSessionsPDF(sessions: SessionWithItems[]) {
+export async function exportSessionsPDF(sessions: SessionWithItems[], labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const { default: jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   // Title
   doc.setFontSize(20)
-  doc.text('Hookah Torus — Session History', 105, 20, { align: 'center' })
+  doc.text(l.exportSessionsTitle, 105, 20, { align: 'center' })
 
   // Subtitle
   doc.setFontSize(10)
   doc.setTextColor(100)
-  doc.text(`Date: ${new Date().toLocaleDateString('en-US')} | Total sessions: ${sessions.length}`, 105, 28, { align: 'center' })
+  doc.text(`${l.exportDate}: ${new Date().toLocaleDateString('en-US')} | ${l.exportTotalSessions}: ${sessions.length}`, 105, 28, { align: 'center' })
 
   // Sessions table
   doc.setFontSize(14)
   doc.setTextColor(0)
-  doc.text('Sessions', 14, 42)
+  doc.text(l.exportSessions, 14, 42)
 
   autoTable(doc, {
     startY: 46,
-    head: [['Date', 'Mix', 'Total (g)', 'Compat.', 'Rating']],
+    head: [[l.exportDate, l.exportMix, l.exportTotalG, l.exportCompat, l.exportRating]],
     body: sessions.map(session => {
       const mix = session.session_items?.map(i => `${i.flavor} (${i.percentage}%)`).join(' + ') || '-'
       return [
@@ -484,7 +526,7 @@ export async function exportSessionsPDF(sessions: SessionWithItems[]) {
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.text(
-      `Hookah Torus | Generated: ${new Date().toLocaleString('en-US')} | Page ${i} of ${pageCount}`,
+      `Hookah Torus | ${l.exportGenerated}: ${new Date().toLocaleString('en-US')} | ${l.exportPage(i, pageCount)}`,
       105,
       290,
       { align: 'center' }

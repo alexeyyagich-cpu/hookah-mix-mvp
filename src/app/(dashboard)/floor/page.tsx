@@ -20,6 +20,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { toast } from 'sonner'
 
 import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',
@@ -316,6 +317,7 @@ export default function FloorPage() {
   }, [profile?.venue_slug, tm])
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Header */}
       <div>
@@ -918,5 +920,6 @@ export default function FloorPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

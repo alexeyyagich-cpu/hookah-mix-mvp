@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useLoyalty } from '@/lib/hooks/useLoyalty'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -12,6 +13,7 @@ import { IconSearch, IconPlus, IconUsers, IconSettings, IconLock } from '@/compo
 import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { Guest, LoyaltyTier } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 type SortBy = 'name' | 'visits' | 'spent' | 'tier' | 'recent'
 
@@ -19,6 +21,7 @@ const TIER_ORDER: Record<LoyaltyTier, number> = { gold: 3, silver: 2, bronze: 1 
 
 export default function GuestsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { guests, loading, error, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
   const { settings: loyaltySettings, updateSettings, getBonusHistory } = useLoyalty()
   const { isFreeTier } = useSubscription()
@@ -69,13 +72,15 @@ export default function GuestsPage() {
       setNewName('')
       setNewPhone('')
       setShowAddForm(false)
+      toast.success(tc.saved)
     } catch {
-      // Error displayed by hook
+      toast.error(tc.errorSaving)
     }
   }
 
   if (isFreeTier) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.guestsTitle}</h1>
         <EmptyState
@@ -85,10 +90,12 @@ export default function GuestsPage() {
           action={{ label: tm.upgradePlan, href: '/pricing' }}
         />
       </div>
+      </ErrorBoundary>
     )
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -227,15 +234,26 @@ export default function GuestsPage() {
           bonusHistory={getBonusHistory(selectedGuest.id)}
           onClose={() => setSelectedGuest(null)}
           onUpdate={async (updates) => {
-            await updateGuest(selectedGuest.id, updates)
-            setSelectedGuest(prev => prev ? { ...prev, ...updates } : null)
+            try {
+              await updateGuest(selectedGuest.id, updates)
+              setSelectedGuest(prev => prev ? { ...prev, ...updates } : null)
+              toast.success(tc.saved)
+            } catch {
+              toast.error(tc.errorSaving)
+            }
           }}
           onDelete={async () => {
-            await deleteGuest(selectedGuest.id)
-            setSelectedGuest(null)
+            try {
+              await deleteGuest(selectedGuest.id)
+              setSelectedGuest(null)
+              toast.success(tc.deleted)
+            } catch {
+              toast.error(tc.errorDeleting)
+            }
           }}
         />
       )}
     </div>
+    </ErrorBoundary>
   )
 }

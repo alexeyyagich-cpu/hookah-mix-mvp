@@ -191,4 +191,5 @@ export const settings = {
   portalError: 'Не удалось открыть портал',
   portalOpenError: 'Ошибка при открытии портала подписки',
   qrDownloadError: 'Не удалось скачать QR-код',
+  invalidUrl: 'Введите корректный URL (https://...)',
 }

@@ -58,6 +58,7 @@ export function NewOrderModal({
   guests,
 }: NewOrderModalProps) {
   const t = useTranslation('manage')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'bar' | 'hookah'>(isBarActive ? 'bar' : 'hookah')
@@ -356,7 +357,7 @@ export function NewOrderModal({
           <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
-            aria-label="Close"
+            aria-label={tc.close}
           >
             <IconClose size={20} />
           </button>

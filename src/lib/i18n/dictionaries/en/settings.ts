@@ -181,4 +181,5 @@ export const settings: typeof SettingsType = {
   portalError: 'Could not open portal',
   portalOpenError: 'Error opening subscription portal',
   qrDownloadError: 'Failed to download QR code',
+  invalidUrl: 'Enter a valid URL (https://...)',
 } as const

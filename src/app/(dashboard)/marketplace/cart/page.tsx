@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { useCart } from '@/lib/hooks/useCart'
 import { useMarketplaceOrders } from '@/lib/hooks/useMarketplaceOrders'
 import { CartSummary } from '@/components/marketplace/CartSummary'
@@ -23,13 +24,20 @@ export default function CartPage() {
   const handleCheckout = async (notes?: string): Promise<boolean> => {
     if (!cart) return false
 
-    const order = await createOrder({ cart, notes })
-    if (order) {
-      clearCart()
-      router.push('/marketplace/orders')
-      return true
+    try {
+      const order = await createOrder({ cart, notes })
+      if (order) {
+        clearCart()
+        toast.success(tc.saved)
+        router.push('/marketplace/orders')
+        return true
+      }
+      toast.error(tc.errorSaving)
+      return false
+    } catch {
+      toast.error(tc.errorGeneric)
+      return false
     }
-    return false
   }
 
   if (!cart || cart.items.length === 0) {

@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
-import AnimatedSmokeBackground from '@/components/AnimatedSmokeBackground'
+const AnimatedSmokeBackground = dynamic(() => import('@/components/AnimatedSmokeBackground'), { ssr: false })
 import { useAuth } from '@/lib/AuthContext'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useGuests, type NewGuest } from '@/lib/hooks/useGuests'

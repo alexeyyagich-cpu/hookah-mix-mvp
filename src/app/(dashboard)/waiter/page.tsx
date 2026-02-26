@@ -16,6 +16,7 @@ import { IconWaiter, IconLock } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { BarRecipeWithIngredients, KdsOrderItem, KdsHookahData, StrengthPreference } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 import { TableSelector } from '@/components/waiter/TableSelector'
 import { MenuSection } from '@/components/waiter/MenuSection'
@@ -226,6 +227,7 @@ export default function WaiterPage() {
   // Pro guard
   if (isFreeTier) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.waiterProRequired}</h1>
         <EmptyState
@@ -235,12 +237,14 @@ export default function WaiterPage() {
           action={{ label: tm.upgradePlan, href: '/pricing' }}
         />
       </div>
+      </ErrorBoundary>
     )
   }
 
   const showTabs = isBarActive && isHookahActive
 
   return (
+    <ErrorBoundary>
     <div className="max-w-lg mx-auto pb-32">
       {/* Header */}
       <div className="mb-4">
@@ -260,7 +264,7 @@ export default function WaiterPage() {
           tables={tables}
           selectedId={selectedTableId}
           onSelect={setSelectedTableId}
-          tm={tm as unknown as Record<string, unknown>}
+          tm={tm}
         />
       </div>
 
@@ -312,7 +316,7 @@ export default function WaiterPage() {
             hookahDescription={hookahDescription}
             onSetHookahMode={setHookahMode}
             onSetHookahDescription={setHookahDescription}
-            tm={tm as unknown as Record<string, unknown>}
+            tm={tm}
           />
         </>
       )}
@@ -342,8 +346,9 @@ export default function WaiterPage() {
         tableName={selectedTable?.name || null}
         submitting={submitting}
         sent={sent}
-        tm={tm as unknown as Record<string, unknown>}
+        tm={tm}
       />
     </div>
+    </ErrorBoundary>
   )
 }

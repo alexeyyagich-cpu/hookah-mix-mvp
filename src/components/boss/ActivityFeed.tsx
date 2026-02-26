@@ -53,8 +53,8 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
     events.push({
       id: `s-${s.id}`,
       emoji: '🔥',
-      title: 'Hookah session',
-      subtitle: mixStr.length > 40 ? mixStr.slice(0, 40) + '...' : mixStr,
+      title: tm.bossActivityHookah,
+      subtitle: mixStr.length > 40 ? mixStr.slice(0, 40) + '…' : mixStr,
       timestamp: s.session_date,
     })
   }
@@ -75,7 +75,7 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
     events.push({
       id: `k-${o.id}`,
       emoji: '📋',
-      title: `KDS: ${o.table_name || 'Order'}`,
+      title: `${tm.bossActivityKds}: ${o.table_name || tm.bossActivityOrder}`,
       subtitle: o.status,
       timestamp: o.created_at,
     })
@@ -86,7 +86,7 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
     events.push({
       id: `r-${r.id}`,
       emoji: '⭐',
-      title: r.author_name || 'Guest',
+      title: r.author_name || tm.bossActivityGuest,
       subtitle: `${'★'.repeat(r.rating)}${r.text ? ` — ${r.text.slice(0, 30)}` : ''}`,
       timestamp: r.created_at,
     })
@@ -97,8 +97,8 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
     events.push({
       id: `t-${t.id}`,
       emoji: '💰',
-      title: 'Tip',
-      subtitle: `${formatCurrency(t.amount, locale)}${t.payer_name ? ` from ${t.payer_name}` : ''}`,
+      title: tm.bossActivityTip,
+      subtitle: `${formatCurrency(t.amount, locale)}${t.payer_name ? ` ${tm.bossActivityFrom(t.payer_name)}` : ''}`,
       timestamp: t.created_at,
     })
   }

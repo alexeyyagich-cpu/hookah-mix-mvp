@@ -8,10 +8,12 @@ import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
+import { toast } from 'sonner'
 import { IconBowl } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const BOWL_BACKGROUNDS = [
   '/images/bowl-bg-1.jpg',
@@ -59,22 +61,29 @@ export default function BowlsPage() {
     e.preventDefault()
     if (!name || !capacity) return
 
+    const parsed = parseFloat(capacity)
+    if (isNaN(parsed) || parsed < 1 || parsed > 500) {
+      setSubmitError(tc.errorSaving)
+      return
+    }
+
     setSaving(true)
     setSubmitError('')
     try {
       if (editingBowl) {
         await updateBowl(editingBowl.id, {
           name,
-          capacity_grams: parseFloat(capacity),
+          capacity_grams: parsed,
         })
       } else {
         await addBowl({
           name,
-          capacity_grams: parseFloat(capacity),
+          capacity_grams: parsed,
           is_default: bowls.length === 0,
         })
       }
       closeModal()
+      toast.success(tc.saved)
     } catch {
       setSubmitError(tc.errorSaving)
     } finally {
@@ -110,11 +119,17 @@ export default function BowlsPage() {
   }
 
   const confirmDelete = async () => {
-    if (confirmDeleteId) await deleteBowl(confirmDeleteId)
-    setConfirmDeleteId(null)
+    try {
+      if (confirmDeleteId) await deleteBowl(confirmDeleteId)
+      setConfirmDeleteId(null)
+      toast.success(tc.deleted)
+    } catch {
+      toast.error(tc.errorDeleting)
+    }
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6 relative">
       {/* Background Image via Portal */}
       {bgContainer && createPortal(
@@ -325,5 +340,6 @@ export default function BowlsPage() {
         onCancel={() => setConfirmDeleteId(null)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

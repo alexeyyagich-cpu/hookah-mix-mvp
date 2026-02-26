@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
+import { toast } from 'sonner'
 import { useKDS } from '@/lib/hooks/useKDS'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
@@ -22,6 +23,7 @@ type MobileColumn = 'new' | 'preparing' | 'ready'
 
 export default function KdsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { orders, loading, error, createOrder, updateStatus, cancelOrder } = useKDS()
   const { tables } = useFloorPlan()
   const { recipes } = useBarRecipes()
@@ -56,11 +58,21 @@ export default function KdsPage() {
   const readyOrders = useMemo(() => filteredOrders.filter(o => o.status === 'ready'), [filteredOrders])
 
   const handleAction = async (orderId: string, newStatus: KdsOrderStatus) => {
-    await updateStatus(orderId, newStatus)
+    try {
+      await updateStatus(orderId, newStatus)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
+    }
   }
 
   const handleCancel = async (orderId: string) => {
-    await cancelOrder(orderId)
+    try {
+      await cancelOrder(orderId)
+      toast.success(tc.deleted)
+    } catch {
+      toast.error(tc.errorDeleting)
+    }
   }
 
   const activeCount = orders.length

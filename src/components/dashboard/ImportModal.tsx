@@ -16,6 +16,7 @@ interface ImportModalProps {
 
 export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -114,7 +115,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
             <IconExport size={20} />
             {t.importTitle}
           </h2>
-          <button type="button" onClick={handleClose} className="btn btn-ghost p-2" aria-label="Close"><IconClose size={18} /></button>
+          <button type="button" onClick={handleClose} className="btn btn-ghost p-2" aria-label={tc.close}><IconClose size={18} /></button>
         </div>
 
         <div className="p-4 space-y-4">

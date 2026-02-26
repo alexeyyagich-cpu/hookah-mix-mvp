@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -17,12 +18,15 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   danger = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const tc = useTranslation('common')
+  const resolvedConfirmLabel = confirmLabel ?? tc.confirm
+  const resolvedCancelLabel = cancelLabel ?? tc.cancel
   const confirmRef = useRef<HTMLButtonElement>(null)
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
@@ -75,7 +79,7 @@ export function ConfirmDialog({
             onClick={handleClose}
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-[var(--color-bgHover)] hover:opacity-80 transition-opacity"
           >
-            {cancelLabel}
+            {resolvedCancelLabel}
           </button>
           <button type="button"
             ref={confirmRef}
@@ -86,7 +90,7 @@ export function ConfirmDialog({
                 : 'bg-[var(--color-primary)] text-[var(--color-bg)]'
             }`}
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </button>
         </div>
       </div>

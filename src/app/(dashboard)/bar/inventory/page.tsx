@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
@@ -37,8 +38,9 @@ export default function BarInventoryPage() {
         await addIngredient(item)
       }
       setEditingItem(null)
+      toast.success(tc.saved)
     } catch {
-      // Error displayed by hook
+      toast.error(tc.errorSaving)
     }
   }
 
@@ -50,14 +52,20 @@ export default function BarInventoryPage() {
   const handleDelete = async (id: string) => {
     try {
       await deleteIngredient(id)
+      toast.success(tc.deleted)
     } catch {
-      // Error displayed by hook
+      toast.error(tc.errorDeleting)
     }
   }
 
   const handleAdjust = async (id: string, amount: number) => {
-    const type = amount > 0 ? 'purchase' : 'adjustment'
-    await adjustQuantity(id, amount, type, amount > 0 ? t.receipt : t.adjustment)
+    try {
+      const type = amount > 0 ? 'purchase' : 'adjustment'
+      await adjustQuantity(id, amount, type, amount > 0 ? t.receipt : t.adjustment)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
+    }
   }
 
   // Stats

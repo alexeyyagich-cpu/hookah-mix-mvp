@@ -3,6 +3,7 @@
 import { IconPlus, IconMinus, IconClose } from '@/components/Icons'
 import type { BarRecipeWithIngredients } from '@/types/database'
 import type { Tobacco } from '@/data/tobaccos'
+import type { Dictionary } from '@/lib/i18n'
 
 interface BarItemEntry {
   recipe: BarRecipeWithIngredients
@@ -31,7 +32,7 @@ interface WaiterCartProps {
   tableName: string | null
   submitting: boolean
   sent: boolean
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 export function WaiterCart({

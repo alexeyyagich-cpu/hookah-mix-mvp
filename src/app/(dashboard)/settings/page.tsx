@@ -18,6 +18,7 @@ import { LOW_STOCK_THRESHOLD, TOAST_TIMEOUT } from '@/lib/constants'
 import { QRCodeCanvas } from 'qrcode.react'
 import LoungeProfileSettings from '@/components/settings/LoungeProfileSettings'
 import Link from 'next/link'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function SettingsPage() {
   const { user, profile, refreshProfile, signOut, isDemoMode } = useAuth()
@@ -226,6 +227,7 @@ export default function SettingsPage() {
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div>
@@ -1072,5 +1074,6 @@ export default function SettingsPage() {
         onCancel={() => setShowDeleteConfirm(false)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useTeam } from '@/lib/hooks/useTeam'
 import { useTips } from '@/lib/hooks/useTips'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -56,14 +57,20 @@ export default function TeamPage() {
     setInviting(true)
     setInviteError('')
 
-    const result = await inviteMember(inviteEmail.trim(), inviteRole)
+    try {
+      const result = await inviteMember(inviteEmail.trim(), inviteRole)
 
-    if (result.success) {
-      setInviteEmail('')
-      setInviteRole('hookah_master')
-      setShowInviteModal(false)
-    } else {
-      setInviteError(result.error || tm.inviteError)
+      if (result.success) {
+        toast.success(tc.saved)
+        setInviteEmail('')
+        setInviteRole('hookah_master')
+        setShowInviteModal(false)
+      } else {
+        toast.error(tc.errorSaving)
+        setInviteError(result.error || tm.inviteError)
+      }
+    } catch {
+      toast.error(tc.errorGeneric)
     }
 
     setInviting(false)
@@ -88,8 +95,13 @@ export default function TeamPage() {
   const executeConfirmAction = async () => {
     if (!confirmAction) return
     setActionLoading(confirmAction.id)
-    if (confirmAction.type === 'remove') await removeMember(confirmAction.id)
-    else await cancelInvitation(confirmAction.id)
+    try {
+      if (confirmAction.type === 'remove') await removeMember(confirmAction.id)
+      else await cancelInvitation(confirmAction.id)
+      toast.success(tc.deleted)
+    } catch {
+      toast.error(tc.errorDeleting)
+    }
     setActionLoading(null)
     setConfirmAction(null)
   }

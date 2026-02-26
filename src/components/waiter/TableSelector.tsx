@@ -1,12 +1,13 @@
 'use client'
 
 import type { FloorTable } from '@/types/database'
+import type { Dictionary } from '@/lib/i18n'
 
 interface TableSelectorProps {
   tables: FloorTable[]
   selectedId: string | null
   onSelect: (id: string) => void
-  tm: Record<string, unknown>
+  tm: Dictionary['manage']
 }
 
 const STATUS_DOT: Record<string, string> = {

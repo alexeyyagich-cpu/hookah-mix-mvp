@@ -13,6 +13,7 @@ interface LoyaltySettingsPanelProps {
 
 export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySettingsPanelProps) {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const [accrualPercent, setAccrualPercent] = useState(settings.bonus_accrual_percent.toString())
   const [maxRedemption, setMaxRedemption] = useState(settings.bonus_max_redemption_percent.toString())
   const [silverThreshold, setSilverThreshold] = useState(settings.tier_silver_threshold.toString())
@@ -46,7 +47,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
     <div className="card p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">{tm.loyaltySettings}</h3>
-        <button type="button" onClick={onClose} className="btn btn-ghost p-2" aria-label="Close">
+        <button type="button" onClick={onClose} className="btn btn-ghost p-2" aria-label={tc.close}>
           <IconClose size={18} />
         </button>
       </div>

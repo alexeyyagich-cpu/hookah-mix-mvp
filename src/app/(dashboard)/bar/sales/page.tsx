@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { toast } from 'sonner'
 import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -51,7 +52,12 @@ export default function BarSalesPage() {
   }
 
   const handleSell = async (recipe: Parameters<typeof recordSale>[0]) => {
-    await recordSale(recipe)
+    try {
+      await recordSale(recipe)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
+    }
   }
 
   // Recent sales for the log
@@ -402,6 +408,9 @@ export default function BarSalesPage() {
         onConfirm={async () => {
           try {
             if (deletingId) await deleteSale(deletingId)
+            toast.success(tc.deleted)
+          } catch {
+            toast.error(tc.errorDeleting)
           } finally {
             setDeletingId(null)
           }

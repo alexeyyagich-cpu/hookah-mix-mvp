@@ -28,6 +28,7 @@ import { QuickStatsRow } from '@/components/boss/QuickStatsRow'
 import { AlertsPanel } from '@/components/boss/AlertsPanel'
 import { FloorMiniMap } from '@/components/boss/FloorMiniMap'
 import { ActivityFeed } from '@/components/boss/ActivityFeed'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function BossPage() {
   const tm = useTranslation('manage')
@@ -100,15 +101,18 @@ export default function BossPage() {
 
   // Owner guard — wait for org data to load before checking
   if (orgLoading) return (
+    <ErrorBoundary>
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
     </div>
+    </ErrorBoundary>
   )
-  if (!isOwner) return <AccessDenied />
+  if (!isOwner) return <ErrorBoundary><AccessDenied /></ErrorBoundary>
 
   // Pro guard
   if (isFreeTier) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.bossProRequired}</h1>
         <EmptyState
@@ -118,12 +122,14 @@ export default function BossPage() {
           action={{ label: tm.upgradePlan, href: '/pricing' }}
         />
       </div>
+      </ErrorBoundary>
     )
   }
 
   const lowStockThreshold = notifSettings?.low_stock_threshold ?? LOW_STOCK_THRESHOLD
 
   return (
+    <ErrorBoundary>
     <div className="space-y-4 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -218,5 +224,6 @@ export default function BossPage() {
         }
       </div>
     </div>
+    </ErrorBoundary>
   )
 }

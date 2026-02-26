@@ -14,6 +14,7 @@ interface CheckoutModalProps {
 
 export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModalProps) {
   const t = useTranslation('market')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
@@ -92,7 +93,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
               <button type="button"
                 onClick={handleClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
-                aria-label="Close"
+                aria-label={tc.close}
               >
                 <IconClose size={20} />
               </button>

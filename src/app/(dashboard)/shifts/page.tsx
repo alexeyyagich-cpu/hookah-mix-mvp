@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useShifts } from '@/lib/hooks/useShifts'
 import { useModules } from '@/lib/hooks/useModules'
 import { useTranslation, useLocale, formatCurrency, formatDate, formatTime } from '@/lib/i18n'
 import { IconTimer, IconPlus, IconClose, IconCoin, IconBowl, IconCocktail, IconMenuList } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import type { Shift, ShiftReconciliation } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 function formatDuration(ms: number, t: { hoursShort: string; minutesShort: string }): string {
   const hours = Math.floor(ms / 3600000)
@@ -17,6 +19,7 @@ function formatDuration(ms: number, t: { hoursShort: string; minutesShort: strin
 
 export default function ShiftsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const { shifts, activeShift, loading, error, openShift, closeShift, getReconciliation } = useShifts()
   const { isHookahActive, isBarActive } = useModules()
@@ -79,7 +82,10 @@ export default function ShiftsPage() {
         setShowOpenModal(false)
         setStartingCash('')
         setOpenNotes('')
+        toast.success(tc.saved)
       }
+    } catch {
+      toast.error(tc.errorSaving)
     } finally {
       setSubmitting(false)
     }
@@ -97,13 +103,17 @@ export default function ShiftsPage() {
         setShowCloseModal(false)
         setClosingCash('')
         setCloseNotes('')
+        toast.success(tc.saved)
       }
+    } catch {
+      toast.error(tc.errorSaving)
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -398,6 +408,7 @@ export default function ShiftsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }
 

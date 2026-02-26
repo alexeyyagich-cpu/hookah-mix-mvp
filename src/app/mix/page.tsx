@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useMemo, useState, useCallback, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { TOBACCOS, getBrandNames, type Category } from "@/data/tobaccos";
 import MixPieChart from "@/components/MixPieChart";
 import ProgressRing from "@/components/ProgressRing";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { SmokeCanvasBackground } from "@/components/SmokeCanvasBackground";
+const SmokeCanvasBackground = dynamic(() => import("@/components/SmokeCanvasBackground").then(m => m.SmokeCanvasBackground), { ssr: false });
 import TobaccoCard from "@/components/TobaccoCard";
-import MixesDrawer from "@/components/MixesDrawer";
+const MixesDrawer = dynamic(() => import("@/components/MixesDrawer"), { ssr: false });
 import SlotMachine from "@/components/SlotMachine";
 import {
   IconStrength,

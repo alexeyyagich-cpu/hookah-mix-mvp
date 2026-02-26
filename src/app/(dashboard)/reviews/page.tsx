@@ -1,15 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 type Filter = 'all' | 'published' | 'hidden'
 
 export default function ReviewsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const { reviews, loading, averageRating, totalCount, togglePublished, deleteReview } = useReviews()
   const [filter, setFilter] = useState<Filter>('all')
@@ -28,6 +31,9 @@ export default function ReviewsPage() {
     setDeletingId(id)
     try {
       await deleteReview(id)
+      toast.success(tc.deleted)
+    } catch {
+      toast.error(tc.errorDeleting)
     } finally {
       setDeletingId(null)
     }
@@ -35,6 +41,7 @@ export default function ReviewsPage() {
 
   if (loading) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <div className="h-8 w-48 bg-[var(--color-bgHover)] rounded animate-pulse" />
         <div className="grid gap-4">
@@ -43,10 +50,12 @@ export default function ReviewsPage() {
           ))}
         </div>
       </div>
+      </ErrorBoundary>
     )
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -137,7 +146,14 @@ export default function ReviewsPage() {
                     {/* Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <button type="button"
-                        onClick={() => togglePublished(review.id, !review.is_published)}
+                        onClick={async () => {
+                          try {
+                            await togglePublished(review.id, !review.is_published)
+                            toast.success(tc.saved)
+                          } catch {
+                            toast.error(tc.errorSaving)
+                          }
+                        }}
                         className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/20 text-[var(--color-textMuted)] hover:text-[var(--color-primary)]"
                       >
                         {review.is_published ? tm.actionHide : tm.actionPublish}
@@ -165,5 +181,6 @@ export default function ReviewsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

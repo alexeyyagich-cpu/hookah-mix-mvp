@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { usePromotions } from '@/lib/hooks/usePromotions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useTranslation } from '@/lib/i18n'
@@ -8,6 +9,7 @@ import { IconPlus, IconLock, IconPercent, IconEdit, IconTrash, IconClose } from 
 import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { Promotion, PromoType, PromoRules } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const PROMO_TYPES: PromoType[] = ['happy_hour', 'nth_free', 'birthday', 'custom_discount']
 
@@ -20,6 +22,7 @@ const PROMO_ICONS: Record<PromoType, string> = {
 
 export default function PromotionsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { promotions, loading, createPromo, updatePromo, deletePromo, toggleActive } = usePromotions()
   const { isFreeTier } = useSubscription()
 
@@ -37,6 +40,7 @@ export default function PromotionsPage() {
 
   if (isFreeTier) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.promosTitle}</h1>
         <EmptyState
@@ -46,6 +50,7 @@ export default function PromotionsPage() {
           action={{ label: tm.upgradePlan, href: '/pricing' }}
         />
       </div>
+      </ErrorBoundary>
     )
   }
 
@@ -93,7 +98,10 @@ export default function PromotionsPage() {
       } else {
         await createPromo({ name: name.trim(), type, rules, max_uses: maxUses ? parseInt(maxUses) : null })
       }
+      toast.success(tc.saved)
       resetForm()
+    } catch {
+      toast.error(tc.errorSaving)
     } finally {
       setSubmitting(false)
     }
@@ -102,6 +110,7 @@ export default function PromotionsPage() {
   const promoTypeLabel = (t: PromoType) => tm[`promoType_${t}` as keyof typeof tm] as string
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -123,7 +132,7 @@ export default function PromotionsPage() {
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold">{editingPromo ? tm.editPromo : tm.createPromo}</h3>
-            <button type="button" onClick={resetForm} className="btn btn-ghost p-2" aria-label="Close"><IconClose size={18} /></button>
+            <button type="button" onClick={resetForm} className="btn btn-ghost p-2" aria-label={tc.close}><IconClose size={18} /></button>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -292,7 +301,7 @@ export default function PromotionsPage() {
                 {confirmDeleteId === promo.id ? (
                   <div className="flex gap-1">
                     <button type="button"
-                      onClick={async () => { try { await deletePromo(promo.id) } finally { setConfirmDeleteId(null) } }}
+                      onClick={async () => { try { await deletePromo(promo.id); toast.success(tc.deleted) } catch { toast.error(tc.errorDeleting) } finally { setConfirmDeleteId(null) } }}
                       className="btn btn-ghost text-[var(--color-danger)] text-xs"
                     >
                       {tm.delete}
@@ -315,5 +324,6 @@ export default function PromotionsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

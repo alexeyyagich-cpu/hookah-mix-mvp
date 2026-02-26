@@ -181,4 +181,5 @@ export const settings: typeof SettingsType = {
   portalError: 'Portal konnte nicht geöffnet werden',
   portalOpenError: 'Fehler beim Öffnen des Abonnementportals',
   qrDownloadError: 'QR-Code konnte nicht heruntergeladen werden',
+  invalidUrl: 'Geben Sie eine gültige URL ein (https://...)',
 } as const

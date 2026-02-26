@@ -13,6 +13,7 @@ interface BarcodeScannerProps {
 
 export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScannerProps) {
   const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
   const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null)
@@ -110,7 +111,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
         <button type="button"
           onClick={handleClose}
           className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
-          aria-label="Close"
+          aria-label={tc.close}
         >
           <IconClose size={20} />
         </button>

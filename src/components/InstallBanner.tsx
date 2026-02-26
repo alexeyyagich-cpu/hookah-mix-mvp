@@ -44,7 +44,7 @@ export function InstallBanner() {
       <button type="button" onClick={handleInstall} className="btn btn-primary text-sm px-4 py-2 flex-shrink-0">
         {tc.install}
       </button>
-      <button type="button" onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] flex-shrink-0" aria-label="Close">
+      <button type="button" onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] flex-shrink-0" aria-label={tc.close}>
         <IconClose size={16} />
       </button>
     </div>

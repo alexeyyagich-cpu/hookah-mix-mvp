@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { toast } from 'sonner'
 import { useLoungeProfile } from '@/lib/hooks/useLoungeProfile'
 import { useTranslation } from '@/lib/i18n'
 import { TOAST_TIMEOUT } from '@/lib/constants'
@@ -103,6 +104,24 @@ export default function LoungeProfileSettings() {
 
   const handleSave = useCallback(async () => {
     if (!lounge) return
+
+    // Validate URL fields before saving
+    const urlFields = [
+      { value: website, name: 'website' },
+      { value: coverImageUrl, name: 'cover_image_url' },
+      { value: logoUrl, name: 'logo_url' },
+    ]
+    for (const { value } of urlFields) {
+      if (value) {
+        try {
+          new URL(value)
+        } catch {
+          toast.error(ts.invalidUrl)
+          return
+        }
+      }
+    }
+
     setSaving(true)
     setMessage('')
     try {
@@ -124,6 +143,7 @@ export default function LoungeProfileSettings() {
       messageTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } catch (err) {
       console.error('Failed to save lounge profile:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
     }

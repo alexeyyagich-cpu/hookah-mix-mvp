@@ -50,10 +50,15 @@ export const common = {
   pieces: 'шт',
   seconds: 'с',
 
+  // Feedback
+  saved: 'Сохранено!',
+  deleted: 'Удалено!',
+
   // Errors
   deleteWarning: 'Это действие нельзя отменить.',
   error: 'Ошибка',
   errorSaving: 'Ошибка сохранения',
+  errorDeleting: 'Ошибка удаления',
   errorLoading: 'Ошибка загрузки',
   errorGeneric: 'Что-то пошло не так',
 

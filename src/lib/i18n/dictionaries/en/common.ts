@@ -48,9 +48,13 @@ export const common: typeof CommonType = {
   pieces: 'pcs',
   seconds: 's',
 
+  saved: 'Saved!',
+  deleted: 'Deleted!',
+
   deleteWarning: 'This action cannot be undone.',
   error: 'Error',
   errorSaving: 'Error saving',
+  errorDeleting: 'Error deleting',
   errorLoading: 'Error loading',
   errorGeneric: 'Something went wrong',
 

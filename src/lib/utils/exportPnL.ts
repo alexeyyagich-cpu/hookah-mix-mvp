@@ -2,7 +2,26 @@
 
 import type { PnLData } from '@/lib/hooks/usePnL'
 import type { Locale } from '@/lib/i18n/types'
+import type { Dictionary } from '@/lib/i18n'
 import { formatCurrency } from '@/lib/i18n/format'
+
+type ExportLabels = Dictionary['manage']
+
+const DEFAULT_LABELS = {
+  pnlTitle: 'P&L REPORT', pnlTotal: 'TOTAL', pnlBar: 'BAR', pnlHookah: 'HOOKAH',
+  pnlByDay: 'BY DAY', pnlByCategory: 'EXPENSES BY CATEGORY', pnlTopItems: 'TOP ITEMS',
+  pnlGrossProfit: 'Gross Profit', pnlTobaccoCost: 'Tobacco cost',
+  pnlUsed: 'Used', pnlCostPerSession: 'Cost/session',
+  pnlBarCost: 'Bar cost', pnlTotalExpenses: 'Total expenses',
+  pnlCategory: 'Category', pnlModule: 'Module', pnlAmount: 'Amount', pnlShare: 'Share',
+  pnlName: 'Name', pnlItem: 'Item',
+  pnlRevenueBreakdown: 'Revenue Breakdown', pnlDailyTitle: 'Daily P&L',
+  pnlVsPrev: 'vs prev. period', pnlTopItemsLabel: 'Top items:',
+  exportRevenue: 'Revenue', exportCost: 'Cost', exportProfit: 'Profit',
+  exportExpenses: 'Expenses', exportMargin: 'Margin', exportSales: 'Sales',
+  exportPeriod: 'Period', exportDate: 'Date', exportMetric: 'Metric', exportValue: 'Value',
+  exportSessions: 'Sessions', exportGenerated: 'Generated',
+}
 
 function downloadFile(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
@@ -25,55 +44,56 @@ function formatPeriod(period: { start: Date; end: Date }): string {
 // CSV EXPORT
 // ========================================
 
-export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en') {
+export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en', labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const fc = (v: number) => formatCurrency(v, locale)
   const lines: string[] = []
 
-  lines.push('P&L REPORT')
-  lines.push(`Period,${formatPeriod(period)}`)
+  lines.push(l.pnlTitle)
+  lines.push(`${l.exportPeriod},${formatPeriod(period)}`)
   lines.push('')
 
-  lines.push('TOTAL')
-  lines.push(`Revenue,${fc(data.totalRevenue)}`)
-  lines.push(`Expenses,${fc(data.totalCost)}`)
-  lines.push(`Gross Profit,${fc(data.grossProfit)}`)
-  lines.push(`Margin,${data.marginPercent !== null ? data.marginPercent.toFixed(1) + '%' : '—'}`)
+  lines.push(l.pnlTotal)
+  lines.push(`${l.exportRevenue},${fc(data.totalRevenue)}`)
+  lines.push(`${l.exportExpenses},${fc(data.totalCost)}`)
+  lines.push(`${l.pnlGrossProfit},${fc(data.grossProfit)}`)
+  lines.push(`${l.exportMargin},${data.marginPercent !== null ? data.marginPercent.toFixed(1) + '%' : '—'}`)
   lines.push('')
 
   if (data.bar) {
-    lines.push('BAR')
-    lines.push(`Revenue,${fc(data.bar.revenue)}`)
-    lines.push(`Cost,${fc(data.bar.cost)}`)
-    lines.push(`Profit,${fc(data.bar.profit)}`)
-    lines.push(`Sales,${data.bar.salesCount}`)
+    lines.push(l.pnlBar)
+    lines.push(`${l.exportRevenue},${fc(data.bar.revenue)}`)
+    lines.push(`${l.exportCost},${fc(data.bar.cost)}`)
+    lines.push(`${l.exportProfit},${fc(data.bar.profit)}`)
+    lines.push(`${l.exportSales},${data.bar.salesCount}`)
     lines.push('')
   }
 
   if (data.hookah) {
-    lines.push('HOOKAH')
-    lines.push(`Tobacco cost,${fc(data.hookah.cost)}`)
-    lines.push(`Used,${data.hookah.gramsUsed.toFixed(0)}g`)
-    lines.push(`Sessions,${data.hookah.sessionsCount}`)
-    lines.push(`Cost/session,${fc(data.hookah.costPerSession)}`)
+    lines.push(l.pnlHookah)
+    lines.push(`${l.pnlTobaccoCost},${fc(data.hookah.cost)}`)
+    lines.push(`${l.pnlUsed},${data.hookah.gramsUsed.toFixed(0)}g`)
+    lines.push(`${l.exportSessions},${data.hookah.sessionsCount}`)
+    lines.push(`${l.pnlCostPerSession},${fc(data.hookah.costPerSession)}`)
     lines.push('')
   }
 
-  lines.push('BY DAY')
-  lines.push('Date,Revenue,Bar cost,Tobacco cost,Total expenses,Profit')
+  lines.push(l.pnlByDay)
+  lines.push(`${l.exportDate},${l.exportRevenue},${l.pnlBarCost},${l.pnlTobaccoCost},${l.pnlTotalExpenses},${l.exportProfit}`)
   for (const d of data.dailyPnL) {
     lines.push(`${d.date},${fc(d.barRevenue)},${fc(d.barCost)},${fc(d.hookahCost)},${fc(d.totalCost)},${fc(d.profit)}`)
   }
   lines.push('')
 
-  lines.push('EXPENSES BY CATEGORY')
-  lines.push('Category,Module,Amount,Share')
+  lines.push(l.pnlByCategory)
+  lines.push(`${l.pnlCategory},${l.pnlModule},${l.pnlAmount},${l.pnlShare}`)
   for (const c of data.costByCategory) {
     lines.push(`${c.category},${c.module},${fc(c.cost)},${c.percentage.toFixed(1)}%`)
   }
   lines.push('')
 
-  lines.push('TOP ITEMS')
-  lines.push('Name,Module,Revenue,Cost,Profit,Margin')
+  lines.push(l.pnlTopItems)
+  lines.push(`${l.pnlName},${l.pnlModule},${l.exportRevenue},${l.exportCost},${l.exportProfit},${l.exportMargin}`)
   for (const item of data.topItems.slice(0, 10)) {
     lines.push(`${item.name},${item.module},${fc(item.revenue)},${fc(item.cost)},${fc(item.profit)},${item.margin.toFixed(1)}%`)
   }
@@ -87,27 +107,28 @@ export function exportPnLCSV(data: PnLData, period: { start: Date; end: Date }, 
 // PDF EXPORT
 // ========================================
 
-export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en') {
+export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en', labels?: ExportLabels) {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const fc = (v: number) => formatCurrency(v, locale)
   const { default: jsPDF } = await import('jspdf')
   const { default: autoTable } = await import('jspdf-autotable')
   const doc = new jsPDF()
 
   doc.setFontSize(18)
-  doc.text('P&L Report', 14, 20)
+  doc.text(l.pnlTitle, 14, 20)
   doc.setFontSize(10)
-  doc.text(`Period: ${formatPeriod(period)}`, 14, 28)
+  doc.text(`${l.exportPeriod}: ${formatPeriod(period)}`, 14, 28)
   doc.text(`Hookah Torus — hookahtorus.com`, 14, 34)
 
   // Summary table
   autoTable(doc, {
     startY: 42,
-    head: [['Metric', 'Value']],
+    head: [[l.exportMetric, l.exportValue]],
     body: [
-      ['Revenue', fc(data.totalRevenue)],
-      ['Expenses', fc(data.totalCost)],
-      ['Gross Profit', fc(data.grossProfit)],
-      ['Margin', data.marginPercent !== null ? `${data.marginPercent.toFixed(1)}%` : '—'],
+      [l.exportRevenue, fc(data.totalRevenue)],
+      [l.exportExpenses, fc(data.totalCost)],
+      [l.pnlGrossProfit, fc(data.grossProfit)],
+      [l.exportMargin, data.marginPercent !== null ? `${data.marginPercent.toFixed(1)}%` : '—'],
     ],
     theme: 'grid',
     headStyles: { fillColor: [99, 102, 241] },
@@ -123,7 +144,7 @@ export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Da
 
   autoTable(doc, {
     startY: (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
-    head: [['Date', 'Revenue', 'Expenses', 'Profit']],
+    head: [[l.exportDate, l.exportRevenue, l.exportExpenses, l.exportProfit]],
     body: dailyBody,
     theme: 'striped',
     headStyles: { fillColor: [99, 102, 241] },
@@ -133,7 +154,7 @@ export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Da
   if (data.topItems.length > 0) {
     const topBody = data.topItems.slice(0, 8).map(i => [
       i.name,
-      i.module === 'bar' ? 'Bar' : 'Hookah',
+      i.module === 'bar' ? l.pnlBar : l.pnlHookah,
       fc(i.revenue),
       fc(i.cost),
       `${i.margin.toFixed(0)}%`,
@@ -141,7 +162,7 @@ export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Da
 
     autoTable(doc, {
       startY: (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
-      head: [['Item', 'Module', 'Revenue', 'Cost', 'Margin']],
+      head: [[l.pnlItem, l.pnlModule, l.exportRevenue, l.exportCost, l.exportMargin]],
       body: topBody,
       theme: 'striped',
       headStyles: { fillColor: [99, 102, 241] },
@@ -155,25 +176,26 @@ export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Da
 // COPY AS TEXT
 // ========================================
 
-export function copyPnLAsText(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en'): Promise<void> {
+export function copyPnLAsText(data: PnLData, period: { start: Date; end: Date }, locale: Locale = 'en', labels?: ExportLabels): Promise<void> {
+  const l = labels || DEFAULT_LABELS as ExportLabels
   const fc = (v: number) => formatCurrency(v, locale)
   const lines: string[] = []
 
-  lines.push(`P&L REPORT — ${formatPeriod(period)}`)
+  lines.push(`${l.pnlTitle} — ${formatPeriod(period)}`)
   lines.push('')
-  lines.push(`Revenue: ${fc(data.totalRevenue)}`)
-  lines.push(`Expenses: ${fc(data.totalCost)}`)
-  lines.push(`Profit: ${fc(data.grossProfit)}`)
-  if (data.marginPercent !== null) lines.push(`Margin: ${data.marginPercent.toFixed(1)}%`)
+  lines.push(`${l.exportRevenue}: ${fc(data.totalRevenue)}`)
+  lines.push(`${l.exportExpenses}: ${fc(data.totalCost)}`)
+  lines.push(`${l.exportProfit}: ${fc(data.grossProfit)}`)
+  if (data.marginPercent !== null) lines.push(`${l.exportMargin}: ${data.marginPercent.toFixed(1)}%`)
   lines.push('')
 
-  if (data.revenueChange !== null) lines.push(`Revenue: ${data.revenueChange >= 0 ? '+' : ''}${data.revenueChange.toFixed(0)}% vs prev. period`)
-  if (data.costChange !== null) lines.push(`Expenses: ${data.costChange >= 0 ? '+' : ''}${data.costChange.toFixed(0)}% vs prev. period`)
-  if (data.profitChange !== null) lines.push(`Profit: ${data.profitChange >= 0 ? '+' : ''}${data.profitChange.toFixed(0)}% vs prev. period`)
+  if (data.revenueChange !== null) lines.push(`${l.exportRevenue}: ${data.revenueChange >= 0 ? '+' : ''}${data.revenueChange.toFixed(0)}% ${l.pnlVsPrev}`)
+  if (data.costChange !== null) lines.push(`${l.exportExpenses}: ${data.costChange >= 0 ? '+' : ''}${data.costChange.toFixed(0)}% ${l.pnlVsPrev}`)
+  if (data.profitChange !== null) lines.push(`${l.exportProfit}: ${data.profitChange >= 0 ? '+' : ''}${data.profitChange.toFixed(0)}% ${l.pnlVsPrev}`)
   lines.push('')
 
   if (data.topItems.length > 0) {
-    lines.push('Top items:')
+    lines.push(l.pnlTopItemsLabel)
     for (const item of data.topItems.slice(0, 5)) {
       lines.push(`  ${item.name} — ${fc(item.revenue)} revenue, margin ${item.margin.toFixed(0)}%`)
     }

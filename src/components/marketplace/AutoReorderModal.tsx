@@ -27,6 +27,7 @@ export function AutoReorderModal({
   onSave,
 }: AutoReorderModalProps) {
   const t = useTranslation('market')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const [selectedProductId, setSelectedProductId] = useState('')
   const [threshold, setThreshold] = useState(50)
@@ -106,7 +107,7 @@ export function AutoReorderModal({
               <button type="button"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
-                aria-label="Close"
+                aria-label={tc.close}
               >
                 <IconClose size={20} />
               </button>

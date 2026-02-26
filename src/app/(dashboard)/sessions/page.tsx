@@ -11,7 +11,9 @@ import { exportSessionsCSV, exportSessionsPDF } from '@/lib/utils/exportReport'
 import type { SessionWithItems } from '@/types/database'
 import Link from 'next/link'
 import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
+import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function SessionsPage() {
   const t = useTranslation('hookah')
@@ -72,7 +74,12 @@ export default function SessionsPage() {
   }
 
   const handleRate = async (id: string, rating: number) => {
-    await updateSession(id, { rating })
+    try {
+      await updateSession(id, { rating })
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
+    }
   }
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
@@ -82,11 +89,17 @@ export default function SessionsPage() {
   }
 
   const confirmDelete = async () => {
-    if (confirmDeleteId) await deleteSession(confirmDeleteId)
-    setConfirmDeleteId(null)
+    try {
+      if (confirmDeleteId) await deleteSession(confirmDeleteId)
+      setConfirmDeleteId(null)
+      toast.success(tc.deleted)
+    } catch {
+      toast.error(tc.errorDeleting)
+    }
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6 relative">
       {/* Background Image via Portal */}
       {bgContainer && createPortal(
@@ -329,5 +342,6 @@ export default function SessionsPage() {
         onCancel={() => setConfirmDeleteId(null)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

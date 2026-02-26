@@ -13,6 +13,7 @@ import { ImportModal } from '@/components/dashboard/ImportModal'
 import { InvoiceScanModal } from '@/components/dashboard/InvoiceScanModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
 import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
+import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -91,12 +92,17 @@ export default function InventoryPage() {
   }
 
   const handleSave = async (tobacco: Omit<TobaccoInventory, 'id' | 'profile_id' | 'created_at' | 'updated_at'>) => {
-    if (editingItem) {
-      await updateTobacco(editingItem.id, tobacco)
-    } else {
-      await addTobacco(tobacco)
+    try {
+      if (editingItem) {
+        await updateTobacco(editingItem.id, tobacco)
+      } else {
+        await addTobacco(tobacco)
+      }
+      setEditingItem(null)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
     }
-    setEditingItem(null)
   }
 
   const handleEdit = (item: TobaccoInventory) => {
@@ -106,8 +112,13 @@ export default function InventoryPage() {
 
   const handleDelete = async (id: string) => {
     if (deleteConfirm === id) {
-      await deleteTobacco(id)
-      setDeleteConfirm(null)
+      try {
+        await deleteTobacco(id)
+        setDeleteConfirm(null)
+        toast.success(tc.deleted)
+      } catch {
+        toast.error(tc.errorDeleting)
+      }
     } else {
       setDeleteConfirm(id)
       clearTimeout(deleteTimerRef.current)
@@ -116,8 +127,13 @@ export default function InventoryPage() {
   }
 
   const handleAdjust = async (id: string, amount: number) => {
-    const type = amount > 0 ? 'purchase' : 'adjustment'
-    await adjustQuantity(id, amount, type, amount > 0 ? t.adjustPurchase : t.adjustCorrection)
+    try {
+      const type = amount > 0 ? 'purchase' : 'adjustment'
+      await adjustQuantity(id, amount, type, amount > 0 ? t.adjustPurchase : t.adjustCorrection)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
+    }
   }
 
 

@@ -22,6 +22,7 @@ interface GuestDetailModalProps {
 
 export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDelete }: GuestDetailModalProps) {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(guest.name)
@@ -80,7 +81,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
             <button type="button" onClick={() => setEditing(!editing)} className="btn btn-ghost p-2" aria-label="Edit">
               <IconEdit size={18} />
             </button>
-            <button type="button" onClick={onClose} className="btn btn-ghost p-2" aria-label="Close">
+            <button type="button" onClick={onClose} className="btn btn-ghost p-2" aria-label={tc.close}>
               <IconClose size={18} />
             </button>
           </div>
