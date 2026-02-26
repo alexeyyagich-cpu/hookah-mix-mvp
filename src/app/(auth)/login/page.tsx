@@ -1,22 +1,11 @@
-'use client'
+import type { Metadata } from 'next'
+import LoginPageClient from './LoginPageClient'
 
-import { Suspense } from 'react'
-import { LoginForm } from '@/components/auth/LoginForm'
-import { useTranslation } from '@/lib/i18n'
-
-function LoginFormWrapper() {
-  return <LoginForm />
-}
-
-function LoginFallback() {
-  const tc = useTranslation('common')
-  return <div className="text-[var(--color-textMuted)]">{tc.loading}</div>
+export const metadata: Metadata = {
+  title: 'Login — Hookah Torus',
+  description: 'Sign in to your Hookah Torus account to manage your lounge, inventory, and team.',
 }
 
 export default function LoginPage() {
-  return (
-    <Suspense fallback={<LoginFallback />}>
-      <LoginFormWrapper />
-    </Suspense>
-  )
+  return <LoginPageClient />
 }

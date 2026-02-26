@@ -88,9 +88,9 @@ function enrichStaffRows(rows: DashboardControlSnapshot['staff_comparison']): St
       ? Math.round(((r.avg_grams - mean) / mean) * 1000) / 10
       : 0
     let status: 'best' | 'worst' | 'normal' = 'normal'
-    if (r.sessions_count > 0 && activeRows.length > 1) {
+    if (r.sessions_count > 0 && activeRows.length > 1 && maxAvg !== minAvg) {
       if (r.avg_grams === minAvg) status = 'best'
-      if (r.avg_grams === maxAvg) status = 'worst'
+      else if (r.avg_grams === maxAvg) status = 'worst'
     }
     return { ...r, deviation_from_mean: deviation, status }
   })

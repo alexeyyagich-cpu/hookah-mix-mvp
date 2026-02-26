@@ -72,7 +72,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
 
       const data = await res.json()
 
-      if (data.url) {
+      if (data.url && typeof data.url === 'string' && data.url.startsWith('https://')) {
         window.location.href = data.url
       } else if (data.success) {
         setSuccess(true)

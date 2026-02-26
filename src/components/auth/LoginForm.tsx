@@ -16,7 +16,9 @@ export function LoginForm() {
   const t = useTranslation('auth')
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/dashboard'
+  const rawRedirect = searchParams.get('redirect') || '/dashboard'
+  // Prevent open redirect: only allow relative paths starting with /
+  const redirect = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/dashboard'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

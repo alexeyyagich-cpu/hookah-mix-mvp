@@ -155,7 +155,7 @@ function PricingPageContent() {
 
       const data = await response.json()
 
-      if (data.url) {
+      if (data.url && typeof data.url === 'string' && data.url.startsWith('https://')) {
         window.location.href = data.url
       } else {
         throw new Error(data.error || 'Failed to create checkout session')
