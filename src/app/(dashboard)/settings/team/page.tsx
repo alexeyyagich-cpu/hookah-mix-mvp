@@ -35,7 +35,11 @@ export default function TeamPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   // Only owners can access this page — wait for org data to load
-  if (orgLoading) return null
+  if (orgLoading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
+    </div>
+  )
   if (!isOwner) return <AccessDenied />
 
   const getRoleLabel = (role: OrgRole) => {
@@ -172,7 +176,7 @@ export default function TeamPage() {
             {members.map((member) => (
               <div key={member.id} className="p-4 flex items-start justify-between gap-2">
                 <div className="flex items-start gap-4 min-w-0 flex-1">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary)]/60 flex items-center justify-center text-white font-bold text-lg">
                     {(member.display_name || 'S')[0].toUpperCase()}
                   </div>
                   <div>

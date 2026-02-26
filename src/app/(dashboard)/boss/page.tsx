@@ -96,7 +96,11 @@ export default function BossPage() {
   }
 
   // Owner guard — wait for org data to load before checking
-  if (orgLoading) return null
+  if (orgLoading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
+    </div>
+  )
   if (!isOwner) return <AccessDenied />
 
   // Pro guard

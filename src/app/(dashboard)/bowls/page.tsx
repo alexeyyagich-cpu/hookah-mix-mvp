@@ -40,6 +40,7 @@ export default function BowlsPage() {
   const [name, setName] = useState('')
   const [capacity, setCapacity] = useState('')
   const [saving, setSaving] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   // Random background image selection
   const backgroundImage = useMemo(() => {
@@ -59,23 +60,30 @@ export default function BowlsPage() {
     if (!name || !capacity) return
 
     setSaving(true)
-    if (editingBowl) {
-      await updateBowl(editingBowl.id, {
-        name,
-        capacity_grams: parseFloat(capacity),
-      })
-    } else {
-      await addBowl({
-        name,
-        capacity_grams: parseFloat(capacity),
-        is_default: bowls.length === 0,
-      })
+    setSubmitError('')
+    try {
+      if (editingBowl) {
+        await updateBowl(editingBowl.id, {
+          name,
+          capacity_grams: parseFloat(capacity),
+        })
+      } else {
+        await addBowl({
+          name,
+          capacity_grams: parseFloat(capacity),
+          is_default: bowls.length === 0,
+        })
+      }
+      closeModal()
+    } catch {
+      setSubmitError(tc.errorSaving)
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    closeModal()
   }
 
   const openModal = (bowl?: BowlType) => {
+    setSubmitError('')
     if (bowl) {
       setEditingBowl(bowl)
       setName(bowl.name)
@@ -238,13 +246,14 @@ export default function BowlsPage() {
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
+          <div role="dialog" aria-modal="true" aria-labelledby="bowl-modal-title" className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
-              <h2 className="text-xl font-bold">
+              <h2 id="bowl-modal-title" className="text-xl font-bold">
                 {editingBowl ? t.editBowl : t.addBowl}
               </h2>
               <button type="button"
                 onClick={closeModal}
+                aria-label={tc.close}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
                 ✕
@@ -261,6 +270,7 @@ export default function BowlsPage() {
                   className="input"
                   placeholder={t.bowlNamePlaceholder}
                   required
+                  autoFocus
                 />
               </div>
 
@@ -279,6 +289,10 @@ export default function BowlsPage() {
                   required
                 />
               </div>
+
+              {submitError && (
+                <p className="text-sm text-[var(--color-danger)]">{submitError}</p>
+              )}
 
               <div className="flex items-center gap-3 pt-4">
                 <button
@@ -303,7 +317,7 @@ export default function BowlsPage() {
       <ConfirmDialog
         open={!!confirmDeleteId}
         title={t.deleteBowlConfirm}
-        message={t.deleteBowlConfirm}
+        message={tc.deleteWarning}
         confirmLabel={tc.delete}
         cancelLabel={tc.cancel}
         danger

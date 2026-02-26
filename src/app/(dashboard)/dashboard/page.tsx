@@ -54,10 +54,10 @@ export default function DashboardPage() {
       {profile?.onboarding_skipped && !profile.business_type && (
         <Link
           href="/settings"
-          className="block p-4 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 hover:border-amber-500 transition-colors"
+          className="block p-4 rounded-xl bg-gradient-to-r from-[var(--color-warning)]/20 to-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 hover:border-[var(--color-warning)] transition-colors"
         >
           <div className="flex items-center gap-3">
-            <IconSettings size={20} className="text-amber-500 shrink-0" />
+            <IconSettings size={20} className="text-[var(--color-warning)] shrink-0" />
             <div className="min-w-0">
               <div className="text-sm font-semibold">{th.setupBannerTitle}</div>
               <div className="text-xs text-[var(--color-textMuted)]">{th.setupBannerDesc}</div>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
 
       {/* Upgrade Banner */}
       {isFreeTier && (
-        <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30">
+        <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-primary)]/5 border-[var(--color-primary)]/30">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="flex-1">
               <h3 className="text-lg font-bold mb-2">{th.upgradeToPro}</h3>

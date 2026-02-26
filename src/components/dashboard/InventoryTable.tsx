@@ -87,6 +87,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder={t.searchPlaceholder}
+          aria-label={t.searchPlaceholder}
           className="w-full px-4 py-3 pl-10 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
         />
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-textMuted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">

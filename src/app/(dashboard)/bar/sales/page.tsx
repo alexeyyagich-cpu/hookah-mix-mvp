@@ -9,6 +9,7 @@ import { IconExport, IconLock, IconChart } from '@/components/Icons'
 import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
 import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 type Period = 7 | 14 | 30
 
@@ -19,9 +20,11 @@ export default function BarSalesPage() {
   const { recipes, calculateCost } = useBarRecipes()
   const { canExport } = useSubscription()
 
+  const tc = useTranslation('common')
   const [period, setPeriod] = useState<Period>(7)
   const [tab, setTab] = useState<'sell' | 'log' | 'analytics'>('sell')
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const exportMenuRef = useRef<HTMLDivElement>(null)
 
   const analytics = useMemo(() => getAnalytics(period), [getAnalytics, period])
@@ -239,8 +242,8 @@ export default function BarSalesPage() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <button type="button"
-                              onClick={() => deleteSale(sale.id)}
-                              className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
+                              onClick={() => setDeletingId(sale.id)}
+                              className="p-2 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors"
                               title={tb.deleteTitle}
                             >
                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -389,6 +392,19 @@ export default function BarSalesPage() {
           )}
         </>
       )}
+      <ConfirmDialog
+        open={!!deletingId}
+        title={tb.deleteTitle}
+        message={tb.deleteConfirmQ}
+        confirmLabel={tc.delete}
+        cancelLabel={tc.cancel}
+        danger
+        onConfirm={() => {
+          if (deletingId) deleteSale(deletingId)
+          setDeletingId(null)
+        }}
+        onCancel={() => setDeletingId(null)}
+      />
     </div>
   )
 }

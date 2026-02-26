@@ -155,7 +155,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <PageTitle />
       <main className={isOnboarding ? '' : 'lg:pl-72 relative'} style={{ zIndex: 1 }}>
         {!isOnboarding && <InstallBanner />}
-        <div className={isOnboarding ? '' : 'p-4 pt-16 pl-20 lg:p-8 lg:pt-8'}>
+        <div className={isOnboarding ? '' : 'p-4 pt-16 lg:p-8 lg:pt-8'}>
           {children}
         </div>
       </main>

@@ -47,6 +47,7 @@ export const common: typeof CommonType = {
   pieces: 'Stk',
   seconds: 's',
 
+  deleteWarning: 'Diese Aktion kann nicht rückgängig gemacht werden.',
   error: 'Fehler',
   errorSaving: 'Fehler beim Speichern',
   errorLoading: 'Fehler beim Laden',

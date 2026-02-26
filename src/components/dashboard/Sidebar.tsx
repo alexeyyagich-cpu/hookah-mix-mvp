@@ -277,6 +277,7 @@ export function Sidebar() {
               <button
                 type="button"
                 onClick={() => toggleGroup(group.label!)}
+                aria-expanded={!isCollapsed}
                 className="w-full flex items-center justify-between px-4 pt-2 pb-1 text-[10px] font-semibold text-[var(--color-textMuted)] uppercase tracking-widest hover:text-[var(--color-text)] transition-colors"
               >
                 {group.label}

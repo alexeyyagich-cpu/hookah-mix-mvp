@@ -50,6 +50,7 @@ export const common = {
   seconds: 'с',
 
   // Errors
+  deleteWarning: 'Это действие нельзя отменить.',
   error: 'Ошибка',
   errorSaving: 'Ошибка сохранения',
   errorLoading: 'Ошибка загрузки',

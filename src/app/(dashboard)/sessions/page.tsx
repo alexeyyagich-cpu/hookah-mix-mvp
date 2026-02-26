@@ -178,6 +178,7 @@ export default function SessionsPage() {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder={t.searchTobaccos}
+          aria-label={tc.search}
           className="w-full px-4 py-3 pl-10 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
         />
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-textMuted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -227,11 +228,12 @@ export default function SessionsPage() {
       {/* Session Detail Modal */}
       {selectedSession && (
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${closingModal ? 'animate-backdropFadeOut' : ''}`}>
-          <div className={`w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] ${closingModal ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
+          <div role="dialog" aria-modal="true" aria-labelledby="session-modal-title" className={`w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] ${closingModal ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
-              <h2 className="text-xl font-bold">{t.sessionDetails}</h2>
+              <h2 id="session-modal-title" className="text-xl font-bold">{t.sessionDetails}</h2>
               <button type="button"
                 onClick={closeModal}
+                aria-label={tc.close}
                 className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
               >
                 ✕
@@ -319,7 +321,7 @@ export default function SessionsPage() {
       <ConfirmDialog
         open={!!confirmDeleteId}
         title={t.deleteSessionConfirm}
-        message={t.deleteSessionConfirm}
+        message={tc.deleteWarning}
         confirmLabel={tc.delete}
         cancelLabel={tc.cancel}
         danger

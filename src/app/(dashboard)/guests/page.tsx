@@ -19,7 +19,7 @@ const TIER_ORDER: Record<LoyaltyTier, number> = { gold: 3, silver: 2, bronze: 1 
 
 export default function GuestsPage() {
   const tm = useTranslation('manage')
-  const { guests, loading, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
+  const { guests, loading, error, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
   const { settings: loyaltySettings, updateSettings, getBonusHistory } = useLoyalty()
   const { isFreeTier } = useSubscription()
 
@@ -185,6 +185,13 @@ export default function GuestsPage() {
           ))}
         </div>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
+          <p className="text-[var(--color-danger)] text-sm">{error}</p>
+        </div>
+      )}
 
       {/* Guest List */}
       {loading ? (

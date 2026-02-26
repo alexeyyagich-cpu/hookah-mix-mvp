@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { createPortal } from 'react-dom'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useStatisticsComparison } from '@/lib/hooks/useStatisticsComparison'
@@ -9,11 +10,24 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
 import { StatsCard } from '@/components/dashboard/StatsCard'
 import { ComparisonCard } from '@/components/dashboard/ComparisonCard'
-import { ConsumptionChart } from '@/components/dashboard/Charts/ConsumptionChart'
-import { PopularFlavorsChart } from '@/components/dashboard/Charts/PopularFlavorsChart'
-import { BrandPieChart } from '@/components/dashboard/Charts/BrandPieChart'
 import { exportStatisticsCSV, exportStatisticsPDF } from '@/lib/utils/exportReport'
-import { ABCAnalysisPanel } from '@/components/dashboard/ABCAnalysisPanel'
+
+const ConsumptionChart = dynamic(
+  () => import('@/components/dashboard/Charts/ConsumptionChart').then(m => m.ConsumptionChart),
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+)
+const PopularFlavorsChart = dynamic(
+  () => import('@/components/dashboard/Charts/PopularFlavorsChart').then(m => m.PopularFlavorsChart),
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+)
+const BrandPieChart = dynamic(
+  () => import('@/components/dashboard/Charts/BrandPieChart').then(m => m.BrandPieChart),
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+)
+const ABCAnalysisPanel = dynamic(
+  () => import('@/components/dashboard/ABCAnalysisPanel').then(m => m.ABCAnalysisPanel),
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+)
 import {
   IconSmoke,
   IconChart,

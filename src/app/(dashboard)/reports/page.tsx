@@ -27,7 +27,7 @@ export default function ReportsPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
-  const { data, loading, selectedPreset, setSelectedPreset, period } = usePnL()
+  const { data, loading, error, selectedPreset, setSelectedPreset, period } = usePnL()
   const { isHookahActive, isBarActive } = useModules()
   const { isFreeTier, canExport } = useSubscription()
 
@@ -154,6 +154,13 @@ export default function ReportsPage() {
 
       {copyMessage && (
         <div className="text-sm text-[var(--color-success)]">{copyMessage}</div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
+          <p className="text-[var(--color-danger)] text-sm">{error}</p>
+        </div>
       )}
 
       {/* Stats Grid */}
@@ -346,7 +353,7 @@ export default function ReportsPage() {
 
       {/* Pro banner */}
       {isFreeTier && (
-        <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-purple-500/10 border-[var(--color-primary)]/30">
+        <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-primary)]/5 border-[var(--color-primary)]/30">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="flex-1">
               <h3 className="text-lg font-bold mb-2">{tm.proReportsTitle}</h3>

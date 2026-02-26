@@ -82,6 +82,7 @@ export type PnLPreset = '7d' | '30d' | '90d'
 interface UsePnLReturn {
   data: PnLData
   loading: boolean
+  error: string | null
   selectedPreset: PnLPreset
   setSelectedPreset: (preset: PnLPreset) => void
   period: { start: Date; end: Date }
@@ -108,7 +109,7 @@ function dateKey(d: Date | string): string {
 export function usePnL(): UsePnLReturn {
   const { isDemoMode } = useAuth()
   const { isHookahActive, isBarActive } = useModules()
-  const { sales, loading: barLoading } = useBarSales()
+  const { sales, loading: barLoading, error: barError } = useBarSales()
   const { inventory: barInventory } = useBarInventory()
   const { sessions, loading: sessionsLoading } = useSessions()
   const { inventory: tobaccoInventory } = useInventory()
@@ -408,6 +409,7 @@ export function usePnL(): UsePnLReturn {
   return {
     data,
     loading,
+    error: barError || null,
     selectedPreset,
     setSelectedPreset,
     period: { start: periodStart, end: periodEnd },

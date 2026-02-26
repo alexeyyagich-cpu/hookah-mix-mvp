@@ -156,6 +156,7 @@ export default function BarRecipesPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={tb.searchRecipes}
+          aria-label={tb.searchRecipes}
           className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         />
         <select
@@ -225,7 +226,7 @@ export default function BarRecipesPage() {
             })}
           </div>
 
-          {/* Cost Calculator Sidebar */}
+          {/* Cost Calculator Sidebar — desktop */}
           {selectedCost && (
             <div className="hidden lg:block w-80 flex-shrink-0">
               <div className="sticky top-6">
@@ -233,6 +234,25 @@ export default function BarRecipesPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Cost Calculator — mobile bottom sheet */}
+      {selectedCost && (
+        <div className="lg:hidden fixed inset-x-0 bottom-0 z-30 bg-[var(--color-bgCard)] border-t border-[var(--color-border)] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] rounded-t-2xl max-h-[60vh] overflow-y-auto animate-fadeInUp">
+          <div className="flex items-center justify-between p-3 border-b border-[var(--color-border)]">
+            <span className="text-sm font-semibold">{selectedRecipeObj?.name}</span>
+            <button
+              type="button"
+              onClick={() => setSelectedRecipe(null)}
+              className="p-1.5 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)]"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <div className="p-3">
+            <CostCalculator cost={selectedCost} />
+          </div>
         </div>
       )}
 
