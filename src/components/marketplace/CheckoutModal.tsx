@@ -50,14 +50,18 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
 
   const handleConfirm = async () => {
     setLoading(true)
-    const result = await onConfirm(notes || undefined)
-    setLoading(false)
-
-    if (result) {
-      setSuccess(true)
-      setTimeout(() => {
-        handleClose()
-      }, 2000)
+    try {
+      const result = await onConfirm(notes || undefined)
+      if (result) {
+        setSuccess(true)
+        setTimeout(() => {
+          handleClose()
+        }, 2000)
+      }
+    } catch {
+      // Error handled by parent hook
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -71,6 +75,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
       {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 ${isClosing ? 'animate-backdropFadeOut' : ''}`}
+        aria-hidden="true"
         onClick={() => !loading && handleClose()}
       />
 

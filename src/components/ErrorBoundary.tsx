@@ -1,6 +1,15 @@
 'use client'
 
 import React from 'react'
+import { dictionaries } from '@/lib/i18n/dictionaries'
+import type { Locale } from '@/lib/i18n/types'
+import { DEFAULT_LOCALE, LOCALES } from '@/lib/i18n/types'
+
+function getLocale(): Locale {
+  if (typeof localStorage === 'undefined') return DEFAULT_LOCALE
+  const saved = localStorage.getItem('hookah-locale') as Locale | null
+  return saved && LOCALES.includes(saved) ? saved : DEFAULT_LOCALE
+}
 
 interface Props {
   children: React.ReactNode
@@ -30,16 +39,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback
+      const tc = dictionaries[getLocale()].common
       return (
         <div className="card p-6 text-center">
           <div className="text-[var(--color-textMuted)] mb-2">
-            {this.props.sectionName ? `${this.props.sectionName} — ` : ''}Something went wrong
+            {this.props.sectionName ? `${this.props.sectionName} — ` : ''}{tc.errorGeneric}
           </div>
           <button type="button"
             className="text-sm text-[var(--color-primary)] hover:underline"
             onClick={() => this.setState({ hasError: false, error: null })}
           >
-            Try again
+            {tc.retry}
           </button>
         </div>
       )

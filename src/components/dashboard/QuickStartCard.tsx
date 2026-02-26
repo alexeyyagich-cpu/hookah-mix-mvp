@@ -29,6 +29,7 @@ const STORAGE_KEY = 'quickstart_dismissed'
 export function QuickStartCard() {
   const { profile, isDemoMode } = useAuth()
   const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   const [dismissed, setDismissed] = useState(true) // start hidden, show after check
@@ -44,6 +45,8 @@ export function QuickStartCard() {
   // Lightweight Supabase count queries
   useEffect(() => {
     if (!profile?.id || !supabase || isDemoMode) return
+
+    let cancelled = false
 
     Promise.all([
       supabase
@@ -85,6 +88,7 @@ export function QuickStartCard() {
           return { count: 1, error: null }
         }),
     ]).then(([inv, sess, team]) => {
+      if (cancelled) return
       setInventoryCount(inv.count ?? 0)
       setSessionsCount(sess.count ?? 0)
       // team might be a plain object or a Supabase response
@@ -93,7 +97,11 @@ export function QuickStartCard() {
       } else {
         setTeamCount(1)
       }
+    }).catch(() => {
+      // Counts are non-critical — fail silently
     })
+
+    return () => { cancelled = true }
   }, [profile?.id, supabase, isDemoMode])
 
   const handleDismiss = () => {
@@ -191,7 +199,7 @@ export function QuickStartCard() {
                 {step.title}
                 {step.optional && (
                   <span className="ml-1.5 text-xs font-normal text-[var(--color-textMuted)]">
-                    (optional)
+                    ({tc.optional})
                   </span>
                 )}
               </div>

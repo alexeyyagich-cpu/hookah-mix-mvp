@@ -14,6 +14,7 @@ export const common: typeof CommonType = {
   back: 'Zurück',
   next: 'Weiter',
   retry: 'Erneut versuchen',
+  optional: 'optional',
   copy: 'Kopieren',
   download: 'Herunterladen',
   export: 'Exportieren',

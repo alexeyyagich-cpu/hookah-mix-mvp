@@ -51,6 +51,8 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       } else {
         setCashShortageAlert(null)
       }
+    }).catch(() => {
+      // Non-critical — skip cash shortage alert on error
     })
     return () => { cancelled = true }
   }, [shifts, getReconciliation, tm])

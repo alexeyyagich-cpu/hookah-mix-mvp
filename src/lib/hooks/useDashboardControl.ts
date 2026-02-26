@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { translateError } from '@/lib/utils/translateError'
 import type {
   DashboardControlSnapshot,
   StaffRowEnriched,
@@ -140,8 +141,7 @@ export function useDashboardControl(): UseDashboardControlReturn {
       if (rpcError) throw rpcError
       setData(result as unknown as DashboardControlSnapshot)
     } catch (err) {
-      console.error('Dashboard control error:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard')
+      setError(translateError(err as Error))
     }
 
     setLoading(false)
