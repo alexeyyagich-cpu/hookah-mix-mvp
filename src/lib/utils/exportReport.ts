@@ -362,7 +362,7 @@ export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStock
 // BAR SALES EXPORTS
 // ========================================
 
-export function exportBarSalesCSV(sales: BarSale[], locale: Locale = 'en', labels?: ExportLabels) {
+export function exportBarSalesCSV(sales: BarSale[], _locale: Locale = 'en', labels?: ExportLabels) {
   const l = labels || DEFAULT_LABELS as ExportLabels
   const headers = [l.exportDateTime, l.exportCocktail, l.exportQty, l.exportRevenue, l.exportCost, l.exportMargin]
   const rows = sales.map(sale => [
