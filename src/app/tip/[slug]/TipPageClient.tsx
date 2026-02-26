@@ -180,6 +180,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
                 max="500"
                 step="1"
                 autoFocus
+                aria-label={t.customAmount}
                 className="w-full px-4 py-3 rounded-xl bg-gray-700 border border-gray-600 text-white text-lg font-bold focus:border-amber-400 focus:outline-none"
               />
             )}
@@ -193,6 +194,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
             value={payerName}
             onChange={(e) => setPayerName(e.target.value)}
             placeholder={t.namePlaceholder}
+            aria-label={t.namePlaceholder}
             className="w-full px-4 py-2.5 rounded-xl bg-gray-700 border border-gray-600 text-white text-sm focus:border-amber-400 focus:outline-none placeholder-gray-500"
           />
           <input
@@ -200,6 +202,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder={t.messagePlaceholder}
+            aria-label={t.messagePlaceholder}
             className="w-full px-4 py-2.5 rounded-xl bg-gray-700 border border-gray-600 text-white text-sm focus:border-amber-400 focus:outline-none placeholder-gray-500"
           />
         </div>

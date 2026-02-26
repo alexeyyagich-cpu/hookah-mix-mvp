@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
@@ -55,6 +55,7 @@ export function useOnboarding(): UseOnboardingReturn {
   const [loading, setLoading] = useState(true)
   const { user, profile, refreshProfile, isDemoMode } = useAuth()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+  const pendingRef = useRef(false)
 
   // Load onboarding state from profile metadata
   useEffect(() => {
@@ -174,59 +175,73 @@ export function useOnboarding(): UseOnboardingReturn {
   }, [saveState])
 
   const skipOnboarding = useCallback(async () => {
-    setState(prev => ({
-      ...prev,
-      isComplete: true,
-      skipped: true,
-    }))
-    await saveState({
-      onboarding_completed: true,
-      onboarding_skipped: true,
-    })
+    if (pendingRef.current) return
+    pendingRef.current = true
 
-    // Still create org even when skipping, so multi-tenant features work
-    if (supabase && user && !isDemoMode) {
-      try {
-        const { error: rpcErr } = await supabase.rpc('setup_organization', {
-          p_name: profile?.business_name || 'My Lounge',
-          p_type: state.businessType || 'hookah_bar',
-          p_slug: profile?.venue_slug || null,
-        })
-        if (rpcErr) console.error('setup_organization:', rpcErr)
-      } catch (e) {
-        console.error('setup_organization failed:', e)
+    try {
+      setState(prev => ({
+        ...prev,
+        isComplete: true,
+        skipped: true,
+      }))
+      await saveState({
+        onboarding_completed: true,
+        onboarding_skipped: true,
+      })
+
+      // Still create org even when skipping, so multi-tenant features work
+      if (supabase && user && !isDemoMode) {
+        try {
+          const { error: rpcErr } = await supabase.rpc('setup_organization', {
+            p_name: profile?.business_name || 'My Lounge',
+            p_type: state.businessType || 'hookah_bar',
+            p_slug: profile?.venue_slug || null,
+          })
+          if (rpcErr) console.error('setup_organization:', rpcErr)
+        } catch (e) {
+          console.error('setup_organization failed:', e)
+        }
       }
-    }
 
-    await refreshProfile()
+      await refreshProfile()
+    } finally {
+      pendingRef.current = false
+    }
   }, [saveState, refreshProfile, supabase, user, isDemoMode, profile, state.businessType])
 
   const finishOnboarding = useCallback(async () => {
-    setState(prev => ({
-      ...prev,
-      currentStep: 'complete',
-      isComplete: true,
-    }))
-    await saveState({
-      onboarding_step: 'complete',
-      onboarding_completed: true,
-    })
+    if (pendingRef.current) return
+    pendingRef.current = true
 
-    // Auto-create org + location + lounge via idempotent RPC
-    if (supabase && user && !isDemoMode) {
-      try {
-        const { error: rpcErr } = await supabase.rpc('setup_organization', {
-          p_name: profile?.business_name || 'My Lounge',
-          p_type: state.businessType || 'hookah_bar',
-          p_slug: profile?.venue_slug || null,
-        })
-        if (rpcErr) console.error('setup_organization:', rpcErr)
-      } catch (e) {
-        console.error('setup_organization failed:', e)
+    try {
+      setState(prev => ({
+        ...prev,
+        currentStep: 'complete',
+        isComplete: true,
+      }))
+      await saveState({
+        onboarding_step: 'complete',
+        onboarding_completed: true,
+      })
+
+      // Auto-create org + location + lounge via idempotent RPC
+      if (supabase && user && !isDemoMode) {
+        try {
+          const { error: rpcErr } = await supabase.rpc('setup_organization', {
+            p_name: profile?.business_name || 'My Lounge',
+            p_type: state.businessType || 'hookah_bar',
+            p_slug: profile?.venue_slug || null,
+          })
+          if (rpcErr) console.error('setup_organization:', rpcErr)
+        } catch (e) {
+          console.error('setup_organization failed:', e)
+        }
       }
-    }
 
-    await refreshProfile()
+      await refreshProfile()
+    } finally {
+      pendingRef.current = false
+    }
   }, [saveState, refreshProfile, supabase, user, isDemoMode, profile, state.businessType])
 
   // Should show onboarding if not completed and not skipped

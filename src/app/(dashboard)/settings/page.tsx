@@ -65,7 +65,11 @@ export default function SettingsPage() {
   const handleLocaleChange = useCallback(async (newLocale: Locale) => {
     setLocale(newLocale)
     if (user && !isDemoMode) {
-      await supabase.from('profiles').update({ locale: newLocale }).eq('id', user.id)
+      try {
+        await supabase.from('profiles').update({ locale: newLocale }).eq('id', user.id)
+      } catch {
+        // Best-effort locale persist
+      }
     }
   }, [user, isDemoMode, supabase, setLocale])
 
@@ -83,19 +87,22 @@ export default function SettingsPage() {
       return
     }
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ venue_slug: slug })
-      .eq('id', user.id)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ venue_slug: slug })
+        .eq('id', user.id)
 
-    if (error) {
-      setSlugMessage(error.message.includes('unique') ? ts.slugTaken : tc.error + ': ' + error.message)
-    } else {
-      setSlugMessage(ts.slugSaved)
-      await refreshProfile()
+      if (error) {
+        setSlugMessage(error.message.includes('unique') ? ts.slugTaken : tc.error + ': ' + error.message)
+      } else {
+        setSlugMessage(ts.slugSaved)
+        await refreshProfile()
+      }
+      setTimeout(() => setSlugMessage(''), TOAST_TIMEOUT)
+    } finally {
+      setSlugSaving(false)
     }
-    setSlugSaving(false)
-    setTimeout(() => setSlugMessage(''), TOAST_TIMEOUT)
   }, [user, venueSlug, supabase, refreshProfile, ts, tc])
 
   const handleCopyUrl = useCallback(() => {
@@ -121,25 +128,27 @@ export default function SettingsPage() {
     setSaving(true)
     setMessage('')
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        business_name: businessName || null,
-        owner_name: ownerName || null,
-        phone: phone || null,
-        address: address || null,
-      })
-      .eq('id', user.id)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          business_name: businessName || null,
+          owner_name: ownerName || null,
+          phone: phone || null,
+          address: address || null,
+        })
+        .eq('id', user.id)
 
-    if (error) {
-      setMessage(tc.errorSaving + ': ' + error.message)
-    } else {
-      setMessage(ts.saved)
-      await refreshProfile()
+      if (error) {
+        setMessage(tc.errorSaving + ': ' + error.message)
+      } else {
+        setMessage(ts.saved)
+        await refreshProfile()
+      }
+      setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+    } finally {
+      setSaving(false)
     }
-
-    setSaving(false)
-    setTimeout(() => setMessage(''), TOAST_TIMEOUT)
   }
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
