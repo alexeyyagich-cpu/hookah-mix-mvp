@@ -47,13 +47,18 @@ export function useTelegram(): UseTelegramReturn {
   // Fetch connect link from server (token generation needs server-side secrets)
   useEffect(() => {
     if (!user || isDemoMode) return
-    fetch('/api/telegram/connect-link')
+    const controller = new AbortController()
+    fetch('/api/telegram/connect-link', { signal: controller.signal })
       .then(r => r.json())
       .then(data => {
         setIsConfigured(data.configured)
         setConnectLink(data.link || '')
       })
-      .catch((err) => console.error('Telegram hook error:', err))
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return
+        console.error('Telegram hook error:', err)
+      })
+    return () => controller.abort()
   }, [user, isDemoMode])
 
   // Return demo data if in demo mode

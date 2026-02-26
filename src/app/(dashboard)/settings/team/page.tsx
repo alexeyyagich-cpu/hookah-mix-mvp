@@ -207,7 +207,7 @@ export default function TeamPage() {
                           step="0.5"
                           className="w-16 px-1.5 py-0.5 rounded text-xs bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                           onBlur={(e) => {
-                            const val = parseFloat(e.target.value) || 0
+                            const val = Math.max(0, parseFloat(e.target.value) || 0)
                             if (val !== member.hourly_rate) {
                               updateMemberPayroll(member.id, val, member.sales_commission_percent)
                             }
@@ -226,7 +226,7 @@ export default function TeamPage() {
                           step="0.5"
                           className="w-14 px-1.5 py-0.5 rounded text-xs bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                           onBlur={(e) => {
-                            const val = parseFloat(e.target.value) || 0
+                            const val = Math.min(100, Math.max(0, parseFloat(e.target.value) || 0))
                             if (val !== member.sales_commission_percent) {
                               updateMemberPayroll(member.id, member.hourly_rate, val)
                             }

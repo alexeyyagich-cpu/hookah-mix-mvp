@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import type { SupplierProduct, Supplier } from '@/types/database'
 import { IconPlus, IconMinus, IconCart } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
@@ -13,7 +13,7 @@ interface ProductCardProps {
   canAdd: boolean
 }
 
-export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canAdd }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, supplier, onAddToCart, cartQuantity, canAdd }: ProductCardProps) {
   const t = useTranslation('market')
   const { locale } = useLocale()
   const [quantity, setQuantity] = useState(1)
@@ -104,4 +104,4 @@ export function ProductCard({ product, supplier, onAddToCart, cartQuantity, canA
       )}
     </div>
   )
-}
+})

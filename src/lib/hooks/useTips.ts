@@ -102,21 +102,30 @@ export function useTips(): UseTipsReturn {
       return
     }
 
-    const fetch = async () => {
-      const [{ data: profiles }, { data: tipsData }] = await Promise.all([
-        supabase.from('staff_profiles').select('id, profile_id, org_member_id, display_name, photo_url, tip_slug, is_tip_enabled, created_at, updated_at').eq('profile_id', user.id),
-        supabase.from('tips').select('id, staff_profile_id, amount, currency, stripe_payment_intent_id, status, payer_name, message, created_at').in(
-          'staff_profile_id',
-          (await supabase.from('staff_profiles').select('id').eq('profile_id', user.id)).data?.map(p => p.id) || []
-        ).order('created_at', { ascending: false }).limit(100),
-      ])
+    const fetchData = async () => {
+      // Fetch staff profiles first, then use their IDs for tips query
+      const { data: profiles } = await supabase
+        .from('staff_profiles')
+        .select('id, profile_id, org_member_id, display_name, photo_url, tip_slug, is_tip_enabled, created_at, updated_at')
+        .eq('profile_id', user.id)
 
-      if (profiles) setStaffProfiles(profiles)
-      if (tipsData) setTips(tipsData)
+      if (profiles) {
+        setStaffProfiles(profiles)
+        const ids = profiles.map(p => p.id)
+        if (ids.length > 0) {
+          const { data: tipsData } = await supabase
+            .from('tips')
+            .select('id, staff_profile_id, amount, currency, stripe_payment_intent_id, status, payer_name, message, created_at')
+            .in('staff_profile_id', ids)
+            .order('created_at', { ascending: false })
+            .limit(100)
+          if (tipsData) setTips(tipsData)
+        }
+      }
       setLoading(false)
     }
 
-    fetch()
+    fetchData()
   }, [user, isDemoMode, supabase])
 
   const createStaffProfile = useCallback(async (memberId: string, displayName: string): Promise<StaffProfile | null> => {
