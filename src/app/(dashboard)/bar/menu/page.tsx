@@ -221,7 +221,9 @@ export default function BarMenuPage() {
                               <div className="flex items-center justify-end gap-1">
                                 <input
                                   type="number"
+                                  inputMode="decimal"
                                   step="0.01"
+                                  min="0"
                                   value={priceValue}
                                   onChange={e => setPriceValue(e.target.value)}
                                   onKeyDown={e => {

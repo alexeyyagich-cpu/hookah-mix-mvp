@@ -191,6 +191,7 @@ export default function TeamPage() {
                         <label className="text-xs text-[var(--color-textMuted)]">{tm.hourlyRate}:</label>
                         <input
                           type="number"
+                          inputMode="decimal"
                           defaultValue={member.hourly_rate}
                           min="0"
                           step="0.5"
@@ -208,6 +209,7 @@ export default function TeamPage() {
                         <label className="text-xs text-[var(--color-textMuted)]">{tm.salesCommission}:</label>
                         <input
                           type="number"
+                          inputMode="decimal"
                           defaultValue={member.sales_commission_percent}
                           min="0"
                           max="100"

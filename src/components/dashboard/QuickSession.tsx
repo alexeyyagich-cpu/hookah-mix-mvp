@@ -293,8 +293,9 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                   <button
                     type="button"
                     onClick={() => { setSelectedGuest(null); setUseBonus(false); setBonusAmount('') }}
-                    className="p-1 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors text-[var(--color-textMuted)]"
+                    className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors text-[var(--color-textMuted)] flex items-center justify-center"
                     title={t.loyaltyRemoveGuest}
+                    aria-label={t.loyaltyRemoveGuest}
                   >
                     <IconClose size={14} />
                   </button>

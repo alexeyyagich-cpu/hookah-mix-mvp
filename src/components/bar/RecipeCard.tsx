@@ -56,8 +56,9 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
         <div className="flex items-center gap-1 ml-2">
           <button type="button"
             onClick={onToggleFavorite}
-            className="p-1.5 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+            className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors flex items-center justify-center"
             title={recipe.is_favorite ? t.removeFavorite : t.addFavorite}
+            aria-label={recipe.is_favorite ? t.removeFavorite : t.addFavorite}
           >
             <span className="text-sm">{recipe.is_favorite ? '\u2764\uFE0F' : '\u{1F90D}'}</span>
           </button>

@@ -485,8 +485,9 @@ export default function FloorPage() {
                 <h2 className="text-xl font-bold">{activeSelectedTable.name}</h2>
                 <button type="button"
                   onClick={(e) => { e.stopPropagation(); handleDownloadQr(activeSelectedTable); }}
-                  className="p-1 rounded text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bgCard)]"
+                  className="min-w-[44px] min-h-[44px] p-2.5 rounded text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bgCard)] flex items-center justify-center"
                   title={tm.downloadTableQr}
+                  aria-label={tm.downloadTableQr}
                 >
                   QR
                 </button>
@@ -859,10 +860,12 @@ export default function FloorPage() {
                     />
                     <input
                       type="number"
+                      inputMode="numeric"
                       value={quickForm.guest_count}
                       onChange={(e) => setQuickForm(f => ({ ...f, guest_count: e.target.value }))}
                       min="1"
                       max="20"
+                      step="1"
                       placeholder={tm.guestCountLabel}
                       className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
                     />

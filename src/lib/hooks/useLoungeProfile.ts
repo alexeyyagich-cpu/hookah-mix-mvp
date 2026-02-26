@@ -127,18 +127,20 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
 
   // Fetch lounge profile from Supabase
   useEffect(() => {
+    let mounted = true
+
     if (isDemoMode) {
       setLounge(DEMO_LOUNGE)
       setMixes(DEMO_MIXES)
       setLoading(false)
-      return
+      return () => { mounted = false }
     }
 
     if (!user || !supabase) {
       setLounge(null)
       setMixes([])
       setLoading(false)
-      return
+      return () => { mounted = false }
     }
 
     const fetchLounge = async () => {
@@ -150,6 +152,8 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
           .eq('profile_id', user.id)
           .limit(1)
           .maybeSingle()
+
+        if (!mounted) return
 
         if (fetchErr) {
           setError(fetchErr.message)
@@ -183,6 +187,8 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
           .order('usage_count', { ascending: false })
           .limit(20)
 
+        if (!mounted) return
+
         if (savedMixes && data) {
           setMixes(savedMixes.map(m => ({
             id: m.id,
@@ -197,12 +203,14 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
           })))
         }
       } catch (e) {
+        if (!mounted) return
         setError(e instanceof Error ? e.message : 'Failed to load lounge profile')
       }
-      setLoading(false)
+      if (mounted) setLoading(false)
     }
 
     fetchLounge()
+    return () => { mounted = false }
   }, [user, isDemoMode, supabase])
 
   // Update lounge profile with optimistic update
@@ -364,6 +372,8 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    let mounted = true
+
     // Demo slug returns demo data
     if (slug === 'demo-lounge') {
       setLounge(DEMO_LOUNGE)
@@ -372,7 +382,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
       setTobaccoMenu(DEMO_TOBACCO_MENU)
       setTables(DEMO_TABLES)
       setLoading(false)
-      return
+      return () => { mounted = false }
     }
 
     // Fetch real venue from public API
@@ -382,6 +392,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
         return res.json()
       })
       .then(data => {
+        if (!mounted) return
         if (data.loungeProfile) {
           // Real lounge_profiles data from DB
           setLounge({
@@ -427,9 +438,12 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
         setLoading(false)
       })
       .catch(() => {
+        if (!mounted) return
         setError('Venue not found')
         setLoading(false)
       })
+
+    return () => { mounted = false }
   }, [slug])
 
   return { lounge, mixes, barRecipes, tobaccoMenu, tables, loading, error }

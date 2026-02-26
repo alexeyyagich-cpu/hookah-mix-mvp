@@ -31,6 +31,8 @@ export const hookah: typeof HookahType = {
   noResults: 'Keine Ergebnisse',
   editItem: 'Bearbeiten',
   deleteItem: 'Löschen',
+  confirmAction: 'Bestätigen',
+  cancelAction: 'Abbrechen',
   deleteConfirm: 'Diesen Artikel aus dem Inventar löschen?',
 
   addTobaccoTitle: 'Tabak hinzufügen',

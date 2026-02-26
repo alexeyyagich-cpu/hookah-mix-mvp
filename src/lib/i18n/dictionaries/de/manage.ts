@@ -132,6 +132,10 @@ export const manage: typeof ManageType = {
   sourceWalkIn: 'Laufkundschaft',
   cancelAction: 'Stornieren',
   deleteReservation: 'Reservierung löschen',
+  decreaseQuantity: 'Menge verringern',
+  increaseQuantity: 'Menge erhöhen',
+  removeItem: 'Entfernen',
+  removeTobacco: 'Tabak entfernen',
 
   // KDS extras
   filterAllOrders: 'Alle',

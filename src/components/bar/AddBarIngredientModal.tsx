@@ -292,6 +292,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     type="number"
                     inputMode="decimal"
                     step="any"
+                    min="0"
                     value={quantity}
                     onChange={e => setQuantity(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
@@ -305,6 +306,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     type="number"
                     inputMode="decimal"
                     step="any"
+                    min="0"
                     value={minQuantity}
                     onChange={e => setMinQuantity(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
@@ -320,6 +322,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     type="number"
                     inputMode="decimal"
                     step="0.01"
+                    min="0"
                     value={purchasePrice}
                     onChange={e => setPurchasePrice(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
@@ -333,6 +336,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
                     type="number"
                     inputMode="decimal"
                     step="any"
+                    min="0"
                     value={packageSize}
                     onChange={e => setPackageSize(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"

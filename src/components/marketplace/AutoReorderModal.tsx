@@ -170,6 +170,7 @@ export function AutoReorderModal({
                   </label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={threshold}
                     onChange={(e) => setThreshold(Math.max(0, parseInt(e.target.value) || 0))}
                     className="input w-full"
@@ -188,10 +189,12 @@ export function AutoReorderModal({
                   </label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                     className="input w-full"
                     min="1"
+                    step="1"
                   />
                   {selectedProduct && (
                     <p className="text-xs text-[var(--color-textMuted)] mt-1">

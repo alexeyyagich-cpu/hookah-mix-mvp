@@ -193,6 +193,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                         <div className="flex items-center justify-end gap-1">
                           <input
                             type="number"
+                            inputMode="decimal"
                             value={adjustAmount}
                             onChange={e => setAdjustAmount(e.target.value)}
                             onKeyDown={e => {

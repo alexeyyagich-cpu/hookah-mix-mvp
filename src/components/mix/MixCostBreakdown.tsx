@@ -170,6 +170,7 @@ export function MixCostBreakdown({ items, totalGrams, inventory, currency = 'EUR
               </span>
               <input
                 type="number"
+                inputMode="decimal"
                 value={sellingPrice}
                 onChange={(e) => setSellingPrice(e.target.value)}
                 placeholder="0.00"

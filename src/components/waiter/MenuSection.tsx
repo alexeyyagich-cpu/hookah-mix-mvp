@@ -266,11 +266,13 @@ export function MenuSection({
               </select>
               <input
                 type="number"
+                inputMode="numeric"
                 value={totalGrams}
                 onChange={e => onSetTotalGrams(parseInt(e.target.value) || 20)}
                 className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] text-sm"
                 min={5}
                 max={50}
+                step="1"
               />
             </div>
           )}

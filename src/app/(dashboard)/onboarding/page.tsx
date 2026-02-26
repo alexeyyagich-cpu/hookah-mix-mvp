@@ -444,10 +444,12 @@ export default function OnboardingPage() {
                     <label className="block text-sm font-medium mb-2">{t.capacityGramsLabel}</label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       value={bowlCapacity}
                       onChange={(e) => setBowlCapacity(e.target.value)}
                       min="5"
                       max="50"
+                      step="1"
                       className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                     />
                   </div>
@@ -536,9 +538,11 @@ export default function OnboardingPage() {
                     <label className="block text-sm font-medium mb-2">{t.quantityPerItemLabel}</label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       value={tobaccoQuantity}
                       onChange={(e) => setTobaccoQuantity(e.target.value)}
                       min="1"
+                      step="1"
                       className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                     />
                   </div>

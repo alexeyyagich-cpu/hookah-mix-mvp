@@ -177,17 +177,23 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
                       />
                       <input
                         type="number"
+                        inputMode="numeric"
                         value={item.packageGrams}
                         onChange={e => updateItem(i, 'packageGrams', parseFloat(e.target.value) || 0)}
                         className="input text-sm w-20"
                         placeholder="g"
+                        min="0"
+                        step="1"
                       />
                       <input
                         type="number"
+                        inputMode="decimal"
                         value={item.price}
                         onChange={e => updateItem(i, 'price', parseFloat(e.target.value) || 0)}
                         className="input text-sm w-20"
                         placeholder="€"
+                        min="0"
+                        step="0.01"
                       />
                     </div>
                     <button type="button" onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]" aria-label="Remove">

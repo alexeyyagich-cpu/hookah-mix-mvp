@@ -159,7 +159,8 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                             />
                             <button type="button"
                               onClick={() => handleAdjust(item.id)}
-                              className="p-1 rounded-lg hover:bg-[var(--color-success)]/20 text-[var(--color-success)]"
+                              className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg hover:bg-[var(--color-success)]/20 text-[var(--color-success)] flex items-center justify-center"
+                              aria-label={t.confirmAction}
                             >
                               ✓
                             </button>
@@ -168,7 +169,8 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                                 setAdjustingId(null)
                                 setAdjustAmount('')
                               }}
-                              className="p-1 rounded-lg hover:bg-[var(--color-danger)]/20 text-[var(--color-danger)]"
+                              className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg hover:bg-[var(--color-danger)]/20 text-[var(--color-danger)] flex items-center justify-center"
+                              aria-label={t.cancelAction}
                             >
                               ✕
                             </button>
@@ -215,23 +217,26 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                           {canUseMarketplace && status.color !== 'success' && (
                             <Link
                               href="/marketplace"
-                              className="p-2 rounded-lg hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors"
+                              className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-[var(--color-primary)]/10 text-[var(--color-primary)] transition-colors flex items-center justify-center"
                               title={t.orderAction}
+                              aria-label={t.orderAction}
                             >
                               <IconShop size={16} />
                             </Link>
                           )}
                           <button type="button"
                             onClick={() => onEdit(item)}
-                            className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
+                            className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors flex items-center justify-center"
                             title={t.editItem}
+                            aria-label={t.editItem}
                           >
                             ✏️
                           </button>
                           <button type="button"
                             onClick={() => onDelete(item.id)}
-                            className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
+                            className="min-w-[44px] min-h-[44px] p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors flex items-center justify-center"
                             title={t.deleteItem}
+                            aria-label={t.deleteItem}
                           >
                             🗑️
                           </button>

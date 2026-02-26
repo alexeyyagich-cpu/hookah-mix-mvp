@@ -31,6 +31,8 @@ export const hookah = {
   noResults: 'Ничего не найдено',
   editItem: 'Редактировать',
   deleteItem: 'Удалить',
+  confirmAction: 'Подтвердить',
+  cancelAction: 'Отменить',
   deleteConfirm: 'Удалить эту позицию из инвентаря?',
 
   // Add tobacco modal

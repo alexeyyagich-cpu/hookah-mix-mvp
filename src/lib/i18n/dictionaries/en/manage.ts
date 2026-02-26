@@ -132,6 +132,10 @@ export const manage: typeof ManageType = {
   sourceWalkIn: 'Walk-in',
   cancelAction: 'Cancel',
   deleteReservation: 'Delete reservation',
+  decreaseQuantity: 'Decrease quantity',
+  increaseQuantity: 'Increase quantity',
+  removeItem: 'Remove item',
+  removeTobacco: 'Remove tobacco',
 
   // KDS extras
   filterAllOrders: 'All',

@@ -11,16 +11,32 @@ export function ServiceWorkerRegistration() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
 
-    navigator.serviceWorker.register('/sw.js').then((registration) => {
+    let mounted = true
+    let registration: ServiceWorkerRegistration | null = null
+    let updateFoundHandler: (() => void) | null = null
+    let stateChangeHandler: (() => void) | null = null
+    let trackedWorker: ServiceWorker | null = null
+
+    navigator.serviceWorker.register('/sw.js').then((reg) => {
+      if (!mounted) return
+      registration = reg
+
       // Check for updates periodically (every 60s)
-      intervalRef.current = setInterval(() => registration.update(), 60_000)
+      intervalRef.current = setInterval(() => reg.update(), 60_000)
 
       // Listen for new SW waiting
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing
+      updateFoundHandler = () => {
+        const newWorker = reg.installing
         if (!newWorker) return
 
-        newWorker.addEventListener('statechange', () => {
+        // Clean up previous statechange listener if any
+        if (trackedWorker && stateChangeHandler) {
+          trackedWorker.removeEventListener('statechange', stateChangeHandler)
+        }
+        trackedWorker = newWorker
+
+        stateChangeHandler = () => {
+          if (!mounted) return
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New version available — show toast
             toast(tc.sw.updateAvailable, {
@@ -35,8 +51,10 @@ export function ServiceWorkerRegistration() {
               duration: Infinity,
             })
           }
-        })
-      })
+        }
+        newWorker.addEventListener('statechange', stateChangeHandler)
+      }
+      reg.addEventListener('updatefound', updateFoundHandler)
     }).catch((err) => {
       console.error('SW registration failed:', err)
     })
@@ -44,7 +62,7 @@ export function ServiceWorkerRegistration() {
     // Detect controller change (new SW activated) — reload
     let refreshing = false
     const handleControllerChange = () => {
-      if (!refreshing) {
+      if (!refreshing && mounted) {
         refreshing = true
         window.location.reload()
       }
@@ -52,8 +70,15 @@ export function ServiceWorkerRegistration() {
     navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange)
 
     return () => {
+      mounted = false
       clearInterval(intervalRef.current)
       navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange)
+      if (registration && updateFoundHandler) {
+        registration.removeEventListener('updatefound', updateFoundHandler)
+      }
+      if (trackedWorker && stateChangeHandler) {
+        trackedWorker.removeEventListener('statechange', stateChangeHandler)
+      }
     }
   }, [tc])
 

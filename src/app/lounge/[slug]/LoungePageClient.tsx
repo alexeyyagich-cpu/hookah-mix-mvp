@@ -620,10 +620,12 @@ function ReservationForm({ profileId }: { profileId: string }) {
             <label className="block text-sm font-medium mb-1">{t.reservationGuestCount}</label>
             <input
               type="number"
+              inputMode="numeric"
               value={guestCount}
               onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
               min={1}
               max={20}
+              step="1"
               className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
               required
             />

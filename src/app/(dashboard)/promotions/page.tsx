@@ -156,11 +156,13 @@ export default function PromotionsPage() {
                 <div className="flex items-center gap-2 mt-1">
                   <input
                     type="number"
+                    inputMode="decimal"
                     value={discountPercent}
                     onChange={e => setDiscountPercent(e.target.value)}
                     className="input w-24"
                     min="1"
                     max="100"
+                    step="0.5"
                   />
                   <span className="text-sm">%</span>
                 </div>
@@ -173,22 +175,26 @@ export default function PromotionsPage() {
                   <label className="text-sm font-medium">{tm.startHour}</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={startHour}
                     onChange={e => setStartHour(e.target.value)}
                     className="input w-24 mt-1"
                     min="0"
                     max="23"
+                    step="1"
                   />
                 </div>
                 <div>
                   <label className="text-sm font-medium">{tm.endHour}</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={endHour}
                     onChange={e => setEndHour(e.target.value)}
                     className="input w-24 mt-1"
                     min="0"
                     max="23"
+                    step="1"
                   />
                 </div>
               </>
@@ -199,11 +205,13 @@ export default function PromotionsPage() {
                 <label className="text-sm font-medium">{tm.everyNthVisit}</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={nthVisit}
                   onChange={e => setNthVisit(e.target.value)}
                   className="input w-24 mt-1"
                   min="2"
                   max="50"
+                  step="1"
                 />
               </div>
             )}
@@ -212,11 +220,13 @@ export default function PromotionsPage() {
               <label className="text-sm font-medium">{tm.maxUses}</label>
               <input
                 type="number"
+                inputMode="numeric"
                 value={maxUses}
                 onChange={e => setMaxUses(e.target.value)}
                 className="input w-24 mt-1"
                 placeholder="∞"
                 min="1"
+                step="1"
               />
             </div>
           </div>

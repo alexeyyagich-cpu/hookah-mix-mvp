@@ -138,6 +138,10 @@ export const manage = {
   sourceWalkIn: 'Без записи',
   cancelAction: 'Отменить',
   deleteReservation: 'Удалить бронирование',
+  decreaseQuantity: 'Уменьшить количество',
+  increaseQuantity: 'Увеличить количество',
+  removeItem: 'Удалить',
+  removeTobacco: 'Удалить табак',
 
   // KDS extras
   filterAllOrders: 'Все',

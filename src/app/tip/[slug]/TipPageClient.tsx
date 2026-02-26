@@ -177,6 +177,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
                 onChange={(e) => setCustomAmount(e.target.value)}
                 placeholder="0"
                 min="1"
+                max="500"
                 step="1"
                 autoFocus
                 className="w-full px-4 py-3 rounded-xl bg-gray-700 border border-gray-600 text-white text-lg font-bold focus:border-amber-400 focus:outline-none"

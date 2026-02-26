@@ -270,12 +270,14 @@ export default function BowlsPage() {
                 <label className="block text-sm font-medium">{t.bowlCapacity} ({tc.grams})</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={capacity}
                   onChange={(e) => setCapacity(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                   placeholder="20"
                   min="5"
                   max="50"
+                  step="1"
                   required
                 />
               </div>

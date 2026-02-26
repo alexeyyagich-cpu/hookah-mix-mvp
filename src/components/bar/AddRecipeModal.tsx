@@ -375,7 +375,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                 <div className="space-y-2">
                   <label className="block text-sm font-medium">{t.menuPriceEur}</label>
                   <input
-                    type="number" inputMode="decimal" step="0.01" value={menuPrice} onChange={e => setMenuPrice(e.target.value)}
+                    type="number" inputMode="decimal" step="0.01" min="0" value={menuPrice} onChange={e => setMenuPrice(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
                     placeholder="12.00"
                   />
@@ -434,6 +434,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                       type="number"
                       inputMode="decimal"
                       step="any"
+                      min="0"
                       value={ing.quantity}
                       onChange={e => updateIngredient(ing.key, 'quantity', e.target.value)}
                       placeholder="0"

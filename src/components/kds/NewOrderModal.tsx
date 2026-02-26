@@ -468,20 +468,23 @@ export function NewOrderModal({
                       <div className="flex items-center gap-2">
                         <button type="button"
                           onClick={() => updateBarItemQty(entry.recipe.id, -1)}
-                          className="p-1 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors"
+                          className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors flex items-center justify-center"
+                          aria-label={t.decreaseQuantity}
                         >
                           <IconMinus size={14} />
                         </button>
                         <span className="text-sm font-mono font-semibold w-6 text-center">{entry.quantity}</span>
                         <button type="button"
                           onClick={() => updateBarItemQty(entry.recipe.id, 1)}
-                          className="p-1 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors"
+                          className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg hover:bg-[var(--color-bgCard)] transition-colors flex items-center justify-center"
+                          aria-label={t.increaseQuantity}
                         >
                           <IconPlus size={14} />
                         </button>
                         <button type="button"
                           onClick={() => removeBarItem(entry.recipe.id)}
-                          className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors ml-1"
+                          className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors ml-1 flex items-center justify-center"
+                          aria-label={t.removeItem}
                         >
                           <IconClose size={14} />
                         </button>
@@ -617,7 +620,8 @@ export function NewOrderModal({
                           </span>
                           <button type="button"
                             onClick={() => removeTobacco(st.tobacco.id)}
-                            className="p-1 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
+                            className="min-w-[44px] min-h-[44px] p-2.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors flex items-center justify-center"
+                            aria-label={t.removeTobacco}
                           >
                             <IconClose size={14} />
                           </button>
@@ -656,10 +660,12 @@ export function NewOrderModal({
                       </label>
                       <input
                         type="number"
+                        inputMode="numeric"
                         value={totalGrams}
                         onChange={e => setTotalGrams(Math.max(5, Math.min(40, Number(e.target.value) || 0)))}
                         min={5}
                         max={40}
+                        step="1"
                         className="w-full px-3 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
                       />
                     </div>

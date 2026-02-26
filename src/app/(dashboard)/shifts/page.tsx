@@ -265,9 +265,12 @@ export default function ShiftsPage() {
                 <label className="text-sm font-medium block mb-1.5">{tm.startingCash} (€)</label>
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={startingCash}
                   onChange={e => setStartingCash(e.target.value)}
                   placeholder="0"
+                  min="0"
+                  step="0.01"
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
                 />
               </div>
@@ -331,9 +334,12 @@ export default function ShiftsPage() {
                 <label className="text-sm font-medium block mb-1.5">{tm.closingCash} (€)</label>
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={closingCash}
                   onChange={e => setClosingCash(e.target.value)}
                   placeholder={String(Math.round(closeReconciliation.cash.expectedCash))}
+                  min="0"
+                  step="0.01"
                   className="w-full px-4 py-3 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
                 />
               </div>

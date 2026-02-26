@@ -503,6 +503,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
                 onChange={(e) => setCapacity(e.target.value)}
                 min="1"
                 max="20"
+                step="1"
                 className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               />
             </div>
@@ -530,6 +531,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
                 onChange={(e) => setWidth(e.target.value)}
                 min="40"
                 max="200"
+                step="1"
                 className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               />
             </div>
@@ -542,6 +544,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
                 onChange={(e) => setHeight(e.target.value)}
                 min="40"
                 max="200"
+                step="1"
                 className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
               />
             </div>
