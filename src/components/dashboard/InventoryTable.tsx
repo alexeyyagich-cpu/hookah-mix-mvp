@@ -96,7 +96,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
       {/* Table */}
       <div className="card overflow-x-auto p-0">
           <table className="w-full min-w-[640px]">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
               <tr className="border-b border-[var(--color-border)]">
                 <th
                   onClick={() => handleSort('brand')}

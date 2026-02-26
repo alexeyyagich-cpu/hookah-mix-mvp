@@ -336,7 +336,7 @@ export function NewOrderModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" role="button" tabIndex={-1} aria-label="Close" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" role="button" tabIndex={-1} aria-label="Close" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()} />
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)] flex items-center justify-between">

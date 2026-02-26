@@ -154,7 +154,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
   const canSubmit = mixItems.length >= 2 && parseFloat(totalGrams) > 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="w-full max-w-lg max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] flex flex-col">
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between flex-shrink-0">

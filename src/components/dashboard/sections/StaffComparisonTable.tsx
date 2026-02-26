@@ -22,7 +22,7 @@ export function StaffComparisonTable({ rows }: Props) {
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
             <tr className="text-left text-[var(--color-textMuted)] border-b border-[var(--color-border)]">
               <th className="pb-3 font-medium">{t.controlStaffName}</th>
               <th className="pb-3 font-medium text-right">{t.controlStaffSessions}</th>

@@ -140,7 +140,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   if (!visible) return null
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ${isClosing ? 'animate-backdropFadeOut' : ''}`}>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`}>
       <div className={`w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col ${isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
         {/* Header */}
         <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">

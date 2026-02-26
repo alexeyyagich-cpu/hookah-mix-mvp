@@ -142,7 +142,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
       <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
               <tr className="border-b border-[var(--color-border)]">
                 <th
                   onClick={() => handleSort('category')}

@@ -237,7 +237,7 @@ export default function BowlsPage() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 className="text-xl font-bold">

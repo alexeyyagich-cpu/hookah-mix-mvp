@@ -324,7 +324,7 @@ input[type="range"]::-moz-range-thumb {
   outline: none;
 }
 .input::placeholder {
-  color: var(--color-textMuted);
+  color: color-mix(in srgb, var(--color-textMuted) 70%, var(--color-text));
 }
 .input-compact {
   padding: 8px 12px;
@@ -338,6 +338,9 @@ input[type="range"]::-moz-range-thumb {
 .input-compact:focus {
   border-color: var(--color-primary);
   outline: none;
+}
+.input-compact::placeholder {
+  color: color-mix(in srgb, var(--color-textMuted) 70%, var(--color-text));
 }
 
 /* ========== BUTTON ========== */
@@ -379,6 +382,10 @@ input[type="range"]::-moz-range-thumb {
 .btn-ghost:hover {
   background: var(--color-bgHover);
   border-color: var(--color-borderAccent);
+}
+
+.btn-ghost:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {

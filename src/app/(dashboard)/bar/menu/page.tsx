@@ -171,7 +171,7 @@ export default function BarMenuPage() {
 
               <div className="card overflow-x-auto">
                 <table className="w-full min-w-[600px]">
-                  <thead>
+                  <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
                     <tr className="border-b border-[var(--color-border)]">
                       <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase">{tb.thName}</th>
                       <th className="text-left px-4 py-3 text-xs font-medium text-[var(--color-textMuted)] uppercase hidden sm:table-cell">{tb.thComposition}</th>

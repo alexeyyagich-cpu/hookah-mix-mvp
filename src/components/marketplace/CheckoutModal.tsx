@@ -70,7 +70,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 z-40 ${isClosing ? 'animate-backdropFadeOut' : ''}`}
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 ${isClosing ? 'animate-backdropFadeOut' : ''}`}
         onClick={() => !loading && handleClose()}
       />
 

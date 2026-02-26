@@ -221,7 +221,7 @@ export function Sidebar() {
                       href="/pricing"
                       onClick={() => setMobileOpen(false)}
                       aria-label={t.proOnlyLabel(item.name)}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all duration-200"
                     >
                       <Icon size={18} aria-hidden="true" />
                       {item.name}
@@ -236,7 +236,7 @@ export function Sidebar() {
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     aria-current={isActive ? 'page' : undefined}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
                         ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                         : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
@@ -298,7 +298,7 @@ export function Sidebar() {
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />

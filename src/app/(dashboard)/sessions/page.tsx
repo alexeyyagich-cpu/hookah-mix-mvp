@@ -226,7 +226,7 @@ export default function SessionsPage() {
 
       {/* Session Detail Modal */}
       {selectedSession && (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 ${closingModal ? 'animate-backdropFadeOut' : ''}`}>
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${closingModal ? 'animate-backdropFadeOut' : ''}`}>
           <div className={`w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] ${closingModal ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 className="text-xl font-bold">{t.sessionDetails}</h2>

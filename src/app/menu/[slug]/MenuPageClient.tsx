@@ -771,7 +771,7 @@ function MenuPageInner({ slug }: { slug: string }) {
 
       {/* ===== CART OVERLAY ===== */}
       {showCartOverlay && (
-        <div className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center" role="button" tabIndex={-1} aria-label="Close" onClick={() => setShowCartOverlay(false)} onKeyDown={(e) => e.key === 'Escape' && setShowCartOverlay(false)}>
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" role="button" tabIndex={-1} aria-label="Close" onClick={() => setShowCartOverlay(false)} onKeyDown={(e) => e.key === 'Escape' && setShowCartOverlay(false)}>
           <div
             className="bg-[var(--color-bgCard)] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
