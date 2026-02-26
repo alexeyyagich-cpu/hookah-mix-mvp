@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useTranslation } from '@/lib/i18n'
 
@@ -13,17 +13,19 @@ interface AuthGuardProps {
 export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
   const tc = useTranslation('common')
 
   useEffect(() => {
     if (!loading && !user) {
       // Grace period: allow token refresh to complete before redirecting
       const timer = setTimeout(() => {
-        router.push('/login')
+        const redirectParam = pathname && pathname !== '/dashboard' ? `?redirect=${encodeURIComponent(pathname)}` : ''
+        router.push(`/login${redirectParam}`)
       }, 2000)
       return () => clearTimeout(timer)
     }
-  }, [user, loading, router])
+  }, [user, loading, router, pathname])
 
   if (loading) {
     return (

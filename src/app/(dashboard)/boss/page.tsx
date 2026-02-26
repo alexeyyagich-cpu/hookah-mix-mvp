@@ -33,7 +33,7 @@ export default function BossPage() {
   const tm = useTranslation('manage')
   const { locale } = useLocale()
   const router = useRouter()
-  const { orgRole } = useOrganizationContext()
+  const { orgRole, loading: orgLoading } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
   const { isFreeTier } = useSubscription()
 
@@ -96,12 +96,12 @@ export default function BossPage() {
     setOpening(false)
   }
 
-  // Owner guard
+  // Owner guard — wait for org data to load before checking
   useEffect(() => {
-    if (!isOwner) router.push('/dashboard')
-  }, [isOwner, router])
+    if (!orgLoading && !isOwner) router.push('/dashboard')
+  }, [orgLoading, isOwner, router])
 
-  if (!isOwner) return null
+  if (orgLoading || !isOwner) return null
 
   // Pro guard
   if (isFreeTier) {

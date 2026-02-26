@@ -18,6 +18,7 @@ export const manage = {
   tableActions: 'Действия',
 
   // Reservations
+  backToFloorPlan: 'План зала',
   reservationsTitle: 'Бронирования',
   addReservation: 'Новое бронирование',
   date: 'Дата',
@@ -99,6 +100,7 @@ export const manage = {
   enterpriseFeatures: 'Безлимит + поддержка',
 
   // Team
+  backToSettings: 'Настройки',
   teamTitle: 'Команда',
   teamDescription: 'Управление командой заведения',
   inviteMember: 'Пригласить сотрудника',

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
-import { IconCalendar, IconTrash } from '@/components/Icons'
+import { IconCalendar, IconChevronLeft, IconTrash } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useRole } from '@/lib/hooks/useRole'
@@ -70,6 +70,15 @@ export default function ReservationsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Back link */}
+      <Link
+        href="/floor"
+        className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
+      >
+        <IconChevronLeft size={20} />
+        {tm.backToFloorPlan}
+      </Link>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -81,12 +90,6 @@ export default function ReservationsPage() {
             {tm.reservationsCount(filteredReservations.length)}
           </p>
         </div>
-        <Link
-          href="/floor"
-          className="text-sm text-[var(--color-primary)] hover:underline"
-        >
-          ← {tm.floorTitle}
-        </Link>
       </div>
 
       {/* Filters */}

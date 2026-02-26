@@ -73,11 +73,12 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Redirect authenticated users from auth pages to dashboard
+  // Redirect authenticated users from auth/landing pages to dashboard
   const authPaths = ['/login', '/register']
   const isAuthPath = authPaths.some(path => request.nextUrl.pathname === path)
+  const isRootPath = request.nextUrl.pathname === '/'
 
-  if (isAuthPath && user) {
+  if ((isAuthPath || isRootPath) && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)

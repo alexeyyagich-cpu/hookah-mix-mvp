@@ -6,11 +6,12 @@ import { useTips } from '@/lib/hooks/useTips'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
-import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus } from '@/components/Icons'
+import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus, IconChevronLeft } from '@/components/Icons'
 import { TipQRCode } from '@/components/dashboard/TipQRCode'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { OrgRole } from '@/types/database'
 
 const INVITABLE_ROLES: OrgRole[] = ['manager', 'hookah_master', 'bartender', 'cook']
@@ -21,7 +22,7 @@ export default function TeamPage() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const router = useRouter()
-  const { orgRole } = useOrganizationContext()
+  const { orgRole, loading: orgLoading } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
   const { members, invitations, loading, error, inviteMember, removeMember, updateMemberRole, updateMemberPayroll, cancelInvitation, resendInvitation } = useTeam()
   const { staffProfiles, createStaffProfile, toggleTipEnabled, getTipStats } = useTips()
@@ -34,12 +35,12 @@ export default function TeamPage() {
   const [inviteError, setInviteError] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-  // Only owners can access this page
+  // Only owners can access this page — wait for org data to load
   useEffect(() => {
-    if (!isOwner) router.push('/dashboard')
-  }, [isOwner, router])
+    if (!orgLoading && !isOwner) router.push('/dashboard')
+  }, [orgLoading, isOwner, router])
 
-  if (!isOwner) return null
+  if (orgLoading || !isOwner) return null
 
   const getRoleLabel = (role: OrgRole) => {
     const labels = ORG_ROLE_LABELS[role]
@@ -116,6 +117,15 @@ export default function TeamPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
+      {/* Back link */}
+      <Link
+        href="/settings"
+        className="inline-flex items-center gap-2 text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
+      >
+        <IconChevronLeft size={20} />
+        {tm.backToSettings}
+      </Link>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

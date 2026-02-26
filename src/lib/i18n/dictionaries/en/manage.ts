@@ -18,6 +18,7 @@ export const manage: typeof ManageType = {
   currentGuest: 'Guest',
   tableActions: 'Actions',
 
+  backToFloorPlan: 'Floor plan',
   reservationsTitle: 'Reservations',
   addReservation: 'New reservation',
   date: 'Date',
@@ -93,6 +94,7 @@ export const manage: typeof ManageType = {
   proPlanFeatures: 'All features',
   enterpriseFeatures: 'Unlimited + support',
 
+  backToSettings: 'Settings',
   teamTitle: 'Team',
   teamDescription: 'Manage your venue team',
   inviteMember: 'Invite member',
