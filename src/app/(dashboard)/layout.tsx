@@ -16,25 +16,43 @@ import { InstallBanner } from '@/components/InstallBanner'
 import { OnlineStatusProvider } from '@/lib/offline/useOnlineStatus'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
 
-function PageTransition() {
+function PageProgressBar() {
   const pathname = usePathname()
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [visible, setVisible] = useState(false)
   const previousPathRef = useRef(pathname)
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (previousPathRef.current !== pathname) {
-      setIsTransitioning(true)
-      const timer = setTimeout(() => setIsTransitioning(false), 300)
       previousPathRef.current = pathname
-      return () => clearTimeout(timer)
+      // Start progress
+      setVisible(true)
+      setProgress(30)
+      clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(() => setProgress(70), 100)
+      timerRef.current = setTimeout(() => {
+        setProgress(100)
+        setTimeout(() => {
+          setVisible(false)
+          setProgress(0)
+        }, 200)
+      }, 300)
     }
+    return () => clearTimeout(timerRef.current)
   }, [pathname])
 
-  if (!isTransitioning) return null
+  if (!visible) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-bg)]/80 backdrop-blur-sm animate-fadeIn">
-      <BrandLoader size="lg" />
+    <div className="fixed top-0 left-0 right-0 z-[100] h-[3px]">
+      <div
+        className="h-full bg-[var(--color-primary)] shadow-[0_0_8px_var(--color-primary)]"
+        style={{
+          width: `${progress}%`,
+          transition: progress === 0 ? 'none' : 'width 0.3s ease',
+        }}
+      />
     </div>
   )
 }
@@ -126,7 +144,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
-      <PageTransition />
+      <PageProgressBar />
       {!isOnboarding && <LowStockNotifier />}
       <OfflineIndicator />
       <ServiceWorkerRegistration />
