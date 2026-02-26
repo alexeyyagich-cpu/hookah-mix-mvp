@@ -57,6 +57,7 @@ export default function StatisticsPage() {
     periodB,
     comparison,
     loading: comparisonLoading,
+    error: comparisonError,
     presets,
     applyPreset,
     periodsConfig,
@@ -268,13 +269,13 @@ export default function StatisticsPage() {
       )}
 
       {/* Error */}
-      {error && (
+      {(error || comparisonError) && (
         <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[var(--color-danger)]/20 flex items-center justify-center text-[var(--color-danger)]">
               <IconWarning size={20} />
             </div>
-            <p className="text-[var(--color-danger)]">{error}</p>
+            <p className="text-[var(--color-danger)]">{error || comparisonError}</p>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import { IconPlus, IconMinus, IconClose, IconCocktail, IconBowl, IconSearch } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
@@ -331,6 +331,16 @@ export function NewOrderModal({
       setSaving(false)
     }
   }
+
+  // Escape key to close
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !saving) onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [isOpen, saving, onClose])
 
   if (!isOpen) return null
 

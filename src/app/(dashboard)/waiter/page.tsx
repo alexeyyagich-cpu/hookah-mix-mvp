@@ -160,7 +160,9 @@ export default function WaiterPage() {
           }]
         } else {
           const bowl = bowls.find(b => b.id === selectedBowlId)
-          const avgStrength = selectedTobaccos.reduce((sum, t) => sum + t.tobacco.strength, 0) / selectedTobaccos.length
+          const avgStrength = selectedTobaccos.length > 0
+            ? selectedTobaccos.reduce((sum, t) => sum + t.tobacco.strength, 0) / selectedTobaccos.length
+            : 5
           const strengthPref = getStrengthFromAvg(avgStrength)
           const heat = getHeatRecommendation(strengthPref, totalGrams)
 

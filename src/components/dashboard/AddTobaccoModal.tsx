@@ -50,6 +50,16 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     }, 200)
   }, [onClose])
 
+  // Escape key to close
+  useEffect(() => {
+    if (!visible) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [visible, handleClose])
+
   useEffect(() => {
     if (editingItem) {
       setSelectedTobacco(editingItem.tobacco_id)

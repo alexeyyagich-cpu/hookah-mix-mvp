@@ -257,6 +257,7 @@ export function FloorPlan({
               id={`table-${table.id}`}
               role="button"
               tabIndex={0}
+              aria-label={table.name}
               onClick={(e) => handleTableClick(e, table)}
               onTouchEnd={(e) => {
                 if (!editable && !isDragging) {
