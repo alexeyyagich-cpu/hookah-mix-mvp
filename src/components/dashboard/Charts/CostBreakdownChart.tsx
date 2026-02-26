@@ -87,10 +87,10 @@ export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
   })
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-6" role="img" aria-label={`${formatCurrency(total, locale)} total: ${segments.slice(0, 3).map(s => `${categoryLabels[s.category] || s.category} ${s.percentage.toFixed(0)}%`).join(', ')}`}>
       {/* Donut */}
       <div className="relative w-40 h-40 flex-shrink-0">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
+        <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
           {segments.map((segment) => (
             segment.percentage > 0.5 && (
               <path

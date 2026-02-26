@@ -420,7 +420,7 @@ export default function LoungeProfileSettings() {
           {saving ? '...' : ts.saveSlug}
         </button>
         {message && (
-          <span className="text-sm text-[var(--color-success)]">{message}</span>
+          <span role="status" aria-live="polite" className="text-sm text-[var(--color-success)]">{message}</span>
         )}
       </div>
     </div>

@@ -94,7 +94,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
           {/* Content */}
           <div className="p-4 space-y-4">
             {success ? (
-              <div className="py-8 text-center">
+              <div className="py-8 text-center" role="status" aria-live="polite">
                 <div className="w-16 h-16 rounded-full bg-[var(--color-success)]/10 flex items-center justify-center mx-auto mb-4">
                   <IconCheck size={32} className="text-[var(--color-success)]" />
                 </div>

@@ -27,8 +27,8 @@ export function PnLChart({ data, showHookah = true }: PnLChartProps) {
   const chartHeight = 140
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-end gap-1.5 px-1" style={{ height: chartHeight }}>
+    <div className="space-y-2" role="img" aria-label={`P&L: ${formatCurrency(data.reduce((s, d) => s + d.barRevenue, 0), locale)} revenue, ${formatCurrency(data.reduce((s, d) => s + d.totalCost, 0), locale)} cost, ${formatCurrency(data.reduce((s, d) => s + d.profit, 0), locale)} profit`}>
+      <div className="flex items-end gap-1.5 px-1" style={{ height: chartHeight }} aria-hidden="true">
         {data.map((day) => {
           const revenueH = Math.max((day.barRevenue / maxValue) * chartHeight, 2)
           const barCostH = Math.max((day.barCost / maxValue) * chartHeight, 1)

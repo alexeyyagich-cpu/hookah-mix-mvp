@@ -63,9 +63,10 @@ body {
 ::selection { background: var(--color-primary); color: var(--color-bg); }
 
 /* ========== FOCUS ========== */
+/* !important ensures keyboard focus ring shows even when Tailwind focus:outline-none is used */
 *:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px !important;
 }
 
 /* ========== ACCESSIBILITY ========== */
@@ -323,6 +324,10 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--color-primary);
   outline: none;
 }
+.input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
 .input::placeholder {
   color: color-mix(in srgb, var(--color-textMuted) 70%, var(--color-text));
 }
@@ -338,6 +343,10 @@ input[type="range"]::-moz-range-thumb {
 .input-compact:focus {
   border-color: var(--color-primary);
   outline: none;
+}
+.input-compact:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 .input-compact::placeholder {
   color: color-mix(in srgb, var(--color-textMuted) 70%, var(--color-text));
@@ -867,6 +876,32 @@ input[type="range"]::-moz-range-thumb {
 
 .animate-slot-stop {
   animation: slot-stop 0.3s ease-out;
+}
+
+/* ========== TABLE SCROLL INDICATOR ========== */
+/* Adds a right-edge fade when table content overflows horizontally */
+.table-scroll-container {
+  position: relative;
+  overflow-x: auto;
+}
+.table-scroll-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, var(--color-bgCard));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+/* Show indicator only when scrollable (JS adds this class) */
+.table-scroll-container.is-scrollable::after {
+  opacity: 1;
+}
+.table-scroll-container.is-scrolled-end::after {
+  opacity: 0;
 }
 
 /* Accessibility: respect user's reduced motion preference */

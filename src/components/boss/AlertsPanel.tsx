@@ -122,7 +122,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       </div>
 
       {alerts.length === 0 ? (
-        <div className="flex items-center gap-2 text-[var(--color-success)]">
+        <div className="flex items-center gap-2 text-[var(--color-success)]" role="status" aria-live="polite">
           <span>✅</span>
           <span className="text-sm font-medium">{tm.bossAllClear}</span>
         </div>

@@ -51,7 +51,8 @@ export default function MixPieChart({ items, size = 200 }: Props) {
           width={size}
           height={size}
           viewBox={`0 0 ${size} ${size}`}
-          aria-label="Mix pie chart"
+          role="img"
+          aria-label={`Mix: ${slices.map(s => `${s.tobacco.flavor} ${s.percent.toFixed(0)}%`).join(', ')}`}
           className="drop-shadow-lg"
         >
           {/* Glow filter */}

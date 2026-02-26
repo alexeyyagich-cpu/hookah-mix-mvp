@@ -75,10 +75,10 @@ export function BrandPieChart({ data }: BrandPieChartProps) {
   }
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-6" role="img" aria-label={`${t.chartTotal}: ${total.toFixed(0)}g — ${segments.slice(0, 3).map(s => `${s.brand} ${s.percentage.toFixed(0)}%`).join(', ')}`}>
       {/* Pie Chart */}
       <div className="relative w-40 h-40 flex-shrink-0">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
+        <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
           {segments.map((segment, index) => (
             <path
               key={segment.brand}

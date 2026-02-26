@@ -52,7 +52,7 @@ export function RegisterForm() {
   if (success) {
     return (
       <div className="w-full max-w-md">
-        <div className="card p-6 text-center space-y-6">
+        <div className="card p-6 text-center space-y-6" role="status" aria-live="polite">
           <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-success)]/10 flex items-center justify-center">
             <svg className="w-8 h-8 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -96,7 +96,7 @@ export function RegisterForm() {
 
       <form onSubmit={handleSubmit} className="card p-6 space-y-5">
         {error && (
-          <div className="p-4 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)]">
+          <div role="alert" aria-live="polite" className="p-4 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)]">
             {error}
           </div>
         )}

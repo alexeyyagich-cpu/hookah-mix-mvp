@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
+import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import type { TobaccoInventory } from '@/types/database'
 import type { ForecastResult } from '@/lib/utils/forecast'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
@@ -94,7 +95,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
       </div>
 
       {/* Table */}
-      <div className="card overflow-x-auto p-0">
+      <ScrollableTable className="card p-0">
           <table className="w-full min-w-[640px]">
             <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
               <tr className="border-b border-[var(--color-border)]">
@@ -248,7 +249,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
               )}
             </tbody>
           </table>
-      </div>
+      </ScrollableTable>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import { IconMenuList } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ScrollableTable } from '@/components/ui/ScrollableTable'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
@@ -169,7 +170,7 @@ export default function BarMenuPage() {
                 </h2>
               )}
 
-              <div className="card overflow-x-auto">
+              <ScrollableTable className="card">
                 <table className="w-full min-w-[600px]">
                   <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
                     <tr className="border-b border-[var(--color-border)]">
@@ -272,7 +273,7 @@ export default function BarMenuPage() {
                     })}
                   </tbody>
                 </table>
-              </div>
+              </ScrollableTable>
             </div>
           ))}
         </div>

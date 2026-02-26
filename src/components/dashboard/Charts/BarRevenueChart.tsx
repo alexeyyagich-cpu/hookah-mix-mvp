@@ -28,8 +28,8 @@ export function BarRevenueChart({ data }: BarRevenueChartProps) {
   const chartHeight = 140
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-end gap-2 px-1" style={{ height: chartHeight }}>
+    <div className="space-y-2" role="img" aria-label={`${data.length} days, ${formatCurrency(data.reduce((s, d) => s + d.revenue, 0), locale)} revenue, ${formatCurrency(data.reduce((s, d) => s + d.cost, 0), locale)} cost`}>
+      <div className="flex items-end gap-2 px-1" style={{ height: chartHeight }} aria-hidden="true">
         {data.map((day) => {
           const revenueHeight = Math.max((day.revenue / maxRevenue) * chartHeight, 4)
           const costHeight = Math.max((day.cost / maxRevenue) * chartHeight, 2)

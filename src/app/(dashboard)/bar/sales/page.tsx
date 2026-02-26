@@ -8,6 +8,7 @@ import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
 import { IconExport, IconLock, IconChart } from '@/components/Icons'
 import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
 import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
+import { ScrollableTable } from '@/components/ui/ScrollableTable'
 
 type Period = 7 | 14 | 30
 
@@ -191,7 +192,7 @@ export default function BarSalesPage() {
 
           {/* Sales Log Tab */}
           {tab === 'log' && (
-            <div className="card overflow-x-auto">
+            <ScrollableTable className="card">
               {periodSales.length === 0 ? (
                 <div className="p-12 text-center">
                   <div className="text-4xl mb-3">📝</div>
@@ -253,7 +254,7 @@ export default function BarSalesPage() {
                   </tbody>
                 </table>
               )}
-            </div>
+            </ScrollableTable>
           )}
 
           {/* Analytics Tab */}

@@ -37,7 +37,7 @@ export function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
   ]
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" role="img" aria-label={data.slice(0, 3).map((d, i) => `#${i + 1} ${d.brand} ${d.flavor} ${d.grams}g`).join(', ')}>
       {data.slice(0, 7).map((item, index) => {
         const barWidth = (item.grams / maxGrams) * 100
 

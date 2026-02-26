@@ -28,9 +28,9 @@ export function ConsumptionChart({ data }: ConsumptionChartProps) {
   const chartHeight = 140 // Fixed height in pixels
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" role="img" aria-label={`${t.noChartData ? 'Consumption' : ''}: ${data.reduce((s, d) => s + d.grams, 0)}g ${t.chartTotal}, ${data.reduce((s, d) => s + d.sessions, 0)} ${t.chartSessions(data.reduce((s, d) => s + d.sessions, 0))}`}>
       {/* Chart */}
-      <div className="flex items-end gap-2 px-1" style={{ height: chartHeight }}>
+      <div className="flex items-end gap-2 px-1" style={{ height: chartHeight }} aria-hidden="true">
         {data.map((day) => {
           const barHeight = Math.max((day.grams / maxGrams) * chartHeight, 4)
 

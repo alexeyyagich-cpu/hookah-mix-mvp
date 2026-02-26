@@ -13,7 +13,7 @@ export function LowStockAlertPanel({ items }: Props) {
   const t = useTranslation('manage')
 
   return (
-    <div className="card p-5 border-[var(--color-warning)]/30">
+    <div className="card p-5 border-[var(--color-warning)]/30" role="region" aria-live="polite" aria-label={t.controlLowStockTitle}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-[var(--color-warning)]/20 flex items-center justify-center text-[var(--color-warning)]">

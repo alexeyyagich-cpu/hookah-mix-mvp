@@ -106,7 +106,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
 
         <div className="p-4 space-y-4">
           {error && (
-            <div className="p-3 rounded-xl bg-[var(--color-danger)]/10 text-[var(--color-danger)] text-sm">
+            <div role="alert" aria-live="polite" className="p-3 rounded-xl bg-[var(--color-danger)]/10 text-[var(--color-danger)] text-sm">
               {error}
             </div>
           )}
@@ -216,7 +216,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
 
           {/* Done */}
           {step === 'done' && (
-            <div className="text-center py-8">
+            <div className="text-center py-8" role="status" aria-live="polite">
               <div className="text-4xl mb-3">✅</div>
               <h3 className="text-lg font-semibold mb-2">{t.ocrDone}</h3>
               <p className="text-sm text-[var(--color-textMuted)] mb-4">

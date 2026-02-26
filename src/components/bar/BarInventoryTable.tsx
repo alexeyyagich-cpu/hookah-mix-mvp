@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import type { BarInventoryItem } from '@/types/database'
 import { BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
@@ -140,7 +141,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
 
       {/* Table */}
       <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
+        <ScrollableTable>
           <table className="w-full">
             <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
               <tr className="border-b border-[var(--color-border)]">
@@ -251,7 +252,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
               })}
             </tbody>
           </table>
-        </div>
+        </ScrollableTable>
       </div>
     </div>
   )

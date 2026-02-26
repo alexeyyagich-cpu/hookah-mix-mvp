@@ -68,11 +68,11 @@ export function ConfirmDialog({
         onClick={handleClose}
         onKeyDown={(e) => e.key === 'Escape' && handleClose()}
       />
-      <div className={`relative w-full max-w-sm rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6 ${
+      <div role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message" className={`relative w-full max-w-sm rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6 ${
         isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'
       }`}>
-        <h3 className="text-lg font-bold mb-2">{title}</h3>
-        <p className="text-sm text-[var(--color-textMuted)] mb-5">{message}</p>
+        <h3 id="confirm-title" className="text-lg font-bold mb-2">{title}</h3>
+        <p id="confirm-message" className="text-sm text-[var(--color-textMuted)] mb-5">{message}</p>
         <div className="flex gap-3">
           <button type="button"
             onClick={handleClose}

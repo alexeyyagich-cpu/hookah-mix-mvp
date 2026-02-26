@@ -113,6 +113,8 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
 
               {error && (
                 <div
+                  role="alert"
+                  aria-live="polite"
                   className="p-3 rounded-lg text-sm"
                   style={{
                     background: 'color-mix(in srgb, var(--color-danger) 15%, transparent)',

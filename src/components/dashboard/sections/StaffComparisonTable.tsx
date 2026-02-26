@@ -2,6 +2,7 @@
 
 import { useTranslation } from '@/lib/i18n'
 import { IconUsers } from '@/components/Icons'
+import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import type { StaffRowEnriched } from '@/types/dashboard-control'
 
 interface Props {
@@ -20,7 +21,7 @@ export function StaffComparisonTable({ rows }: Props) {
         <h2 className="text-lg font-semibold">{t.controlStaffTitle}</h2>
       </div>
 
-      <div className="overflow-x-auto">
+      <ScrollableTable>
         <table className="w-full text-sm">
           <thead className="sticky top-0 z-10 bg-[var(--color-bgCard)]">
             <tr className="text-left text-[var(--color-textMuted)] border-b border-[var(--color-border)]">
@@ -75,7 +76,7 @@ export function StaffComparisonTable({ rows }: Props) {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollableTable>
     </div>
   )
 }
