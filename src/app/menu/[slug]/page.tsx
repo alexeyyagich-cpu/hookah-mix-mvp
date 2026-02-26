@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Try lounge_profiles first for published lounges
   const { data: lounge } = await supabase
     .from('lounge_profiles')
-    .select('name, description, city')
+    .select('name, description, city, cover_image_url, logo_url')
     .eq('slug', slug)
     .eq('is_published', true)
     .single()
@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const name = lounge?.name || slug
   const title = `Menu \u2014 ${name}`
   const description = lounge?.description || `Browse the menu at ${name}`
+  const ogImage = lounge?.cover_image_url || lounge?.logo_url || null
 
   return {
     title,
@@ -29,11 +30,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title,
       description,
       type: 'website',
+      ...(ogImage && { images: [{ url: ogImage, alt: name }] }),
     },
     twitter: {
-      card: 'summary',
+      card: ogImage ? 'summary_large_image' : 'summary',
       title,
       description,
+      ...(ogImage && { images: [ogImage] }),
     },
   }
 }

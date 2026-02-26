@@ -20,7 +20,17 @@ export default function LoungeProfileSettings() {
   const [message, setMessage] = useState('')
   const [linkCopied, setLinkCopied] = useState(false)
   const qrRef = useRef<HTMLDivElement>(null)
+  const messageTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [isDirty, setIsDirty] = useState(false)
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(messageTimerRef.current)
+      clearTimeout(copyTimerRef.current)
+    }
+  }, [])
 
   // Warn on navigation with unsaved changes
   useEffect(() => {
@@ -57,19 +67,21 @@ export default function LoungeProfileSettings() {
 
   // Sync local state when lounge loads
   const [initialized, setInitialized] = useState(false)
-  if (lounge && !initialized) {
-    setDescription(lounge.description || '')
-    setCity(lounge.city || '')
-    setInstagram(lounge.instagram || '')
-    setTelegram(lounge.telegram || '')
-    setWebsite(lounge.website || '')
-    setCoverImageUrl(lounge.cover_image_url || '')
-    setLogoUrl(lounge.logo_url || '')
-    setFeatures(lounge.features || [])
-    if (lounge.working_hours) setWorkingHours(lounge.working_hours)
-    setIsPublished(lounge.is_published ?? false)
-    setInitialized(true)
-  }
+  useEffect(() => {
+    if (lounge && !initialized) {
+      setDescription(lounge.description || '')
+      setCity(lounge.city || '')
+      setInstagram(lounge.instagram || '')
+      setTelegram(lounge.telegram || '')
+      setWebsite(lounge.website || '')
+      setCoverImageUrl(lounge.cover_image_url || '')
+      setLogoUrl(lounge.logo_url || '')
+      setFeatures(lounge.features || [])
+      if (lounge.working_hours) setWorkingHours(lounge.working_hours)
+      setIsPublished(lounge.is_published ?? false)
+      setInitialized(true)
+    }
+  }, [lounge, initialized])
 
   const toggleFeature = useCallback((feature: LoungeFeature) => {
     setFeatures(prev =>
@@ -108,7 +120,8 @@ export default function LoungeProfileSettings() {
     setIsDirty(false)
     setMessage(ts.loungeSaved)
     setSaving(false)
-    setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+    clearTimeout(messageTimerRef.current)
+    messageTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
   }, [lounge, updateLounge, description, city, instagram, telegram, website, coverImageUrl, logoUrl, features, workingHours, isPublished, ts])
 
   const handlePublishToggle = useCallback(async () => {
@@ -127,7 +140,8 @@ export default function LoungeProfileSettings() {
     if (!menuUrl) return
     navigator.clipboard.writeText(menuUrl)
     setLinkCopied(true)
-    setTimeout(() => setLinkCopied(false), TOAST_TIMEOUT)
+    clearTimeout(copyTimerRef.current)
+    copyTimerRef.current = setTimeout(() => setLinkCopied(false), TOAST_TIMEOUT)
   }, [menuUrl])
 
   const handleDownloadQR = useCallback(() => {

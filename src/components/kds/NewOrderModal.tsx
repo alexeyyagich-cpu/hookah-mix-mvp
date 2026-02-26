@@ -723,12 +723,13 @@ export function NewOrderModal({
           <button type="button"
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               canSubmit
                 ? 'bg-[var(--color-primary)] text-white hover:opacity-90'
                 : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] cursor-not-allowed'
             }`}
           >
+            {saving && <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />}
             {saving ? t.creatingOrder : t.createOrderBtn}
           </button>
         </div>

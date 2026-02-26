@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { calculateForecast, type ForecastResult } from '@/lib/utils/forecast'
+import { translateError } from '@/lib/utils/translateError'
 import type { SessionWithItems, TobaccoInventory, InventoryTransaction } from '@/types/database'
 
 // Demo bowl for sessions
@@ -304,7 +305,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       if (transactionsError) throw transactionsError
       setTransactions(transactionsData || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load statistics')
+      setError(translateError(err as Error))
     }
 
     setLoading(false)

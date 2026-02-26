@@ -155,7 +155,7 @@ export function useReady2Order(): UseReady2OrderReturn {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to connect POS')
+      setError(translateError(err as Error))
     }
   }, [isDemoMode, fetchConnection])
 
@@ -180,7 +180,7 @@ export function useReady2Order(): UseReady2OrderReturn {
       setConnection(null)
       setSyncResult(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to disconnect POS')
+      setError(translateError(err as Error))
     }
   }, [isDemoMode])
 
@@ -212,7 +212,7 @@ export function useReady2Order(): UseReady2OrderReturn {
       setSyncResult(data)
       setConnection(prev => prev ? { ...prev, last_sync_at: new Date().toISOString() } : null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sync failed')
+      setError(translateError(err as Error))
     }
 
     setSyncing(false)
