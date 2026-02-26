@@ -105,23 +105,28 @@ export default function LoungeProfileSettings() {
     if (!lounge) return
     setSaving(true)
     setMessage('')
-    await updateLounge({
-      description: description || null,
-      city: city || null,
-      instagram: instagram || null,
-      telegram: telegram || null,
-      website: website || null,
-      cover_image_url: coverImageUrl || null,
-      logo_url: logoUrl || null,
-      features,
-      working_hours: workingHours,
-      is_published: isPublished,
-    })
-    setIsDirty(false)
-    setMessage(ts.loungeSaved)
-    setSaving(false)
-    clearTimeout(messageTimerRef.current)
-    messageTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+    try {
+      await updateLounge({
+        description: description || null,
+        city: city || null,
+        instagram: instagram || null,
+        telegram: telegram || null,
+        website: website || null,
+        cover_image_url: coverImageUrl || null,
+        logo_url: logoUrl || null,
+        features,
+        working_hours: workingHours,
+        is_published: isPublished,
+      })
+      setIsDirty(false)
+      setMessage(ts.loungeSaved)
+      clearTimeout(messageTimerRef.current)
+      messageTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+    } catch (err) {
+      console.error('Failed to save lounge profile:', err)
+    } finally {
+      setSaving(false)
+    }
   }, [lounge, updateLounge, description, city, instagram, telegram, website, coverImageUrl, logoUrl, features, workingHours, isPublished, ts])
 
   const handlePublishToggle = useCallback(async () => {

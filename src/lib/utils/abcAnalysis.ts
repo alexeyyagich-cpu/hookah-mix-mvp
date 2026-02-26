@@ -104,7 +104,8 @@ export function calculateABCByRevenue(sessions: SessionWithItems[]): ABCResult {
 
   for (const session of sessions) {
     const sessionRevenue = session.selling_price || 0
-    const totalGrams = session.total_grams || 1
+    const totalGrams = session.total_grams
+    if (!totalGrams || totalGrams <= 0) continue
     for (const item of session.session_items || []) {
       const key = item.tobacco_id
       if (!revenue[key]) {
@@ -132,7 +133,8 @@ export function calculateABCByMargin(
 
   for (const session of sessions) {
     const sessionRevenue = session.selling_price || 0
-    const totalGrams = session.total_grams || 1
+    const totalGrams = session.total_grams
+    if (!totalGrams || totalGrams <= 0) continue
     for (const item of session.session_items || []) {
       const key = item.tobacco_id
       if (!margin[key]) {

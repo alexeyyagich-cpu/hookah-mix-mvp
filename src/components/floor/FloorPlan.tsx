@@ -445,18 +445,23 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    await onSave({
-      name,
-      capacity: parseInt(capacity) || 4,
-      shape,
-      width: parseInt(width) || 80,
-      height: parseInt(height) || 80,
-      zone: zone.trim() || null,
-      notes: notes || null,
-      position_x: table?.position_x || 100,
-      position_y: table?.position_y || 100,
-    })
-    setSaving(false)
+    try {
+      await onSave({
+        name,
+        capacity: parseInt(capacity) || 4,
+        shape,
+        width: parseInt(width) || 80,
+        height: parseInt(height) || 80,
+        zone: zone.trim() || null,
+        notes: notes || null,
+        position_x: table?.position_x || 100,
+        position_y: table?.position_y || 100,
+      })
+    } catch (err) {
+      console.error('Failed to save table:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (

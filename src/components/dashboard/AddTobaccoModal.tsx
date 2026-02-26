@@ -132,21 +132,25 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     const pkgGrams = parseFloat(packageGrams) || 100
     const totalGrams = (parseFloat(packageCount) || 0) * pkgGrams
 
-    await onSave({
-      tobacco_id: selectedTobacco || `custom-${Date.now()}`,
-      brand,
-      flavor,
-      quantity_grams: totalGrams,
-      purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
-      package_grams: pkgGrams,
-      purchase_date: null,
-      expiry_date: null,
-      notes: notes || null,
-    })
-
-    setSaving(false)
-    handleClose()
-    resetForm()
+    try {
+      await onSave({
+        tobacco_id: selectedTobacco || `custom-${Date.now()}`,
+        brand,
+        flavor,
+        quantity_grams: totalGrams,
+        purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
+        package_grams: pkgGrams,
+        purchase_date: null,
+        expiry_date: null,
+        notes: notes || null,
+      })
+      handleClose()
+      resetForm()
+    } catch (err) {
+      console.error('Failed to save tobacco:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (!visible) return null
