@@ -383,7 +383,7 @@ export function cacheGuestsLocally(guests: Guest[]): void {
       guests,
       cached_at: new Date().toISOString(),
     }))
-  } catch (e) {
+  } catch {
     // Failed to cache guests locally
   }
 }
@@ -400,7 +400,7 @@ export function getCachedGuests(): Guest[] | null {
 
     const parsed = JSON.parse(data)
     return parsed.guests || null
-  } catch (e) {
+  } catch {
     return null
   }
 }
@@ -420,7 +420,7 @@ export function queueGuestUpdate(guestId: string, update: Partial<Guest>): void 
       queued_at: new Date().toISOString(),
     })
     localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue))
-  } catch (e) {
+  } catch {
     // Failed to queue guest update
   }
 }

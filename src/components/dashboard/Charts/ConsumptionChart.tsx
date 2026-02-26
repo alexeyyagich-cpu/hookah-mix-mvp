@@ -16,6 +16,7 @@ interface ConsumptionChartProps {
 export function ConsumptionChart({ data }: ConsumptionChartProps) {
   const t = useTranslation('manage')
   const { locale } = useLocale()
+  const maxGrams = useMemo(() => data && data.length > 0 ? Math.max(...data.map(d => d.grams), 1) : 1, [data])
 
   if (!data || data.length === 0) {
     return (
@@ -24,8 +25,6 @@ export function ConsumptionChart({ data }: ConsumptionChartProps) {
       </div>
     )
   }
-
-  const maxGrams = useMemo(() => Math.max(...data.map(d => d.grams), 1), [data])
   const chartHeight = 140 // Fixed height in pixels
 
   return (

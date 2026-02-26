@@ -56,7 +56,7 @@ export async function GET(
     ])
 
     const rIds = (recipesRes.data || []).map(r => r.id)
-    let iMap: Record<string, string[]> = {}
+    const iMap: Record<string, string[]> = {}
     if (rIds.length > 0) {
       const { data: ings } = await supabase
         .from('bar_recipe_ingredients').select('recipe_id, ingredient_name')
@@ -101,7 +101,7 @@ export async function GET(
 
   // Fetch ingredient names for all recipes
   const recipeIds = (recipes || []).map(r => r.id)
-  let ingredientMap: Record<string, string[]> = {}
+  const ingredientMap: Record<string, string[]> = {}
 
   if (recipeIds.length > 0) {
     const { data: ingredients } = await supabase

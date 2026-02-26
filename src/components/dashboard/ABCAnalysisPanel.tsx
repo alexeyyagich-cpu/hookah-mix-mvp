@@ -37,6 +37,12 @@ export function ABCAnalysisPanel() {
     }
   }, [sessions, inventory, mode])
 
+  const modes: { key: ABCMode; label: string }[] = useMemo(() => [
+    { key: 'usage', label: tm.abcByUsage },
+    { key: 'revenue', label: tm.abcByRevenue },
+    { key: 'margin', label: tm.abcByMargin },
+  ], [tm])
+
   if (isFreeTier) {
     return (
       <div className="card p-6 text-center">
@@ -51,12 +57,6 @@ export function ABCAnalysisPanel() {
       </div>
     )
   }
-
-  const modes: { key: ABCMode; label: string }[] = useMemo(() => [
-    { key: 'usage', label: tm.abcByUsage },
-    { key: 'revenue', label: tm.abcByRevenue },
-    { key: 'margin', label: tm.abcByMargin },
-  ], [tm])
 
   return (
     <div className="space-y-4">

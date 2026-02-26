@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
 
 export default function GlobalError({
@@ -38,9 +39,9 @@ export default function GlobalError({
           >
             {tc.retry}
           </button>
-          <a href="/" className="btn btn-secondary px-6 py-3">
+          <Link href="/" className="btn btn-secondary px-6 py-3">
             {tc.notFound.goHome}
-          </a>
+          </Link>
         </div>
 
         {error.digest && (

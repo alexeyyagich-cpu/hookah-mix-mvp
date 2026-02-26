@@ -341,7 +341,7 @@ export function recommendMixes(
 
     if (inventory) {
       let foundCount = 0
-      let totalCount = mix.ingredients.length
+      const totalCount = mix.ingredients.length
 
       for (const ingredient of mix.ingredients) {
         const inStock = inventory.find(

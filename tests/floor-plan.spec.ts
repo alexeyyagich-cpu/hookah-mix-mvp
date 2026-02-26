@@ -78,7 +78,7 @@ test.describe('Floor Plan — Demo Mode', () => {
 
     // Detail panel should appear — it's a .card with border
     // Check that status buttons are visible (Available, Occupied, Reserved, Cleaning)
-    const detailPanel = page.locator('.card').filter({ hasText: 'Table 2' }).filter({ hasText: /capacity|seats/i }).first()
+    const _detailPanel = page.locator('.card').filter({ hasText: 'Table 2' }).filter({ hasText: /capacity|seats/i }).first()
       || page.locator('.card[style*="border-width: 2px"]')
 
     // The panel has a grid of 4 status buttons

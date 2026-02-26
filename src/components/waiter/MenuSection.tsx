@@ -62,6 +62,13 @@ export function MenuSection({
   const [search, setSearch] = useState('')
   const { locale } = useLocale()
 
+  const filteredTobaccos = useMemo(() => {
+    if (!search) return TOBACCOS.slice(0, 50)
+    return TOBACCOS.filter(t =>
+      (t.flavor + t.brand).toLowerCase().includes(search.toLowerCase())
+    )
+  }, [search])
+
   // Bar tab
   if (activeTab === 'bar') {
     const menuRecipes = recipes.filter(r => r.is_on_menu)
@@ -139,13 +146,6 @@ export function MenuSection({
   }
 
   // Hookah tab
-  const filteredTobaccos = useMemo(() => {
-    if (!search) return TOBACCOS.slice(0, 50)
-    return TOBACCOS.filter(t =>
-      (t.flavor + t.brand).toLowerCase().includes(search.toLowerCase())
-    )
-  }, [search])
-
   const selectedIds = tobaccos.map(t => t.tobacco.id)
 
   return (

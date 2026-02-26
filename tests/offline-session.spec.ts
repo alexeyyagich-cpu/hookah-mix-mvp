@@ -81,7 +81,7 @@ test.describe('Offline Session Creation', () => {
     console.log('Testing offline session creation via JavaScript...')
     const result = await page.evaluate(async () => {
       // Access IndexedDB to check the sync queue
-      const { openDB } = await import('/node_modules/idb/build/index.js' as string)
+      const { openDB: _openDB } = await import('/node_modules/idb/build/index.js' as string)
         .catch(() => ({ openDB: null }))
 
       // Check if there's data in the cache

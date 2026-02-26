@@ -34,6 +34,7 @@ export default function TeamPage() {
   const [inviting, setInviting] = useState(false)
   const [inviteError, setInviteError] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [confirmAction, setConfirmAction] = useState<{ type: 'remove' | 'cancel'; id: string; name?: string } | null>(null)
 
   // Only owners can access this page — wait for org data to load
   if (orgLoading) return (
@@ -75,8 +76,6 @@ export default function TeamPage() {
 
     setInviting(false)
   }
-
-  const [confirmAction, setConfirmAction] = useState<{ type: 'remove' | 'cancel'; id: string; name?: string } | null>(null)
 
   const handleRemoveMember = (memberId: string, name: string) => {
     setConfirmAction({ type: 'remove', id: memberId, name })
