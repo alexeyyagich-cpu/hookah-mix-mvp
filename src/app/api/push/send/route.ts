@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import { sendPushToUser } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
@@ -7,9 +8,10 @@ export async function POST(request: NextRequest) {
   const rateCheck = await checkRateLimit(`push-send:${ip}`, rateLimits.webhook)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
-  // Verify internal API key
-  const apiKey = request.headers.get('x-api-key')
-  if (apiKey !== process.env.INTERNAL_API_KEY) {
+  // Verify internal API key (timing-safe)
+  const apiKey = request.headers.get('x-api-key') || ''
+  const expected = process.env.INTERNAL_API_KEY || ''
+  if (!expected || apiKey.length !== expected.length || !timingSafeEqual(Buffer.from(apiKey), Buffer.from(expected))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

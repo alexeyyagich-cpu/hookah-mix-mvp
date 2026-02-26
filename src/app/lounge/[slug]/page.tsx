@@ -34,10 +34,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    alternates: { canonical: `https://hookahtorus.com/lounge/${slug}` },
     openGraph: {
       title,
       description,
       type: 'website',
+      url: `https://hookahtorus.com/lounge/${slug}`,
       ...(lounge.logo_url && { images: [{ url: lounge.logo_url, width: 400, height: 400 }] }),
     },
     twitter: {

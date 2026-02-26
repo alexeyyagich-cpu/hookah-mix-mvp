@@ -26,10 +26,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    alternates: { canonical: `https://hookahtorus.com/menu/${slug}` },
     openGraph: {
       title,
       description,
       type: 'website',
+      url: `https://hookahtorus.com/menu/${slug}`,
       ...(ogImage && { images: [{ url: ogImage, alt: name }] }),
     },
     twitter: {

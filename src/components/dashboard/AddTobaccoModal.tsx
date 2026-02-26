@@ -366,6 +366,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       className="input resize-none"
                       placeholder={t.notesPlaceholder}
                       rows={3}
+                      maxLength={500}
                     />
                   </div>
                 </>

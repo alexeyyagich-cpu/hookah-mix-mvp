@@ -93,6 +93,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           ]
         })
       }
+
+      // Fetch published staff tip pages
+      const { data: staffProfiles } = await supabase
+        .from('staff_profiles')
+        .select('tip_slug, updated_at')
+        .eq('is_tip_enabled', true)
+
+      if (staffProfiles && staffProfiles.length > 0) {
+        const tipRoutes = staffProfiles.map((staff) => ({
+          url: `${baseUrl}/tip/${staff.tip_slug}`,
+          lastModified: staff.updated_at ? new Date(staff.updated_at) : currentDate,
+          changeFrequency: 'monthly' as const,
+          priority: 0.5,
+        }))
+        dynamicRoutes = [...dynamicRoutes, ...tipRoutes]
+      }
     }
   } catch {
     // Sitemap still works with static routes if Supabase query fails
