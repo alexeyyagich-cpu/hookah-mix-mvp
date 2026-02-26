@@ -64,9 +64,15 @@ export default function BarMenuPage() {
   const handlePriceSave = async (recipeId: string) => {
     const price = parseFloat(priceValue)
     if (!isNaN(price) && price >= 0) {
-      await updateRecipe(recipeId, { menu_price: price })
+      try {
+        await updateRecipe(recipeId, { menu_price: price })
+        setEditingPrice(null)
+      } catch {
+        // Error displayed by hook
+      }
+    } else {
+      setEditingPrice(null)
     }
-    setEditingPrice(null)
   }
 
   // Stats

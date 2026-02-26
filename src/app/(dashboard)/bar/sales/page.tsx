@@ -399,9 +399,12 @@ export default function BarSalesPage() {
         confirmLabel={tc.delete}
         cancelLabel={tc.cancel}
         danger
-        onConfirm={() => {
-          if (deletingId) deleteSale(deletingId)
-          setDeletingId(null)
+        onConfirm={async () => {
+          try {
+            if (deletingId) await deleteSale(deletingId)
+          } finally {
+            setDeletingId(null)
+          }
         }}
         onCancel={() => setDeletingId(null)}
       />

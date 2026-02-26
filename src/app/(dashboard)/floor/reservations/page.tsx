@@ -51,8 +51,11 @@ export default function ReservationsPage() {
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
-    await deleteReservation(id)
-    setDeletingId(null)
+    try {
+      await deleteReservation(id)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   if (loading) {

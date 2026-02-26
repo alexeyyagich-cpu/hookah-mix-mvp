@@ -30,12 +30,16 @@ export default function BarInventoryPage() {
   const [editingItem, setEditingItem] = useState<BarInventoryItem | null>(null)
 
   const handleSave = async (item: Omit<BarInventoryItem, 'id' | 'profile_id' | 'created_at' | 'updated_at'>) => {
-    if (editingItem) {
-      await updateIngredient(editingItem.id, item)
-    } else {
-      await addIngredient(item)
+    try {
+      if (editingItem) {
+        await updateIngredient(editingItem.id, item)
+      } else {
+        await addIngredient(item)
+      }
+      setEditingItem(null)
+    } catch {
+      // Error displayed by hook
     }
-    setEditingItem(null)
   }
 
   const handleEdit = (item: BarInventoryItem) => {
@@ -44,7 +48,11 @@ export default function BarInventoryPage() {
   }
 
   const handleDelete = async (id: string) => {
-    await deleteIngredient(id)
+    try {
+      await deleteIngredient(id)
+    } catch {
+      // Error displayed by hook
+    }
   }
 
   const handleAdjust = async (id: string, amount: number) => {

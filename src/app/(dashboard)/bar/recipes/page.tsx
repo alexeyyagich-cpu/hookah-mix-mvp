@@ -70,12 +70,16 @@ export default function BarRecipesPage() {
     recipe: Parameters<typeof addRecipe>[0],
     ingredients: Parameters<typeof addRecipe>[1]
   ) => {
-    if (editingRecipe) {
-      await updateRecipe(editingRecipe.id, recipe, ingredients)
-    } else {
-      await addRecipe(recipe, ingredients)
+    try {
+      if (editingRecipe) {
+        await updateRecipe(editingRecipe.id, recipe, ingredients)
+      } else {
+        await addRecipe(recipe, ingredients)
+      }
+      setEditingRecipe(null)
+    } catch {
+      // Error displayed by hook
     }
-    setEditingRecipe(null)
   }
 
   const handleEdit = (recipe: BarRecipeWithIngredients) => {
@@ -84,8 +88,12 @@ export default function BarRecipesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    await deleteRecipe(id)
-    if (selectedRecipe === id) setSelectedRecipe(null)
+    try {
+      await deleteRecipe(id)
+      if (selectedRecipe === id) setSelectedRecipe(null)
+    } catch {
+      // Error displayed by hook
+    }
   }
 
   // Stats
