@@ -70,30 +70,36 @@ export default function ShiftsPage() {
 
   const handleOpenShift = async () => {
     setSubmitting(true)
-    const result = await openShift({
-      starting_cash: startingCash ? parseFloat(startingCash) : undefined,
-      open_notes: openNotes.trim() || undefined,
-    })
-    setSubmitting(false)
-    if (result) {
-      setShowOpenModal(false)
-      setStartingCash('')
-      setOpenNotes('')
+    try {
+      const result = await openShift({
+        starting_cash: startingCash ? parseFloat(startingCash) : undefined,
+        open_notes: openNotes.trim() || undefined,
+      })
+      if (result) {
+        setShowOpenModal(false)
+        setStartingCash('')
+        setOpenNotes('')
+      }
+    } finally {
+      setSubmitting(false)
     }
   }
 
   const handleCloseShift = async () => {
     if (!activeShift) return
     setSubmitting(true)
-    const result = await closeShift(activeShift.id, {
-      closing_cash: closingCash ? parseFloat(closingCash) : undefined,
-      close_notes: closeNotes.trim() || undefined,
-    })
-    setSubmitting(false)
-    if (result) {
-      setShowCloseModal(false)
-      setClosingCash('')
-      setCloseNotes('')
+    try {
+      const result = await closeShift(activeShift.id, {
+        closing_cash: closingCash ? parseFloat(closingCash) : undefined,
+        close_notes: closeNotes.trim() || undefined,
+      })
+      if (result) {
+        setShowCloseModal(false)
+        setClosingCash('')
+        setCloseNotes('')
+      }
+    } finally {
+      setSubmitting(false)
     }
   }
 

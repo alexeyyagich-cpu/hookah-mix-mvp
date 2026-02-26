@@ -26,8 +26,11 @@ export default function ReviewsPage() {
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
-    await deleteReview(id)
-    setDeletingId(null)
+    try {
+      await deleteReview(id)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   if (loading) {

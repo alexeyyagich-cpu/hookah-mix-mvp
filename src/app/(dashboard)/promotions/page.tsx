@@ -33,6 +33,7 @@ export default function PromotionsPage() {
   const [nthVisit, setNthVisit] = useState('5')
   const [maxUses, setMaxUses] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   if (isFreeTier) {
     return (
@@ -73,7 +74,8 @@ export default function PromotionsPage() {
   }
 
   const handleSubmit = async () => {
-    if (!name.trim()) return
+    if (!name.trim() || submitting) return
+    setSubmitting(true)
 
     const rules: PromoRules = { discount_percent: parseFloat(discountPercent) || 10 }
     if (type === 'happy_hour') {
@@ -85,12 +87,16 @@ export default function PromotionsPage() {
       rules.discount_percent = 100
     }
 
-    if (editingPromo) {
-      await updatePromo(editingPromo.id, { name: name.trim(), type, rules, max_uses: maxUses ? parseInt(maxUses) : null })
-    } else {
-      await createPromo({ name: name.trim(), type, rules, max_uses: maxUses ? parseInt(maxUses) : null })
+    try {
+      if (editingPromo) {
+        await updatePromo(editingPromo.id, { name: name.trim(), type, rules, max_uses: maxUses ? parseInt(maxUses) : null })
+      } else {
+        await createPromo({ name: name.trim(), type, rules, max_uses: maxUses ? parseInt(maxUses) : null })
+      }
+      resetForm()
+    } finally {
+      setSubmitting(false)
     }
-    resetForm()
   }
 
   const promoTypeLabel = (t: PromoType) => tm[`promoType_${t}` as keyof typeof tm] as string
@@ -228,8 +234,8 @@ export default function PromotionsPage() {
             </div>
           </div>
 
-          <button type="button" onClick={handleSubmit} className="btn btn-primary">
-            {editingPromo ? tm.save : tm.createPromo}
+          <button type="button" onClick={handleSubmit} disabled={submitting || !name.trim()} className="btn btn-primary disabled:opacity-50">
+            {submitting ? '...' : editingPromo ? tm.save : tm.createPromo}
           </button>
         </div>
       )}
@@ -286,7 +292,7 @@ export default function PromotionsPage() {
                 {confirmDeleteId === promo.id ? (
                   <div className="flex gap-1">
                     <button type="button"
-                      onClick={async () => { await deletePromo(promo.id); setConfirmDeleteId(null) }}
+                      onClick={async () => { try { await deletePromo(promo.id) } finally { setConfirmDeleteId(null) } }}
                       className="btn btn-ghost text-[var(--color-danger)] text-xs"
                     >
                       {tm.delete}

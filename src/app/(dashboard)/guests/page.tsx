@@ -64,10 +64,14 @@ export default function GuestsPage() {
 
   const handleAddGuest = async () => {
     if (!newName.trim()) return
-    await addGuest({ name: newName.trim(), phone: newPhone.trim() || null })
-    setNewName('')
-    setNewPhone('')
-    setShowAddForm(false)
+    try {
+      await addGuest({ name: newName.trim(), phone: newPhone.trim() || null })
+      setNewName('')
+      setNewPhone('')
+      setShowAddForm(false)
+    } catch {
+      // Error displayed by hook
+    }
   }
 
   if (isFreeTier) {

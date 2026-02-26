@@ -91,8 +91,11 @@ export default function BossPage() {
   const [opening, setOpening] = useState(false)
   const handleQuickOpen = async () => {
     setOpening(true)
-    await openShift()
-    setOpening(false)
+    try {
+      await openShift()
+    } finally {
+      setOpening(false)
+    }
   }
 
   // Owner guard — wait for org data to load before checking
