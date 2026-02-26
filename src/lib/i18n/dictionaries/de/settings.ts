@@ -4,6 +4,13 @@ export const settings: typeof SettingsType = {
   title: 'Einstellungen',
   subtitle: 'Profil und Abonnement verwalten',
 
+  sectionGeneral: 'Allgemein',
+  sectionSubscription: 'Abonnement',
+  sectionVenue: 'Lokal',
+  sectionNotifications: 'Benachrichtigungen',
+  sectionIntegrations: 'Integrationen',
+  sectionAccount: 'Konto',
+
   language: 'Sprache',
   languageDescription: 'Wählen Sie die Sprache der Benutzeroberfläche',
 

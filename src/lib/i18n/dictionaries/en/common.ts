@@ -75,6 +75,13 @@ export const common: typeof CommonType = {
     goDashboard: 'Go to dashboard',
   },
 
+  accessDenied: {
+    title: 'Access denied',
+    description: 'You don\'t have permission to view this page. Contact the venue owner.',
+    goBack: 'Go back',
+    goDashboard: 'Go to dashboard',
+  },
+
   offline: {
     title: 'No internet connection',
     description: 'Check your connection and try again later.',
@@ -127,6 +134,12 @@ export const common: typeof CommonType = {
   legalAllRights: 'All rights reserved.',
 
   changeTheme: 'Change theme',
+
+  commandPalette: {
+    placeholder: 'Go to page...',
+    noResults: 'No results found',
+    hint: '⌘K to quick navigate',
+  },
 
   // Cookie consent
   cookieText: 'We use cookies to ensure the site works properly and to improve our service.',

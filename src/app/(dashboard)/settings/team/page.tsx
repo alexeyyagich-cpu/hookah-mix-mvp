@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTeam } from '@/lib/hooks/useTeam'
 import { useTips } from '@/lib/hooks/useTips'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { IconUsers, IconMail, IconTrash, IconRefresh, IconPlus, IconChevronLeft } from '@/components/Icons'
+import { AccessDenied } from '@/components/ui/AccessDenied'
 import { TipQRCode } from '@/components/dashboard/TipQRCode'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { OrgRole } from '@/types/database'
 
@@ -21,7 +21,6 @@ export default function TeamPage() {
   const ts = useTranslation('settings')
   const tc = useTranslation('common')
   const { locale } = useLocale()
-  const router = useRouter()
   const { orgRole, loading: orgLoading } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
   const { members, invitations, loading, error, inviteMember, removeMember, updateMemberRole, updateMemberPayroll, cancelInvitation, resendInvitation } = useTeam()
@@ -36,11 +35,8 @@ export default function TeamPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   // Only owners can access this page — wait for org data to load
-  useEffect(() => {
-    if (!orgLoading && !isOwner) router.push('/dashboard')
-  }, [orgLoading, isOwner, router])
-
-  if (orgLoading || !isOwner) return null
+  if (orgLoading) return null
+  if (!isOwner) return <AccessDenied />
 
   const getRoleLabel = (role: OrgRole) => {
     const labels = ORG_ROLE_LABELS[role]

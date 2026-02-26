@@ -4,6 +4,13 @@ export const settings: typeof SettingsType = {
   title: 'Settings',
   subtitle: 'Manage your profile and subscription',
 
+  sectionGeneral: 'General',
+  sectionSubscription: 'Subscription',
+  sectionVenue: 'Venue',
+  sectionNotifications: 'Notifications',
+  sectionIntegrations: 'Integrations',
+  sectionAccount: 'Account',
+
   language: 'Language',
   languageDescription: 'Choose interface language',
 

@@ -2,6 +2,14 @@ export const settings = {
   title: 'Настройки',
   subtitle: 'Управление профилем и подпиской',
 
+  // Section tabs
+  sectionGeneral: 'Общие',
+  sectionSubscription: 'Подписка',
+  sectionVenue: 'Заведение',
+  sectionNotifications: 'Уведомления',
+  sectionIntegrations: 'Интеграции',
+  sectionAccount: 'Аккаунт',
+
   // Language
   language: 'Язык',
   languageDescription: 'Выберите язык интерфейса',

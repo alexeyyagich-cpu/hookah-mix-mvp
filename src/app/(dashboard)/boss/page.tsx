@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
 import { useRole } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -17,6 +16,7 @@ import { useTips } from '@/lib/hooks/useTips'
 import { useTranslation, useLocale, formatTime } from '@/lib/i18n'
 import { IconCrown, IconRefresh, IconLock } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { AccessDenied } from '@/components/ui/AccessDenied'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import Link from 'next/link'
 import type { ShiftReconciliation } from '@/types/database'
@@ -32,7 +32,6 @@ import { ActivityFeed } from '@/components/boss/ActivityFeed'
 export default function BossPage() {
   const tm = useTranslation('manage')
   const { locale } = useLocale()
-  const router = useRouter()
   const { orgRole, loading: orgLoading } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
   const { isFreeTier } = useSubscription()
@@ -97,11 +96,8 @@ export default function BossPage() {
   }
 
   // Owner guard — wait for org data to load before checking
-  useEffect(() => {
-    if (!orgLoading && !isOwner) router.push('/dashboard')
-  }, [orgLoading, isOwner, router])
-
-  if (orgLoading || !isOwner) return null
+  if (orgLoading) return null
+  if (!isOwner) return <AccessDenied />
 
   // Pro guard
   if (isFreeTier) {

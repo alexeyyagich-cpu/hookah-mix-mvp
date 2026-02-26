@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
@@ -8,6 +8,7 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useModules } from '@/lib/hooks/useModules'
 import { useRole, ORG_ROLE_LABELS, type Permission } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { useSidebarBadges } from '@/lib/SidebarBadgeContext'
 import { useTranslation, useLocale } from '@/lib/i18n'
 import type { AppModule } from '@/types/database'
 import {
@@ -61,6 +62,27 @@ export function Sidebar() {
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
   const { orgRole, hasPermission, hasAnyPermission, isOwner } = useRole(contextOrgRole)
   const { modules } = useModules()
+  const badges = useSidebarBadges()
+
+  // Close mobile sidebar on Escape key
+  useEffect(() => {
+    if (!mobileOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [mobileOpen])
+
+  // Swipe-to-close mobile sidebar
+  const touchStartX = useRef(0)
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }, [])
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current
+    if (deltaX < -60) setMobileOpen(false)
+  }, [])
 
   // Collapsible groups — persisted in localStorage
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
@@ -296,6 +318,8 @@ export function Sidebar() {
                   )
                 }
 
+                const badgeCount = badges[item.href] || 0
+
                 return (
                   <Link
                     key={item.name}
@@ -310,6 +334,15 @@ export function Sidebar() {
                   >
                     <Icon size={18} aria-hidden="true" />
                     {item.name}
+                    {badgeCount > 0 && (
+                      <span className={`ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${
+                        isActive
+                          ? 'bg-[var(--color-bg)]/30 text-[var(--color-bg)]'
+                          : 'bg-[var(--color-danger)] text-white'
+                      }`}>
+                        {badgeCount > 99 ? '99+' : badgeCount}
+                      </span>
+                    )}
                   </Link>
                 )
               })}
@@ -376,6 +409,8 @@ export function Sidebar() {
         role="dialog"
         aria-label={t.openNav}
         aria-modal="true"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         className={`lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-[var(--color-bgCard)] border-r border-[var(--color-border)] flex flex-col transform transition-transform ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}

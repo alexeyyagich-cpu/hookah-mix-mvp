@@ -6,6 +6,8 @@ import { Toaster, toast } from 'sonner'
 import { AuthGuard } from '@/components/auth/AuthGuard'
 import { OrganizationProvider } from '@/lib/OrganizationContext'
 import { Sidebar } from '@/components/dashboard/Sidebar'
+import { CommandPalette } from '@/components/dashboard/CommandPalette'
+import { PageTitle } from '@/components/dashboard/PageTitle'
 import { BrandLoader } from '@/components/BrandLoader'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useNotificationSettings } from '@/lib/hooks/useNotificationSettings'
@@ -14,6 +16,7 @@ import { useTranslation } from '@/lib/i18n'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { InstallBanner } from '@/components/InstallBanner'
 import { OnlineStatusProvider } from '@/lib/offline/useOnlineStatus'
+import { SidebarBadgeProvider, useSetSidebarBadge } from '@/lib/SidebarBadgeContext'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
 
 function PageProgressBar() {
@@ -98,12 +101,22 @@ function LowStockNotifier() {
   const { settings } = useNotificationSettings()
   const tc = useTranslation('common')
   const hasShownRef = useRef(false)
+  const setBadge = useSetSidebarBadge()
+
+  const threshold = settings?.low_stock_threshold || 50
+  const lowStockCount = inventory.filter(item =>
+    item.quantity_grams < threshold
+  ).length
+
+  // Update sidebar badge for inventory
+  useEffect(() => {
+    setBadge('/inventory', lowStockCount)
+  }, [lowStockCount, setBadge])
 
   useEffect(() => {
     // Only show once per session
     if (hasShownRef.current || !settings?.low_stock_enabled) return
 
-    const threshold = settings?.low_stock_threshold || 50
     const lowStockItems = inventory.filter(item =>
       item.quantity_grams < threshold && item.quantity_grams > 0
     )
@@ -124,7 +137,7 @@ function LowStockNotifier() {
       })
       hasShownRef.current = true
     }
-  }, [inventory, settings, tc])
+  }, [inventory, settings, tc, threshold])
 
   return null
 }
@@ -138,6 +151,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* Global background slot - pages can inject backgrounds here via portal or we check pathname */}
       <div id="page-background" className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }} />
       {!isOnboarding && <Sidebar />}
+      {!isOnboarding && <CommandPalette />}
+      <PageTitle />
       <main className={isOnboarding ? '' : 'lg:pl-72 relative'} style={{ zIndex: 1 }}>
         {!isOnboarding && <InstallBanner />}
         <div className={isOnboarding ? '' : 'p-4 pt-16 pl-20 lg:p-8 lg:pt-8'}>
@@ -170,11 +185,13 @@ export default function DashboardLayout({
   return (
     <AuthGuard>
       <OrganizationProvider>
-        <OnlineStatusProvider>
-          <OnboardingCheck>
-            <DashboardContent>{children}</DashboardContent>
-          </OnboardingCheck>
-        </OnlineStatusProvider>
+        <SidebarBadgeProvider>
+          <OnlineStatusProvider>
+            <OnboardingCheck>
+              <DashboardContent>{children}</DashboardContent>
+            </OnboardingCheck>
+          </OnlineStatusProvider>
+        </SidebarBadgeProvider>
       </OrganizationProvider>
     </AuthGuard>
   )

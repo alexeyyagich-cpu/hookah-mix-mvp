@@ -202,6 +202,20 @@ export default function SettingsPage() {
 
   const hasActiveSubscription = profile?.stripe_subscription_id && tier !== 'free'
 
+  const sections = [
+    { id: 'general', label: ts.sectionGeneral },
+    { id: 'subscription', label: ts.sectionSubscription },
+    { id: 'venue', label: ts.sectionVenue },
+    { id: 'notifications', label: ts.sectionNotifications },
+    { id: 'integrations', label: ts.sectionIntegrations },
+    { id: 'account', label: ts.sectionAccount },
+  ]
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
@@ -212,8 +226,22 @@ export default function SettingsPage() {
         </p>
       </div>
 
+      {/* Tab navigation */}
+      <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+        {sections.map(s => (
+          <button
+            key={s.id}
+            type="button"
+            onClick={() => scrollTo(s.id)}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)] transition-colors"
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       {/* Language Selector */}
-      <div className="card p-6 space-y-4">
+      <div id="general" className="card p-6 space-y-4 scroll-mt-4">
         <div>
           <h2 className="text-lg font-semibold">{ts.language}</h2>
           <p className="text-sm text-[var(--color-textMuted)]">{ts.languageDescription}</p>
@@ -241,7 +269,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Subscription Status */}
-      <div className="card p-6">
+      <div id="subscription" className="card p-6 scroll-mt-4">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-lg font-semibold mb-1">{ts.subscription}</h2>
@@ -441,7 +469,7 @@ export default function SettingsPage() {
       </form>
 
       {/* QR Menu */}
-      <div className="card p-6 space-y-5">
+      <div id="venue" className="card p-6 space-y-5 scroll-mt-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -535,7 +563,7 @@ export default function SettingsPage() {
       <LoungeProfileSettings />
 
       {/* Notification Settings */}
-      <div className="card p-6 space-y-5">
+      <div id="notifications" className="card p-6 space-y-5 scroll-mt-4">
         <h2 className="text-lg font-semibold">{ts.notifications}</h2>
 
         <div className="space-y-4">
@@ -742,7 +770,7 @@ export default function SettingsPage() {
       </div>
 
       {/* POS (ready2order) — brand color #00b341 intentionally not theme-variable */}
-      <div className="card p-6 space-y-5">
+      <div id="integrations" className="card p-6 space-y-5 scroll-mt-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#00b341] flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -974,7 +1002,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Danger Zone */}
-      <div className="card p-6 border-[var(--color-danger)]/30">
+      <div id="account" className="card p-6 border-[var(--color-danger)]/30 scroll-mt-4">
         <h2 className="text-lg font-semibold text-[var(--color-danger)] mb-4">
           {ts.dangerZone}
         </h2>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useKDS } from '@/lib/hooks/useKDS'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
@@ -14,6 +14,7 @@ import { IconPlus, IconMenuList } from '@/components/Icons'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation } from '@/lib/i18n'
+import { useSetSidebarBadge } from '@/lib/SidebarBadgeContext'
 import type { KdsOrderStatus } from '@/types/database'
 
 type TypeFilter = 'all' | 'bar' | 'hookah'
@@ -28,6 +29,16 @@ export default function KdsPage() {
   const { inventory } = useInventory()
   const { guests } = useGuests()
   const { isBarActive, isHookahActive } = useModules()
+  const setBadge = useSetSidebarBadge()
+
+  // Report pending orders count to sidebar badge
+  const pendingCount = useMemo(() =>
+    orders.filter(o => o.status === 'new' || o.status === 'preparing').length,
+    [orders]
+  )
+  useEffect(() => {
+    setBadge('/kds', pendingCount)
+  }, [pendingCount, setBadge])
 
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [mobileColumn, setMobileColumn] = useState<MobileColumn>('new')

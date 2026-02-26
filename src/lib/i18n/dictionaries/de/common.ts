@@ -75,6 +75,13 @@ export const common: typeof CommonType = {
     goDashboard: 'Zum Dashboard',
   },
 
+  accessDenied: {
+    title: 'Zugriff verweigert',
+    description: 'Sie haben keine Berechtigung, diese Seite anzuzeigen. Wenden Sie sich an den Inhaber.',
+    goBack: 'Zurück',
+    goDashboard: 'Zum Dashboard',
+  },
+
   offline: {
     title: 'Keine Internetverbindung',
     description: 'Prüfen Sie Ihre Verbindung und versuchen Sie es später erneut.',
@@ -127,6 +134,12 @@ export const common: typeof CommonType = {
   legalAllRights: 'Alle Rechte vorbehalten.',
 
   changeTheme: 'Design ändern',
+
+  commandPalette: {
+    placeholder: 'Zur Seite gehen...',
+    noResults: 'Keine Ergebnisse gefunden',
+    hint: '⌘K zum Schnellzugriff',
+  },
 
   // Cookie consent
   cookieText: 'Wir verwenden Cookies, um den Betrieb der Website zu gewährleisten und unseren Service zu verbessern.',

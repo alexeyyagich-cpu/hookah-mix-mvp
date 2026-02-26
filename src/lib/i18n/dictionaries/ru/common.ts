@@ -82,6 +82,14 @@ export const common = {
     goDashboard: 'В личный кабинет',
   },
 
+  // Access Denied
+  accessDenied: {
+    title: 'Нет доступа',
+    description: 'У вас нет прав для просмотра этой страницы. Обратитесь к владельцу заведения.',
+    goBack: 'Вернуться назад',
+    goDashboard: 'На главную',
+  },
+
   // Offline
   offline: {
     title: 'Нет подключения к интернету',
@@ -141,6 +149,13 @@ export const common = {
   legalAllRights: 'Все права защищены.',
 
   changeTheme: 'Сменить тему',
+
+  // Command palette
+  commandPalette: {
+    placeholder: 'Перейти к странице...',
+    noResults: 'Ничего не найдено',
+    hint: '⌘K для быстрого перехода',
+  },
 
   // Cookie consent
   cookieText: 'Мы используем файлы cookie для обеспечения работы сайта и улучшения качества обслуживания.',
