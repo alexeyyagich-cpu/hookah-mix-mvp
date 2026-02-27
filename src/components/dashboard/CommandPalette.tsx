@@ -7,6 +7,8 @@ import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useModules } from '@/lib/hooks/useModules'
 import { useTranslation } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import type { AppModule } from '@/types/database'
 import {
   IconDashboard,
@@ -47,10 +49,14 @@ export function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const paletteRef = useRef<HTMLDivElement>(null)
+  const focusTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const router = useRouter()
 
   const t = useTranslation('nav')
   const tc = useTranslation('common')
+  useFocusTrap(paletteRef, open)
+  useBodyScrollLock(open)
   const { orgRole } = useOrganizationContext()
   const { hasPermission, hasAnyPermission, isOwner } = useRole(orgRole)
   const { isFreeTier } = useSubscription()
@@ -117,8 +123,9 @@ export function CommandPalette() {
     if (open) {
       setQuery('')
       setSelectedIndex(0)
-      setTimeout(() => inputRef.current?.focus(), 50)
+      focusTimerRef.current = setTimeout(() => inputRef.current?.focus(), 50)
     }
+    return () => { clearTimeout(focusTimerRef.current) }
   }, [open])
 
   // Scroll selected item into view
@@ -164,7 +171,7 @@ export function CommandPalette() {
       />
 
       {/* Palette */}
-      <div className="relative w-full max-w-lg mx-4 bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] shadow-2xl overflow-hidden animate-fadeInUp">
+      <div ref={paletteRef} role="dialog" aria-modal="true" className="relative w-full max-w-lg mx-4 bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] shadow-2xl overflow-hidden animate-fadeInUp">
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)]">
           <svg className="w-5 h-5 text-[var(--color-textMuted)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

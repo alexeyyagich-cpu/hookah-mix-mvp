@@ -36,6 +36,9 @@ export default function ReportsPage() {
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [copyMessage, setCopyMessage] = useState('')
   const exportMenuRef = useRef<HTMLDivElement>(null)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useEffect(() => () => { clearTimeout(copyTimerRef.current) }, [])
 
   const isCombined = isHookahActive && isBarActive
 
@@ -72,7 +75,7 @@ export default function ReportsPage() {
     await copyPnLAsText(data, period, locale)
     setCopyMessage(tm.copied)
     setExportMenuOpen(false)
-    setTimeout(() => setCopyMessage(''), 2000)
+    copyTimerRef.current = setTimeout(() => setCopyMessage(''), 2000)
   }
 
   // Filter data for module view

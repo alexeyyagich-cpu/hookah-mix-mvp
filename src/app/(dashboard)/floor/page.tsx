@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useMemo, useCallback, useRef, } from 'react'
+import { Suspense, useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
@@ -62,6 +62,8 @@ function FloorPageInner() {
   const [deductInventory, setDeductInventory] = useState(true)
   const [serveStatus, setServeStatus] = useState<'idle' | 'serving' | 'served'>('idle')
   const qrCanvasRef = useRef<HTMLCanvasElement>(null)
+  const serveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const qrTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [qrTableId, setQrTableId] = useState<string | null>(null)
   const [quickReserving, setQuickReserving] = useState(false)
   const searchParams = useSearchParams()
@@ -263,9 +265,10 @@ function FloorPageInner() {
       }
 
       setServeStatus('served')
-      setTimeout(() => setServeStatus('idle'), 1500)
+      serveTimerRef.current = setTimeout(() => setServeStatus('idle'), 1500)
     } catch (err) {
       console.error('Serve error:', err)
+      toast.error(tc.errorSaving)
       setServeStatus('idle')
     }
   }
@@ -293,6 +296,7 @@ function FloorPageInner() {
       setQuickForm({ guest_name: '', guest_phone: '', guest_count: '2', reservation_time: '' })
     } catch (err) {
       console.error('Quick reserve error:', err)
+      toast.error(tc.errorSaving)
     }
     setQuickReserving(false)
   }
@@ -321,7 +325,7 @@ function FloorPageInner() {
       return
     }
     setQrTableId(table.id)
-    setTimeout(() => {
+    qrTimerRef.current = setTimeout(() => {
       const canvas = qrCanvasRef.current
       if (!canvas) return
       const url = canvas.toDataURL('image/png')
@@ -333,6 +337,8 @@ function FloorPageInner() {
       toast.success(tm.tableQrDownloaded)
     }, 100)
   }, [profile?.venue_slug, tm])
+
+  useEffect(() => () => { clearTimeout(serveTimerRef.current); clearTimeout(qrTimerRef.current) }, [])
 
   return (
     <ErrorBoundary>

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import type { BarInventoryItem, BarIngredientCategory, BarUnitType } from '@/types/database'
 import { BAR_INGREDIENT_PRESETS, BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
@@ -46,7 +47,9 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
   const [packageSize, setPackageSize] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
   useBodyScrollLock(isOpen)
+  useFocusTrap(modalRef, isOpen, onClose)
 
   // Reset form when modal opens/closes or editing item changes
   useEffect(() => {
@@ -125,7 +128,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={onClose} />
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
+      <div ref={modalRef} role="dialog" aria-modal="true" className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">

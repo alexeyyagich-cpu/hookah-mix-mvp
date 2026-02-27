@@ -8,6 +8,7 @@ import { IconChevronLeft, IconPackage, IconShop } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation } from '@/lib/i18n'
 import type { OrderStatus } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function OrdersPage() {
   const tmk = useTranslation('market')
@@ -32,6 +33,7 @@ export default function OrdersPage() {
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Back link */}
       <Link
@@ -126,5 +128,6 @@ export default function OrdersPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

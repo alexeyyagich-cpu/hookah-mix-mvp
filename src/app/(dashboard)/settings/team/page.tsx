@@ -14,6 +14,7 @@ import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import Link from 'next/link'
 import type { OrgRole } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const INVITABLE_ROLES: OrgRole[] = ['manager', 'hookah_master', 'bartender', 'cook']
 
@@ -38,11 +39,13 @@ export default function TeamPage() {
 
   // Only owners can access this page — wait for org data to load
   if (orgLoading) return (
+    <ErrorBoundary>
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
     </div>
+    </ErrorBoundary>
   )
-  if (!isOwner) return <AccessDenied />
+  if (!isOwner) return <ErrorBoundary><AccessDenied /></ErrorBoundary>
 
   const getRoleLabel = (role: OrgRole) => {
     const labels = ORG_ROLE_LABELS[role]
@@ -120,13 +123,16 @@ export default function TeamPage() {
 
   if (loading) {
     return (
+      <ErrorBoundary>
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
       </div>
+      </ErrorBoundary>
     )
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6 max-w-3xl">
       {/* Back link */}
       <Link
@@ -254,6 +260,7 @@ export default function TeamPage() {
                   disabled={actionLoading === member.id}
                   className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50 shrink-0"
                   title={tm.removeFromTeamTooltip}
+                  aria-label={tm.removeFromTeamTooltip}
                 >
                   {actionLoading === member.id ? (
                     <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -304,6 +311,7 @@ export default function TeamPage() {
                       disabled={actionLoading === `resend-${invitation.id}`}
                       className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors disabled:opacity-50"
                       title={tm.resendTooltip}
+                      aria-label={tm.resendTooltip}
                     >
                       {actionLoading === `resend-${invitation.id}` ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -317,6 +325,7 @@ export default function TeamPage() {
                       disabled={actionLoading === invitation.id}
                       className="p-2 rounded-lg hover:bg-[var(--color-danger)]/10 text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
                       title={tm.cancelInvitationTooltip}
+                      aria-label={tm.cancelInvitationTooltip}
                     >
                       {actionLoading === invitation.id ? (
                         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -506,5 +515,6 @@ export default function TeamPage() {
         onCancel={() => setConfirmAction(null)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

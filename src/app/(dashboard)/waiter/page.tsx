@@ -57,7 +57,7 @@ export default function WaiterPage() {
   const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const errorTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const selectedTable = tables.find(t => t.id === selectedTableId)
 

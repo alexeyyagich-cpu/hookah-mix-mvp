@@ -28,9 +28,11 @@ import { AlertsPanel } from '@/components/boss/AlertsPanel'
 import { FloorMiniMap } from '@/components/boss/FloorMiniMap'
 import { ActivityFeed } from '@/components/boss/ActivityFeed'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { toast } from 'sonner'
 
 export default function BossPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const { orgRole, loading: orgLoading } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
@@ -93,6 +95,8 @@ export default function BossPage() {
     setOpening(true)
     try {
       await openShift()
+    } catch {
+      toast.error(tc.errorSaving)
     } finally {
       setOpening(false)
     }

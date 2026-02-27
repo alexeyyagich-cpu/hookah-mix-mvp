@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useTranslation, useLocale } from "@/lib/i18n";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
+import { useBodyScrollLock } from "@/lib/hooks/useBodyScrollLock";
 import { MIX_RECIPES, MIX_CATEGORY_INFO, getMixCategories, type MixRecipe } from "@/data/mixes";
 
 type Props = {
@@ -16,6 +18,9 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
   const useEn = locale === "en" || locale === "de";
   const [selectedCategory, setSelectedCategory] = useState<MixRecipe["category"] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const drawerRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(drawerRef, isOpen, onClose);
+  useBodyScrollLock(isOpen);
 
   const categories = getMixCategories();
 
@@ -48,6 +53,9 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
 
       {/* Drawer */}
       <div
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
         className={`fixed top-0 right-0 h-full z-50 transition-transform duration-300 ease-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}

@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
 import { IconStar, IconMix, IconTrash } from '@/components/Icons'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -25,6 +27,9 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [filterBy, setFilterBy] = useState<FilterOption>('all')
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(drawerRef, isOpen, onClose)
+  useBodyScrollLock(isOpen)
 
   // Filter and sort mixes
   const filteredMixes = savedMixes
@@ -70,6 +75,9 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
 
       {/* Drawer */}
       <div
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
         className="fixed right-0 top-0 h-full w-full max-w-md z-[70] animate-slideInRight overflow-hidden flex flex-col"
         style={{
           background: 'var(--color-bgCard)',

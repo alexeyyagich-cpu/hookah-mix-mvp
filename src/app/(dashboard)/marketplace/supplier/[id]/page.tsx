@@ -11,6 +11,7 @@ import { CartDrawer } from '@/components/marketplace/CartDrawer'
 import { IconChevronLeft, IconCart, IconTruck } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
 import type { Supplier, SupplierProduct } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function SupplierPage() {
   const t = useTranslation('market')
@@ -49,6 +50,7 @@ export default function SupplierPage() {
 
   if (!loading && !supplier) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <Link
           href="/marketplace"
@@ -65,10 +67,12 @@ export default function SupplierPage() {
           </p>
         </div>
       </div>
+      </ErrorBoundary>
     )
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Back link */}
       <Link
@@ -160,5 +164,6 @@ export default function SupplierPage() {
         clearCart={clearCart}
       />
     </div>
+    </ErrorBoundary>
   )
 }

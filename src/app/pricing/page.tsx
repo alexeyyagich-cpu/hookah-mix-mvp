@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n'
 import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 // Stripe price IDs (from environment)
 const STRIPE_PRICES = {
@@ -171,6 +172,7 @@ function PricingPageContent() {
   const yearlyDiscount = Math.round((1 - 27900 / (2900 * 12)) * 100)
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen">
       {/* Header */}
       <header className="p-4 border-b border-[var(--color-border)]">
@@ -179,7 +181,6 @@ function PricingPageContent() {
             <div className="w-8 h-8 rounded-lg overflow-hidden">
               <video autoPlay loop muted playsInline preload="none" poster="/images/torus-logo.png" className="w-full h-full object-cover">
                 <source src="/images/logo-animated.mp4" type="video/mp4" />
-                <img src="/images/torus-logo.png" alt="Hookah Torus" className="w-full h-full object-cover" />
               </video>
             </div>
             Hookah Torus
@@ -331,6 +332,7 @@ function PricingPageContent() {
         </div>
       </main>
     </div>
+    </ErrorBoundary>
   )
 }
 

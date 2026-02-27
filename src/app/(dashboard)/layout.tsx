@@ -25,6 +25,7 @@ function PageProgressBar() {
   const [visible, setVisible] = useState(false)
   const previousPathRef = useRef(pathname)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const innerTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (previousPathRef.current !== pathname) {
@@ -36,13 +37,13 @@ function PageProgressBar() {
       timerRef.current = setTimeout(() => setProgress(70), 100)
       timerRef.current = setTimeout(() => {
         setProgress(100)
-        setTimeout(() => {
+        innerTimerRef.current = setTimeout(() => {
           setVisible(false)
           setProgress(0)
         }, 200)
       }, 300)
     }
-    return () => clearTimeout(timerRef.current)
+    return () => { clearTimeout(timerRef.current); clearTimeout(innerTimerRef.current) }
   }, [pathname])
 
   if (!visible) return null

@@ -12,6 +12,7 @@ import { IconCheck } from '@/components/Icons'
 import { TOBACCOS, getBrandNames, getFlavorsByBrand } from '@/data/tobaccos'
 import { getBowlBrands, getBowlsByBrand } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function OnboardingPage() {
   const t = useTranslation('hookah')
@@ -181,9 +182,11 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
+      <ErrorBoundary>
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
       </div>
+      </ErrorBoundary>
     )
   }
 
@@ -211,6 +214,7 @@ export default function OnboardingPage() {
   )
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--color-bg)]">
       {/* Progress bar */}
       {state.currentStep !== 'complete' && (
@@ -656,5 +660,6 @@ export default function OnboardingPage() {
         <span className="text-sm font-medium">Hookah Torus</span>
       </div>
     </div>
+    </ErrorBoundary>
   )
 }

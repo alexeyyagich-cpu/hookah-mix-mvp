@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
+import { useTranslation } from '@/lib/i18n'
 import type { SessionWithItems } from '@/types/database'
 
 interface PeriodStats {
@@ -118,6 +119,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
 
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
+  const t = useTranslation('manage')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
   const fetchIdRef = useRef(0)
 
@@ -152,22 +154,22 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
 
     return [
       {
-        name: 'This week vs last',
+        name: t.presetThisWeek,
         periodA: { start: thisWeekStart, end: thisWeekEnd },
         periodB: { start: lastWeekStart, end: lastWeekEnd },
       },
       {
-        name: 'This month vs last',
+        name: t.presetThisMonth,
         periodA: { start: thisMonthStart, end: thisMonthEnd },
         periodB: { start: lastMonthStart, end: lastMonthEnd },
       },
       {
-        name: 'Last 30 days vs previous',
+        name: t.presetLast30,
         periodA: { start: last30Start, end: last30End },
         periodB: { start: prev30Start, end: prev30End },
       },
     ]
-  }, [])
+  }, [t])
 
   const applyPreset = useCallback((presetIndex: number) => {
     if (presets[presetIndex]) {

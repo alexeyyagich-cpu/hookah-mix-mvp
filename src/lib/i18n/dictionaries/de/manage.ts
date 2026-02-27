@@ -776,4 +776,9 @@ export const manage: typeof ManageType = {
   pnlDailyTitle: 'Tägliches G&V',
   pnlVsPrev: 'gg. Vorperiode',
   pnlTopItemsLabel: 'Top-Artikel:',
+
+  // Comparison presets
+  presetThisWeek: 'Diese Woche vs letzte',
+  presetThisMonth: 'Dieser Monat vs letzter',
+  presetLast30: 'Letzte 30 Tage vs vorherige',
 }

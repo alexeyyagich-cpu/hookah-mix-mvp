@@ -782,4 +782,9 @@ export const manage = {
   pnlDailyTitle: 'P&L по дням',
   pnlVsPrev: 'к пред. периоду',
   pnlTopItemsLabel: 'Топ позиций:',
+
+  // Comparison presets
+  presetThisWeek: 'Эта неделя vs прошлая',
+  presetThisMonth: 'Этот месяц vs прошлый',
+  presetLast30: 'Последние 30 дней vs предыдущие',
 }

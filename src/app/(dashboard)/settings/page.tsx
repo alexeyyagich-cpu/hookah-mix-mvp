@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -44,7 +44,7 @@ export default function SettingsPage() {
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, loading: pushLoading, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
   const { connection: telegramConnection, loading: telegramLoading, connectLink: telegramConnectLink, updateSettings: updateTelegramSettings, disconnect: disconnectTelegram } = useTelegram()
   const { settings: emailSettings, loading: emailLoading, isConfigured: emailConfigured, updateSettings: updateEmailSettings } = useEmailSettings()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [businessName, setBusinessName] = useState(profile?.business_name || '')
   const [ownerName, setOwnerName] = useState(profile?.owner_name || '')

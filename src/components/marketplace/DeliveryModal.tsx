@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import type { MarketplaceOrderWithItems } from '@/types/database'
 import { IconClose, IconCheck, IconInventory } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
+import { toast } from 'sonner'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 
@@ -68,6 +69,7 @@ export function DeliveryModal({
       }
     } catch (err) {
       console.error('Delivery confirmation failed:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setLoading(false)
     }
@@ -93,6 +95,7 @@ export function DeliveryModal({
       timerRef.current = setTimeout(onClose, 2000)
     } catch (err) {
       console.error('Add to inventory failed:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setLoading(false)
     }

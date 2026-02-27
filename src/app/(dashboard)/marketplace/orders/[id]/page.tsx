@@ -17,6 +17,7 @@ import {
 import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function OrderDetailPage() {
   const t = useTranslation('market')
@@ -130,6 +131,7 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <div className="h-6 bg-[var(--color-bgHover)] rounded w-32 animate-pulse" />
         <div className="card p-6 animate-pulse">
@@ -137,11 +139,13 @@ export default function OrderDetailPage() {
           <div className="h-4 bg-[var(--color-bgHover)] rounded w-1/4" />
         </div>
       </div>
+      </ErrorBoundary>
     )
   }
 
   if (!order) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <Link
           href="/marketplace/orders"
@@ -158,12 +162,14 @@ export default function OrderDetailPage() {
           </p>
         </div>
       </div>
+      </ErrorBoundary>
     )
   }
 
   const statusAction = STATUS_ACTIONS[order.status]
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Back link */}
       <Link
@@ -352,5 +358,6 @@ export default function OrderDetailPage() {
         onCancel={() => setShowCancelConfirm(false)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

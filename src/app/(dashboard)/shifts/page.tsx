@@ -76,6 +76,17 @@ export default function ShiftsPage() {
     return () => { cancelled = true }
   }, [activeShift, getReconciliation, showCloseModal])
 
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (showOpenModal) setShowOpenModal(false)
+      else if (showCloseModal) setShowCloseModal(false)
+      else if (selectedShift) setSelectedShift(null)
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [showOpenModal, showCloseModal, selectedShift])
+
   const handleOpenShift = async () => {
     setSubmitting(true)
     try {
@@ -267,9 +278,9 @@ export default function ShiftsPage() {
       {showOpenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowOpenModal(false)} />
-          <div className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
+          <div className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="open-shift-title">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">{tm.openShift}</h2>
+              <h2 id="open-shift-title" className="text-xl font-bold">{tm.openShift}</h2>
               <button type="button" onClick={() => setShowOpenModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
                 <IconClose size={20} />
               </button>
@@ -323,9 +334,9 @@ export default function ShiftsPage() {
       {showCloseModal && activeShift && closeReconciliation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowCloseModal(false)} />
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="close-shift-title">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">{tm.closeShift}</h2>
+              <h2 id="close-shift-title" className="text-xl font-bold">{tm.closeShift}</h2>
               <button type="button" onClick={() => setShowCloseModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
                 <IconClose size={20} />
               </button>
@@ -390,10 +401,10 @@ export default function ShiftsPage() {
       {selectedShift && selectedReconciliation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setSelectedShift(null)} />
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="shift-recon-title">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold">{tm.shiftReconciliation}</h2>
+                <h2 id="shift-recon-title" className="text-xl font-bold">{tm.shiftReconciliation}</h2>
                 <p className="text-sm text-[var(--color-textMuted)]">
                   {formatDate(selectedShift.opened_at, locale)} {formatTime(selectedShift.opened_at, locale)} – {selectedShift.closed_at ? formatTime(selectedShift.closed_at, locale) : '...'}
                 </p>

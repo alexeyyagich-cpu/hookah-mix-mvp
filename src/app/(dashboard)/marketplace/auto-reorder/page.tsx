@@ -20,6 +20,7 @@ import {
 } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import type { TobaccoInventory } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function AutoReorderPage() {
   const t = useTranslation('market')
@@ -71,6 +72,7 @@ export default function AutoReorderPage() {
   // Paywall for non-enterprise users
   if (!canUseAutoReorder) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <Link
           href="/marketplace"
@@ -93,10 +95,12 @@ export default function AutoReorderPage() {
           </Link>
         </div>
       </div>
+      </ErrorBoundary>
     )
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Back link */}
       <Link
@@ -203,6 +207,7 @@ export default function AutoReorderPage() {
                       <button type="button"
                         onClick={() => setDeleteTarget(rule.id)}
                         className="p-2 rounded-lg transition-colors text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
+                        aria-label={tc.delete}
                       >
                         <IconTrash size={18} />
                       </button>
@@ -285,5 +290,6 @@ export default function AutoReorderPage() {
         />
       )}
     </div>
+    </ErrorBoundary>
   )
 }

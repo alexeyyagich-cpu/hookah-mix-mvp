@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
 interface SaveMixModalProps {
   isOpen: boolean
@@ -18,7 +19,9 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
   const [error, setError] = useState('')
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
   useBodyScrollLock(isOpen)
+  useFocusTrap(modalRef, isOpen, onClose)
 
   useEffect(() => {
     if (isOpen) {
@@ -72,6 +75,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
       {/* Modal */}
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[70]">
         <div
+          ref={modalRef}
           className={`rounded-2xl p-6 ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}
           style={{
             background: 'var(--color-bgCard)',

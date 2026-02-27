@@ -300,10 +300,10 @@ export default function PromotionsPage() {
                     promo.is_active ? 'translate-x-4' : ''
                   }`} />
                 </button>
-                <button type="button" onClick={() => openEdit(promo)} className="btn btn-ghost p-2">
+                <button type="button" onClick={() => openEdit(promo)} className="btn btn-ghost p-2" aria-label={tc.edit}>
                   <IconEdit size={16} />
                 </button>
-                <button type="button" onClick={() => setDeleteTarget(promo.id)} className="btn btn-ghost p-2 text-[var(--color-danger)]">
+                <button type="button" onClick={() => setDeleteTarget(promo.id)} className="btn btn-ghost p-2 text-[var(--color-danger)]" aria-label={tc.delete}>
                   <IconTrash size={16} />
                 </button>
               </div>

@@ -45,14 +45,17 @@ function SessionsPageInner() {
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [closingModal, setClosingModal] = useState(false)
   const exportMenuRef = useRef<HTMLDivElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const closeModal = useCallback(() => {
     setClosingModal(true)
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       setSelectedSession(null)
       setClosingModal(false)
     }, 200)
   }, [])
+
+  useEffect(() => () => { clearTimeout(closeTimerRef.current) }, [])
 
   useEffect(() => {
     if (!selectedSession) return

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
@@ -150,6 +151,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
       resetForm()
     } catch (err) {
       console.error('Failed to save tobacco:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
     }
@@ -168,6 +170,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
           <button type="button"
             onClick={handleClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+            aria-label={tc.close}
           >
             ✕
           </button>

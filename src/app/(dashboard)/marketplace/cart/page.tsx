@@ -11,6 +11,7 @@ import { CheckoutModal } from '@/components/marketplace/CheckoutModal'
 import { IconChevronLeft, IconCart, IconPlus, IconMinus, IconTrash } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function CartPage() {
   const tmk = useTranslation('market')
@@ -42,6 +43,7 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
+      <ErrorBoundary>
       <div className="space-y-6">
         <Link
           href="/marketplace"
@@ -58,10 +60,12 @@ export default function CartPage() {
           action={{ label: tmk.goToSuppliers, href: '/marketplace' }}
         />
       </div>
+      </ErrorBoundary>
     )
   }
 
   return (
+    <ErrorBoundary>
     <div className="space-y-6">
       {/* Back link */}
       <Link
@@ -172,5 +176,6 @@ export default function CartPage() {
         onConfirm={handleCheckout}
       />
     </div>
+    </ErrorBoundary>
   )
 }

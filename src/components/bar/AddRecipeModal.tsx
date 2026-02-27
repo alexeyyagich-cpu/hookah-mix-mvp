@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, CocktailCategory, BarPortionUnit } from '@/types/database'
 import { RECIPE_PRESETS, COCKTAIL_CATEGORY_EMOJI, type RecipePreset } from '@/data/bar-recipes'
 import { BAR_INGREDIENT_PRESETS } from '@/data/bar-ingredients'
@@ -77,7 +78,9 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
   const [notes, setNotes] = useState('')
   const [ingredients, setIngredients] = useState<IngredientRow[]>([])
   const [saving, setSaving] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
   useBodyScrollLock(isOpen)
+  useFocusTrap(modalRef, isOpen, onClose)
 
   useEffect(() => {
     if (editingRecipe) {
@@ -230,7 +233,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={onClose} />
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
+      <div ref={modalRef} role="dialog" aria-modal="true" className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { TobaccoInventory, SupplierProduct, Supplier } from '@/types/database'
 import { IconClose, IconRefresh, IconCheck } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
@@ -34,6 +34,7 @@ export function AutoReorderModal({
   const [quantity, setQuantity] = useState(3)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   // Filter products that match the tobacco
   const matchingProducts = products.filter(p =>
@@ -52,6 +53,8 @@ export function AutoReorderModal({
       setSuccess(false)
     }
   }, [isOpen, matchingProducts])
+
+  useEffect(() => () => { clearTimeout(closeTimerRef.current) }, [])
 
   // Close on escape key
   useEffect(() => {
@@ -75,7 +78,7 @@ export function AutoReorderModal({
 
     if (result) {
       setSuccess(true)
-      setTimeout(onClose, 2000)
+      closeTimerRef.current = setTimeout(onClose, 2000)
     }
   }
 
