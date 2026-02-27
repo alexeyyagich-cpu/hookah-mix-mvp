@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/lib/ThemeContext";
 import { AuthProvider } from "@/lib/AuthContext";
 import { LocaleProviderBridge } from "@/lib/i18n/LocaleProviderBridge";
 import CookieConsent from "@/components/CookieConsent";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -111,7 +112,7 @@ const jsonLd = {
         "@type": "Offer",
         price: "0",
         priceCurrency: "EUR",
-        description: "Free tier available",
+        description: "14-day free trial, plans from €79/month",
       },
       featureList: [
         "Mix Calculator",
@@ -177,6 +178,7 @@ export default function RootLayout({
             <ThemeProvider>
               {children}
               <CookieConsent />
+              <Analytics />
             </ThemeProvider>
           </LocaleProviderBridge>
         </AuthProvider>
