@@ -175,21 +175,30 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register" className="btn btn-primary btn-lg text-lg px-8">
-                {t.heroCta}
-              </Link>
+              {user ? (
+                <Link href="/dashboard" className="btn btn-primary btn-lg text-lg px-8">
+                  {t.dashboard}
+                </Link>
+              ) : (
+                <Link href="/register" className="btn btn-primary btn-lg text-lg px-8">
+                  {t.heroCta}
+                </Link>
+              )}
               <Link href="/mix" className="btn btn-secondary btn-lg text-lg px-8">
                 {t.heroCtaCalculator}
               </Link>
             </div>
 
-            <p className="mt-6 text-sm text-[var(--color-textMuted)]">
-              {t.heroNote}
-            </p>
-
-            <Link href="/login?demo=true" className="mt-2 inline-block text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
-              {t.tryDemo}
-            </Link>
+            {!user && (
+              <>
+                <p className="mt-6 text-sm text-[var(--color-textMuted)]">
+                  {t.heroNote}
+                </p>
+                <Link href="/login?demo=true" className="mt-2 inline-block text-sm text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
+                  {t.tryDemo}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -323,25 +332,33 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="btn btn-primary btn-lg text-lg px-8">
-              {t.ctaButton}
-            </Link>
+            {user ? (
+              <Link href="/dashboard" className="btn btn-primary btn-lg text-lg px-8">
+                {t.dashboard}
+              </Link>
+            ) : (
+              <Link href="/register" className="btn btn-primary btn-lg text-lg px-8">
+                {t.ctaButton}
+              </Link>
+            )}
             <Link href="/pricing" className="btn btn-secondary btn-lg text-lg px-8">
               {t.ctaComparePlans}
             </Link>
           </div>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-[var(--color-textMuted)]">
-            <span className="flex items-center gap-2">
-              <span className="text-[var(--color-success)]">✓</span> {t.ctaFreeStart}
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="text-[var(--color-success)]">✓</span> {t.ctaNoCard}
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="text-[var(--color-success)]">✓</span> {t.ctaCancelAnytime}
-            </span>
-          </div>
+          {!user && (
+            <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-[var(--color-textMuted)]">
+              <span className="flex items-center gap-2">
+                <span className="text-[var(--color-success)]">✓</span> {t.ctaFreeStart}
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-[var(--color-success)]">✓</span> {t.ctaNoCard}
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-[var(--color-success)]">✓</span> {t.ctaCancelAnytime}
+              </span>
+            </div>
+          )}
         </div>
       </section>
 

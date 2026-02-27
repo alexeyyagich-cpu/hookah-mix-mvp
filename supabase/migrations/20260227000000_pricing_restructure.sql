@@ -13,26 +13,14 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS trial_expires_at TIMESTAMPTZ;
 ALTER TABLE organizations ADD COLUMN IF NOT EXISTS trial_expires_at TIMESTAMPTZ;
 
 -- =========================================================================
--- 2. Migrate existing tier values BEFORE changing constraints
--- =========================================================================
-UPDATE profiles SET subscription_tier = 'trial' WHERE subscription_tier = 'free';
-UPDATE profiles SET subscription_tier = 'core' WHERE subscription_tier = 'pro';
-UPDATE profiles SET subscription_tier = 'multi' WHERE subscription_tier = 'enterprise';
-
-UPDATE organizations SET subscription_tier = 'trial' WHERE subscription_tier = 'free';
-UPDATE organizations SET subscription_tier = 'core' WHERE subscription_tier = 'pro';
-UPDATE organizations SET subscription_tier = 'multi' WHERE subscription_tier = 'enterprise';
-
--- =========================================================================
--- 3. Drop old CHECK constraints and add new ones
+-- 2. Drop old CHECK constraints (must happen BEFORE updating values)
 -- =========================================================================
 
--- profiles table: find and drop the constraint, then add new one
+-- profiles table: find and drop the constraint
 DO $$
 DECLARE
   constraint_name TEXT;
 BEGIN
-  -- Find the CHECK constraint on profiles.subscription_tier
   SELECT con.conname INTO constraint_name
   FROM pg_constraint con
   JOIN pg_attribute att ON att.attnum = ANY(con.conkey) AND att.attrelid = con.conrelid
@@ -45,9 +33,6 @@ BEGIN
   END IF;
 END
 $$;
-
-ALTER TABLE profiles ADD CONSTRAINT profiles_subscription_tier_check
-  CHECK (subscription_tier IN ('trial', 'core', 'multi', 'enterprise'));
 
 -- organizations table: same approach
 DO $$
@@ -66,6 +51,28 @@ BEGIN
   END IF;
 END
 $$;
+
+-- =========================================================================
+-- 3. Migrate existing tier values (constraints already dropped)
+-- =========================================================================
+UPDATE profiles SET subscription_tier = 'trial' WHERE subscription_tier = 'free';
+UPDATE profiles SET subscription_tier = 'core' WHERE subscription_tier = 'pro';
+UPDATE profiles SET subscription_tier = 'multi' WHERE subscription_tier = 'enterprise';
+
+UPDATE organizations SET subscription_tier = 'trial' WHERE subscription_tier = 'free';
+UPDATE organizations SET subscription_tier = 'core' WHERE subscription_tier = 'pro';
+UPDATE organizations SET subscription_tier = 'multi' WHERE subscription_tier = 'enterprise';
+
+-- Migrate demo account to multi tier
+UPDATE profiles
+SET subscription_tier = 'multi', trial_expires_at = NULL
+WHERE id = 'c9a3791c-978f-4695-8d77-28cf235101f7';
+
+-- =========================================================================
+-- 4. Add new CHECK constraints
+-- =========================================================================
+ALTER TABLE profiles ADD CONSTRAINT profiles_subscription_tier_check
+  CHECK (subscription_tier IN ('trial', 'core', 'multi', 'enterprise'));
 
 ALTER TABLE organizations ADD CONSTRAINT organizations_subscription_tier_check
   CHECK (subscription_tier IN ('trial', 'core', 'multi', 'enterprise'));
