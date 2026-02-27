@@ -208,13 +208,14 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
       console.error('Failed to update subscription:', error)
     }
   } else if (status === 'past_due' || status === 'unpaid' || status === 'canceled') {
-    // Downgrade to free on failed payment or cancellation
+    // Downgrade to expired trial on failed payment or cancellation
     const supabase = getSupabaseAdmin()
     await supabase
       .from('profiles')
       .update({
         subscription_tier: 'trial',
         subscription_expires_at: null,
+        trial_expires_at: new Date().toISOString(), // immediately expired
         stripe_subscription_id: status === 'canceled' ? null : subscription.id,
       })
       .eq('id', userId)
@@ -236,12 +237,13 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     return
   }
 
-  // Downgrade to free tier
+  // Downgrade to expired trial (read-only mode)
   const { error } = await supabase
     .from('profiles')
     .update({
       subscription_tier: 'trial',
       subscription_expires_at: null,
+      trial_expires_at: new Date().toISOString(), // immediately expired
       stripe_subscription_id: null,
     })
     .eq('id', profile.id)
