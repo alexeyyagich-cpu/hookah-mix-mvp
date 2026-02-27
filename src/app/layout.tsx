@@ -37,10 +37,17 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://hookahtorus.com"),
   alternates: {
     canonical: "/",
+    languages: {
+      "x-default": "https://hookahtorus.com",
+      "de": "https://hookahtorus.com",
+      "en": "https://hookahtorus.com",
+      "ru": "https://hookahtorus.com",
+    },
   },
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "de_DE",
+    alternateLocale: ["en_US", "ru_RU"],
     url: "https://hookahtorus.com",
     siteName: "Hookah Torus",
     title: "Hookah Torus — All-in-One Hookah Lounge Management Platform",
@@ -133,7 +140,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="de">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

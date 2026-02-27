@@ -7,6 +7,7 @@ const SECURITY_HEADERS: [string, string][] = [
   ['X-Frame-Options', 'SAMEORIGIN'],
   ['Referrer-Policy', 'strict-origin-when-cross-origin'],
   ['Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()'],
+  ['Content-Language', 'de, en, ru'],
 ]
 
 function applySecurityHeaders(response: NextResponse): NextResponse {
