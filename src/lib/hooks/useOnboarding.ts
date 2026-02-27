@@ -96,8 +96,8 @@ export function useOnboarding(): UseOnboardingReturn {
             businessType: (data.business_type as BusinessType) || null,
           })
         }
-      } catch (error) {
-        console.error('Failed to load onboarding state:', error)
+      } catch {
+        // Gracefully degrade — default state is sufficient
       }
       setLoading(false)
     }
@@ -117,8 +117,8 @@ export function useOnboarding(): UseOnboardingReturn {
         .from('profiles')
         .update(updates)
         .eq('id', user.id)
-    } catch (error) {
-      console.error('Failed to save onboarding state:', error)
+    } catch {
+      // Silent — save is best-effort
     }
   }, [user, isDemoMode, supabase])
 
@@ -197,9 +197,10 @@ export function useOnboarding(): UseOnboardingReturn {
             p_type: state.businessType || 'hookah_bar',
             p_slug: profile?.venue_slug || null,
           })
-          if (rpcErr) console.error('setup_organization:', rpcErr)
-        } catch (e) {
-          console.error('setup_organization failed:', e)
+          // RPC is idempotent — ignore errors silently
+          if (rpcErr && process.env.NODE_ENV !== 'production') console.error('setup_organization:', rpcErr)
+        } catch {
+          // RPC failure is non-fatal — org creation retried on next load
         }
       }
 
@@ -232,9 +233,10 @@ export function useOnboarding(): UseOnboardingReturn {
             p_type: state.businessType || 'hookah_bar',
             p_slug: profile?.venue_slug || null,
           })
-          if (rpcErr) console.error('setup_organization:', rpcErr)
-        } catch (e) {
-          console.error('setup_organization failed:', e)
+          // RPC is idempotent — ignore errors silently
+          if (rpcErr && process.env.NODE_ENV !== 'production') console.error('setup_organization:', rpcErr)
+        } catch {
+          // RPC failure is non-fatal — org creation retried on next load
         }
       }
 

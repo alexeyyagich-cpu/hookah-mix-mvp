@@ -61,6 +61,7 @@ export const common = {
   errorDeleting: 'Ошибка удаления',
   errorLoading: 'Ошибка загрузки',
   errorGeneric: 'Что-то пошло не так',
+  invalidValue: 'Некорректное значение',
 
   // Roles
   roles: {

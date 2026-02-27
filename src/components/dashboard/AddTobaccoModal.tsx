@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
@@ -34,6 +35,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   const isEditing = !!editingItem
   useBodyScrollLock(isOpen)
@@ -55,15 +57,8 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     }, 200)
   }, [onClose])
 
-  // Escape key to close
-  useEffect(() => {
-    if (!visible) return
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [visible, handleClose])
+  // Focus trap handles Tab cycling and Escape key
+  useFocusTrap(dialogRef, visible, handleClose)
 
   useEffect(() => {
     if (editingItem) {
@@ -135,6 +130,12 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     const pkgGrams = parseFloat(packageGrams) || 100
     const totalGrams = (parseFloat(packageCount) || 0) * pkgGrams
 
+    if (totalGrams <= 0) {
+      toast.error(tc.invalidValue)
+      setSaving(false)
+      return
+    }
+
     try {
       await onSave({
         tobacco_id: selectedTobacco || `custom-${Date.now()}`,
@@ -149,8 +150,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
       })
       handleClose()
       resetForm()
-    } catch (err) {
-      console.error('Failed to save tobacco:', err)
+    } catch {
       toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
@@ -161,7 +161,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`} role="dialog" aria-modal="true">
-      <div className={`w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col ${isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
+      <div ref={dialogRef} className={`w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col ${isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
         {/* Header */}
         <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
           <h2 className="text-xl font-bold">
@@ -397,6 +397,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
             <button type="button"
               onClick={handleSubmit}
               disabled={!brand || !flavor || !packageCount || saving}
+              data-testid="add-tobacco-submit"
               className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? tc.saving : isEditing ? t.mixSaveButton : tc.add}

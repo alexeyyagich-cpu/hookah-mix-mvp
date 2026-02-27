@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single()
 
     if (error) {
-      console.error('Error fetching profile:', error)
+      if (process.env.NODE_ENV !== 'production') console.error('Error fetching profile:', error)
       return null
     }
 
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (isMounted) setProfile(profileData)
         }
       } catch (error) {
-        console.error('Failed to get initial session:', error)
+        if (process.env.NODE_ENV !== 'production') console.error('Failed to get initial session:', error)
       } finally {
         if (!didSettle && isMounted) {
           didSettle = true

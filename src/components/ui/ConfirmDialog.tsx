@@ -28,6 +28,7 @@ export function ConfirmDialog({
   const resolvedConfirmLabel = confirmLabel ?? tc.confirm
   const resolvedCancelLabel = cancelLabel ?? tc.cancel
   const confirmRef = useRef<HTMLButtonElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
 
@@ -42,9 +43,14 @@ export function ConfirmDialog({
     if (visible && !isClosing) confirmRef.current?.focus()
   }, [visible, isClosing])
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => clearTimeout(closeTimerRef.current)
+  }, [])
+
   const handleClose = useCallback(() => {
     setIsClosing(true)
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       setVisible(false)
       setIsClosing(false)
       onCancel()
@@ -77,12 +83,14 @@ export function ConfirmDialog({
         <div className="flex gap-3">
           <button type="button"
             onClick={handleClose}
+            data-testid="confirm-dialog-cancel"
             className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-[var(--color-bgHover)] hover:opacity-80 transition-opacity"
           >
             {resolvedCancelLabel}
           </button>
           <button type="button"
             ref={confirmRef}
+            data-testid="confirm-dialog-confirm"
             onClick={onConfirm}
             className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-80 ${
               danger

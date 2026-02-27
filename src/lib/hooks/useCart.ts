@@ -46,8 +46,7 @@ export function useCart(): UseCartReturn {
           localStorage.removeItem(CART_STORAGE_KEY)
         }
       }
-    } catch (e) {
-      console.error('Failed to load cart:', e)
+    } catch {
       localStorage.removeItem(CART_STORAGE_KEY)
     }
     setLoading(false)

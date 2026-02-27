@@ -247,9 +247,8 @@ export function useSavedMixes(): UseSavedMixesReturn {
       setSavedMixes(prev => prev.map(m =>
         m.id === id ? { ...m, usage_count: m.usage_count + 1 } : m
       ))
-    } catch (err) {
-      // Silently fail for usage increment
-      console.error('Failed to increment usage:', err)
+    } catch {
+      // Silently fail — usage increment is non-critical
     }
   }, [user, supabase, savedMixes, isDemoMode])
 

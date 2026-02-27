@@ -109,6 +109,7 @@ export function LoginForm() {
             className="input transition-colors"
             placeholder={t.placeholderEmail}
             autoComplete="email"
+            data-testid="auth-email-input"
             required
           />
         </div>
@@ -125,6 +126,7 @@ export function LoginForm() {
             className="input transition-colors"
             placeholder={t.placeholderPassword}
             autoComplete="current-password"
+            data-testid="auth-password-input"
             required
           />
         </div>
@@ -132,6 +134,7 @@ export function LoginForm() {
         <button
           type="submit"
           disabled={loading}
+          data-testid="auth-submit"
           className="btn btn-primary w-full py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (

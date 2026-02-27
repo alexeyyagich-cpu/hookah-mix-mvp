@@ -201,8 +201,7 @@ export default function SettingsPage() {
         setMessage(tc.error + ': ' + (data.error || ts.portalError))
         setTimeout(() => setMessage(''), TOAST_TIMEOUT)
       }
-    } catch (error) {
-      void error
+    } catch (_error) {
       setMessage(ts.portalOpenError)
       setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } finally {

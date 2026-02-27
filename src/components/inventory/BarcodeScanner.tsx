@@ -18,6 +18,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
   const [notFound, setNotFound] = useState(false)
   const scannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const notFoundTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const onScanRef = useRef(onScan)
   const lastScannedRef = useRef<string | null>(null)
 
@@ -55,11 +56,12 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
               // Found! Stop scanning and return result
               scanner.stop().then(() => {
                 onScanRef.current(tobacco)
-              }).catch(console.error)
+              }).catch(() => {})
             } else {
               // Not found in database
               setNotFound(true)
-              setTimeout(() => setNotFound(false), 2000)
+              clearTimeout(notFoundTimerRef.current)
+              notFoundTimerRef.current = setTimeout(() => setNotFound(false), 2000)
             }
           },
           () => {
@@ -71,7 +73,6 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
           setError(null)
         }
       } catch (err) {
-        console.error('Scanner error:', err)
         if (mounted) {
           if (err instanceof Error && err.message.includes('Permission')) {
             setError(t.cameraNoAccess)
@@ -86,10 +87,11 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
 
     return () => {
       mounted = false
+      clearTimeout(notFoundTimerRef.current)
       const scanner = scannerRef.current
       scannerRef.current = null
       if (scanner) {
-        scanner.stop().then(() => scanner.clear()).catch((err: unknown) => console.error('BarcodeScanner error:', err))
+        scanner.stop().then(() => scanner.clear()).catch(() => {})
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,7 +100,7 @@ export function BarcodeScanner({ onScan, onManualEntry, onClose }: BarcodeScanne
   const handleClose = () => {
     const scanner = scannerRef.current
     if (scanner) {
-      scanner.stop().catch((err: unknown) => console.error('BarcodeScanner error:', err))
+      scanner.stop().catch(() => {})
     }
     onClose()
   }

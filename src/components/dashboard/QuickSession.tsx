@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
@@ -8,6 +8,8 @@ import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useLoyalty } from '@/lib/hooks/useLoyalty'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { IconSmoke, IconTimer, IconUsers, IconClose } from '@/components/Icons'
 import { SessionTimer } from '@/components/session/SessionTimer'
 import type { Session, SessionItem, Guest } from '@/types/database'
@@ -30,6 +32,9 @@ interface QuickSessionProps {
 }
 
 export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessionProps) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, isOpen, onClose)
+  useBodyScrollLock(isOpen)
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
   const { locale } = useLocale()
@@ -148,8 +153,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
       }
 
       onClose()
-    } catch (err) {
-      console.error('Session save failed:', err)
+    } catch {
       toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
@@ -162,7 +166,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-lg max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] flex flex-col">
+      <div ref={dialogRef} role="dialog" aria-modal="true" className="w-full max-w-lg max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] flex flex-col">
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between flex-shrink-0">
           <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
@@ -172,6 +176,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
           <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+            aria-label={tc.close}
           >
             ✕
           </button>
@@ -491,6 +496,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
           <button type="button"
             onClick={handleSubmit}
             disabled={!canSubmit || saving}
+            data-testid="quick-session-submit"
             className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? tc.saving : t.saveSession}

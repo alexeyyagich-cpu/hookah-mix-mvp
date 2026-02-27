@@ -161,8 +161,7 @@ function PricingPageContent() {
       } else {
         throw new Error(data.error || 'Failed to create checkout session')
       }
-    } catch (error) {
-      void error
+    } catch (_error) {
       showError(ta.paymentError)
     } finally {
       setLoadingPlan(null)

@@ -8,11 +8,11 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 
 const IconCheck = ({ size = 16 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
 )
 
 const IconArrowRight = ({ size = 16 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
 )
 
 interface QuickStartStep {
@@ -48,59 +48,49 @@ export function QuickStartCard() {
 
     let cancelled = false
 
-    Promise.all([
-      supabase
-        .from('tobacco_inventory')
-        .select('id', { count: 'exact', head: true })
-        .eq('profile_id', profile.id),
-      supabase
-        .from('sessions')
-        .select('id', { count: 'exact', head: true })
-        .eq('profile_id', profile.id),
-      supabase
-        .from('org_members')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', profile.id)
-        .eq('is_active', true)
-        .limit(1)
-        .then(async (memberResult) => {
-          // Get the org_id from membership, then count all members in that org
-          const orgId = memberResult.data?.[0]
-            ? (memberResult.data[0] as { id: string }).id
-            : null
-          if (!orgId && !memberResult.error) {
-            // Try getting org_id via a direct member lookup
-            const { data: memberData } = await supabase
-              .from('org_members')
-              .select('organization_id')
-              .eq('user_id', profile.id)
-              .eq('is_active', true)
-              .limit(1)
-              .single()
-            if (memberData?.organization_id) {
-              return supabase
-                .from('org_members')
-                .select('id', { count: 'exact', head: true })
-                .eq('organization_id', memberData.organization_id)
-                .eq('is_active', true)
-            }
-          }
-          return { count: 1, error: null }
-        }),
-    ]).then(([inv, sess, team]) => {
-      if (cancelled) return
-      setInventoryCount(inv.count ?? 0)
-      setSessionsCount(sess.count ?? 0)
-      // team might be a plain object or a Supabase response
-      if (team && typeof team === 'object' && 'count' in team) {
-        setTeamCount(team.count ?? 1)
-      } else {
-        setTeamCount(1)
-      }
-    }).catch(() => {
-      // Counts are non-critical — fail silently
-    })
+    const loadCounts = async () => {
+      try {
+        const [inv, sess] = await Promise.all([
+          supabase
+            .from('tobacco_inventory')
+            .select('id', { count: 'exact', head: true })
+            .eq('profile_id', profile.id),
+          supabase
+            .from('sessions')
+            .select('id', { count: 'exact', head: true })
+            .eq('profile_id', profile.id),
+        ])
+        if (cancelled) return
 
+        // Resolve team count via org membership
+        let teamCountValue = 1
+        const { data: memberData } = await supabase
+          .from('org_members')
+          .select('organization_id')
+          .eq('user_id', profile.id)
+          .eq('is_active', true)
+          .limit(1)
+          .single()
+
+        if (!cancelled && memberData?.organization_id) {
+          const { count } = await supabase
+            .from('org_members')
+            .select('id', { count: 'exact', head: true })
+            .eq('organization_id', memberData.organization_id)
+            .eq('is_active', true)
+          teamCountValue = count ?? 1
+        }
+
+        if (cancelled) return
+        setInventoryCount(inv.count ?? 0)
+        setSessionsCount(sess.count ?? 0)
+        setTeamCount(teamCountValue)
+      } catch {
+        // Counts are non-critical — fail silently
+      }
+    }
+
+    loadCounts()
     return () => { cancelled = true }
   }, [profile?.id, supabase, isDemoMode])
 

@@ -218,6 +218,21 @@ input[type="range"]::-moz-range-thumb {
   animation: backdropFadeOut 0.2s ease forwards;
 }
 
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+@keyframes long-session-glow {
+  0%, 100% { box-shadow: 0 0 8px var(--color-warning); }
+  50% { box-shadow: 0 0 18px var(--color-warning); }
+}
+.animate-long-session {
+  animation: long-session-glow 1.5s ease-in-out infinite;
+}
+
 .animate-fadeInUp {
   animation: fadeInUp 0.4s ease forwards;
 }

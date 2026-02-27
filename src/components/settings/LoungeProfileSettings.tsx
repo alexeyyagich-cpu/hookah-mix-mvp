@@ -141,8 +141,7 @@ export default function LoungeProfileSettings() {
       setMessage(ts.loungeSaved)
       clearTimeout(messageTimerRef.current)
       messageTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
-    } catch (err) {
-      console.error('Failed to save lounge profile:', err)
+    } catch {
       toast.error(tc.errorSaving)
     } finally {
       setSaving(false)

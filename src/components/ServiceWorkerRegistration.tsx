@@ -64,7 +64,7 @@ export function ServiceWorkerRegistration() {
       }
       reg.addEventListener('updatefound', updateFoundHandler)
     }).catch((err) => {
-      console.error('SW registration failed:', err)
+      if (process.env.NODE_ENV !== 'production') console.error('SW registration failed:', err)
     })
 
     // Detect controller change (new SW activated) — reload

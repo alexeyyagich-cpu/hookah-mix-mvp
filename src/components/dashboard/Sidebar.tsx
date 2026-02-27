@@ -377,6 +377,7 @@ export function Sidebar() {
         <button type="button"
           onClick={() => signOut()}
           aria-label={t.logoutLabel}
+          data-testid="sidebar-logout"
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors"
         >
           <IconLogout size={18} aria-hidden="true" />

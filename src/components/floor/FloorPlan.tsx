@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
+import { useState, useRef, useCallback, useMemo, useEffect, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus } from '@/components/Icons'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
 
 export const LONG_SESSION_MINUTES = 120
@@ -291,7 +293,7 @@ export function FloorPlan({
               }}
             >
               {isLongSession && (
-                <span className="absolute -top-1 -right-1 text-[10px]">&#9888;</span>
+                <span className="absolute -top-1 -right-1 text-[10px]" aria-hidden="true">&#9888;</span>
               )}
               <span
                 className="font-bold text-sm"
@@ -427,6 +429,9 @@ interface TableModalProps {
 function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onStatusChange }: TableModalProps) {
   const t = useTranslation('manage')
   const tc = useTranslation('common')
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true, onClose)
+  useBodyScrollLock(true)
 
   const STATUS_LABELS: Record<TableStatus, string> = {
     available: t.statusAvailable,
@@ -459,8 +464,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
         position_x: table?.position_x || 100,
         position_y: table?.position_y || 100,
       })
-    } catch (err) {
-      console.error('Failed to save table:', err)
+    } catch {
       toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
@@ -470,6 +474,9 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
         className="w-full max-w-md rounded-2xl p-6"
         style={{
           background: 'var(--color-bgCard)',
@@ -484,6 +491,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]"
             style={{ color: 'var(--color-textMuted)' }}
+            aria-label={tc.close}
           >
             ✕
           </button>
@@ -657,27 +665,4 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
   )
 }
 
-// Add subtle pulse animation
-const styles = `
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
-}
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s ease-in-out infinite;
-}
-@keyframes long-session-glow {
-  0%, 100% { box-shadow: 0 0 8px var(--color-warning); }
-  50% { box-shadow: 0 0 18px var(--color-warning); }
-}
-.animate-long-session {
-  animation: long-session-glow 1.5s ease-in-out infinite;
-}
-`
-
-// Inject styles
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style')
-  styleSheet.textContent = styles
-  document.head.appendChild(styleSheet)
-}
+// Animations (.animate-pulse-subtle, .animate-long-session) defined in globals.css

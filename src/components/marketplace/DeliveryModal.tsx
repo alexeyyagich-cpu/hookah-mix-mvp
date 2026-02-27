@@ -67,8 +67,7 @@ export function DeliveryModal({
           timerRef.current = setTimeout(onClose, 2000)
         }
       }
-    } catch (err) {
-      console.error('Delivery confirmation failed:', err)
+    } catch {
       toast.error(tc.errorSaving)
     } finally {
       setLoading(false)
@@ -93,8 +92,7 @@ export function DeliveryModal({
       await onAddToInventory(itemsToAdd)
       setStep('success')
       timerRef.current = setTimeout(onClose, 2000)
-    } catch (err) {
-      console.error('Add to inventory failed:', err)
+    } catch {
       toast.error(tc.errorSaving)
     } finally {
       setLoading(false)

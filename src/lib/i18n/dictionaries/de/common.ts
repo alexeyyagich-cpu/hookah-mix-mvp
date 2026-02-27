@@ -57,6 +57,7 @@ export const common: typeof CommonType = {
   errorDeleting: 'Fehler beim Löschen',
   errorLoading: 'Fehler beim Laden',
   errorGeneric: 'Etwas ist schiefgelaufen',
+  invalidValue: 'Ungültiger Wert',
 
   roles: {
     owner: 'Inhaber',

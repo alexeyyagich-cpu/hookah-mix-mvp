@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useRole, type Permission } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
@@ -86,8 +86,8 @@ export function CommandPalette() {
     { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view', group: t.settingsGroup },
   ]
 
-  // Filter by permissions
-  const accessibleItems = allItems.filter(item => {
+  // Filter by permissions (memoized)
+  const accessibleItems = useMemo(() => allItems.filter(item => {
     const hasAccess = Array.isArray(item.permission)
       ? hasAnyPermission(item.permission)
       : hasPermission(item.permission)
@@ -96,15 +96,16 @@ export function CommandPalette() {
     if (item.ownerOnly && !isOwner) return false
     if (item.proOnly && isFreeTier) return false
     return true
-  })
+  }), [allItems, hasPermission, hasAnyPermission, modules, isOwner, isFreeTier])
 
-  // Filter by query
-  const filtered = query.trim()
+  // Filter by query (memoized)
+  const filtered = useMemo(() => query.trim()
     ? accessibleItems.filter(item =>
         item.name.toLowerCase().includes(query.toLowerCase()) ||
         (item.group && item.group.toLowerCase().includes(query.toLowerCase()))
       )
     : accessibleItems
+  , [query, accessibleItems])
 
   // Keyboard shortcut to open
   useEffect(() => {
@@ -174,7 +175,7 @@ export function CommandPalette() {
       <div ref={paletteRef} role="dialog" aria-modal="true" className="relative w-full max-w-lg mx-4 bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] shadow-2xl overflow-hidden animate-fadeInUp">
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)]">
-          <svg className="w-5 h-5 text-[var(--color-textMuted)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-5 h-5 text-[var(--color-textMuted)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -184,6 +185,7 @@ export function CommandPalette() {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={tc.commandPalette.placeholder}
+            data-testid="command-palette-input"
             className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--color-textMuted)]"
           />
           <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-textMuted)] bg-[var(--color-bgHover)] rounded border border-[var(--color-border)]">

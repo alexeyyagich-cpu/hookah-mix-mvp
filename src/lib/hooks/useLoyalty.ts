@@ -116,8 +116,8 @@ export function useLoyalty(): UseLoyaltyReturn {
 
         if (!isMounted) return
         if (txData) setTransactions(txData)
-      } catch (err) {
-        console.error('Failed to load loyalty settings:', err)
+      } catch {
+        // Fallback to defaults
       } finally {
         if (isMounted) setLoading(false)
       }
@@ -199,10 +199,7 @@ export function useLoyalty(): UseLoyaltyReturn {
       })
       .eq('id', guestId)
 
-    if (updateError) {
-      console.error('Loyalty accrual update failed:', updateError)
-      return false
-    }
+    if (updateError) return false
 
     const { error: txError } = await supabase.from('bonus_transactions').insert({
       guest_id: guestId,
@@ -214,9 +211,7 @@ export function useLoyalty(): UseLoyaltyReturn {
       description: `Session bonus (${settings.bonus_accrual_percent}%)`,
     })
 
-    if (txError) {
-      console.error('Loyalty accrual transaction insert failed:', txError)
-    }
+    if (txError) return true // Guest updated, tx insert is non-critical
 
     return true
   }, [user, isDemoMode, supabase, settings])
@@ -255,10 +250,7 @@ export function useLoyalty(): UseLoyaltyReturn {
       .update({ bonus_balance: newBalance })
       .eq('id', guestId)
 
-    if (updateError) {
-      console.error('Loyalty redemption update failed:', updateError)
-      return false
-    }
+    if (updateError) return false
 
     const { error: txError } = await supabase.from('bonus_transactions').insert({
       guest_id: guestId,
@@ -270,9 +262,7 @@ export function useLoyalty(): UseLoyaltyReturn {
       description: 'Bonus redeemed',
     })
 
-    if (txError) {
-      console.error('Loyalty redemption transaction insert failed:', txError)
-    }
+    if (txError) return true // Guest updated, tx insert is non-critical
 
     return true
   }, [user, isDemoMode, supabase, settings])

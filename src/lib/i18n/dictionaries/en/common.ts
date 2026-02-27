@@ -57,6 +57,7 @@ export const common: typeof CommonType = {
   errorDeleting: 'Error deleting',
   errorLoading: 'Error loading',
   errorGeneric: 'Something went wrong',
+  invalidValue: 'Invalid value',
 
   roles: {
     owner: 'Owner',

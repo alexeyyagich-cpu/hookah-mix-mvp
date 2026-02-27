@@ -88,7 +88,6 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
       await onImport(validRows)
       setStep('done')
     } catch (err) {
-      console.error('Import failed:', err)
       setError(err instanceof Error ? err.message : 'Import failed')
     } finally {
       setImporting(false)
@@ -231,7 +230,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
                 <button type="button" onClick={() => setStep('mapping')} className="btn btn-ghost flex-1">
                   {t.importBack}
                 </button>
-                <button type="button" onClick={handleImport} disabled={importing} className="btn btn-primary flex-1">
+                <button type="button" onClick={handleImport} disabled={importing} data-testid="import-confirm" className="btn btn-primary flex-1">
                   {importing ? t.importImporting : t.importConfirm}
                 </button>
               </div>

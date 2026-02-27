@@ -325,8 +325,7 @@ export function NewOrderModal({
 
       resetForm()
       onClose()
-    } catch (err) {
-      console.error('Order creation failed:', err)
+    } catch {
       toast.error(tc.errorGeneric)
     } finally {
       setSaving(false)

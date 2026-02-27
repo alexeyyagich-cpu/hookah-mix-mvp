@@ -60,8 +60,8 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         const registration = await navigator.serviceWorker.ready
         const subscription = await registration.pushManager.getSubscription()
         isSubscribed = !!subscription
-      } catch (e) {
-        console.error('Error checking subscription:', e)
+      } catch {
+        // Non-critical — subscription check may fail if SW not ready
       }
 
       setState({
@@ -149,7 +149,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
       return true
     } catch (error) {
-      console.error('Subscription error:', error)
       setState(prev => ({
         ...prev,
         loading: false,
@@ -195,7 +194,6 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
       return true
     } catch (error) {
-      console.error('Unsubscribe error:', error)
       setState(prev => ({
         ...prev,
         loading: false,
