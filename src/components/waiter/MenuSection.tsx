@@ -5,16 +5,7 @@ import { IconSearch, IconPlus, IconMinus } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
 import { getLocaleName, useLocale, formatCurrency, type Dictionary } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, BowlType, TobaccoInventory } from '@/types/database'
-
-interface BarItemEntry {
-  recipe: BarRecipeWithIngredients
-  quantity: number
-}
-
-interface SelectedTobacco {
-  tobacco: Tobacco
-  percent: number
-}
+import type { BarItemEntry, SelectedTobacco } from '@/types/shared'
 
 interface MenuSectionProps {
   activeTab: 'bar' | 'hookah'

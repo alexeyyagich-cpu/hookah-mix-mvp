@@ -1,5 +1,47 @@
 import { z } from 'zod'
 
+// ── Slug validation ─────────────────────────────────────────────────────
+export const slugSchema = z.string().min(1).max(100).regex(
+  /^[a-z0-9][a-z0-9-]*$/,
+  'Invalid slug format'
+)
+
+// ── OCR extract response validation ─────────────────────────────────────
+export const ocrExtractResponseSchema = z.object({
+  items: z.array(z.object({
+    brand: z.string().max(200).default('Unknown'),
+    flavor: z.string().max(200).default('Unknown'),
+    quantity: z.number().min(0).max(10000).default(1),
+    price: z.number().min(0).max(100000).default(0),
+    packageGrams: z.number().min(0).max(10000).default(200),
+  })).max(100).default([]),
+  total: z.number().min(0).max(1000000).nullable().optional(),
+  supplier: z.string().max(200).nullable().optional(),
+  date: z.string().max(50).nullable().optional(),
+})
+
+// ── Telegram webhook validation ─────────────────────────────────────────
+export const telegramUpdateSchema = z.object({
+  update_id: z.number(),
+  message: z.object({
+    message_id: z.number(),
+    chat: z.object({ id: z.number() }),
+    text: z.string().max(4096).optional(),
+    from: z.object({
+      id: z.number(),
+      username: z.string().optional(),
+    }).optional(),
+  }).optional(),
+  callback_query: z.object({
+    id: z.string(),
+    data: z.string().max(256).optional(),
+    message: z.object({
+      message_id: z.number(),
+      chat: z.object({ id: z.number() }),
+    }).optional(),
+  }).optional(),
+}).passthrough()
+
 // ── /api/public/order/[slug] ────────────────────────────────────────────
 export const publicOrderSchema = z.object({
   table_id: z.string().min(1),

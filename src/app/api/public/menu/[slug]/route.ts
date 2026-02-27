@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { slugSchema } from '@/lib/validation'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -9,6 +10,11 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params
+
+  const slugResult = slugSchema.safeParse(slug)
+  if (!slugResult.success) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
+  }
 
   if (!supabaseUrl || !supabaseServiceKey) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 })
@@ -91,15 +97,28 @@ export async function GET(
     })
   }
 
-  // Fetch bar recipes where is_on_menu = true
-  const { data: recipes } = await supabase
-    .from('bar_recipes')
-    .select('id, name, name_en, description, method, glass, garnish_description, menu_price')
-    .eq('profile_id', profile.id)
-    .eq('is_on_menu', true)
-    .order('name', { ascending: true })
+  // Fetch recipes, tobacco, tables, and lounge profile in parallel
+  const [recipesResult, tobaccosResult, tablesResult, loungeResult] = await Promise.all([
+    supabase.from('bar_recipes')
+      .select('id, name, name_en, description, method, glass, garnish_description, menu_price')
+      .eq('profile_id', profile.id).eq('is_on_menu', true).order('name', { ascending: true }),
+    supabase.from('tobacco_inventory')
+      .select('brand, flavor, quantity_grams')
+      .eq('profile_id', profile.id).gt('quantity_grams', 0).order('brand', { ascending: true }),
+    supabase.from('floor_tables')
+      .select('id, name')
+      .eq('profile_id', profile.id).order('name', { ascending: true }),
+    supabase.from('lounge_profiles')
+      .select('id, profile_id, slug, name, description, logo_url, cover_image_url, city, address, latitude, longitude, phone, email, website, instagram, telegram, working_hours, features, is_published, show_menu, show_prices, show_popular_mixes, rating, reviews_count, created_at, updated_at')
+      .eq('profile_id', profile.id).eq('is_published', true).maybeSingle(),
+  ])
 
-  // Fetch ingredient names for all recipes
+  const recipes = recipesResult.data
+  const tobaccos = tobaccosResult.data
+  const tables = tablesResult.data
+  const loungeProfile = loungeResult.data
+
+  // Fetch ingredient names for all recipes (depends on recipe IDs)
   const recipeIds = (recipes || []).map(r => r.id)
   const ingredientMap: Record<string, string[]> = {}
 
@@ -123,14 +142,6 @@ export async function GET(
     ingredients: ingredientMap[r.id] || [],
   }))
 
-  // Fetch tobacco inventory (brand + flavor for public menu)
-  const { data: tobaccos } = await supabase
-    .from('tobacco_inventory')
-    .select('brand, flavor, quantity_grams')
-    .eq('profile_id', profile.id)
-    .gt('quantity_grams', 0)
-    .order('brand', { ascending: true })
-
   // Group tobaccos by brand
   const tobaccoMap: Record<string, string[]> = {}
   for (const t of tobaccos || []) {
@@ -143,21 +154,6 @@ export async function GET(
     brand,
     flavors: flavors.sort(),
   }))
-
-  // Fetch floor tables for QR ordering
-  const { data: tables } = await supabase
-    .from('floor_tables')
-    .select('id, name')
-    .eq('profile_id', profile.id)
-    .order('name', { ascending: true })
-
-  // Fetch lounge profile if exists
-  const { data: loungeProfile } = await supabase
-    .from('lounge_profiles')
-    .select('id, profile_id, slug, name, description, logo_url, cover_image_url, city, address, latitude, longitude, phone, email, website, instagram, telegram, working_hours, features, is_published, show_menu, show_prices, show_popular_mixes, rating, reviews_count, created_at, updated_at')
-    .eq('profile_id', profile.id)
-    .eq('is_published', true)
-    .maybeSingle()
 
   return NextResponse.json({
     venue: {

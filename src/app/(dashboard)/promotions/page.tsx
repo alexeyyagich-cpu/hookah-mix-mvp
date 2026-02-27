@@ -243,8 +243,9 @@ export default function PromotionsPage() {
             </div>
           </div>
 
-          <button type="button" onClick={handleSubmit} disabled={submitting || !name.trim()} className="btn btn-primary disabled:opacity-50">
-            {submitting ? '...' : editingPromo ? tm.save : tm.createPromo}
+          <button type="button" onClick={handleSubmit} disabled={submitting || !name.trim()} className="btn btn-primary disabled:opacity-50 flex items-center gap-2">
+            {submitting && <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />}
+            {editingPromo ? tm.save : tm.createPromo}
           </button>
         </div>
       )}

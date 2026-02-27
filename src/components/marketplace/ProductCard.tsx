@@ -87,6 +87,7 @@ export const ProductCard = memo(function ProductCard({ product, supplier, onAddT
           <button type="button"
             onClick={handleAdd}
             disabled={!canAdd}
+            aria-disabled={!canAdd}
             aria-label={canAdd ? t.addToCartLabel(product.flavor) : t.otherSupplierLabel}
             className={`w-full btn ${canAdd ? 'btn-primary' : 'btn-ghost opacity-50 cursor-not-allowed'} flex items-center justify-center gap-2`}
           >

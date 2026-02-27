@@ -191,9 +191,12 @@ export function Sidebar() {
     .filter(group => group.items.length > 0),
   [navigationGroups, modules, hasPermission, hasAnyPermission, isOwner])
 
+  const filteredGroupsRef = useRef(filteredGroups)
+  filteredGroupsRef.current = filteredGroups
+
   // Auto-expand group if it contains the active page
   useEffect(() => {
-    for (const group of filteredGroups) {
+    for (const group of filteredGroupsRef.current) {
       if (!group.label) continue
       const hasActive = group.items.some(item =>
         pathname === item.href || pathname.startsWith(item.href + '/')
@@ -207,7 +210,7 @@ export function Sidebar() {
         })
       }
     }
-  }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pathname, collapsedGroups])
 
   const roleLabels = ORG_ROLE_LABELS[orgRole]
   const roleName = roleLabels ? (locale === 'de' ? roleLabels.de : roleLabels.label) : orgRole
@@ -311,7 +314,7 @@ export function Sidebar() {
                       href="/pricing"
                       onClick={() => setMobileOpen(false)}
                       aria-label={t.proOnlyLabel(item.name)}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all duration-200"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-textMuted)] opacity-60 hover:bg-[var(--color-bgHover)] transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2"
                     >
                       <Icon size={18} aria-hidden="true" />
                       {item.name}
@@ -328,7 +331,7 @@ export function Sidebar() {
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     aria-current={isActive ? 'page' : undefined}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${
                       isActive
                         ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                         : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'

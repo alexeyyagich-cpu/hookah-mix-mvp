@@ -26,12 +26,7 @@ import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from '@/data/tobaccos'
 import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
 import { IconTarget } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
-
-// Mix item for the builder
-interface SelectedTobacco {
-  tobacco: Tobacco
-  percent: number
-}
+import type { SelectedTobacco } from '@/types/shared'
 
 export default function RecommendPage() {
   const t = useTranslation('hookah')

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
@@ -16,13 +17,29 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function SessionsPage() {
+  return (
+    <Suspense>
+      <SessionsPageInner />
+    </Suspense>
+  )
+}
+
+function SessionsPageInner() {
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const { sessions, loading, error, updateSession, deleteSession } = useSessions()
   const { isFreeTier, canExport } = useSubscription()
 
-  const [filter, setFilter] = useState('')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const filter = searchParams.get('filter') || ''
+  const setFilter = useCallback((value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) params.set('filter', value)
+    else params.delete('filter')
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [searchParams, router])
   const [selectedSession, setSelectedSession] = useState<SessionWithItems | null>(null)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [closingModal, setClosingModal] = useState(false)

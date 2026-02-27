@@ -17,6 +17,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
@@ -56,9 +57,7 @@ export default function InventoryPage() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<TobaccoInventory | null>(null)
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const deleteTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => { return () => clearTimeout(deleteTimerRef.current) }, [])
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [scannedTobacco, setScannedTobacco] = useState<TobaccoBarcode | null>(null)
   const exportMenuRef = useRef<HTMLDivElement>(null)
@@ -110,20 +109,8 @@ export default function InventoryPage() {
     setModalOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (deleteConfirm === id) {
-      try {
-        await deleteTobacco(id)
-        setDeleteConfirm(null)
-        toast.success(tc.deleted)
-      } catch {
-        toast.error(tc.errorDeleting)
-      }
-    } else {
-      setDeleteConfirm(id)
-      clearTimeout(deleteTimerRef.current)
-      deleteTimerRef.current = setTimeout(() => setDeleteConfirm(null), 3000)
-    }
+  const handleDelete = (id: string) => {
+    setDeleteTarget(id)
   }
 
   const handleAdjust = async (id: string, amount: number) => {
@@ -326,13 +313,6 @@ export default function InventoryPage() {
         />
       </ErrorBoundary>
 
-      {/* Delete Confirmation Toast */}
-      {deleteConfirm && (
-        <div className="fixed bottom-4 right-4 z-50 p-4 rounded-xl bg-[var(--color-danger)] text-white shadow-lg animate-fadeInUp">
-          {t.deleteConfirmToast}
-        </div>
-      )}
-
       {/* Modal */}
       <AddTobaccoModal
         isOpen={modalOpen}
@@ -383,6 +363,25 @@ export default function InventoryPage() {
           }))
           await bulkAddTobacco(items)
         }}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={t.deleteItem || 'Delete Item'}
+        message={t.deleteConfirmToast || 'This action cannot be undone.'}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) {
+            try {
+              await deleteTobacco(deleteTarget)
+              toast.success(tc.deleted)
+            } catch {
+              toast.error(tc.errorDeleting)
+            }
+          }
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   )

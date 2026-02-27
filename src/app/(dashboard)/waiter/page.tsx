@@ -16,21 +16,12 @@ import { IconWaiter, IconLock } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import type { BarRecipeWithIngredients, KdsOrderItem, KdsHookahData, StrengthPreference } from '@/types/database'
+import type { BarItemEntry, SelectedTobacco } from '@/types/shared'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 import { TableSelector } from '@/components/waiter/TableSelector'
 import { MenuSection } from '@/components/waiter/MenuSection'
 import { WaiterCart } from '@/components/waiter/WaiterCart'
-
-interface BarItemEntry {
-  recipe: BarRecipeWithIngredients
-  quantity: number
-}
-
-interface SelectedTobacco {
-  tobacco: Tobacco
-  percent: number
-}
 
 function getStrengthFromAvg(avgStrength: number): StrengthPreference {
   if (avgStrength <= 4) return 'light'

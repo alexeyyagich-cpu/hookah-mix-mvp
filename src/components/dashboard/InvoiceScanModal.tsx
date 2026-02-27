@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { IconClose, IconScan } from '@/components/Icons'
 import { matchTobaccoCatalog } from '@/lib/utils/invoiceExtractor'
 import type { ExtractedItem, ExtractedInvoice } from '@/lib/utils/invoiceExtractor'
@@ -18,6 +19,8 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
   const fileRef = useRef<HTMLInputElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
   const [step, setStep] = useState<Step>('upload')
   const [items, setItems] = useState<ExtractedItem[]>([])
   const [invoice, setInvoice] = useState<ExtractedInvoice | null>(null)
@@ -91,14 +94,16 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" aria-hidden="true" onClick={handleClose}>
-      <div
-        className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
-        onClick={e => e.stopPropagation()}
-      >
+    <>
+      <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={handleClose} />
+      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="invoice-scan-title">
+        <div
+          className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
+          onClick={e => e.stopPropagation()}
+        >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-          <h2 className="text-lg font-bold flex items-center gap-2">
+          <h2 id="invoice-scan-title" className="text-lg font-bold flex items-center gap-2">
             <IconScan size={20} />
             {t.ocrTitle}
           </h2>
@@ -114,9 +119,11 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
 
           {/* Upload */}
           {step === 'upload' && (
-            <div
-              className="border-2 border-dashed border-[var(--color-border)] rounded-2xl p-12 text-center cursor-pointer hover:border-[var(--color-primary)] transition-colors"
+            <button
+              type="button"
+              className="w-full border-2 border-dashed border-[var(--color-border)] rounded-2xl p-12 text-center cursor-pointer hover:border-[var(--color-primary)] transition-colors bg-transparent"
               onClick={() => fileRef.current?.click()}
+              aria-label={t.ocrUpload}
             >
               <input
                 ref={fileRef}
@@ -132,7 +139,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
               <IconScan size={40} className="mx-auto mb-3 text-[var(--color-textMuted)]" />
               <p className="font-medium">{t.ocrUpload}</p>
               <p className="text-sm text-[var(--color-textMuted)] mt-1">{t.ocrFormats}</p>
-            </div>
+            </button>
           )}
 
           {/* Processing */}
@@ -229,7 +236,8 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

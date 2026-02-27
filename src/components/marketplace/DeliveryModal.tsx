@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import type { MarketplaceOrderWithItems } from '@/types/database'
 import { IconClose, IconCheck, IconInventory } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
 interface DeliveryModalProps {
   isOpen: boolean
@@ -26,6 +27,8 @@ export function DeliveryModal({
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'confirm' | 'inventory' | 'success'>('confirm')
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
 
   // Reset state when modal opens + cleanup timer
   useEffect(() => {
@@ -114,11 +117,12 @@ export function DeliveryModal({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+        aria-hidden="true"
         onClick={() => !loading && onClose()}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
         <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl animate-fadeInUp">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
@@ -173,6 +177,7 @@ export function DeliveryModal({
                           checked={selectedItems.has(item.id)}
                           onChange={() => toggleItem(item.id)}
                           className="w-5 h-5 rounded border-[var(--color-border)]"
+                          aria-label={`${item.brand} ${item.flavor}`}
                         />
                       </label>
                     </div>

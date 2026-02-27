@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -22,6 +23,8 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
 
   useEffect(() => {
     if (isOpen) {
@@ -60,7 +63,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
         setSuccess(true)
         timerRef.current = setTimeout(() => {
           handleClose()
-        }, 2000)
+        }, 4000)
       }
     } catch {
       // Error handled by parent hook
@@ -84,7 +87,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
         <div className={`w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
@@ -111,6 +114,9 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                 <p className="text-[var(--color-textMuted)]">
                   {t.trackInOrders}
                 </p>
+                <button type="button" onClick={() => { clearTimeout(timerRef.current); handleClose() }} className="btn btn-primary mt-4 w-full">
+                  {tc.close || 'Close'}
+                </button>
               </div>
             ) : (
               <>

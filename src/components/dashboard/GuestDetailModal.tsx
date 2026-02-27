@@ -1,9 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Guest, BonusTransaction, LoyaltyTier } from '@/types/database'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { IconClose, IconEdit, IconTrash, IconCoin } from '@/components/Icons'
+import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 // Loyalty tier identity colors — intentionally not theme-variable
 const TIER_COLORS: Record<LoyaltyTier, string> = {
@@ -28,7 +31,9 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const [name, setName] = useState(guest.name)
   const [phone, setPhone] = useState(guest.phone || '')
   const [notes, setNotes] = useState(guest.notes || '')
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
 
   // Sync state when guest changes (e.g. switching between guests while modal is open)
   useEffect(() => {
@@ -36,7 +41,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
     setPhone(guest.phone || '')
     setNotes(guest.notes || '')
     setEditing(false)
-    setConfirmDelete(false)
+    setShowDeleteConfirm(false)
   }, [guest.id])
 
   const handleSave = async () => {
@@ -51,13 +56,13 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const tierLabel = tm[`tier${guest.loyalty_tier.charAt(0).toUpperCase()}${guest.loyalty_tier.slice(1)}` as keyof typeof tm] as string
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
-      <div
-        className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-xl"
-        role="dialog"
-        aria-modal="true"
-        onClick={e => e.stopPropagation()}
-      >
+    <>
+      <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={onClose} />
+      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="guest-detail-title">
+        <div
+          className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-xl"
+          onClick={e => e.stopPropagation()}
+        >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
           <div className="flex items-center gap-3">
@@ -68,7 +73,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
               {guest.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h2 className="text-lg font-bold">{guest.name}</h2>
+              <h2 id="guest-detail-title" className="text-lg font-bold">{guest.name}</h2>
               <span
                 className="text-xs font-bold px-2 py-0.5 rounded-full"
                 style={{ backgroundColor: `${TIER_COLORS[guest.loyalty_tier]}20`, color: TIER_COLORS[guest.loyalty_tier] }}
@@ -118,6 +123,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="input w-full mt-1"
+                  aria-label={tm.guestNameLabel}
                 />
               </div>
               <div>
@@ -127,6 +133,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                   className="input w-full mt-1"
+                  aria-label={tm.phone}
                 />
               </div>
               <div>
@@ -136,6 +143,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                   onChange={e => setNotes(e.target.value)}
                   className="input w-full mt-1 min-h-[80px]"
                   rows={3}
+                  aria-label={tm.notes}
                 />
               </div>
               <div className="flex gap-2">
@@ -219,28 +227,30 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
 
           {/* Delete */}
           <div className="pt-2 border-t border-[var(--color-border)]">
-            {confirmDelete ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[var(--color-danger)]">{tm.confirmDeleteGuest}</span>
-                <button type="button" onClick={onDelete} className="btn btn-ghost text-[var(--color-danger)] text-sm">
-                  {tm.delete}
-                </button>
-                <button type="button" onClick={() => setConfirmDelete(false)} className="btn btn-ghost text-sm">
-                  {tm.cancel}
-                </button>
-              </div>
-            ) : (
-              <button type="button"
-                onClick={() => setConfirmDelete(true)}
-                className="btn btn-ghost text-[var(--color-danger)] text-sm flex items-center gap-1"
-              >
-                <IconTrash size={14} />
-                {tm.deleteGuest}
-              </button>
-            )}
+            <button type="button"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="btn btn-ghost text-[var(--color-danger)] text-sm flex items-center gap-1"
+            >
+              <IconTrash size={14} />
+              {tm.deleteGuest}
+            </button>
           </div>
+
+          <ConfirmDialog
+            open={showDeleteConfirm}
+            title={tm.deleteGuest}
+            message={tm.confirmDeleteGuest}
+            danger
+            onConfirm={async () => {
+              await onDelete()
+              toast.success(tc.deleted)
+              setShowDeleteConfirm(false)
+            }}
+            onCancel={() => setShowDeleteConfirm(false)}
+          />
         </div>
       </div>
     </div>
+    </>
   )
 }

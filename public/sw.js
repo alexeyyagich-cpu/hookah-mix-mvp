@@ -1,5 +1,5 @@
 // Service Worker for Push Notifications + PWA Offline Caching
-const CACHE_NAME = 'hookah-torus-v14'
+const CACHE_NAME = 'hookah-torus-v15'
 
 // Critical routes — SW install MUST succeed for these
 const CRITICAL_URLS = [
@@ -193,17 +193,28 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
-  const urlToOpen = event.notification.data?.url || '/dashboard'
+  // Support notification action buttons
+  let urlToOpen = event.notification.data?.url || '/dashboard'
+  if (event.action) {
+    const actions = event.notification.data?.actions || {}
+    if (actions[event.action]) {
+      urlToOpen = actions[event.action]
+    }
+  }
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((windowClients) => {
         for (const client of windowClients) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.navigate(urlToOpen)
-            return client.focus()
+          if (new URL(client.url).origin === self.location.origin && 'focus' in client) {
+            return client.navigate(urlToOpen).then(() => client.focus())
           }
         }
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen)
+        }
+      })
+      .catch(() => {
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen)
         }

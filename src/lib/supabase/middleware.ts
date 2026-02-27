@@ -2,10 +2,24 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from '@/lib/config'
 
+const SECURITY_HEADERS: [string, string][] = [
+  ['X-Content-Type-Options', 'nosniff'],
+  ['X-Frame-Options', 'SAMEORIGIN'],
+  ['Referrer-Policy', 'strict-origin-when-cross-origin'],
+  ['Permissions-Policy', 'camera=(), microphone=(), geolocation=(), interest-cohort=()'],
+]
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  for (const [key, value] of SECURITY_HEADERS) {
+    response.headers.set(key, value)
+  }
+  return response
+}
+
 export async function updateSession(request: NextRequest) {
   // Skip auth check if Supabase is not configured
   if (!isSupabaseConfigured) {
-    return NextResponse.next({ request })
+    return applySecurityHeaders(NextResponse.next({ request }))
   }
 
   let supabaseResponse = NextResponse.next({
@@ -45,7 +59,11 @@ export async function updateSession(request: NextRequest) {
   const publicPaths = [
     '/', '/login', '/register', '/forgot-password', '/update-password',
     '/join', '/tip', '/lounge', '/menu', '/mix', '/pricing',
-    '/legal', '/recommend', '/offline', '/setup', '/api',
+    '/legal', '/recommend', '/offline', '/setup',
+    // Specific public API routes (individual routes handle their own auth)
+    '/api/health', '/api/public', '/api/stripe/webhook',
+    '/api/telegram/webhook', '/api/r2o/webhooks', '/api/cron',
+    '/api/invite/accept',
   ]
   const isPublicPath = publicPaths.some(path =>
     request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')
@@ -62,7 +80,7 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', request.nextUrl.pathname)
-    return NextResponse.redirect(url)
+    return applySecurityHeaders(NextResponse.redirect(url))
   }
 
   // Public auth paths that don't require login
@@ -81,7 +99,7 @@ export async function updateSession(request: NextRequest) {
   if ((isAuthPath || isRootPath) && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+    return applySecurityHeaders(NextResponse.redirect(url))
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
@@ -97,5 +115,5 @@ export async function updateSession(request: NextRequest) {
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
 
-  return supabaseResponse
+  return applySecurityHeaders(supabaseResponse)
 }

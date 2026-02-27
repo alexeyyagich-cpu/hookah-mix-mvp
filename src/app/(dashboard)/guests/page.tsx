@@ -172,6 +172,7 @@ export default function GuestsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder={tm.searchGuests}
+            aria-label={tm.searchGuests}
             className="input pl-10 w-full"
           />
         </div>

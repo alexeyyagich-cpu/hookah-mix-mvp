@@ -7,6 +7,7 @@ import {
   kbd, btn, urlBtn,
 } from '@/lib/telegram/bot'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { telegramUpdateSchema } from '@/lib/validation'
 import type { TelegramUpdate } from '@/lib/telegram/types'
 import type { Session, BarSale, TobaccoInventory, Shift } from '@/types/database'
 import { STRIPE_MESSAGE_MAX_LENGTH } from '@/lib/constants'
@@ -216,7 +217,12 @@ export async function POST(request: NextRequest) {
 
   let update: TelegramUpdate
   try {
-    update = await request.json()
+    const raw = await request.json()
+    const validated = telegramUpdateSchema.safeParse(raw)
+    if (!validated.success) {
+      return NextResponse.json({ ok: false, error: 'Invalid update' }, { status: 400 })
+    }
+    update = validated.data as TelegramUpdate
   } catch {
     return NextResponse.json({ ok: false, error: 'Invalid JSON' }, { status: 400 })
   }

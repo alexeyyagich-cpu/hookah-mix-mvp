@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { publicOrderSchema, validateBody } from '@/lib/validation'
+import { publicOrderSchema, slugSchema, validateBody } from '@/lib/validation'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -15,6 +15,11 @@ export async function POST(
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   const { slug } = await params
+
+  const slugResult = slugSchema.safeParse(slug)
+  if (!slugResult.success) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
+  }
 
   if (!supabaseUrl || !supabaseServiceKey) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 })
@@ -47,30 +52,19 @@ export async function POST(
     return NextResponse.json({ error: 'Venue not found' }, { status: 404 })
   }
 
-  // Validate table belongs to this profile
-  const { data: table, error: tableError } = await supabase
-    .from('floor_tables')
-    .select('id, name')
-    .eq('id', table_id)
-    .eq('profile_id', profile.id)
-    .single()
+  // Validate table + check recent order rate limit in parallel
+  const [tableResult, recentOrderResult] = await Promise.all([
+    supabase.from('floor_tables').select('id, name').eq('id', table_id).eq('profile_id', profile.id).single(),
+    supabase.from('kds_orders').select('created_at').eq('table_id', table_id).eq('source', 'guest_qr').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+  ])
 
-  if (tableError || !table) {
+  if (tableResult.error || !tableResult.data) {
     return NextResponse.json({ error: 'Table not found' }, { status: 400 })
   }
+  const table = tableResult.data
 
-  // Rate limit: max 1 guest order per table per 30 seconds
-  const { data: recentOrder } = await supabase
-    .from('kds_orders')
-    .select('created_at')
-    .eq('table_id', table_id)
-    .eq('source', 'guest_qr')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
-
-  if (recentOrder) {
-    const elapsed = Date.now() - new Date(recentOrder.created_at).getTime()
+  if (recentOrderResult.data) {
+    const elapsed = Date.now() - new Date(recentOrderResult.data.created_at).getTime()
     if (elapsed < 30000) {
       return NextResponse.json({ error: 'Rate limited', retry_after: Math.ceil((30000 - elapsed) / 1000) }, { status: 429 })
     }

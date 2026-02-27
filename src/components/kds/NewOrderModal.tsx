@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { IconPlus, IconMinus, IconClose, IconCocktail, IconBowl, IconSearch } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
 import { getHeatRecommendation } from '@/logic/quickRepeatEngine'
 import { calculateCompatibility, type MixItem } from '@/logic/mixCalculator'
 import type { FloorTable, BarRecipeWithIngredients, KdsOrderItem, BowlType, TobaccoInventory, Guest, KdsHookahData, StrengthPreference } from '@/types/database'
+import type { BarItemEntry, SelectedTobacco } from '@/types/shared'
 import type { CreateKdsOrderInput } from '@/lib/hooks/useKDS'
 
 interface NewOrderModalProps {
@@ -20,16 +22,6 @@ interface NewOrderModalProps {
   bowls: BowlType[]
   inventory: TobaccoInventory[]
   guests: Guest[]
-}
-
-interface BarItemEntry {
-  recipe: BarRecipeWithIngredients
-  quantity: number
-}
-
-interface SelectedTobacco {
-  tobacco: Tobacco
-  percent: number
 }
 
 const TABLE_STATUS_DOTS: Record<string, string> = {
@@ -66,6 +58,8 @@ export function NewOrderModal({
   const [hookahDescription, setHookahDescription] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true)
 
   // Structured hookah builder state
   const [hookahMode, setHookahMode] = useState<'structured' | 'freetext'>('structured')
@@ -348,7 +342,7 @@ export function NewOrderModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={onClose} />
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
         {/* Header */}
@@ -564,6 +558,7 @@ export function NewOrderModal({
                       value={tobaccoSearch}
                       onChange={e => setTobaccoSearch(e.target.value)}
                       placeholder={t.tobaccoSearch}
+                      aria-label={t.tobaccoSearch}
                       className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
                     />
                   </div>
@@ -719,6 +714,7 @@ export function NewOrderModal({
               value={notes}
               onChange={e => setNotes(e.target.value)}
               placeholder={t.placeholderSpecialRequests}
+              aria-label={t.sectionNotes}
               rows={2}
               className="input text-sm resize-none"
             />

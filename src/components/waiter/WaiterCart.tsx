@@ -1,19 +1,8 @@
 'use client'
 
 import { IconPlus, IconMinus, IconClose } from '@/components/Icons'
-import type { BarRecipeWithIngredients } from '@/types/database'
-import type { Tobacco } from '@/data/tobaccos'
 import type { Dictionary } from '@/lib/i18n'
-
-interface BarItemEntry {
-  recipe: BarRecipeWithIngredients
-  quantity: number
-}
-
-interface SelectedTobacco {
-  tobacco: Tobacco
-  percent: number
-}
+import type { BarItemEntry, SelectedTobacco } from '@/types/shared'
 
 interface WaiterCartProps {
   barItems: BarItemEntry[]

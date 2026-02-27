@@ -212,6 +212,11 @@ export function useReservations(): UseReservationsReturn {
 
     if (!user || !supabase) return
 
+    const previousReservations = reservations
+    setReservations(prev => prev.map(r =>
+      r.id === id ? { ...r, status } : r
+    ))
+
     try {
       const { error: updateError } = await supabase
         .from('reservations')
@@ -220,13 +225,11 @@ export function useReservations(): UseReservationsReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
-      setReservations(prev => prev.map(r =>
-        r.id === id ? { ...r, status } : r
-      ))
     } catch (err) {
+      setReservations(previousReservations)
       setError(err instanceof Error ? err.message : 'Failed to update status')
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, reservations])
 
   const assignTable = useCallback(async (id: string, tableId: string | null) => {
     if (isDemoMode) {
@@ -238,6 +241,11 @@ export function useReservations(): UseReservationsReturn {
 
     if (!user || !supabase) return
 
+    const previousReservations = reservations
+    setReservations(prev => prev.map(r =>
+      r.id === id ? { ...r, table_id: tableId } : r
+    ))
+
     try {
       const { error: updateError } = await supabase
         .from('reservations')
@@ -246,13 +254,11 @@ export function useReservations(): UseReservationsReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
-      setReservations(prev => prev.map(r =>
-        r.id === id ? { ...r, table_id: tableId } : r
-      ))
     } catch (err) {
+      setReservations(previousReservations)
       setError(err instanceof Error ? err.message : 'Failed to assign table')
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, reservations])
 
   const deleteReservation = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -262,6 +268,9 @@ export function useReservations(): UseReservationsReturn {
 
     if (!user || !supabase) return
 
+    const previousReservations = reservations
+    setReservations(prev => prev.filter(r => r.id !== id))
+
     try {
       const { error: deleteError } = await supabase
         .from('reservations')
@@ -270,11 +279,11 @@ export function useReservations(): UseReservationsReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (deleteError) throw deleteError
-      setReservations(prev => prev.filter(r => r.id !== id))
     } catch (err) {
+      setReservations(previousReservations)
       setError(err instanceof Error ? err.message : 'Failed to delete reservation')
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, reservations])
 
   return {
     reservations,

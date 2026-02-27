@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useCallback, useRef, } from 'react'
+import { Suspense, useState, useMemo, useCallback, useRef, } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
@@ -30,6 +31,14 @@ const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
 }
 
 export default function FloorPage() {
+  return (
+    <Suspense>
+      <FloorPageInner />
+    </Suspense>
+  )
+}
+
+function FloorPageInner() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
@@ -55,7 +64,15 @@ export default function FloorPage() {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null)
   const [qrTableId, setQrTableId] = useState<string | null>(null)
   const [quickReserving, setQuickReserving] = useState(false)
-  const [zoneFilter, setZoneFilter] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const zoneFilter = searchParams.get('zone') || null
+  const setZoneFilter = useCallback((value: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) params.set('zone', value)
+    else params.delete('zone')
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [searchParams, router])
   const [quickForm, setQuickForm] = useState({
     guest_name: '',
     guest_phone: '',

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import Anthropic from '@anthropic-ai/sdk'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { ocrExtractResponseSchema } from '@/lib/validation'
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 
@@ -108,9 +109,13 @@ Rules:
       return NextResponse.json({ error: 'Could not parse response' }, { status: 500 })
     }
 
-    const extracted = JSON.parse(jsonMatch[0])
+    const raw = JSON.parse(jsonMatch[0])
+    const validated = ocrExtractResponseSchema.safeParse(raw)
+    if (!validated.success) {
+      return NextResponse.json({ error: 'Invalid extraction result' }, { status: 500 })
+    }
 
-    return NextResponse.json(extracted)
+    return NextResponse.json(validated.data)
   } catch (error) {
     console.error('OCR extraction error:', error)
     return NextResponse.json({ error: 'Extraction failed' }, { status: 500 })
