@@ -83,6 +83,38 @@ export async function updateSession(request: NextRequest) {
     return applySecurityHeaders(NextResponse.redirect(url))
   }
 
+  // Trial expiry enforcement — block write API calls for expired trial users
+  // Exempt: /api/stripe (so users can still pay to upgrade)
+  if (user && isProtectedPath) {
+    const isWriteOp = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+    const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
+    const isStripeRoute = request.nextUrl.pathname.startsWith('/api/stripe/')
+
+    if (isWriteOp && isApiRoute && !isStripeRoute) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_tier, trial_expires_at')
+        .eq('id', user.id)
+        .single()
+
+      if (
+        profile?.subscription_tier === 'trial' &&
+        profile?.trial_expires_at &&
+        new Date(profile.trial_expires_at) < new Date()
+      ) {
+        const trialExpiredResponse = NextResponse.json(
+          { error: 'Trial expired. Please upgrade to continue.' },
+          { status: 402 }
+        )
+        // Copy auth cookies to preserve session
+        for (const cookie of supabaseResponse.cookies.getAll()) {
+          trialExpiredResponse.cookies.set(cookie.name, cookie.value)
+        }
+        return applySecurityHeaders(trialExpiredResponse)
+      }
+    }
+  }
+
   // Public auth paths that don't require login
   const publicAuthPaths = ['/forgot-password', '/update-password']
   const isPublicAuthPath = publicAuthPaths.some(path => request.nextUrl.pathname === path)

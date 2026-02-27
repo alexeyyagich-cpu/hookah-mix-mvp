@@ -122,6 +122,10 @@ export const common: typeof CommonType = {
     update: 'Update',
   },
 
+  trialExpired: 'Your trial has expired. Data is read-only.',
+  trialDaysLeft: (days: number) => days === 1 ? '1 day left in your trial.' : `${days} days left in your trial.`,
+  upgradeNow: 'Upgrade now',
+
   pricing: {
     select: 'Select',
     popular: 'Popular',

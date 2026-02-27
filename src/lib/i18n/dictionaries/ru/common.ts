@@ -136,6 +136,11 @@ export const common = {
     update: 'Обновить',
   },
 
+  // Trial
+  trialExpired: 'Пробный период закончился. Данные доступны только для чтения.',
+  trialDaysLeft: (days: number) => days === 1 ? 'Остался 1 день пробного периода.' : `Осталось ${days} дн. пробного периода.`,
+  upgradeNow: 'Выбрать тариф',
+
   // Pricing card
   pricing: {
     select: 'Выбрать',

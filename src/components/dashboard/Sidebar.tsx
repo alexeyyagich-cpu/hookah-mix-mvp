@@ -58,7 +58,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { locale } = useLocale()
   const { profile, signOut } = useAuth()
-  const { tier, isFreeTier } = useSubscription()
+  const { tier, isFreeTier, isTrialTier, needsUpgrade } = useSubscription()
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
   const { orgRole, hasPermission, hasAnyPermission, isOwner } = useRole(contextOrgRole)
   const { modules } = useModules()
@@ -357,12 +357,16 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Upgrade Banner */}
-      {isFreeTier && (
+      {/* Upgrade Banner — shown for trial users */}
+      {isTrialTier && (
         <div className="p-4 border-t border-[var(--color-border)]">
           <Link
             href="/pricing"
-            className="block p-4 rounded-xl bg-gradient-to-r from-[var(--color-primary)]/20 to-purple-500/20 border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition-colors"
+            className={`block p-4 rounded-xl border transition-colors ${
+              needsUpgrade
+                ? 'bg-[var(--color-danger)]/10 border-[var(--color-danger)]/30 hover:border-[var(--color-danger)]'
+                : 'bg-gradient-to-r from-[var(--color-primary)]/20 to-purple-500/20 border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]'
+            }`}
           >
             <div className="text-sm font-semibold mb-1">{t.upgradeToPro}</div>
             <div className="text-xs text-[var(--color-textMuted)]">

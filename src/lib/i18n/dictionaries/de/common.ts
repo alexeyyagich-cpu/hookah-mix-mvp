@@ -122,6 +122,10 @@ export const common: typeof CommonType = {
     update: 'Aktualisieren',
   },
 
+  trialExpired: 'Ihre Testphase ist abgelaufen. Daten sind schreibgeschützt.',
+  trialDaysLeft: (days: number) => days === 1 ? 'Noch 1 Tag in Ihrer Testphase.' : `Noch ${days} Tage in Ihrer Testphase.`,
+  upgradeNow: 'Jetzt upgraden',
+
   pricing: {
     select: 'Auswählen',
     popular: 'Beliebt',

@@ -15,6 +15,7 @@ import { useOnboarding } from '@/lib/hooks/useOnboarding'
 import { useTranslation } from '@/lib/i18n'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { InstallBanner } from '@/components/InstallBanner'
+import { TrialBanner } from '@/components/dashboard/TrialBanner'
 import { OnlineStatusProvider } from '@/lib/offline/useOnlineStatus'
 import { SidebarBadgeProvider, useSetSidebarBadge } from '@/lib/SidebarBadgeContext'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
@@ -159,6 +160,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <PageTitle />
       <main className={isOnboarding ? '' : 'lg:pl-72 relative'} style={{ zIndex: 1 }}>
         {!isOnboarding && <InstallBanner />}
+        {!isOnboarding && <TrialBanner />}
         <div className={isOnboarding ? '' : 'p-4 pt-16 lg:p-8 lg:pt-8'}>
           {children}
         </div>
