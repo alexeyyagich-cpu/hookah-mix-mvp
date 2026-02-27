@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PageBackground } from '@/components/ui/PageBackground'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const BOWL_BACKGROUNDS = [
   '/images/bowl-bg-1.jpg',
@@ -196,7 +197,7 @@ export default function BowlsPage() {
       {/* Loading */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="lg" className="mx-auto" />
           <p className="mt-4 text-[var(--color-textMuted)]">{tc.loading}</p>
         </div>
       ) : bowls.length === 0 ? (

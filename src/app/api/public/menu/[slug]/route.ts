@@ -1,12 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { slugSchema } from '@/lib/validation'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function GET(
-  _request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params
@@ -15,6 +16,10 @@ export async function GET(
   if (!slugResult.success) {
     return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
   }
+
+  const ip = getClientIp(request)
+  const rateCheck = await checkRateLimit(`menu:${ip}`, rateLimits.standard)
+  if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   if (!supabaseUrl || !supabaseServiceKey) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 })

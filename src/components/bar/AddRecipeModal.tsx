@@ -34,6 +34,7 @@ interface IngredientRow {
 
 export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRecipeModalProps) {
   const t = useTranslation('bar')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
 
   const METHOD_LABELS: Record<string, string> = {
@@ -235,7 +236,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
             <h2 className="text-lg font-bold">
               {editingRecipe ? t.editRecipe : t.newRecipeTitle}
             </h2>
-            <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+            <button type="button" onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>

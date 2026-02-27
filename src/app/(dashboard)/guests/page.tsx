@@ -13,6 +13,7 @@ import { IconSearch, IconPlus, IconUsers, IconSettings, IconLock } from '@/compo
 import { EmptyState } from '@/components/ui/EmptyState'
 import type { Guest, LoyaltyTier } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 type SortBy = 'name' | 'visits' | 'spent' | 'tier' | 'recent'
 
@@ -207,7 +208,7 @@ export default function GuestsPage() {
       {/* Guest List */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="lg" className="mx-auto" />
         </div>
       ) : filteredGuests.length === 0 ? (
         <EmptyState

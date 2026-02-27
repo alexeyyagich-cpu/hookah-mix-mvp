@@ -9,6 +9,7 @@ import type { ForecastResult } from '@/lib/utils/forecast'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { IconShop } from '@/components/Icons'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 interface InventoryTableProps {
@@ -72,7 +73,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
   if (loading) {
     return (
       <div className="card p-8 text-center" role="status" aria-live="polite">
-        <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+        <LoadingSpinner size="lg" className="mx-auto" />
         <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingInventory}</p>
       </div>
     )

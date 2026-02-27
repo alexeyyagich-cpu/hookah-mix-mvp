@@ -12,6 +12,7 @@ import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime }
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 type Period = 7 | 14 | 30
 
@@ -188,7 +189,7 @@ export default function BarSalesPage() {
       {/* Content */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
+          <LoadingSpinner size="lg" className="mx-auto" />
         </div>
       ) : (
         <>

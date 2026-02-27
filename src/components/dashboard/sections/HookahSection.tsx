@@ -21,6 +21,7 @@ import {
 } from '@/components/Icons'
 import Link from 'next/link'
 import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 export function HookahSection() {
@@ -142,7 +143,7 @@ export function HookahSection() {
           </div>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : (
             <ConsumptionChart data={statistics?.dailyConsumption || []} />
@@ -158,7 +159,7 @@ export function HookahSection() {
           </div>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : (
             <PopularFlavorsChart data={statistics?.consumptionByFlavor || []} />

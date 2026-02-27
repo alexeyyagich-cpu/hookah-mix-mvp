@@ -15,6 +15,7 @@ import {
 } from '@/components/Icons'
 import Link from 'next/link'
 import { useTranslation, useLocale, formatCurrency, formatDateTime } from '@/lib/i18n'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export function BarSection() {
   const t = useTranslation('manage')
@@ -99,7 +100,7 @@ export function BarSection() {
           </div>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : (
             <BarRevenueChart data={analytics.revenueByDay} />

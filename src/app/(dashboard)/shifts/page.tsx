@@ -270,7 +270,7 @@ export default function ShiftsPage() {
           <div className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{tm.openShift}</h2>
-              <button type="button" onClick={() => setShowOpenModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <button type="button" onClick={() => setShowOpenModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
                 <IconClose size={20} />
               </button>
             </div>
@@ -326,7 +326,7 @@ export default function ShiftsPage() {
           <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">{tm.closeShift}</h2>
-              <button type="button" onClick={() => setShowCloseModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <button type="button" onClick={() => setShowCloseModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
                 <IconClose size={20} />
               </button>
             </div>
@@ -398,7 +398,7 @@ export default function ShiftsPage() {
                   {formatDate(selectedShift.opened_at, locale)} {formatTime(selectedShift.opened_at, locale)} – {selectedShift.closed_at ? formatTime(selectedShift.closed_at, locale) : '...'}
                 </p>
               </div>
-              <button type="button" onClick={() => setSelectedShift(null)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]">
+              <button type="button" onClick={() => setSelectedShift(null)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
                 <IconClose size={20} />
               </button>
             </div>

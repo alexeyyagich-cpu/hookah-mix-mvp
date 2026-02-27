@@ -74,14 +74,14 @@ export function WaiterCart({
                 <span className="text-sm font-medium truncate">{item.recipe.name}</span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <button type="button" onClick={() => onUpdateBarQty(item.recipe.id, -1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center">
+                <button type="button" onClick={() => onUpdateBarQty(item.recipe.id, -1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center" aria-label="Decrease quantity">
                   <IconMinus size={12} />
                 </button>
                 <span className="text-sm font-bold w-5 text-center">{item.quantity}</span>
-                <button type="button" onClick={() => onUpdateBarQty(item.recipe.id, 1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center">
+                <button type="button" onClick={() => onUpdateBarQty(item.recipe.id, 1)} className="w-7 h-7 rounded-lg bg-[var(--color-bgCard)] flex items-center justify-center" aria-label="Increase quantity">
                   <IconPlus size={12} />
                 </button>
-                <button type="button" onClick={() => onRemoveBarItem(item.recipe.id)} className="w-7 h-7 rounded-lg text-[var(--color-danger)] flex items-center justify-center">
+                <button type="button" onClick={() => onRemoveBarItem(item.recipe.id)} className="w-7 h-7 rounded-lg text-[var(--color-danger)] flex items-center justify-center" aria-label="Remove item">
                   <IconClose size={12} />
                 </button>
               </div>

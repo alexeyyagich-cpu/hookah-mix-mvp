@@ -20,6 +20,7 @@ const CATEGORIES: BarIngredientCategory[] = [
 
 export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, canAddMore }: AddBarIngredientModalProps) {
   const t = useTranslation('bar')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const CATEGORY_LABELS: Record<string, string> = {
     spirit: t.catSpirit, liqueur: t.catLiqueur, wine: t.catWine,
@@ -133,6 +134,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
             <button type="button"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"
+              aria-label={tc.close}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

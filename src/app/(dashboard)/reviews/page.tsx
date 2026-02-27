@@ -6,6 +6,7 @@ import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 type Filter = 'all' | 'published' | 'hidden'
@@ -17,6 +18,7 @@ export default function ReviewsPage() {
   const { reviews, loading, averageRating, totalCount, togglePublished, deleteReview } = useReviews()
   const [filter, setFilter] = useState<Filter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   const filteredReviews = useMemo(() => reviews.filter(r => {
     if (filter === 'published') return r.is_published
@@ -159,7 +161,7 @@ export default function ReviewsPage() {
                         {review.is_published ? tm.actionHide : tm.actionPublish}
                       </button>
                       <button type="button"
-                        onClick={() => handleDelete(review.id)}
+                        onClick={() => setDeleteTarget(review.id)}
                         disabled={deletingId === review.id}
                         className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"
                         aria-label={tm.deleteReview}
@@ -180,6 +182,19 @@ export default function ReviewsPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={tm.deleteReview}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) {
+            await handleDelete(deleteTarget)
+          }
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
     </ErrorBoundary>
   )

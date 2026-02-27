@@ -1,12 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { generateConnectLink, isTelegramConfigured } from '@/lib/telegram/bot'
+import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   if (!isTelegramConfigured) {
     return NextResponse.json({ configured: false, link: '' })
   }
+
+  const ip = getClientIp(request)
+  const rateCheck = await checkRateLimit(`tg-link:${ip}`, rateLimits.standard)
+  if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
   const cookieStore = await cookies()
   const supabase = createServerClient(

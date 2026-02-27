@@ -386,7 +386,8 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
     }
 
     // Fetch real venue from public API
-    fetch(`/api/public/menu/${slug}`)
+    const controller = new AbortController()
+    fetch(`/api/public/menu/${slug}`, { signal: controller.signal })
       .then(res => {
         if (!res.ok) throw new Error(res.status === 404 ? 'not_found' : 'fetch_error')
         return res.json()
@@ -438,12 +439,13 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
         setLoading(false)
       })
       .catch((err) => {
+        if (err?.name === 'AbortError') return
         if (!mounted) return
         setError(err?.message === 'not_found' ? 'Venue not found' : translateError(err))
         setLoading(false)
       })
 
-    return () => { mounted = false }
+    return () => { mounted = false; controller.abort() }
   }, [slug])
 
   return { lounge, mixes, barRecipes, tobaccoMenu, tables, loading, error }

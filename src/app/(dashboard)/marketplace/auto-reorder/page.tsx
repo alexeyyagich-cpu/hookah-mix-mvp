@@ -8,6 +8,7 @@ import { useSuppliers } from '@/lib/hooks/useSuppliers'
 import { useSupplierProducts, DEMO_PRODUCTS } from '@/lib/hooks/useSupplierProducts'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { AutoReorderModal } from '@/components/marketplace/AutoReorderModal'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import {
   IconChevronLeft,
   IconRefresh,
@@ -22,6 +23,7 @@ import type { TobaccoInventory } from '@/types/database'
 
 export default function AutoReorderPage() {
   const t = useTranslation('market')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const { rules, loading, error, createRule, deleteRule, toggleRule } = useAutoReorder()
   const { inventory } = useInventory()
@@ -31,7 +33,7 @@ export default function AutoReorderPage() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedTobacco, setSelectedTobacco] = useState<TobaccoInventory | null>(null)
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   // Get inventory items that don't have rules yet
   const inventoryWithoutRules = inventory.filter(inv =>
@@ -55,16 +57,6 @@ export default function AutoReorderPage() {
       ...data,
     })
     return !!result
-  }
-
-  const handleDeleteRule = async (id: string) => {
-    if (deleteConfirm === id) {
-      await deleteRule(id)
-      setDeleteConfirm(null)
-    } else {
-      setDeleteConfirm(id)
-      setTimeout(() => setDeleteConfirm(null), 3000)
-    }
   }
 
   const getRuleDetails = (rule: AutoReorderRuleWithDetails) => {
@@ -209,12 +201,8 @@ export default function AutoReorderPage() {
 
                       {/* Delete */}
                       <button type="button"
-                        onClick={() => handleDeleteRule(rule.id)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          deleteConfirm === rule.id
-                            ? 'bg-[var(--color-danger)] text-white'
-                            : 'text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10'
-                        }`}
+                        onClick={() => setDeleteTarget(rule.id)}
+                        className="p-2 rounded-lg transition-colors text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
                       >
                         <IconTrash size={18} />
                       </button>
@@ -270,12 +258,17 @@ export default function AutoReorderPage() {
         </div>
       )}
 
-      {/* Delete confirmation toast */}
-      {deleteConfirm && (
-        <div className="fixed bottom-4 right-4 z-50 p-4 rounded-xl bg-[var(--color-danger)] text-white shadow-lg animate-fadeInUp">
-          {t.clickAgainToConfirmDelete}
-        </div>
-      )}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={tc.delete}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) await deleteRule(deleteTarget)
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {/* Auto Reorder Modal */}
       {selectedTobacco && (

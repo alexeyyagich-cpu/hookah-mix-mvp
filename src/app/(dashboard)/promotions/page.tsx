@@ -8,9 +8,11 @@ import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus, IconLock, IconPercent, IconEdit, IconTrash, IconClose } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import Link from 'next/link'
 import type { Promotion, PromoType, PromoRules } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const PROMO_TYPES: PromoType[] = ['happy_hour', 'nth_free', 'birthday', 'custom_discount']
 
@@ -36,7 +38,7 @@ export default function PromotionsPage() {
   const [endHour, setEndHour] = useState('17')
   const [nthVisit, setNthVisit] = useState('5')
   const [maxUses, setMaxUses] = useState('')
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   if (isFreeTier) {
@@ -255,7 +257,7 @@ export default function PromotionsPage() {
       {/* Promo List */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="lg" className="mx-auto" />
         </div>
       ) : promotions.length === 0 ? (
         <EmptyState
@@ -301,31 +303,32 @@ export default function PromotionsPage() {
                 <button type="button" onClick={() => openEdit(promo)} className="btn btn-ghost p-2">
                   <IconEdit size={16} />
                 </button>
-                {confirmDeleteId === promo.id ? (
-                  <div className="flex gap-1">
-                    <button type="button"
-                      onClick={async () => { try { await deletePromo(promo.id); toast.success(tc.deleted) } catch { toast.error(tc.errorDeleting) } finally { setConfirmDeleteId(null) } }}
-                      className="btn btn-ghost text-[var(--color-danger)] text-xs"
-                    >
-                      {tm.delete}
-                    </button>
-                    <button type="button"
-                      onClick={() => setConfirmDeleteId(null)}
-                      className="btn btn-ghost text-xs"
-                    >
-                      {tm.cancel}
-                    </button>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => setConfirmDeleteId(promo.id)} className="btn btn-ghost p-2 text-[var(--color-danger)]">
-                    <IconTrash size={16} />
-                  </button>
-                )}
+                <button type="button" onClick={() => setDeleteTarget(promo.id)} className="btn btn-ghost p-2 text-[var(--color-danger)]">
+                  <IconTrash size={16} />
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={tc.delete}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) {
+            try {
+              await deletePromo(deleteTarget)
+              toast.success(tc.deleted)
+            } catch {
+              toast.error(tc.errorDeleting)
+            }
+          }
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
     </ErrorBoundary>
   )

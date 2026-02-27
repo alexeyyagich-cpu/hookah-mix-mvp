@@ -104,10 +104,11 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={handleClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={handleClose} />
       <div
         ref={dialogRef}
-        className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
+        className="relative bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
         role="dialog"
         aria-modal="true"
         onClick={e => e.stopPropagation()}

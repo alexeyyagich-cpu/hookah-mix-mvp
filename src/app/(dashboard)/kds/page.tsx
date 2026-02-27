@@ -13,6 +13,7 @@ import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
 import { IconPlus, IconMenuList } from '@/components/Icons'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation } from '@/lib/i18n'
 import { useSetSidebarBadge } from '@/lib/SidebarBadgeContext'
@@ -138,7 +139,7 @@ export default function KdsPage() {
       <ErrorBoundary sectionName="KDS Board">
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
+          <LoadingSpinner size="lg" className="mx-auto" />
         </div>
       ) : filteredOrders.length === 0 ? (
         <EmptyState

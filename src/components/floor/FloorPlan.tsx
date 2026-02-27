@@ -162,7 +162,7 @@ export function FloorPlan({
     }
   }, [draggedTable, moveTable])
 
-  const handleTableClick = useCallback((e: React.MouseEvent | React.TouchEvent, table: FloorTable) => {
+  const handleTableClick = useCallback((_e: React.MouseEvent | React.TouchEvent | React.KeyboardEvent, table: FloorTable) => {
     if (isDragging) return
 
     setSelectedTable(table)
@@ -266,7 +266,7 @@ export function FloorPlan({
                   handleTableClick(e, table)
                 }
               }}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleTableClick(e as unknown as React.MouseEvent, table) }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleTableClick(e, table) }}
               onMouseDown={(e) => handlePointerDown(e, table)}
               onTouchStart={(e) => handlePointerDown(e, table)}
               className={`

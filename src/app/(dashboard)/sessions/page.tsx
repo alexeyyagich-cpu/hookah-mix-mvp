@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PageBackground } from '@/components/ui/PageBackground'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export default function SessionsPage() {
   return (
@@ -221,7 +222,7 @@ function SessionsPageInner() {
       {/* Sessions List */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="lg" className="mx-auto" />
           <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingSessions}</p>
         </div>
       ) : filteredSessions.length === 0 ? (

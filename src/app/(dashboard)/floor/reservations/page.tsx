@@ -6,6 +6,7 @@ import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { IconCalendar, IconChevronLeft, IconTrash } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useRole } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
@@ -23,6 +24,7 @@ type StatusFilter = 'all' | ReservationStatus
 
 export default function ReservationsPage() {
   const tm = useTranslation('manage')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const { orgRole: contextOrgRole } = useOrganizationContext()
   const { hasPermission } = useRole(contextOrgRole)
@@ -41,6 +43,7 @@ export default function ReservationsPage() {
   const [dateFilter, setDateFilter] = useState(today)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   const filteredReservations = useMemo(() => reservations.filter(r => {
     if (dateFilter && r.reservation_date !== dateFilter) return false
@@ -227,7 +230,7 @@ export default function ReservationsPage() {
                       )}
                       {canEdit && (
                         <button type="button"
-                          onClick={() => handleDelete(reservation.id)}
+                          onClick={() => setDeleteTarget(reservation.id)}
                           disabled={deletingId === reservation.id}
                           className="p-1.5 rounded-lg text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition-colors disabled:opacity-50"
                           aria-label={tm.deleteReservation}
@@ -243,6 +246,19 @@ export default function ReservationsPage() {
           })}
         </div>
       )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={tm.deleteReservation}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) {
+            await handleDelete(deleteTarget)
+          }
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
     </ErrorBoundary>
   )

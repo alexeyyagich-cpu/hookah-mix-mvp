@@ -9,6 +9,7 @@ import { IconMenuList } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
@@ -152,7 +153,7 @@ export default function BarMenuPage() {
       {/* Content */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
+          <LoadingSpinner size="lg" className="mx-auto" />
         </div>
       ) : menuRecipes.length === 0 ? (
         <EmptyState

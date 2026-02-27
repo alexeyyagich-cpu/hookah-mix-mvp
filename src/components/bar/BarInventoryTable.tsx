@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { BarInventoryItem } from '@/types/database'
 import { BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
@@ -17,6 +18,7 @@ interface BarInventoryTableProps {
 
 export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading, onAdd }: BarInventoryTableProps) {
   const t = useTranslation('bar')
+  const tc = useTranslation('common')
   const CATEGORY_LABELS: Record<string, string> = {
     spirit: t.catSpirit, liqueur: t.catLiqueur, wine: t.catWine,
     beer: t.catBeer, mixer: t.catMixer, syrup: t.catSyrup,
@@ -31,9 +33,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   const [filter, setFilter] = useState('')
   const [adjustingId, setAdjustingId] = useState<string | null>(null)
   const [adjustAmount, setAdjustAmount] = useState('')
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const deleteTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => { return () => clearTimeout(deleteTimerRef.current) }, [])
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   const handleSort = (field: keyof BarInventoryItem) => {
     if (sortField === field) {
@@ -67,17 +67,6 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
     }
     setAdjustingId(null)
     setAdjustAmount('')
-  }
-
-  const handleDelete = (id: string) => {
-    if (deleteConfirm === id) {
-      onDelete(id)
-      setDeleteConfirm(null)
-    } else {
-      setDeleteConfirm(id)
-      clearTimeout(deleteTimerRef.current)
-      deleteTimerRef.current = setTimeout(() => setDeleteConfirm(null), 3000)
-    }
   }
 
   const getStockStatus = (item: BarInventoryItem) => {
@@ -236,14 +225,10 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                           {t.editShort}
                         </button>
                         <button type="button"
-                          onClick={() => handleDelete(item.id)}
-                          className={`text-xs transition-colors ${
-                            deleteConfirm === item.id
-                              ? 'text-[var(--color-danger)] font-medium'
-                              : 'text-[var(--color-textMuted)] hover:text-[var(--color-danger)]'
-                          }`}
+                          onClick={() => setDeleteTarget(item.id)}
+                          className="text-xs transition-colors text-[var(--color-textMuted)] hover:text-[var(--color-danger)]"
                         >
-                          {deleteConfirm === item.id ? t.deleteConfirmQ : t.deleteShort}
+                          {t.deleteShort}
                         </button>
                       </div>
                     </td>
@@ -254,6 +239,18 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
           </table>
         </ScrollableTable>
       </div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={tc.delete}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={() => {
+          if (deleteTarget) onDelete(deleteTarget)
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }

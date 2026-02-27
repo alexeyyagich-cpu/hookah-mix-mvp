@@ -12,6 +12,7 @@ import {
   IconTarget,
   IconTrendUp,
 } from '@/components/Icons'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export function ControlDashboard() {
   const { data, staffEnriched, loading, error } = useDashboardControl()
@@ -22,7 +23,7 @@ export function ControlDashboard() {
   if (loading) {
     return (
       <div className="card p-8 flex items-center justify-center" role="status" aria-live="polite">
-        <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" aria-label="Loading" />
+        <LoadingSpinner size="lg" />
       </div>
     )
   }

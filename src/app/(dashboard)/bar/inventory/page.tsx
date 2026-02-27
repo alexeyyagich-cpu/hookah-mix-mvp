@@ -189,6 +189,7 @@ export default function BarInventoryPage() {
         editingItem={editingItem}
         canAddMore={canAddMore}
       />
+
     </div>
   )
 }

@@ -9,6 +9,8 @@ import { RecipeCard } from '@/components/bar/RecipeCard'
 import { CostCalculator } from '@/components/bar/CostCalculator'
 import { AddRecipeModal } from '@/components/bar/AddRecipeModal'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTranslation } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, CocktailMethod } from '@/types/database'
 
@@ -42,6 +44,7 @@ export default function BarRecipesPage() {
   const [filterMethod, setFilterMethod] = useState<FilterMethod>('all')
   const [filterMenu, setFilterMenu] = useState<FilterMenu>('all')
   const [search, setSearch] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   const filteredRecipes = useMemo(() => {
     let result = recipes
@@ -203,7 +206,7 @@ export default function BarRecipesPage() {
       {/* Content */}
       {loading ? (
         <div className="card p-12 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto" />
+          <LoadingSpinner size="lg" className="mx-auto" />
         </div>
       ) : filteredRecipes.length === 0 ? (
         <EmptyState
@@ -233,7 +236,7 @@ export default function BarRecipesPage() {
                     onToggleMenu={() => toggleOnMenu(recipe.id)}
                     onToggleFavorite={() => toggleFavorite(recipe.id)}
                     onEdit={() => handleEdit(recipe)}
-                    onDelete={() => handleDelete(recipe.id)}
+                    onDelete={() => setDeleteTarget(recipe.id)}
                   />
                 </div>
               )
@@ -280,6 +283,20 @@ export default function BarRecipesPage() {
         }}
         onSave={handleSave}
         editingRecipe={editingRecipe}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={tc.delete}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) {
+            await handleDelete(deleteTarget)
+          }
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
       />
     </div>
   )

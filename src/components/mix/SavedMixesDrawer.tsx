@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
 import { IconStar, IconMix, IconTrash } from '@/components/Icons'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { MixRating, MixNotes } from './MixRating'
 import type { SavedMix, SavedMixTobacco } from '@/types/database'
 
@@ -18,11 +19,12 @@ type FilterOption = 'all' | 'favorites'
 
 export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDrawerProps) {
   const t = useTranslation('hookah')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
   const { savedMixes, loading, deleteMix, toggleFavorite, incrementUsage, updateMix } = useSavedMixes()
   const [sortBy, setSortBy] = useState<SortOption>('recent')
   const [filterBy, setFilterBy] = useState<FilterOption>('all')
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   // Filter and sort mixes
   const filteredMixes = savedMixes
@@ -54,16 +56,6 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
     await incrementUsage(mix.id)
     onSelectMix(mix.tobaccos, mix.id)
     onClose()
-  }
-
-  const handleDelete = async (id: string) => {
-    if (deleteConfirm === id) {
-      await deleteMix(id)
-      setDeleteConfirm(null)
-    } else {
-      setDeleteConfirm(id)
-      setTimeout(() => setDeleteConfirm(null), 3000)
-    }
   }
 
   if (!isOpen) return null
@@ -270,14 +262,12 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                       <IconStar size={16} className={mix.is_favorite ? 'text-[var(--color-warning)]' : 'text-[var(--color-textMuted)]'} />
                     </button>
                     <button type="button"
-                      onClick={() => handleDelete(mix.id)}
+                      onClick={() => setDeleteTarget(mix.id)}
                       className="px-3 py-2 rounded-lg transition-colors"
                       style={{
-                        background: deleteConfirm === mix.id
-                          ? 'var(--color-danger)'
-                          : 'var(--color-bgCard)',
+                        background: 'var(--color-bgCard)',
                         border: '1px solid var(--color-border)',
-                        color: deleteConfirm === mix.id ? 'white' : 'var(--color-textMuted)',
+                        color: 'var(--color-textMuted)',
                       }}
                       title={t.mixDelete}
                     >
@@ -290,6 +280,18 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={tc.delete}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (deleteTarget) await deleteMix(deleteTarget)
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       <style jsx>{`
         @keyframes slideInRight {
