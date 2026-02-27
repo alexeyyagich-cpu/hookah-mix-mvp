@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
@@ -61,7 +61,7 @@ export function NewOrderModal({
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef, true)
+  useFocusTrap(dialogRef, isOpen, onClose)
   useBodyScrollLock(isOpen)
 
   // Structured hookah builder state
@@ -332,16 +332,6 @@ export function NewOrderModal({
       setSaving(false)
     }
   }
-
-  // Escape key to close
-  useEffect(() => {
-    if (!isOpen) return
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !saving) onClose()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [isOpen, saving, onClose])
 
   if (!isOpen) return null
 

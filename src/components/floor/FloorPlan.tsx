@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import { IconPlus } from '@/components/Icons'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
@@ -425,6 +426,7 @@ interface TableModalProps {
 
 function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onStatusChange }: TableModalProps) {
   const t = useTranslation('manage')
+  const tc = useTranslation('common')
 
   const STATUS_LABELS: Record<TableStatus, string> = {
     available: t.statusAvailable,
@@ -459,6 +461,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
       })
     } catch (err) {
       console.error('Failed to save table:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
     }

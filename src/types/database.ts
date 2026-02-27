@@ -396,10 +396,6 @@ export interface SessionWithItems extends Session {
   bowl_type: BowlType | null
 }
 
-export interface TobaccoInventoryWithTransactions extends TobaccoInventory {
-  inventory_transactions: InventoryTransaction[]
-}
-
 // Database response types
 export interface Database {
   public: {

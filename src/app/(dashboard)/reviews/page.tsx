@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useReviews } from '@/lib/hooks/useReviews'
 import { IconStar, IconTrash } from '@/components/Icons'
@@ -18,14 +18,14 @@ export default function ReviewsPage() {
   const [filter, setFilter] = useState<Filter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const filteredReviews = reviews.filter(r => {
+  const filteredReviews = useMemo(() => reviews.filter(r => {
     if (filter === 'published') return r.is_published
     if (filter === 'hidden') return !r.is_published
     return true
-  })
+  }), [reviews, filter])
 
-  const publishedCount = reviews.filter(r => r.is_published).length
-  const hiddenCount = reviews.filter(r => !r.is_published).length
+  const publishedCount = useMemo(() => reviews.filter(r => r.is_published).length, [reviews])
+  const hiddenCount = useMemo(() => reviews.filter(r => !r.is_published).length, [reviews])
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)

@@ -26,7 +26,6 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
   const [isClosing, setIsClosing] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef, true)
   useBodyScrollLock(isOpen)
 
   useEffect(() => {
@@ -50,13 +49,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
     }, 200)
   }, [onClose])
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !loading) handleClose()
-    }
-    window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
-  }, [handleClose, loading])
+  useFocusTrap(dialogRef, true, handleClose)
 
   const handleConfirm = async () => {
     setLoading(true)

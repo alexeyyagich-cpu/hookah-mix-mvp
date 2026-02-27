@@ -1,6 +1,6 @@
 'use client'
 
-import type { Session, BarSale, KdsOrder, Tip } from '@/types/database'
+import type { SessionWithItems, BarSale, KdsOrder, Tip } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
 import { useLocale, formatCurrency } from '@/lib/i18n'
 
@@ -13,7 +13,7 @@ interface Review {
 }
 
 interface ActivityFeedProps {
-  sessions: Session[]
+  sessions: SessionWithItems[]
   sales: BarSale[]
   kdsOrders: KdsOrder[]
   reviews: Review[]
@@ -48,8 +48,7 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
 
   // Sessions (last 10)
   for (const s of sessions.slice(0, 10)) {
-    const items = (s as unknown as { session_items?: { brand: string; flavor: string }[] }).session_items
-    const mixStr = items?.map(i => `${i.brand} ${i.flavor}`).join(', ') || `${s.total_grams}g`
+    const mixStr = s.session_items?.map(i => `${i.brand} ${i.flavor}`).join(', ') || `${s.total_grams}g`
     events.push({
       id: `s-${s.id}`,
       emoji: '🔥',

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import type { LoyaltySettings } from '@/types/database'
 import { useTranslation } from '@/lib/i18n'
 import { IconClose } from '@/components/Icons'
@@ -38,6 +39,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
       onClose()
     } catch (err) {
       console.error('Loyalty settings save failed:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
     }

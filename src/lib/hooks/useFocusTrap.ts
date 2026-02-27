@@ -1,6 +1,6 @@
 import { useEffect, type RefObject } from 'react'
 
-export function useFocusTrap(ref: RefObject<HTMLElement | null>, isOpen: boolean) {
+export function useFocusTrap(ref: RefObject<HTMLElement | null>, isOpen: boolean, onEscape?: () => void) {
   useEffect(() => {
     if (!isOpen || !ref.current) return
     const el = ref.current
@@ -13,6 +13,11 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, isOpen: boolean
     }, 50)
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onEscape) {
+        e.preventDefault()
+        onEscape()
+        return
+      }
       if (e.key !== 'Tab') return
       const focusable = el.querySelectorAll<HTMLElement>(focusableSelector)
       if (focusable.length === 0) return
@@ -30,5 +35,5 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, isOpen: boolean
       clearTimeout(timer)
       el.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen, ref])
+  }, [isOpen, ref, onEscape])
 }

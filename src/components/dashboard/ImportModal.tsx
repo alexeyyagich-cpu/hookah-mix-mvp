@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { IconClose, IconExport } from '@/components/Icons'
 import { parseFile, autoMapColumns, validateImportRow } from '@/lib/utils/importParser'
@@ -20,6 +21,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const fileRef = useRef<HTMLInputElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
 
   const [step, setStep] = useState<Step>('upload')
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
@@ -29,6 +31,17 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   const [validRows, setValidRows] = useState<ImportRow[]>([])
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
+
+  const handleClose = () => {
+    setStep('upload')
+    setParseResult(null)
+    setValidRows([])
+    setError('')
+    setMapping({ brand: '', flavor: '', quantity_grams: '', purchase_price: '', package_grams: '' })
+    onClose()
+  }
+
+  useFocusTrap(dialogRef, isOpen, handleClose)
   useBodyScrollLock(isOpen)
 
   if (!isOpen) return null
@@ -82,19 +95,6 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
     }
   }
 
-  const reset = () => {
-    setStep('upload')
-    setParseResult(null)
-    setValidRows([])
-    setError('')
-    setMapping({ brand: '', flavor: '', quantity_grams: '', purchase_price: '', package_grams: '' })
-  }
-
-  const handleClose = () => {
-    reset()
-    onClose()
-  }
-
   const columnLabels: Record<keyof ColumnMapping, string> = {
     brand: t.importColBrand,
     flavor: t.importColFlavor,
@@ -106,6 +106,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={handleClose}>
       <div
+        ref={dialogRef}
         className="bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
         role="dialog"
         aria-modal="true"

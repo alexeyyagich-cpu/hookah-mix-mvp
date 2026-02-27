@@ -21,13 +21,22 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
   const tc = useTranslation('common')
   const fileRef = useRef<HTMLInputElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef, true)
-  useBodyScrollLock(isOpen)
   const [step, setStep] = useState<Step>('upload')
   const [items, setItems] = useState<ExtractedItem[]>([])
   const [invoice, setInvoice] = useState<ExtractedInvoice | null>(null)
   const [error, setError] = useState('')
   const [importing, setImporting] = useState(false)
+
+  const handleClose = () => {
+    setStep('upload')
+    setItems([])
+    setInvoice(null)
+    setError('')
+    onClose()
+  }
+
+  useFocusTrap(dialogRef, isOpen, handleClose)
+  useBodyScrollLock(isOpen)
 
   if (!isOpen) return null
 
@@ -85,14 +94,6 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
 
   const removeItem = (index: number) => {
     setItems(prev => prev.filter((_, i) => i !== index))
-  }
-
-  const handleClose = () => {
-    setStep('upload')
-    setItems([])
-    setInvoice(null)
-    setError('')
-    onClose()
   }
 
   return (

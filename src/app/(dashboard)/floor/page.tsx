@@ -93,21 +93,22 @@ function FloorPageInner() {
   }, [tables, zoneFilter])
 
   const today = new Date().toISOString().split('T')[0]
-  const todayReservations = reservations
+  const todayReservations = useMemo(() => reservations
     .filter(r => r.reservation_date === today && r.status !== 'cancelled' && r.status !== 'completed')
-    .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
+    .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time)),
+    [reservations, today])
 
-  const activeTables = zoneFilter ? filteredTables : tables
-  const longSessionCount = activeTables.filter(t =>
+  const activeTables = useMemo(() => zoneFilter ? filteredTables : tables, [zoneFilter, filteredTables, tables])
+  const longSessionCount = useMemo(() => activeTables.filter(t =>
     t.status === 'occupied' && t.session_start_time &&
     (Date.now() - new Date(t.session_start_time).getTime()) / 60000 >= LONG_SESSION_MINUTES
-  ).length
-  const stats = {
+  ).length, [activeTables])
+  const stats = useMemo(() => ({
     total: activeTables.length,
     available: activeTables.filter(t => t.status === 'available').length,
     occupied: activeTables.filter(t => t.status === 'occupied').length,
     reserved: activeTables.filter(t => t.status === 'reserved').length,
-  }
+  }), [activeTables])
 
   // Keep selectedTable in sync with tables array
   const activeSelectedTable = selectedTable
@@ -930,7 +931,7 @@ function FloorPageInner() {
         <div className="fixed -left-[9999px]">
           <QRCodeCanvas
             ref={qrCanvasRef}
-            value={`https://hookahtorus.com/menu/${profile.venue_slug}?table=${qrTableId}`}
+            value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/menu/${profile.venue_slug}?table=${qrTableId}`}
             size={512}
             level="M"
           />

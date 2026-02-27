@@ -139,7 +139,7 @@ export function useDashboardControl(): UseDashboardControlReturn {
       )
 
       if (rpcError) throw rpcError
-      setData(result as unknown as DashboardControlSnapshot)
+      setData(result as DashboardControlSnapshot)
     } catch (err) {
       setError(translateError(err as Error))
     }

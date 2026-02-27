@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { createPortal } from 'react-dom'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BowlCard } from '@/components/dashboard/BowlCard'
@@ -14,6 +13,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import Link from 'next/link'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { PageBackground } from '@/components/ui/PageBackground'
 
 const BOWL_BACKGROUNDS = [
   '/images/bowl-bg-1.jpg',
@@ -48,13 +48,6 @@ export default function BowlsPage() {
   const backgroundImage = useMemo(() => {
     const randomIndex = Math.floor(Math.random() * BOWL_BACKGROUNDS.length)
     return BOWL_BACKGROUNDS[randomIndex]
-  }, [])
-
-  // Background portal
-  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
-  useEffect(() => {
-    setBgContainer(document.getElementById('page-background'))
-    return () => setBgContainer(null)
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,12 +98,21 @@ export default function BowlsPage() {
     setModalOpen(true)
   }
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setModalOpen(false)
     setEditingBowl(null)
     setName('')
     setCapacity('')
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!modalOpen) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [modalOpen, closeModal])
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
@@ -131,19 +133,7 @@ export default function BowlsPage() {
   return (
     <ErrorBoundary>
     <div className="space-y-6 relative">
-      {/* Background Image via Portal */}
-      {bgContainer && createPortal(
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-          }}
-        />,
-        bgContainer
-      )}
+      <PageBackground image={backgroundImage} />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

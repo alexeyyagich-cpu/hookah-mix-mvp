@@ -1,7 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { useAuth } from '@/lib/AuthContext'
 import { useModules } from '@/lib/hooks/useModules'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -16,6 +14,7 @@ import {
   IconSettings,
 } from '@/components/Icons'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { PageBackground } from '@/components/ui/PageBackground'
 import Link from 'next/link'
 
 export default function DashboardPage() {
@@ -27,28 +26,9 @@ export default function DashboardPage() {
 
   const isCombined = isHookahActive && isBarActive
 
-  // Background portal
-  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
-  useEffect(() => {
-    setBgContainer(document.getElementById('page-background'))
-    return () => setBgContainer(null)
-  }, [])
-
   return (
     <div className="space-y-8 relative">
-      {/* Background Image via Portal */}
-      {bgContainer && createPortal(
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: 'url(/images/dashboard-bg.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-          }}
-        />,
-        bgContainer
-      )}
+      <PageBackground image="/images/dashboard-bg.jpg" />
 
       {/* Setup recovery banner for users who skipped onboarding */}
       {profile?.onboarding_skipped && !profile.business_type && (

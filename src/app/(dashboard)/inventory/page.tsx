@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { createPortal } from 'react-dom'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useStatistics } from '@/lib/hooks/useStatistics'
@@ -17,6 +16,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { PageBackground } from '@/components/ui/PageBackground'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 import type { TobaccoInventory } from '@/types/database'
@@ -127,28 +127,9 @@ export default function InventoryPage() {
 
   const totalGrams = useMemo(() => inventory.reduce((sum, item) => sum + item.quantity_grams, 0), [inventory])
 
-  // Background portal
-  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
-  useEffect(() => {
-    setBgContainer(document.getElementById('page-background'))
-    return () => setBgContainer(null)
-  }, [])
-
   return (
     <div className="space-y-6 relative">
-      {/* Background Image via Portal */}
-      {bgContainer && createPortal(
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: 'url(/images/inventory-bg.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top',
-            backgroundAttachment: 'fixed',
-          }}
-        />,
-        bgContainer
-      )}
+      <PageBackground image="/images/inventory-bg.jpg" position="center top" />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

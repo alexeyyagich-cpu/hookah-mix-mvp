@@ -10,6 +10,11 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
+function safeParseFloat(value: string): number | undefined {
+  const parsed = parseFloat(value)
+  return isNaN(parsed) ? undefined : parsed
+}
+
 function formatDuration(ms: number, t: { hoursShort: string; minutesShort: string }): string {
   const hours = Math.floor(ms / 3600000)
   const minutes = Math.floor((ms % 3600000) / 60000)
@@ -75,7 +80,7 @@ export default function ShiftsPage() {
     setSubmitting(true)
     try {
       const result = await openShift({
-        starting_cash: startingCash ? parseFloat(startingCash) : undefined,
+        starting_cash: startingCash ? safeParseFloat(startingCash) : undefined,
         open_notes: openNotes.trim() || undefined,
       })
       if (result) {
@@ -96,7 +101,7 @@ export default function ShiftsPage() {
     setSubmitting(true)
     try {
       const result = await closeShift(activeShift.id, {
-        closing_cash: closingCash ? parseFloat(closingCash) : undefined,
+        closing_cash: closingCash ? safeParseFloat(closingCash) : undefined,
         close_notes: closeNotes.trim() || undefined,
       })
       if (result) {

@@ -61,7 +61,7 @@ export default function SettingsPage() {
   const [slugMessage, setSlugMessage] = useState('')
   const qrRef = useRef<HTMLCanvasElement>(null)
 
-  const menuUrl = venueSlug ? `https://hookahtorus.com/menu/${venueSlug}` : ''
+  const menuUrl = venueSlug ? `${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/menu/${venueSlug}` : ''
 
   const handleLocaleChange = useCallback(async (newLocale: Locale) => {
     setLocale(newLocale)

@@ -151,7 +151,7 @@ export default function GuestsPage() {
               className="input w-48"
             />
             <div className="flex gap-2">
-              <button type="button" onClick={handleAddGuest} className="btn btn-primary">
+              <button type="button" onClick={handleAddGuest} disabled={!newName.trim()} className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
                 {tm.save}
               </button>
               <button type="button" onClick={() => setShowAddForm(false)} className="btn btn-ghost">

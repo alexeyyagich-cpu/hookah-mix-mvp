@@ -8,6 +8,7 @@ import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/
 import { IconMenuList } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
@@ -97,6 +98,7 @@ export default function BarMenuPage() {
   }, [menuRecipes])
 
   return (
+    <ErrorBoundary sectionName="Bar Menu">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -285,5 +287,6 @@ export default function BarMenuPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

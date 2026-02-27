@@ -11,6 +11,7 @@ import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
 import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 type Period = 7 | 14 | 30
 
@@ -73,6 +74,7 @@ export default function BarSalesPage() {
   const maxDayRevenue = Math.max(...analytics.revenueByDay.map(d => d.revenue), 1)
 
   return (
+    <ErrorBoundary sectionName="Bar Sales">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -418,5 +420,6 @@ export default function BarSalesPage() {
         onCancel={() => setDeletingId(null)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

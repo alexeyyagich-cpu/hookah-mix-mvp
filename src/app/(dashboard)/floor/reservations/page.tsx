@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
@@ -10,6 +10,7 @@ import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useRole } from '@/lib/hooks/useRole'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { ReservationStatus } from '@/types/database'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',
@@ -41,13 +42,13 @@ export default function ReservationsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  const filteredReservations = reservations.filter(r => {
+  const filteredReservations = useMemo(() => reservations.filter(r => {
     if (dateFilter && r.reservation_date !== dateFilter) return false
     if (statusFilter !== 'all' && r.status !== statusFilter) return false
     return true
-  })
+  }), [reservations, dateFilter, statusFilter])
 
-  const availableTables = tables.filter(t => t.status === 'available' || t.status === 'reserved')
+  const availableTables = useMemo(() => tables.filter(t => t.status === 'available' || t.status === 'reserved'), [tables])
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
@@ -72,6 +73,7 @@ export default function ReservationsPage() {
   }
 
   return (
+    <ErrorBoundary sectionName="Reservations">
     <div className="space-y-6">
       {/* Back link */}
       <Link
@@ -242,5 +244,6 @@ export default function ReservationsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

@@ -29,7 +29,7 @@ export function DeliveryModal({
   const [step, setStep] = useState<'confirm' | 'inventory' | 'success'>('confirm')
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef, true)
+  useFocusTrap(dialogRef, isOpen, onClose)
   useBodyScrollLock(isOpen)
 
   // Reset state when modal opens + cleanup timer
@@ -41,15 +41,6 @@ export function DeliveryModal({
     }
     return () => clearTimeout(timerRef.current)
   }, [isOpen, order.order_items])
-
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !loading) onClose()
-    }
-    window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
-  }, [onClose, loading])
 
   const toggleItem = (itemId: string) => {
     setSelectedItems(prev => {

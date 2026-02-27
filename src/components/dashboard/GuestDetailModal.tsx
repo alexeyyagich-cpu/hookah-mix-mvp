@@ -34,7 +34,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const [notes, setNotes] = useState(guest.notes || '')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef, true)
+  useFocusTrap(dialogRef, true, onClose)
   useBodyScrollLock(true)
 
   // Sync state when guest changes (e.g. switching between guests while modal is open)

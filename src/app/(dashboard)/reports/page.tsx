@@ -20,6 +20,7 @@ import {
 } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import Link from 'next/link'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 type ModuleFilter = 'all' | 'bar' | 'hookah'
 
@@ -88,6 +89,7 @@ export default function ReportsPage() {
   })
 
   return (
+    <ErrorBoundary sectionName="Reports">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -368,5 +370,6 @@ export default function ReportsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

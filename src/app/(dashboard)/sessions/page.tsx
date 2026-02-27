@@ -1,7 +1,6 @@
 'use client'
 
 import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { createPortal } from 'react-dom'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -15,6 +14,7 @@ import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { PageBackground } from '@/components/ui/PageBackground'
 
 export default function SessionsPage() {
   return (
@@ -53,12 +53,14 @@ function SessionsPageInner() {
     }, 200)
   }, [])
 
-  // Background portal
-  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
   useEffect(() => {
-    setBgContainer(document.getElementById('page-background'))
-    return () => setBgContainer(null)
-  }, [])
+    if (!selectedSession) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [selectedSession, closeModal])
 
   // Close export menu on outside click
   useEffect(() => {
@@ -118,19 +120,7 @@ function SessionsPageInner() {
   return (
     <ErrorBoundary>
     <div className="space-y-6 relative">
-      {/* Background Image via Portal */}
-      {bgContainer && createPortal(
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: 'url(/images/sessions-bg.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-          }}
-        />,
-        bgContainer
-      )}
+      <PageBackground image="/images/sessions-bg.jpg" />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

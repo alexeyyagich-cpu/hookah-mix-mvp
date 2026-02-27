@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { createPortal } from 'react-dom'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useStatisticsComparison } from '@/lib/hooks/useStatisticsComparison'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -14,19 +13,19 @@ import { exportStatisticsCSV, exportStatisticsPDF } from '@/lib/utils/exportRepo
 
 const ConsumptionChart = dynamic(
   () => import('@/components/dashboard/Charts/ConsumptionChart').then(m => m.ConsumptionChart),
-  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><LoadingSpinner /></div> }
 )
 const PopularFlavorsChart = dynamic(
   () => import('@/components/dashboard/Charts/PopularFlavorsChart').then(m => m.PopularFlavorsChart),
-  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><LoadingSpinner /></div> }
 )
 const BrandPieChart = dynamic(
   () => import('@/components/dashboard/Charts/BrandPieChart').then(m => m.BrandPieChart),
-  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><LoadingSpinner /></div> }
 )
 const ABCAnalysisPanel = dynamic(
   () => import('@/components/dashboard/ABCAnalysisPanel').then(m => m.ABCAnalysisPanel),
-  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" /></div> }
+  { ssr: false, loading: () => <div className="h-48 flex items-center justify-center"><LoadingSpinner /></div> }
 )
 import {
   IconSmoke,
@@ -42,6 +41,9 @@ import {
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { PageBackground } from '@/components/ui/PageBackground'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 type ViewMode = 'overview' | 'comparison' | 'abc'
 
@@ -81,13 +83,6 @@ export default function StatisticsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Background portal
-  const [bgContainer, setBgContainer] = useState<HTMLElement | null>(null)
-  useEffect(() => {
-    setBgContainer(document.getElementById('page-background'))
-    return () => setBgContainer(null)
-  }, [])
-
   const handlePeriodChange = (period: typeof selectedPeriod) => {
     setSelectedPeriod(period)
     const end = new Date()
@@ -123,20 +118,9 @@ export default function StatisticsPage() {
   }
 
   return (
+    <ErrorBoundary sectionName="Statistics">
     <div className="space-y-6 relative">
-      {/* Background Image via Portal */}
-      {bgContainer && createPortal(
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: 'url(/images/statistics-bg.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
-          }}
-        />,
-        bgContainer
-      )}
+      <PageBackground image="/images/statistics-bg.jpg" />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -558,5 +542,6 @@ export default function StatisticsPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

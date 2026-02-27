@@ -9,6 +9,7 @@ import { CartDrawer } from '@/components/marketplace/CartDrawer'
 import { useSuppliers } from '@/lib/hooks/useSuppliers'
 import { useCart } from '@/lib/hooks/useCart'
 import { useTranslation } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function MarketplacePage() {
   const t = useTranslation('market')
@@ -17,6 +18,7 @@ export default function MarketplacePage() {
   const [cartOpen, setCartOpen] = useState(false)
 
   return (
+    <ErrorBoundary sectionName="Marketplace">
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -80,5 +82,6 @@ export default function MarketplacePage() {
         clearCart={clearCart}
       />
     </div>
+    </ErrorBoundary>
   )
 }

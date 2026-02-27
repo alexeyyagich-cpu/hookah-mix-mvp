@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { TOBACCOS } from '@/data/tobaccos'
 import { useBowls } from '@/lib/hooks/useBowls'
@@ -149,6 +150,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
       onClose()
     } catch (err) {
       console.error('Session save failed:', err)
+      toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
     }

@@ -340,7 +340,7 @@ export function useKDS(): UseKDSReturn {
         userId: effectiveProfileId,
         table: 'kds_orders',
         operation: 'insert',
-        payload: tempOrder as unknown as Record<string, unknown>,
+        payload: { ...tempOrder } as Record<string, unknown>,
         optimisticUpdate: (cached) => [...cached, tempOrder],
       })
 
