@@ -188,9 +188,10 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
 
   // Only update if subscription is active or trialing
   if (status === 'active' || status === 'trialing') {
-    // Stripe Subscription returns current_period_end as Unix timestamp
-    const sub = subscription as unknown as { current_period_end: number }
-    const currentPeriodEnd = sub.current_period_end
+    // In Stripe v20+, current_period_end moved to items; access via first item
+    const firstItem = subscription.items.data[0]
+    const currentPeriodEnd = firstItem?.current_period_end
+    if (!currentPeriodEnd) return
     const expiresAt = new Date(currentPeriodEnd * 1000).toISOString()
 
     const supabase = getSupabaseAdmin()
@@ -250,19 +251,21 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   }
 }
 
+// Extract string ID from a Stripe expandable field (string | object | null)
+function extractId(field: unknown): string | null {
+  if (typeof field === 'string') return field
+  if (field && typeof field === 'object' && 'id' in field) return (field as { id: string }).id
+  return null
+}
+
 async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   // Renewal payment — ensure subscription tier is correct
   // Invoice fields may be string IDs or expanded objects depending on Stripe API version
-  const inv = invoice as unknown as Record<string, unknown>
-  const subscriptionId = typeof inv.subscription === 'string'
-    ? inv.subscription
-    : (inv.subscription as { id?: string })?.id ?? null
+  const subscriptionId = extractId((invoice as unknown as Record<string, unknown>).subscription)
   if (!subscriptionId || !stripe) return
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-  const customerId = typeof inv.customer === 'string'
-    ? inv.customer
-    : (inv.customer as { id?: string })?.id ?? ''
+  const customerId = extractId(invoice.customer) ?? ''
 
   const supabase = getSupabaseAdmin()
   const { data: profile } = await supabase
@@ -281,9 +284,6 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   // Stripe retries failed payments multiple times over days.
   // Actual downgrade happens via handleSubscriptionUpdate when the
   // subscription status transitions to past_due/unpaid/canceled.
-  const inv = invoice as unknown as Record<string, unknown>
-  const customerId = typeof inv.customer === 'string'
-    ? inv.customer
-    : (inv.customer as { id?: string })?.id ?? 'unknown'
+  const customerId = extractId(invoice.customer) ?? 'unknown'
   console.warn('Payment failed for customer:', customerId, 'invoice:', invoice.id)
 }

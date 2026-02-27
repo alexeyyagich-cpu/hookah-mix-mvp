@@ -430,6 +430,7 @@ function FloorPageInner() {
           <div className="flex flex-wrap gap-2">
             <button type="button"
               onClick={() => setZoneFilter(null)}
+              aria-pressed={!zoneFilter}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
                 !zoneFilter
                   ? 'bg-[var(--color-primary)] text-white'
@@ -442,6 +443,7 @@ function FloorPageInner() {
               <button type="button"
                 key={z}
                 onClick={() => setZoneFilter(zoneFilter === z ? null : z)}
+                aria-pressed={zoneFilter === z}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
                   zoneFilter === z
                     ? 'bg-[var(--color-primary)] text-white'
@@ -755,6 +757,7 @@ function FloorPageInner() {
                   await setTableStatus(activeSelectedTable.id, status)
                 }}
                 disabled={activeSelectedTable.status === status}
+                aria-pressed={activeSelectedTable.status === status}
                 className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{
                   background: activeSelectedTable.status === status ? color : 'var(--color-bgHover)',
@@ -945,7 +948,7 @@ function FloorPageInner() {
 
       {/* Hidden QR canvas for download */}
       {qrTableId && profile?.venue_slug && (
-        <div className="fixed -left-[9999px]">
+        <div className="fixed -left-[9999px]" aria-hidden="true">
           <QRCodeCanvas
             ref={qrCanvasRef}
             value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/menu/${profile.venue_slug}?table=${qrTableId}`}

@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported image format. Use JPEG, PNG, or WebP.' }, { status: 400 })
     }
 
-    const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY })
+    const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY, timeout: 30_000 })
 
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',

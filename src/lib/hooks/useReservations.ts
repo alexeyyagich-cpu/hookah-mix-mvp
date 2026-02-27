@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Reservation, ReservationStatus } from '@/types/database'
+import { translateError } from '@/lib/utils/translateError'
 
 // Demo reservations
 const DEMO_RESERVATIONS: Reservation[] = [
@@ -99,12 +100,17 @@ interface UseReservationsReturn {
 
 export function useReservations(): UseReservationsReturn {
   const [reservations, setReservations] = useState<Reservation[]>([])
+  const reservationsRef = useRef(reservations)
+  reservationsRef.current = reservations
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+  const safetyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useEffect(() => () => { clearTimeout(safetyTimerRef.current) }, [])
 
   useEffect(() => {
     if (isDemoMode && user) {
@@ -119,8 +125,10 @@ export function useReservations(): UseReservationsReturn {
       return
     }
 
+    clearTimeout(safetyTimerRef.current)
     setLoading(true)
     setError(null)
+    safetyTimerRef.current = setTimeout(() => setLoading(false), 8000)
 
     try {
       let query = supabase
@@ -139,10 +147,11 @@ export function useReservations(): UseReservationsReturn {
       if (fetchError) throw fetchError
       setReservations(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load reservations')
+      setError(translateError(err as Error))
+    } finally {
+      clearTimeout(safetyTimerRef.current)
+      setLoading(false)
     }
-
-    setLoading(false)
   }, [user, supabase, organizationId, locationId])
 
   useEffect(() => {
@@ -197,7 +206,7 @@ export function useReservations(): UseReservationsReturn {
       setReservations(prev => [...prev, data])
       return data
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create reservation')
+      setError(translateError(err as Error))
       return null
     }
   }, [user, supabase, isDemoMode, organizationId, locationId])
@@ -212,7 +221,7 @@ export function useReservations(): UseReservationsReturn {
 
     if (!user || !supabase) return
 
-    const previousReservations = reservations
+    const snapshot = reservationsRef.current
     setReservations(prev => prev.map(r =>
       r.id === id ? { ...r, status } : r
     ))
@@ -226,10 +235,10 @@ export function useReservations(): UseReservationsReturn {
 
       if (updateError) throw updateError
     } catch (err) {
-      setReservations(previousReservations)
-      setError(err instanceof Error ? err.message : 'Failed to update status')
+      setReservations(snapshot)
+      setError(translateError(err as Error))
     }
-  }, [user, supabase, isDemoMode, organizationId, reservations])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const assignTable = useCallback(async (id: string, tableId: string | null) => {
     if (isDemoMode) {
@@ -241,7 +250,7 @@ export function useReservations(): UseReservationsReturn {
 
     if (!user || !supabase) return
 
-    const previousReservations = reservations
+    const snapshot = reservationsRef.current
     setReservations(prev => prev.map(r =>
       r.id === id ? { ...r, table_id: tableId } : r
     ))
@@ -255,10 +264,10 @@ export function useReservations(): UseReservationsReturn {
 
       if (updateError) throw updateError
     } catch (err) {
-      setReservations(previousReservations)
-      setError(err instanceof Error ? err.message : 'Failed to assign table')
+      setReservations(snapshot)
+      setError(translateError(err as Error))
     }
-  }, [user, supabase, isDemoMode, organizationId, reservations])
+  }, [user, supabase, isDemoMode, organizationId])
 
   const deleteReservation = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -268,7 +277,7 @@ export function useReservations(): UseReservationsReturn {
 
     if (!user || !supabase) return
 
-    const previousReservations = reservations
+    const snapshot = reservationsRef.current
     setReservations(prev => prev.filter(r => r.id !== id))
 
     try {
@@ -280,10 +289,10 @@ export function useReservations(): UseReservationsReturn {
 
       if (deleteError) throw deleteError
     } catch (err) {
-      setReservations(previousReservations)
-      setError(err instanceof Error ? err.message : 'Failed to delete reservation')
+      setReservations(snapshot)
+      setError(translateError(err as Error))
     }
-  }, [user, supabase, isDemoMode, organizationId, reservations])
+  }, [user, supabase, isDemoMode, organizationId])
 
   return {
     reservations,
@@ -342,9 +351,10 @@ export function usePublicReservation(profileId: string | undefined, orgId?: stri
         (data || []).map(d => ({ date: d.reservation_date, time: d.reservation_time }))
       )
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load time slots')
+      setError(translateError(err as Error))
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }, [profileId, orgId, supabase])
 
   const submitReservation = useCallback(async (reservation: {
@@ -377,7 +387,7 @@ export function usePublicReservation(profileId: string | undefined, orgId?: stri
       setSubmitting(false)
       return true
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create reservation')
+      setError(translateError(err as Error))
       setSubmitting(false)
       return false
     }

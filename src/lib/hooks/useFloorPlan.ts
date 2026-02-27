@@ -224,8 +224,9 @@ export function useFloorPlan(): UseFloorPlanReturn {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'floor_tables' },
         (payload) => {
-          const record = (payload.new || payload.old) as FloorTable | undefined
-          if (!record) return
+          const raw = payload.new || payload.old
+          if (!raw || typeof raw !== 'object' || !('id' in raw) || !('profile_id' in raw)) return
+          const record = raw as FloorTable
 
           // Client-side filter: only process changes for our org/profile
           const isOurs = organizationId
@@ -234,20 +235,26 @@ export function useFloorPlan(): UseFloorPlanReturn {
           if (!isOurs) return
 
           switch (payload.eventType) {
-            case 'INSERT':
+            case 'INSERT': {
+              const newRecord = payload.new as FloorTable
               setTables(prev => {
-                if (prev.some(t => t.id === (payload.new as FloorTable).id)) return prev
-                return [...prev, payload.new as FloorTable]
+                if (prev.some(t => t.id === newRecord.id)) return prev
+                return [...prev, newRecord]
               })
               break
-            case 'UPDATE':
+            }
+            case 'UPDATE': {
+              const updated = payload.new as FloorTable
               setTables(prev => prev.map(t =>
-                t.id === (payload.new as FloorTable).id ? payload.new as FloorTable : t
+                t.id === updated.id ? updated : t
               ))
               break
-            case 'DELETE':
-              setTables(prev => prev.filter(t => t.id !== (payload.old as FloorTable).id))
+            }
+            case 'DELETE': {
+              const deleted = payload.old as FloorTable
+              setTables(prev => prev.filter(t => t.id !== deleted.id))
               break
+            }
           }
         }
       )

@@ -17,6 +17,11 @@ async function rateLimit(): Promise<void> {
   const now = Date.now()
   requestTimestamps = requestTimestamps.filter(t => now - t < RATE_LIMIT_WINDOW)
 
+  // Cap array to prevent unbounded growth from stale entries
+  if (requestTimestamps.length > RATE_LIMIT_MAX * 2) {
+    requestTimestamps = requestTimestamps.slice(-RATE_LIMIT_MAX)
+  }
+
   if (requestTimestamps.length >= RATE_LIMIT_MAX) {
     const waitUntil = requestTimestamps[0] + RATE_LIMIT_WINDOW
     const delay = waitUntil - now
@@ -28,6 +33,8 @@ async function rateLimit(): Promise<void> {
   requestTimestamps.push(Date.now())
 }
 
+const R2O_TIMEOUT_MS = 15_000
+
 async function r2oFetch<T>(
   path: string,
   accountToken: string,
@@ -36,14 +43,23 @@ async function r2oFetch<T>(
   await rateLimit()
 
   const url = `${R2O_BASE_URL}${path}`
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${accountToken}`,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), R2O_TIMEOUT_MS)
+
+  let response: Response
+  try {
+    response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Authorization': `Bearer ${accountToken}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    })
+  } finally {
+    clearTimeout(timeoutId)
+  }
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => 'Unknown error')
@@ -63,14 +79,23 @@ export async function grantAccessToken(
 ): Promise<R2OGrantResponse> {
   await rateLimit()
 
-  const response = await fetch(`${R2O_BASE_URL}/developerToken/grantAccessToken`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${developerToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ authorizationCallbackUri: redirectUri }),
-  })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), R2O_TIMEOUT_MS)
+
+  let response: Response
+  try {
+    response = await fetch(`${R2O_BASE_URL}/developerToken/grantAccessToken`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Authorization': `Bearer ${developerToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ authorizationCallbackUri: redirectUri }),
+    })
+  } finally {
+    clearTimeout(timeoutId)
+  }
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => 'Unknown error')

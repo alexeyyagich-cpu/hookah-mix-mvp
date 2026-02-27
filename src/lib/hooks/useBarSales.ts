@@ -182,36 +182,46 @@ export function useBarSales(): UseBarSalesReturn {
       return newSale
     }
 
-    // Insert sale record FIRST — so failed insert doesn't leave orphaned deductions
-    const { data, error: insertError } = await supabase
-      .from('bar_sales')
-      .insert(saleData)
-      .select()
-      .single()
+    try {
+      // Insert sale record FIRST — so failed insert doesn't leave orphaned deductions
+      const { data, error: insertError } = await supabase
+        .from('bar_sales')
+        .insert(saleData)
+        .select()
+        .single()
 
-    if (insertError) {
-      setError(translateError(insertError))
+      if (insertError) {
+        setError(translateError(insertError))
+        return null
+      }
+
+      // Auto write-off: deduct ingredients from inventory AFTER sale is recorded
+      for (const ing of recipe.ingredients) {
+        if (!ing.bar_inventory_id) continue
+
+        const conversion = PORTION_CONVERSIONS[ing.unit]
+        if (!conversion) continue
+
+        const deductAmount = ing.quantity * conversion.value * quantity
+        try {
+          await adjustQuantity(
+            ing.bar_inventory_id,
+            -deductAmount,
+            'sale',
+            `Sale: ${recipe.name} x${quantity}`
+          )
+        } catch {
+          // Log but continue — sale is already recorded, best-effort deduction
+          if (process.env.NODE_ENV !== 'production') console.error('Ingredient deduction failed for', ing.bar_inventory_id)
+        }
+      }
+
+      setSales(prev => [data, ...prev])
+      return data
+    } catch (err) {
+      setError(translateError(err as Error))
       return null
     }
-
-    // Auto write-off: deduct ingredients from inventory AFTER sale is recorded
-    for (const ing of recipe.ingredients) {
-      if (!ing.bar_inventory_id) continue
-
-      const conversion = PORTION_CONVERSIONS[ing.unit]
-      if (!conversion) continue
-
-      const deductAmount = ing.quantity * conversion.value * quantity
-      await adjustQuantity(
-        ing.bar_inventory_id,
-        -deductAmount,
-        'sale',
-        `Sale: ${recipe.name} x${quantity}`
-      )
-    }
-
-    setSales(prev => [data, ...prev])
-    return data
   }, [user, isDemoMode, supabase, calculateCost, adjustQuantity, organizationId, locationId])
 
   const deleteSale = useCallback(async (id: string): Promise<boolean> => {
@@ -222,19 +232,24 @@ export function useBarSales(): UseBarSalesReturn {
       return true
     }
 
-    const { error: deleteError } = await supabase
-      .from('bar_sales')
-      .delete()
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    try {
+      const { error: deleteError } = await supabase
+        .from('bar_sales')
+        .delete()
+        .eq('id', id)
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
-    if (deleteError) {
-      setError(translateError(deleteError))
+      if (deleteError) {
+        setError(translateError(deleteError))
+        return false
+      }
+
+      setSales(prev => prev.filter(s => s.id !== id))
+      return true
+    } catch (err) {
+      setError(translateError(err as Error))
       return false
     }
-
-    setSales(prev => prev.filter(s => s.id !== id))
-    return true
   }, [user, isDemoMode, supabase, organizationId])
 
   const getAnalytics = useCallback((days: number = 7): BarAnalytics => {

@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
     .select('profile_id, brand, flavor, quantity_grams')
     .lt('quantity_grams', 50)
     .gt('quantity_grams', 0)
+    .limit(1000)
 
   if (queryError) {
     console.error('Cron low-stock query failed:', queryError)

@@ -70,14 +70,20 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
         }),
       })
 
-      const data = await res.json()
+      let data: Record<string, unknown>
+      try {
+        data = await res.json()
+      } catch {
+        setError(t.paymentFailed)
+        return
+      }
 
-      if (data.url && typeof data.url === 'string' && data.url.startsWith('https://')) {
-        window.location.href = data.url
+      if (data.url && typeof data.url === 'string' && (data.url as string).startsWith('https://')) {
+        window.location.href = data.url as string
       } else if (data.success) {
         setSuccess(true)
       } else {
-        setError(data.error || t.paymentFailed)
+        setError((data.error as string) || t.paymentFailed)
       }
     } catch {
       setError(t.connectionError)
@@ -121,7 +127,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
   if (error && error !== 'not_found') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
-        <div className="text-center">
+        <div role="alert" className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
           <h1 className="text-xl font-bold text-white mb-2">{t.error}</h1>
           <p className="text-gray-400">{error}</p>
@@ -131,7 +137,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Staff info */}
         <div className="text-center mb-6">
@@ -222,6 +228,6 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
           {t.poweredBy}
         </p>
       </div>
-    </div>
+    </main>
   )
 }

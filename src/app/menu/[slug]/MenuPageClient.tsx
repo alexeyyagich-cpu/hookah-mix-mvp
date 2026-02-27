@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState, useMemo, useCallback, Suspense } from 'react'
+import { use, useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -77,6 +77,7 @@ function MenuPageInner({ slug }: { slug: string }) {
   const [submitting, setSubmitting] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderError, setOrderError] = useState<string | null>(null)
+  const submittingRef = useRef(false)
 
   // Hookah ordering
   const [selectedHookahFlavor, setSelectedHookahFlavor] = useState<{ brand: string; flavor: string } | null>(null)
@@ -155,8 +156,20 @@ function MenuPageInner({ slug }: { slug: string }) {
     setCart(prev => prev.filter((_, i) => i !== index))
   }, [])
 
+  // Escape key to close cart overlay
+  const handleCartEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') setShowCartOverlay(false)
+  }, [])
+
+  useEffect(() => {
+    if (!showCartOverlay) return
+    window.addEventListener('keydown', handleCartEscape)
+    return () => window.removeEventListener('keydown', handleCartEscape)
+  }, [showCartOverlay, handleCartEscape])
+
   const submitOrder = useCallback(async () => {
-    if (cart.length === 0 || !tableId) return
+    if (cart.length === 0 || !tableId || submittingRef.current) return
+    submittingRef.current = true
     setSubmitting(true)
     setOrderError(null)
 
@@ -215,6 +228,7 @@ function MenuPageInner({ slug }: { slug: string }) {
           }
           setOrderError(errorMessage)
           setSubmitting(false)
+          submittingRef.current = false
           return
         }
       }
@@ -227,6 +241,7 @@ function MenuPageInner({ slug }: { slug: string }) {
       setOrderError(t.orderError)
     }
     setSubmitting(false)
+    submittingRef.current = false
   }, [cart, tableId, slug, guestName, orderNotes, t])
 
   // Loading / error / hidden states
@@ -569,6 +584,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                     placeholder={t.menuSearchFlavor}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    aria-label={t.menuSearchFlavor}
                     className="input pl-10 w-full sm:w-64"
                   />
                   <svg
@@ -576,6 +592,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    aria-hidden="true"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -771,8 +788,10 @@ function MenuPageInner({ slug }: { slug: string }) {
 
       {/* ===== CART OVERLAY ===== */}
       {showCartOverlay && (
-        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" aria-hidden="true" onClick={() => setShowCartOverlay(false)}>
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" onClick={() => setShowCartOverlay(false)}>
           <div
+            role="dialog"
+            aria-modal="true"
             className="bg-[var(--color-bgCard)] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
@@ -827,7 +846,7 @@ function MenuPageInner({ slug }: { slug: string }) {
               </div>
 
               {orderError && (
-                <div className="mb-4 p-3 rounded-xl bg-[var(--color-error)]/10 text-[var(--color-error)] text-sm">{orderError}</div>
+                <div role="alert" className="mb-4 p-3 rounded-xl bg-[var(--color-error)]/10 text-[var(--color-error)] text-sm">{orderError}</div>
               )}
 
               <div className="flex gap-3">

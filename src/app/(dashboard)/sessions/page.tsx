@@ -205,7 +205,7 @@ function SessionsPageInner() {
 
       {/* Error */}
       {error && (
-        <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
+        <div role="alert" className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[var(--color-danger)]/20 flex items-center justify-center text-[var(--color-danger)]">
               <IconWarning size={20} />
