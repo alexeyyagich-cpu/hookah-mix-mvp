@@ -18,7 +18,6 @@ import { IconCrown, IconRefresh, IconLock } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { AccessDenied } from '@/components/ui/AccessDenied'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
-import Link from 'next/link'
 import type { ShiftReconciliation } from '@/types/database'
 
 import { LiveStatusBar } from '@/components/boss/LiveStatusBar'

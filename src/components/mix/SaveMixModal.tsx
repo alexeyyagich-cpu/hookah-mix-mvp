@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 
 interface SaveMixModalProps {
   isOpen: boolean
@@ -17,6 +18,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
   const [error, setError] = useState('')
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  useBodyScrollLock(isOpen)
 
   useEffect(() => {
     if (isOpen) {

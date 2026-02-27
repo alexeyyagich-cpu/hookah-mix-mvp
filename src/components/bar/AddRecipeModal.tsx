@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import type { BarRecipe, BarRecipeIngredient, BarRecipeWithIngredients, CocktailMethod, CocktailCategory, BarPortionUnit } from '@/types/database'
 import { RECIPE_PRESETS, COCKTAIL_CATEGORY_EMOJI, type RecipePreset } from '@/data/bar-recipes'
 import { BAR_INGREDIENT_PRESETS } from '@/data/bar-ingredients'
@@ -75,6 +76,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
   const [notes, setNotes] = useState('')
   const [ingredients, setIngredients] = useState<IngredientRow[]>([])
   const [saving, setSaving] = useState(false)
+  useBodyScrollLock(isOpen)
 
   useEffect(() => {
     if (editingRecipe) {

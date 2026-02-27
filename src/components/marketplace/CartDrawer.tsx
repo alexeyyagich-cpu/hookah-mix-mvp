@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import Link from 'next/link'
 import type { Cart } from '@/types/database'
 import { IconClose, IconPlus, IconMinus, IconTrash, IconCart } from '@/components/Icons'
@@ -25,6 +26,7 @@ export function CartDrawer({
 }: CartDrawerProps) {
   const t = useTranslation('market')
   const { locale } = useLocale()
+  useBodyScrollLock(isOpen)
 
   // Close on escape key
   useEffect(() => {
@@ -34,18 +36,6 @@ export function CartDrawer({
     window.addEventListener('keydown', handleEscape)
     return () => window.removeEventListener('keydown', handleEscape)
   }, [onClose])
-
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isOpen])
 
   if (!isOpen) return null
 

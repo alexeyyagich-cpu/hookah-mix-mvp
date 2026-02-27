@@ -143,7 +143,7 @@ export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Da
   ])
 
   autoTable(doc, {
-    startY: (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
+    startY: doc.lastAutoTable.finalY + 10,
     head: [[l.exportDate, l.exportRevenue, l.exportExpenses, l.exportProfit]],
     body: dailyBody,
     theme: 'striped',
@@ -161,7 +161,7 @@ export async function exportPnLPDF(data: PnLData, period: { start: Date; end: Da
     ])
 
     autoTable(doc, {
-      startY: (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
+      startY: doc.lastAutoTable.finalY + 10,
       head: [[l.pnlItem, l.pnlModule, l.exportRevenue, l.exportCost, l.exportMargin]],
       body: topBody,
       theme: 'striped',

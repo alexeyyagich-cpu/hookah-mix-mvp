@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useMemo, useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { IconPlus, IconMinus, IconClose, IconCocktail, IconBowl, IconSearch } from '@/components/Icons'
 import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
 import { getHeatRecommendation } from '@/logic/quickRepeatEngine'
@@ -60,6 +62,7 @@ export function NewOrderModal({
   const [saving, setSaving] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef, true)
+  useBodyScrollLock(isOpen)
 
   // Structured hookah builder state
   const [hookahMode, setHookahMode] = useState<'structured' | 'freetext'>('structured')
@@ -324,6 +327,7 @@ export function NewOrderModal({
       onClose()
     } catch (err) {
       console.error('Order creation failed:', err)
+      toast.error(tc.errorGeneric)
     } finally {
       setSaving(false)
     }

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { IconClose, IconExport } from '@/components/Icons'
 import { parseFile, autoMapColumns, validateImportRow } from '@/lib/utils/importParser'
 import type { ParseResult, ColumnMapping, ImportRow } from '@/lib/utils/importParser'
@@ -28,6 +29,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   const [validRows, setValidRows] = useState<ImportRow[]>([])
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState('')
+  useBodyScrollLock(isOpen)
 
   if (!isOpen) return null
 

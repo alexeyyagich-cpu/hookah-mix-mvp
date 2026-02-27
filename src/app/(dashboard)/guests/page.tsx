@@ -11,7 +11,6 @@ import { LoyaltySettingsPanel } from '@/components/dashboard/LoyaltySettingsPane
 import { useTranslation } from '@/lib/i18n'
 import { IconSearch, IconPlus, IconUsers, IconSettings, IconLock } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
-import Link from 'next/link'
 import type { Guest, LoyaltyTier } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 

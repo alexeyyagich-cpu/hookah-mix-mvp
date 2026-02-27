@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import type { Guest, BonusTransaction, LoyaltyTier } from '@/types/database'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { IconClose, IconEdit, IconTrash, IconCoin } from '@/components/Icons'
 import { toast } from 'sonner'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -34,6 +35,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef, true)
+  useBodyScrollLock(true)
 
   // Sync state when guest changes (e.g. switching between guests while modal is open)
   useEffect(() => {

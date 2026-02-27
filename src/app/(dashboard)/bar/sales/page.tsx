@@ -44,7 +44,7 @@ export default function BarSalesPage() {
   const handleExport = (format: 'csv' | 'pdf') => {
     if (!canExport || periodSales.length === 0) return
     if (format === 'csv') {
-      exportBarSalesCSV(periodSales, locale)
+      exportBarSalesCSV(periodSales)
     } else {
       void exportBarSalesPDF(periodSales, analytics, period, locale)
     }

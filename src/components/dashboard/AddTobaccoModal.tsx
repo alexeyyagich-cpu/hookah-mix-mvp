@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
@@ -34,6 +35,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const isEditing = !!editingItem
+  useBodyScrollLock(isOpen)
 
   useEffect(() => {
     if (isOpen) {

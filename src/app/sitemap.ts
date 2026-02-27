@@ -1,4 +1,4 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -9,8 +9,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: baseUrl,
       lastModified: currentDate,
-      changeFrequency: 'daily',
+      changeFrequency: 'weekly',
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/login`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/register`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
     {
       url: `${baseUrl}/mix`,
@@ -61,10 +73,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    if (supabaseUrl && supabaseAnonKey) {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
       const { data: lounges } = await supabase
         .from('lounge_profiles')
@@ -81,14 +93,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             {
               url: `${baseUrl}/lounge/${lounge.slug}`,
               lastModified,
-              changeFrequency: 'weekly' as const,
-              priority: 0.7,
+              changeFrequency: 'daily' as const,
+              priority: 0.8,
             },
             {
               url: `${baseUrl}/menu/${lounge.slug}`,
               lastModified,
-              changeFrequency: 'weekly' as const,
-              priority: 0.7,
+              changeFrequency: 'daily' as const,
+              priority: 0.8,
             },
           ]
         })

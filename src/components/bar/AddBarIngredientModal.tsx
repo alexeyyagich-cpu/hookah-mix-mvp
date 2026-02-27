@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import type { BarInventoryItem, BarIngredientCategory, BarUnitType } from '@/types/database'
 import { BAR_INGREDIENT_PRESETS, BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
@@ -44,6 +45,7 @@ export function AddBarIngredientModal({ isOpen, onClose, onSave, editingItem, ca
   const [packageSize, setPackageSize] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  useBodyScrollLock(isOpen)
 
   // Reset form when modal opens/closes or editing item changes
   useEffect(() => {

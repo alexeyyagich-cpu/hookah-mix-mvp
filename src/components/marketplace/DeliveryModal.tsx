@@ -5,6 +5,7 @@ import type { MarketplaceOrderWithItems } from '@/types/database'
 import { IconClose, IconCheck, IconInventory } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 
 interface DeliveryModalProps {
   isOpen: boolean
@@ -29,6 +30,7 @@ export function DeliveryModal({
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef, true)
+  useBodyScrollLock(isOpen)
 
   // Reset state when modal opens + cleanup timer
   useEffect(() => {

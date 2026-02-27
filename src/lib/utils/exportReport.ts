@@ -203,7 +203,7 @@ export async function exportStatisticsPDF(
   })
 
   // Get current Y position after table
-  let currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+  let currentY = doc.lastAutoTable.finalY + 15
 
   // Consumption by brand
   if (statistics.consumptionByBrand.length > 0) {
@@ -218,7 +218,7 @@ export async function exportStatisticsPDF(
       headStyles: { fillColor: [99, 102, 241] },
     })
 
-    currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+    currentY = doc.lastAutoTable.finalY + 15
   }
 
   // Check if we need a new page
@@ -243,7 +243,7 @@ export async function exportStatisticsPDF(
       headStyles: { fillColor: [99, 102, 241] },
     })
 
-    currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+    currentY = doc.lastAutoTable.finalY + 15
   }
 
   // Low stock warning
@@ -362,7 +362,7 @@ export async function exportInventoryPDF(inventory: TobaccoInventory[], lowStock
 // BAR SALES EXPORTS
 // ========================================
 
-export function exportBarSalesCSV(sales: BarSale[], _locale: Locale = 'en', labels?: ExportLabels) {
+export function exportBarSalesCSV(sales: BarSale[], labels?: ExportLabels) {
   const l = labels || DEFAULT_LABELS as ExportLabels
   const headers = [l.exportDateTime, l.exportCocktail, l.exportQty, l.exportRevenue, l.exportCost, l.exportMargin]
   const rows = sales.map(sale => [
@@ -414,7 +414,7 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
     headStyles: { fillColor: [99, 102, 241] },
   })
 
-  let currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+  let currentY = doc.lastAutoTable.finalY + 15
 
   // Top cocktails
   if (analytics.topCocktails.length > 0) {
@@ -429,7 +429,7 @@ export async function exportBarSalesPDF(sales: BarSale[], analytics: BarAnalytic
       headStyles: { fillColor: [99, 102, 241] },
     })
 
-    currentY = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 15
+    currentY = doc.lastAutoTable.finalY + 15
   }
 
   // Sales log

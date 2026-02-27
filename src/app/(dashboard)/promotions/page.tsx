@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { toast } from 'sonner'
 import { usePromotions } from '@/lib/hooks/usePromotions'
 import { useSubscription } from '@/lib/hooks/useSubscription'
@@ -78,7 +79,8 @@ export default function PromotionsPage() {
     setShowForm(true)
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: FormEvent) => {
+    e?.preventDefault()
     if (!name.trim() || submitting) return
     setSubmitting(true)
 
@@ -129,7 +131,7 @@ export default function PromotionsPage() {
 
       {/* Create/Edit Form */}
       {showForm && (
-        <div className="card p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="card p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold">{editingPromo ? tm.editPromo : tm.createPromo}</h3>
             <button type="button" onClick={resetForm} className="btn btn-ghost p-2" aria-label={tc.close}><IconClose size={18} /></button>
@@ -243,11 +245,11 @@ export default function PromotionsPage() {
             </div>
           </div>
 
-          <button type="button" onClick={handleSubmit} disabled={submitting || !name.trim()} className="btn btn-primary disabled:opacity-50 flex items-center gap-2">
+          <button type="submit" disabled={submitting || !name.trim()} className="btn btn-primary disabled:opacity-50 flex items-center gap-2">
             {submitting && <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />}
             {editingPromo ? tm.save : tm.createPromo}
           </button>
-        </div>
+        </form>
       )}
 
       {/* Promo List */}

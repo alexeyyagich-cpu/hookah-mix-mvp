@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { IconClose, IconScan } from '@/components/Icons'
 import { matchTobaccoCatalog } from '@/lib/utils/invoiceExtractor'
 import type { ExtractedItem, ExtractedInvoice } from '@/lib/utils/invoiceExtractor'
@@ -21,6 +22,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
   const fileRef = useRef<HTMLInputElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef, true)
+  useBodyScrollLock(isOpen)
   const [step, setStep] = useState<Step>('upload')
   const [items, setItems] = useState<ExtractedItem[]>([])
   const [invoice, setInvoice] = useState<ExtractedInvoice | null>(null)

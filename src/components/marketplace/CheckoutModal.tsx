@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { toast } from 'sonner'
 import type { Cart } from '@/types/database'
 import { IconClose, IconCheck, IconTruck } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -25,6 +27,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(dialogRef, true)
+  useBodyScrollLock(isOpen)
 
   useEffect(() => {
     if (isOpen) {
@@ -66,7 +69,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
         }, 4000)
       }
     } catch {
-      // Error handled by parent hook
+      toast.error(tc.errorGeneric)
     } finally {
       setLoading(false)
     }
