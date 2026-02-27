@@ -33,7 +33,7 @@ export default function WaiterPage() {
   const tm = useTranslation('manage')
   const th = useTranslation('hookah')
   const { locale } = useLocale()
-  const { isFreeTier } = useSubscription()
+  const { canUseWaiterTablet } = useSubscription()
   const { tables } = useFloorPlan()
   const { createOrder } = useKDS()
   const { recipes } = useBarRecipes()
@@ -215,8 +215,8 @@ export default function WaiterPage() {
     }
   }, [selectedTableId, barItems, selectedTobaccos, hookahMode, hookahDescription, notes, guestName, tables, createOrder, recordSale, bowls, selectedBowlId, totalGrams, th.orderError])
 
-  // Pro guard
-  if (isFreeTier) {
+  // Multi guard — waiter mode requires Multi or Enterprise
+  if (!canUseWaiterTablet) {
     return (
       <ErrorBoundary sectionName="Waiter Form">
       <div className="space-y-6">

@@ -27,7 +27,7 @@ export default function TeamPage() {
   const { isOwner } = useRole(orgRole)
   const { members, invitations, loading, error, inviteMember, removeMember, updateMemberRole, updateMemberPayroll, cancelInvitation, resendInvitation } = useTeam()
   const { staffProfiles, createStaffProfile, toggleTipEnabled, getTipStats } = useTips()
-  const { isFreeTier } = useSubscription()
+  const { needsUpgrade } = useSubscription()
 
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -348,7 +348,7 @@ export default function TeamPage() {
           <p className="text-sm text-[var(--color-textMuted)] mt-1">{ts.tipSectionDesc}</p>
         </div>
 
-        {isFreeTier ? (
+        {needsUpgrade ? (
           <div className="p-8 text-center">
             <div className="text-4xl mb-3">💡</div>
             <p className="font-medium mb-1">{ts.tipProOnly}</p>

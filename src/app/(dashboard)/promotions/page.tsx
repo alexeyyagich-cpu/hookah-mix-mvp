@@ -27,7 +27,7 @@ export default function PromotionsPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { promotions, loading, createPromo, updatePromo, deletePromo, toggleActive } = usePromotions()
-  const { isFreeTier } = useSubscription()
+  const { canUseCRM } = useSubscription()
 
   const [showForm, setShowForm] = useState(false)
   const [editingPromo, setEditingPromo] = useState<Promotion | null>(null)
@@ -41,7 +41,7 @@ export default function PromotionsPage() {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (isFreeTier) {
+  if (!canUseCRM) {
     return (
       <ErrorBoundary sectionName="Promotion Form">
       <div className="space-y-6">

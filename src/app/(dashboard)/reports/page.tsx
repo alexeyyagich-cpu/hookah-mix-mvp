@@ -31,7 +31,7 @@ export default function ReportsPage() {
   const { locale } = useLocale()
   const { data, loading, error, selectedPreset, setSelectedPreset, period } = usePnL()
   const { isHookahActive, isBarActive } = useModules()
-  const { isFreeTier, canExport } = useSubscription()
+  const { canUseFinancialReports, canExport } = useSubscription()
 
   const [moduleFilter, setModuleFilter] = useState<ModuleFilter>('all')
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
@@ -349,8 +349,8 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* Pro banner */}
-      {isFreeTier && (
+      {/* Upgrade banner — shown when financial reports are locked */}
+      {!canUseFinancialReports && (
         <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-primary)]/5 border-[var(--color-primary)]/30">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="flex-1">

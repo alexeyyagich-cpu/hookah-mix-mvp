@@ -38,7 +38,7 @@ interface SearchItem {
   Icon: React.ComponentType<{ size?: number }>
   group?: string
   permission: Permission | Permission[]
-  proOnly?: boolean
+  proOnly?: boolean // Legacy: means Multi+ tier required
   ownerOnly?: boolean
   module?: AppModule
 }
@@ -59,7 +59,7 @@ export function CommandPalette() {
   useBodyScrollLock(open)
   const { orgRole } = useOrganizationContext()
   const { hasPermission, hasAnyPermission, isOwner } = useRole(orgRole)
-  const { isFreeTier } = useSubscription()
+  const { isMultiTier, isEnterpriseTier } = useSubscription()
   const { modules } = useModules()
 
   const allItems: SearchItem[] = useMemo(() => [
@@ -94,9 +94,9 @@ export function CommandPalette() {
     if (!hasAccess) return false
     if (item.module && !modules.includes(item.module)) return false
     if (item.ownerOnly && !isOwner) return false
-    if (item.proOnly && isFreeTier) return false
+    if (item.proOnly && !isMultiTier && !isEnterpriseTier) return false
     return true
-  }), [allItems, hasPermission, hasAnyPermission, modules, isOwner, isFreeTier])
+  }), [allItems, hasPermission, hasAnyPermission, modules, isOwner, isMultiTier, isEnterpriseTier])
 
   // Filter by query (memoized)
   const filtered = useMemo(() => query.trim()

@@ -6,7 +6,7 @@ import { useSessions } from '@/lib/hooks/useSessions'
 import { useClickOutside } from '@/lib/hooks/useClickOutside'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
-import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus, IconExport, IconLock, IconChart } from '@/components/Icons'
+import { IconSmoke, IconWarning, IconBowl, IconPlus, IconExport, IconLock, IconChart } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { exportSessionsCSV, exportSessionsPDF } from '@/lib/utils/exportReport'
 import type { SessionWithItems } from '@/types/database'
@@ -31,7 +31,7 @@ function SessionsPageInner() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const { sessions, loading, error, updateSession, deleteSession } = useSessions()
-  const { isFreeTier, canExport } = useSubscription()
+  const { isTrialTier, isTrialExpired: needsUpgrade, canExport } = useSubscription()
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -125,7 +125,6 @@ function SessionsPageInner() {
           <h1 className="text-2xl font-bold">{t.sessionHistory}</h1>
           <p className="text-[var(--color-textMuted)]">
             {t.sessionsSubtitle(sessions.length)}
-            {isFreeTier && ` ${t.sessionsFreeTierNotice}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -167,26 +166,6 @@ function SessionsPageInner() {
           </Link>
         </div>
       </div>
-
-      {/* Free Tier Notice */}
-      {isFreeTier && (
-        <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[var(--color-warning)]/20 flex items-center justify-center text-[var(--color-warning)]">
-              <IconCalendar size={20} />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-base font-semibold">{t.limitedHistory}</h3>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {t.limitedHistoryDesc}
-              </p>
-            </div>
-            <a href="/pricing" className="btn btn-primary">
-              {tc.upgrade}
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* Search */}
       <div className="relative">

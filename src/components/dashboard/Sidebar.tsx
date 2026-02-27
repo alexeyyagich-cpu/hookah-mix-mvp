@@ -58,7 +58,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { locale } = useLocale()
   const { profile, signOut } = useAuth()
-  const { tier, isFreeTier, isTrialTier, needsUpgrade } = useSubscription()
+  const { tier, isTrialTier, isMultiTier, isEnterpriseTier, needsUpgrade } = useSubscription()
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
   const { orgRole, hasPermission, hasAnyPermission, isOwner } = useRole(contextOrgRole)
   const { modules } = useModules()
@@ -264,7 +264,7 @@ export function Sidebar() {
           </span>
           {/* Subscription badge - only for owners */}
           {isOwner && (
-            <span className={`badge ${isFreeTier ? 'badge-warning' : 'badge-success'}`}>
+            <span className={`badge ${isTrialTier ? 'badge-warning' : 'badge-success'}`}>
               {tier.toUpperCase()}
             </span>
           )}
@@ -305,7 +305,7 @@ export function Sidebar() {
                   (pathname.startsWith(item.href + '/') &&
                    !allItems.some(n => n.href !== item.href && n.href.startsWith(item.href) && pathname.startsWith(n.href)))
                 const Icon = item.Icon
-                const isLocked = item.proOnly && isFreeTier && isOwner
+                const isLocked = item.proOnly && !isMultiTier && !isEnterpriseTier && isOwner
 
                 if (isLocked) {
                   return (

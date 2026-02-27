@@ -14,7 +14,6 @@ import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport
 import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
-import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PageBackground } from '@/components/ui/PageBackground'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -38,7 +37,7 @@ export default function InventoryPage() {
     canAddMore,
     itemsLimit,
   } = useInventory()
-  const { isFreeTier, canExport } = useSubscription()
+  const { canExport } = useSubscription()
   const [importModalOpen, setImportModalOpen] = useState(false)
   const [scanModalOpen, setScanModalOpen] = useState(false)
   const { settings: notificationSettings } = useNotificationSettings()
@@ -137,7 +136,7 @@ export default function InventoryPage() {
         <div>
           <h1 className="text-2xl font-bold">{t.inventoryTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {t.inventorySubtitle(inventory.length, isFreeTier ? itemsLimit : null, totalGrams.toFixed(0))}
+            {t.inventorySubtitle(inventory.length, null, totalGrams.toFixed(0))}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -189,24 +188,20 @@ export default function InventoryPage() {
             />
           )}
 
-          {!isFreeTier && (
-            <>
-              <button type="button"
-                onClick={() => setScanModalOpen(true)}
-                className="btn btn-ghost flex items-center gap-2"
-              >
-                <IconScan size={16} />
-                {t.ocrBtn}
-              </button>
-              <button type="button"
-                onClick={() => setImportModalOpen(true)}
-                className="btn btn-ghost flex items-center gap-2"
-              >
-                <IconExport size={16} />
-                {t.importBtn}
-              </button>
-            </>
-          )}
+          <button type="button"
+            onClick={() => setScanModalOpen(true)}
+            className="btn btn-ghost flex items-center gap-2"
+          >
+            <IconScan size={16} />
+            {t.ocrBtn}
+          </button>
+          <button type="button"
+            onClick={() => setImportModalOpen(true)}
+            className="btn btn-ghost flex items-center gap-2"
+          >
+            <IconExport size={16} />
+            {t.importBtn}
+          </button>
           <button type="button"
             onClick={() => {
               setScannedTobacco(null)
@@ -244,37 +239,6 @@ export default function InventoryPage() {
           </div>
         </div>
       </div>
-
-      {/* Approaching Limit Warning */}
-      {isFreeTier && itemsLimit && inventory.length >= Math.floor(itemsLimit * 0.8) && inventory.length < itemsLimit && (
-        <div className="p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>⚠️</span>
-            <span className="text-sm">{t.approachingLimit(inventory.length, itemsLimit)}</span>
-          </div>
-          <Link href="/pricing" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
-            {tc.upgrade}
-          </Link>
-        </div>
-      )}
-
-      {/* Limit Warning */}
-      {isFreeTier && !canAddMore && (
-        <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🔒</span>
-            <div className="flex-1">
-              <h3 className="text-base font-semibold">{t.limitReached}</h3>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {t.freeTierLimit(itemsLimit!)}
-              </p>
-            </div>
-            <a href="/pricing" className="btn btn-primary">
-              {tc.upgrade}
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* Error */}
       {error && (

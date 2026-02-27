@@ -20,7 +20,7 @@ import Link from 'next/link'
 export default function DashboardPage() {
   const { profile } = useAuth()
   const { isHookahActive, isBarActive } = useModules()
-  const { isFreeTier } = useSubscription()
+  const { isTrialTier, needsUpgrade } = useSubscription()
   const th = useTranslation('hookah')
   const tc = useTranslation('common')
 
@@ -108,7 +108,7 @@ export default function DashboardPage() {
       )}
 
       {/* Upgrade Banner */}
-      {isFreeTier && (
+      {isTrialTier && (
         <div className="card p-6 bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-primary)]/5 border-[var(--color-primary)]/30">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="flex-1">

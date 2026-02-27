@@ -36,7 +36,8 @@ export default function BossPage() {
   const { locale } = useLocale()
   const { orgRole, loading: orgLoading } = useOrganizationContext()
   const { isOwner } = useRole(orgRole)
-  const { isFreeTier } = useSubscription()
+  const { isMultiTier, isEnterpriseTier } = useSubscription()
+  const needsMulti = !isMultiTier && !isEnterpriseTier
 
   // Data hooks
   const { shifts, activeShift, getReconciliation, openShift, refresh: refreshShifts } = useShifts()
@@ -114,8 +115,8 @@ export default function BossPage() {
   )
   if (!isOwner) return <ErrorBoundary sectionName="Boss"><AccessDenied /></ErrorBoundary>
 
-  // Pro guard
-  if (isFreeTier) {
+  // Multi guard — boss dashboard requires Multi or Enterprise
+  if (needsMulti) {
     return (
       <ErrorBoundary sectionName="Boss Reports">
       <div className="space-y-6">

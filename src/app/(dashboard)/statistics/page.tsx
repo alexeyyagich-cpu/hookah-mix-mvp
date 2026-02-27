@@ -34,7 +34,6 @@ import {
   IconScale,
   IconTarget,
   IconStar,
-  IconTrendUp,
   IconLock,
   IconExport,
   IconWarning,
@@ -65,7 +64,7 @@ export default function StatisticsPage() {
     applyPreset,
     periodsConfig,
   } = useStatisticsComparison()
-  const { isFreeTier, canExport } = useSubscription()
+  const { canExport } = useSubscription()
 
   const [viewMode, setViewMode] = useState<ViewMode>('overview')
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d' | 'all'>('30d')
@@ -174,15 +173,13 @@ export default function StatisticsPage() {
                   type="button"
                   key={option.value}
                   onClick={() => handlePeriodChange(option.value as typeof selectedPeriod)}
-                  disabled={isFreeTier && (option.value === '90d' || option.value === 'all')}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     selectedPeriod === option.value
                       ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
-                  } ${isFreeTier && (option.value === '90d' || option.value === 'all') ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  }`}
                 >
                   {option.label}
-                  {isFreeTier && (option.value === '90d' || option.value === 'all') && <IconLock size={12} className="inline ml-1" />}
                 </button>
               ))}
             </div>
@@ -224,26 +221,6 @@ export default function StatisticsPage() {
           </div>
         </div>
       </div>
-
-      {/* Pro Banner for Free Users */}
-      {isFreeTier && (
-        <div className="card p-4 border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)]/20 flex items-center justify-center text-[var(--color-primary)]">
-              <IconTrendUp size={22} />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-base font-semibold">{tm.advancedAnalytics}</h3>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {tm.advancedAnalyticsDesc}
-              </p>
-            </div>
-            <a href="/pricing" className="btn btn-primary">
-              {tm.upgrade}
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* Error */}
       {(error || comparisonError) && (

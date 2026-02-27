@@ -24,7 +24,7 @@ export default function GuestsPage() {
   const tc = useTranslation('common')
   const { guests, loading, error, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
   const { settings: loyaltySettings, updateSettings, getBonusHistory } = useLoyalty()
-  const { isFreeTier } = useSubscription()
+  const { canUseCRM } = useSubscription()
 
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<SortBy>('recent')
@@ -78,7 +78,7 @@ export default function GuestsPage() {
     }
   }
 
-  if (isFreeTier) {
+  if (!canUseCRM) {
     return (
       <ErrorBoundary sectionName="Guest Form">
       <div className="space-y-6">

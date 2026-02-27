@@ -3,12 +3,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
-import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
 import { AddBarIngredientModal } from '@/components/bar/AddBarIngredientModal'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useTranslation } from '@/lib/i18n'
-import Link from 'next/link'
 import type { BarInventoryItem } from '@/types/database'
 
 export default function BarInventoryPage() {
@@ -25,7 +23,6 @@ export default function BarInventoryPage() {
     canAddMore,
     itemsLimit,
   } = useBarInventory()
-  const { isFreeTier } = useSubscription()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<BarInventoryItem | null>(null)
@@ -85,7 +82,7 @@ export default function BarInventoryPage() {
         <div>
           <h1 className="text-2xl font-bold">{t.inventoryTitle}</h1>
           <p className="text-[var(--color-textMuted)]">
-            {isFreeTier ? t.itemsCountWithLimit(totalItems, itemsLimit!) : t.itemsCount(totalItems)}
+            {t.itemsCount(totalItems)}
             {totalVolumeMl > 0 && ` · ${t.volumeInStock((totalVolumeMl / 1000).toFixed(1))}`}
           </p>
         </div>
@@ -124,37 +121,6 @@ export default function BarInventoryPage() {
           </div>
         </div>
       </div>
-
-      {/* Approaching Limit Warning */}
-      {isFreeTier && itemsLimit && inventory.length >= Math.floor(itemsLimit * 0.8) && inventory.length < itemsLimit && (
-        <div className="p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>⚠️</span>
-            <span className="text-sm">{t.approachingBarLimit(inventory.length, itemsLimit)}</span>
-          </div>
-          <Link href="/pricing" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
-            {tc.upgrade}
-          </Link>
-        </div>
-      )}
-
-      {/* Limit Warning */}
-      {isFreeTier && !canAddMore && (
-        <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🔒</span>
-            <div className="flex-1">
-              <h3 className="font-semibold">{t.limitReached}</h3>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {t.freeTierLimit(itemsLimit!)}
-              </p>
-            </div>
-            <a href="/pricing" className="btn btn-primary">
-              {t.upgrade}
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* Error */}
       {error && (

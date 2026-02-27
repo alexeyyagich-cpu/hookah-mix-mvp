@@ -23,7 +23,7 @@ export function ABCAnalysisPanel() {
   const { locale } = useLocale()
   const { sessions } = useSessions()
   const { inventory } = useInventory()
-  const { isFreeTier } = useSubscription()
+  const { needsUpgrade } = useSubscription()
   const [mode, setMode] = useState<ABCMode>('usage')
 
   const result: ABCResult = useMemo(() => {
@@ -43,7 +43,7 @@ export function ABCAnalysisPanel() {
     { key: 'margin', label: tm.abcByMargin },
   ], [tm])
 
-  if (isFreeTier) {
+  if (needsUpgrade) {
     return (
       <div className="card p-6 text-center">
         <div className="w-12 h-12 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center mx-auto mb-3">

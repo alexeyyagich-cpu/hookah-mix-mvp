@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useBowls } from '@/lib/hooks/useBowls'
-import { useSubscription } from '@/lib/hooks/useSubscription'
 import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
@@ -10,7 +9,6 @@ import { useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
 import { IconBowl } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
-import Link from 'next/link'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { PageBackground } from '@/components/ui/PageBackground'
@@ -36,7 +34,6 @@ export default function BowlsPage() {
     canAddMore,
     bowlsLimit,
   } = useBowls()
-  const { isFreeTier } = useSubscription()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingBowl, setEditingBowl] = useState<BowlType | null>(null)
@@ -152,37 +149,6 @@ export default function BowlsPage() {
           + {t.addBowl}
         </button>
       </div>
-
-      {/* Approaching Limit Warning */}
-      {isFreeTier && bowlsLimit && bowls.length >= Math.floor(bowlsLimit * 0.8) && bowls.length < bowlsLimit && (
-        <div className="p-3 rounded-lg bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span>⚠️</span>
-            <span className="text-sm">{t.approachingBowlLimit(bowls.length, bowlsLimit)}</span>
-          </div>
-          <Link href="/pricing" className="text-sm font-medium text-[var(--color-primary)] hover:underline">
-            {tc.upgrade}
-          </Link>
-        </div>
-      )}
-
-      {/* Limit Warning */}
-      {isFreeTier && !canAddMore && (
-        <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🔒</span>
-            <div className="flex-1">
-              <h3 className="text-base font-semibold">{t.limitReached}</h3>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {t.bowlsFreeTierLimit(bowlsLimit!)}
-              </p>
-            </div>
-            <a href="/pricing" className="btn btn-primary">
-              {tc.upgrade}
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* Error */}
       {error && (
