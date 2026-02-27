@@ -1,10 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 
 const COOKIE_CONSENT_KEY = 'cookie-consent'
+
+// Shared consent state for Analytics integration
+type ConsentState = 'pending' | 'accepted' | 'declined'
+const listeners = new Set<() => void>()
+let cachedConsent: ConsentState = 'pending'
+
+function getConsentSnapshot(): ConsentState {
+  return cachedConsent
+}
+
+function getConsentServerSnapshot(): ConsentState {
+  return 'pending'
+}
+
+function notifyListeners() {
+  listeners.forEach(fn => fn())
+}
+
+function subscribe(fn: () => void) {
+  listeners.add(fn)
+  return () => listeners.delete(fn)
+}
+
+export function useConsentState(): ConsentState {
+  return useSyncExternalStore(subscribe, getConsentSnapshot, getConsentServerSnapshot)
+}
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false)
@@ -12,20 +38,28 @@ export default function CookieConsent() {
 
   useEffect(() => {
     try {
-      const consent = localStorage.getItem(COOKIE_CONSENT_KEY)
+      const consent = localStorage.getItem(COOKIE_CONSENT_KEY) as ConsentState | null
       if (!consent) {
         setVisible(true)
+        cachedConsent = 'pending'
+      } else {
+        cachedConsent = consent
       }
+      notifyListeners()
     } catch { /* Safari private browsing */ }
   }, [])
 
   const accept = () => {
     try { localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted') } catch { /* Safari private browsing */ }
+    cachedConsent = 'accepted'
+    notifyListeners()
     setVisible(false)
   }
 
   const decline = () => {
     try { localStorage.setItem(COOKIE_CONSENT_KEY, 'declined') } catch { /* Safari private browsing */ }
+    cachedConsent = 'declined'
+    notifyListeners()
     setVisible(false)
   }
 

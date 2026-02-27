@@ -5,8 +5,7 @@ import { ThemeProvider } from "@/lib/ThemeContext";
 import { AuthProvider } from "@/lib/AuthContext";
 import { LocaleProviderBridge } from "@/lib/i18n/LocaleProviderBridge";
 import CookieConsent from "@/components/CookieConsent";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ConsentAnalytics } from "@/components/ConsentAnalytics";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -186,8 +185,7 @@ export default function RootLayout({
             <ThemeProvider>
               {children}
               <CookieConsent />
-              <Analytics />
-              <SpeedInsights />
+              <ConsentAnalytics />
             </ThemeProvider>
           </LocaleProviderBridge>
         </AuthProvider>
