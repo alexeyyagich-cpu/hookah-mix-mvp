@@ -36,12 +36,12 @@ export const nav: typeof NavType = {
   team: 'Team',
   settings: 'Einstellungen',
 
-  upgradeToPro: 'Auf Pro upgraden',
-  upgradeDescription: 'Unbegrenztes Inventar und volle Statistiken',
+  upgradeToPro: 'Tarif upgraden',
+  upgradeDescription: 'Alle Funktionen für Ihr Lokal freischalten',
   logout: 'Abmelden',
 
   openNav: 'Navigationsmenü öffnen',
   closeNav: 'Navigationsmenü schließen',
   logoutLabel: 'Vom Konto abmelden',
-  proOnlyLabel: (name: string) => `${name} — verfügbar im Pro-Tarif`,
+  proOnlyLabel: (name: string) => `${name} — verfügbar im Multi-Tarif`,
 } as const

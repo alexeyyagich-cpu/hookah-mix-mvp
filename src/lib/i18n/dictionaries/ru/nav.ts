@@ -38,13 +38,13 @@ export const nav = {
   settings: 'Настройки',
 
   // Actions
-  upgradeToPro: 'Обновить до Pro',
-  upgradeDescription: 'Безлимитный инвентарь и полная статистика',
+  upgradeToPro: 'Обновить тариф',
+  upgradeDescription: 'Разблокируйте все функции для вашего заведения',
   logout: 'Выйти',
 
   // Aria labels
   openNav: 'Открыть меню навигации',
   closeNav: 'Закрыть меню навигации',
   logoutLabel: 'Выйти из аккаунта',
-  proOnlyLabel: (name: string) => `${name} — доступно в Pro тарифе`,
+  proOnlyLabel: (name: string) => `${name} — доступно на тарифе Multi`,
 }

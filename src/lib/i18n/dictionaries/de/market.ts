@@ -43,9 +43,9 @@ export const market: typeof MarketType = {
   reorderQuantity: 'Nachbestellmenge',
 
   // Marketplace page
-  availableOnPro: 'Verfügbar mit Pro',
-  marketplaceProDesc: 'Der Marktplatz ermöglicht es Ihnen, Tabak direkt bei Lieferanten zu bestellen, Lieferungen zu verfolgen und automatisch aufzufüllen.',
-  upgradeToPro: 'Auf Pro upgraden',
+  availableOnPro: 'Verfügbar auf Multi',
+  marketplaceProDesc: 'Der Marktplatz ermöglicht es Ihnen, Tabak direkt bei Lieferanten zu bestellen, Lieferungen zu verfolgen und automatisch aufzufüllen. Verfügbar im Multi-Tarif.',
+  upgradeToPro: 'Auf Multi upgraden',
   orderFromSuppliers: 'Bestellen Sie Tabak bei vertrauenswürdigen Lieferanten',
   noSuppliersAvailable: 'Keine Lieferanten verfügbar',
 

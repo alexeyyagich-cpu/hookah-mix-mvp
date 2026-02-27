@@ -64,16 +64,16 @@ export const auth = {
   navCalculator: 'Калькулятор',
   dashboard: 'Личный кабинет',
   signIn: 'Войти',
-  startFree: 'Начать бесплатно',
+  startFree: 'Попробовать 14 дней',
 
   // Landing page — Hero
-  heroBadge: 'Бесплатный старт — без карты',
+  heroBadge: '14 дней бесплатно — без карты',
   heroTitle1: 'Управляйте кальянной',
   heroTitle2: ' как профи',
   heroSubtitle: 'Учёт табака и бара, умные миксы, рецепты коктейлей, аналитика и гостевая база — всё в одном приложении для вашего заведения',
-  heroCta: 'Попробовать бесплатно',
+  heroCta: 'Начать пробный период',
   heroCtaCalculator: 'Открыть калькулятор',
-  heroNote: 'Бесплатный старт за 2 минуты',
+  heroNote: 'Пробный период за 2 минуты',
   tryDemo: 'или попробуйте демо без регистрации',
 
   // Landing page — Features
@@ -124,10 +124,10 @@ export const auth = {
 
   // Landing page — CTA
   ctaTitle: 'Готовы начать?',
-  ctaSubtitle: 'Бесплатный тариф — навсегда. Без скрытых платежей и обязательств.',
+  ctaSubtitle: '14 дней бесплатно. Полный доступ, без привязки карты.',
   ctaButton: 'Создать аккаунт',
   ctaComparePlans: 'Сравнить тарифы',
-  ctaFreeStart: 'Бесплатный старт',
+  ctaFreeStart: '14 дней бесплатно',
   ctaNoCard: 'Без карты',
   ctaCancelAnytime: 'Отмена в любой момент',
 

@@ -81,7 +81,7 @@ export const bar: typeof BarType = {
   runningLow: 'Geht zur Neige',
   outOfStock: 'Nicht vorrätig',
   limitReached: 'Limit erreicht',
-  freeTierLimit: (limit: number) => `Der kostenlose Tarif erlaubt bis zu ${limit} Positionen. Upgraden Sie für unbegrenztes Lager.`,
+  freeTierLimit: (limit: number) => `Der Testtarif erlaubt bis zu ${limit} Positionen. Upgraden Sie für unbegrenztes Lager.`,
   upgrade: 'Upgraden',
   receipt: 'Eingang',
   adjustment: 'Korrektur',
@@ -310,7 +310,7 @@ export const bar: typeof BarType = {
   exportSales: 'Verkäufe exportieren',
   exportSalesCSV: 'CSV herunterladen',
   exportSalesPDF: 'PDF herunterladen',
-  exportProOnly: 'Export in Pro verfügbar',
+  exportProOnly: 'Export auf Core verfügbar',
 
   // Approaching limit warnings
   approachingBarLimit: (current: number, max: number) => `${current}/${max} Zutaten — Limit fast erreicht`,

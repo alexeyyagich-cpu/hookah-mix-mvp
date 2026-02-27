@@ -60,16 +60,16 @@ export const auth: typeof AuthType = {
   navCalculator: 'Calculator',
   dashboard: 'Dashboard',
   signIn: 'Sign In',
-  startFree: 'Start for free',
+  startFree: 'Start free trial',
 
   // Landing page — Hero
-  heroBadge: 'Free start — no card required',
+  heroBadge: '14-day free trial — no card required',
   heroTitle1: 'Manage your hookah lounge',
   heroTitle2: ' like a pro',
   heroSubtitle: 'Tobacco & bar inventory, smart mixes, cocktail recipes, analytics and guest database — all in one app for your venue',
-  heroCta: 'Try for free',
+  heroCta: 'Start free trial',
   heroCtaCalculator: 'Open calculator',
-  heroNote: 'Free start in 2 minutes',
+  heroNote: '14-day trial in 2 minutes',
   tryDemo: 'or try the demo without signing up',
 
   // Landing page — Features
@@ -120,10 +120,10 @@ export const auth: typeof AuthType = {
 
   // Landing page — CTA
   ctaTitle: 'Ready to start?',
-  ctaSubtitle: 'Free plan — forever. No hidden fees or obligations.',
+  ctaSubtitle: '14-day free trial. Full access, no credit card required.',
   ctaButton: 'Create account',
   ctaComparePlans: 'Compare plans',
-  ctaFreeStart: 'Free start',
+  ctaFreeStart: '14-day trial',
   ctaNoCard: 'No card required',
   ctaCancelAnytime: 'Cancel anytime',
 

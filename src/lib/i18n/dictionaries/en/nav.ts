@@ -36,12 +36,12 @@ export const nav: typeof NavType = {
   team: 'Team',
   settings: 'Settings',
 
-  upgradeToPro: 'Upgrade to Pro',
-  upgradeDescription: 'Unlimited inventory and full statistics',
+  upgradeToPro: 'Upgrade plan',
+  upgradeDescription: 'Unlock all features for your venue',
   logout: 'Log out',
 
   openNav: 'Open navigation menu',
   closeNav: 'Close navigation menu',
   logoutLabel: 'Log out of account',
-  proOnlyLabel: (name: string) => `${name} — available in Pro plan`,
+  proOnlyLabel: (name: string) => `${name} — available on Multi plan`,
 } as const

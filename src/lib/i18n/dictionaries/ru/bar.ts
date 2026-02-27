@@ -86,7 +86,7 @@ export const bar = {
   runningLow: 'Заканчиваются',
   outOfStock: 'Закончились',
   limitReached: 'Достигнут лимит',
-  freeTierLimit: (limit: number) => `Бесплатный тариф позволяет добавить до ${limit} позиций. Обновите подписку для безлимитного склада.`,
+  freeTierLimit: (limit: number) => `Пробный тариф позволяет добавить до ${limit} позиций. Обновите подписку для безлимитного склада.`,
   upgrade: 'Обновить',
   receipt: 'Поступление',
   adjustment: 'Корректировка',
@@ -315,7 +315,7 @@ export const bar = {
   exportSales: 'Экспорт продаж',
   exportSalesCSV: 'Скачать CSV',
   exportSalesPDF: 'Скачать PDF',
-  exportProOnly: 'Экспорт доступен в Pro',
+  exportProOnly: 'Экспорт доступен на Core',
 
   // Approaching limit warnings
   approachingBarLimit: (current: number, max: number) => `${current}/${max} ингредиентов — приближаетесь к лимиту`,

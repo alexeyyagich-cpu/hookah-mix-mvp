@@ -82,8 +82,8 @@ export const settings = {
   // POS
   posTitle: 'POS Касса (ready2order)',
   posDesc: 'Синхронизация с кассовой системой ready2order',
-  posProOnly: 'Доступно на тарифе Pro',
-  posProUpgrade: 'Обновите подписку для интеграции с POS-системой',
+  posProOnly: 'Доступно на тарифе Core',
+  posProUpgrade: 'Обновите тариф для интеграции с POS-системой',
   posConnected: 'POS подключена',
   lastSync: 'последняя синхронизация',
   synced: (count: number, total: number) => `Синхронизировано: ${count} из ${total}`,
@@ -129,8 +129,8 @@ export const settings = {
   tipNotFound: 'Сотрудник не найден',
   tipNotEnabled: 'Чаевые для этого сотрудника отключены',
   tipLeaveATip: 'Оставить чаевые',
-  tipProOnly: 'Доступно на тарифе Pro',
-  tipProOnlyDesc: 'Обновите подписку для QR-чаевых',
+  tipProOnly: 'Доступно на платных тарифах',
+  tipProOnlyDesc: 'Обновите тариф для QR-чаевых',
 
   // Placeholders
   placeholderBusinessName: 'Мой бар',

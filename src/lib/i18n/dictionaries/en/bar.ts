@@ -81,7 +81,7 @@ export const bar: typeof BarType = {
   runningLow: 'Running low',
   outOfStock: 'Out of stock',
   limitReached: 'Limit reached',
-  freeTierLimit: (limit: number) => `Free tier allows up to ${limit} items. Upgrade your plan for unlimited inventory.`,
+  freeTierLimit: (limit: number) => `Trial allows up to ${limit} items. Upgrade your plan for unlimited inventory.`,
   upgrade: 'Upgrade',
   receipt: 'Receipt',
   adjustment: 'Adjustment',
@@ -310,7 +310,7 @@ export const bar: typeof BarType = {
   exportSales: 'Export sales',
   exportSalesCSV: 'Download CSV',
   exportSalesPDF: 'Download PDF',
-  exportProOnly: 'Export available in Pro',
+  exportProOnly: 'Export available on Core',
 
   // Approaching limit warnings
   approachingBarLimit: (current: number, max: number) => `${current}/${max} ingredients — approaching limit`,

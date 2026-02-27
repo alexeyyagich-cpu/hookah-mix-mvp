@@ -60,16 +60,16 @@ export const auth: typeof AuthType = {
   navCalculator: 'Rechner',
   dashboard: 'Dashboard',
   signIn: 'Anmelden',
-  startFree: 'Kostenlos starten',
+  startFree: '14 Tage kostenlos testen',
 
   // Landing page — Hero
-  heroBadge: 'Kostenloser Start — ohne Karte',
+  heroBadge: '14 Tage kostenlos — ohne Karte',
   heroTitle1: 'Verwalten Sie Ihre Shisha-Lounge',
   heroTitle2: ' wie ein Profi',
   heroSubtitle: 'Tabak- & Bar-Inventar, intelligente Mixes, Cocktailrezepte, Analytik und Gästedatenbank \u2014 alles in einer App für Ihr Lokal',
-  heroCta: 'Kostenlos testen',
+  heroCta: '14 Tage kostenlos testen',
   heroCtaCalculator: 'Rechner öffnen',
-  heroNote: 'Kostenloser Start in 2 Minuten',
+  heroNote: 'Testphase in 2 Minuten starten',
   tryDemo: 'oder testen Sie die Demo ohne Anmeldung',
 
   // Landing page — Features
@@ -120,10 +120,10 @@ export const auth: typeof AuthType = {
 
   // Landing page — CTA
   ctaTitle: 'Bereit zu starten?',
-  ctaSubtitle: 'Kostenloser Tarif — für immer. Keine versteckten Gebühren oder Verpflichtungen.',
+  ctaSubtitle: '14 Tage kostenlos testen. Voller Zugang, ohne Kreditkarte.',
   ctaButton: 'Konto erstellen',
   ctaComparePlans: 'Tarife vergleichen',
-  ctaFreeStart: 'Kostenloser Start',
+  ctaFreeStart: '14 Tage kostenlos',
   ctaNoCard: 'Ohne Karte',
   ctaCancelAnytime: 'Jederzeit kündbar',
 

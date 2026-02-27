@@ -74,7 +74,7 @@ export const settings: typeof SettingsType = {
 
   posTitle: 'POS-Kasse (ready2order)',
   posDesc: 'Synchronisierung mit dem ready2order-Kassensystem',
-  posProOnly: 'Verfügbar im Pro-Tarif',
+  posProOnly: 'Verfügbar im Core-Tarif',
   posProUpgrade: 'Upgraden Sie für die POS-Integration',
   posConnected: 'POS verbunden',
   lastSync: 'letzte Synchronisierung',
@@ -120,7 +120,7 @@ export const settings: typeof SettingsType = {
   tipNotFound: 'Mitarbeiter nicht gefunden',
   tipNotEnabled: 'Trinkgeld ist für diesen Mitarbeiter deaktiviert',
   tipLeaveATip: 'Trinkgeld geben',
-  tipProOnly: 'Verfügbar im Pro-Tarif',
+  tipProOnly: 'Verfügbar auf bezahlten Tarifen',
   tipProOnlyDesc: 'Upgraden Sie für QR-Trinkgeld',
 
   // Placeholders

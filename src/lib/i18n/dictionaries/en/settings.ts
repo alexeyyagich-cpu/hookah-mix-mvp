@@ -74,8 +74,8 @@ export const settings: typeof SettingsType = {
 
   posTitle: 'POS Register (ready2order)',
   posDesc: 'Sync with ready2order register system',
-  posProOnly: 'Available on Pro plan',
-  posProUpgrade: 'Upgrade your subscription for POS integration',
+  posProOnly: 'Available on Core plan',
+  posProUpgrade: 'Upgrade your plan for POS integration',
   posConnected: 'POS connected',
   lastSync: 'last sync',
   synced: (count: number, total: number) => `Synced: ${count} of ${total}`,
@@ -120,8 +120,8 @@ export const settings: typeof SettingsType = {
   tipNotFound: 'Staff member not found',
   tipNotEnabled: 'Tips are disabled for this staff member',
   tipLeaveATip: 'Leave a tip',
-  tipProOnly: 'Available on Pro plan',
-  tipProOnlyDesc: 'Upgrade your subscription for QR tips',
+  tipProOnly: 'Available on paid plans',
+  tipProOnlyDesc: 'Upgrade your plan for QR tips',
 
   // Placeholders
   placeholderBusinessName: 'Lounge Bar',

@@ -43,9 +43,9 @@ export const market: typeof MarketType = {
   reorderQuantity: 'Reorder quantity',
 
   // Marketplace page
-  availableOnPro: 'Available on Pro',
-  marketplaceProDesc: 'The marketplace lets you order tobacco directly from suppliers, track deliveries and automatically restock.',
-  upgradeToPro: 'Upgrade to Pro',
+  availableOnPro: 'Available on Multi',
+  marketplaceProDesc: 'The marketplace lets you order tobacco directly from suppliers, track deliveries and automatically restock. Available on the Multi plan.',
+  upgradeToPro: 'Upgrade to Multi',
   orderFromSuppliers: 'Order tobacco from trusted suppliers',
   noSuppliersAvailable: 'No suppliers available',
 

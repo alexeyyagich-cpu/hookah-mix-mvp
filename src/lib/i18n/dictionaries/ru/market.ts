@@ -46,9 +46,9 @@ export const market = {
   reorderQuantity: 'Количество для заказа',
 
   // Marketplace page
-  availableOnPro: 'Доступно на Pro',
-  marketplaceProDesc: 'Маркетплейс позволяет заказывать табак напрямую у поставщиков, отслеживать доставки и автоматически пополнять запасы.',
-  upgradeToPro: 'Обновить до Pro',
+  availableOnPro: 'Доступно на Multi',
+  marketplaceProDesc: 'Маркетплейс позволяет заказывать табак напрямую у поставщиков, отслеживать доставки и автоматически пополнять запасы. Доступно на тарифе Multi.',
+  upgradeToPro: 'Обновить до Multi',
   orderFromSuppliers: 'Заказывайте табак у проверенных поставщиков',
   noSuppliersAvailable: 'Нет доступных поставщиков',
 

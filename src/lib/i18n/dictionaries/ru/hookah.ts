@@ -7,8 +7,8 @@ export const hookah = {
   businessOverview: (name: string) => `${name} — обзор за последние 30 дней`,
   defaultOwner: 'Владелец',
   defaultBusiness: 'Мое заведение',
-  upgradeToPro: 'Перейдите на Pro',
-  upgradeDesc: 'Получите безлимитный инвентарь, полную статистику, экспорт данных и многое другое',
+  upgradeToPro: 'Обновить тариф',
+  upgradeDesc: 'Получите все функции, полную статистику, экспорт данных и многое другое',
   upgradePlan: 'Улучшить тариф',
 
   // Inventory
@@ -103,16 +103,16 @@ export const hookah = {
   inventorySubtitle: (count: number, limit: number | null, grams: string) =>
     `${count} позиций${limit ? ` из ${limit}` : ''} \u2022 ${grams}г на складе`,
   exportInventory: 'Экспорт инвентаря',
-  availableOnPro: 'Доступно на Pro',
+  availableOnPro: 'Доступно на Core',
   exportCSV: 'Экспорт CSV',
   exportPDF: 'Экспорт PDF',
   exportSessions: 'Экспорт сессий',
-  exportProOnly: 'Экспорт доступен в Pro',
+  exportProOnly: 'Экспорт доступен на Core',
   inWarehouse: 'На складе',
   runningLow: 'Заканчиваются',
   limitReached: 'Достигнут лимит',
   freeTierLimit: (limit: number) =>
-    `Бесплатный тариф позволяет добавить до ${limit} позиций. Обновите подписку для безлимитного инвентаря.`,
+    `Пробный тариф позволяет добавить до ${limit} позиций. Обновите подписку для безлимитного инвентаря.`,
   deleteConfirmToast: 'Нажмите еще раз для подтверждения удаления',
   adjustPurchase: 'Поступление',
   adjustCorrection: 'Корректировка',
@@ -139,7 +139,7 @@ export const hookah = {
   sessionsFreeTierNotice: 'за последние 30 дней',
   createSession: 'Создать сессию',
   limitedHistory: 'Ограниченная история',
-  limitedHistoryDesc: 'На бесплатном тарифе доступна история только за последние 30 дней. Обновите подписку для полного доступа.',
+  limitedHistoryDesc: 'На пробном тарифе доступна история только за последние 30 дней. Обновите подписку для полного доступа.',
   searchTobaccos: 'Поиск по табакам...',
   loadingSessions: 'Загрузка сессий...',
   tryDifferentSearch: 'Попробуйте изменить поисковый запрос',
@@ -155,7 +155,7 @@ export const hookah = {
   // Bowls page
   bowlsSubtitle: 'Управляйте чашами для точного расчета граммовки',
   bowlsFreeTierLimit: (limit: number) =>
-    `Бесплатный тариф позволяет добавить ${limit} чашу. Обновите подписку для добавления большего количества.`,
+    `Пробный тариф позволяет добавить ${limit} чашу. Обновите подписку для добавления большего количества.`,
   noBowlsDesc: 'Добавьте первую чашу для точного расчета граммовки при создании сессий',
   editBowl: 'Редактировать чашу',
   bowlNamePlaceholder: 'Phunnel средний',
@@ -233,7 +233,7 @@ export const hookah = {
 
   // AddTobaccoModal
   limitReachedTitle: 'Достигнут лимит',
-  upgradeForUnlimited: 'Обновите подписку до Pro для добавления неограниченного количества табаков',
+  upgradeForUnlimited: 'Обновите подписку для неограниченного количества табаков',
   upgradeSubscription: 'Обновить подписку',
   selectFromCatalog: 'Выберите из каталога',
   addManually: 'Или добавить вручную →',
@@ -471,9 +471,9 @@ export const hookah = {
   recommendInventoryToggle: 'Учитывать инвентарь',
   recommendInventoryHint: 'Только то, что есть в наличии',
   recommendInventoryToggleLabel: 'Переключить учёт инвентаря',
-  recommendProInventory: 'Pro: Учёт инвентаря',
+  recommendProInventory: 'Core: Учёт инвентаря',
   recommendProInventoryHint: 'Рекомендации с учётом наличия на складе',
-  recommendGoToPro: 'Перейти на Pro',
+  recommendGoToPro: 'Перейти на Core',
   recommendSavePrefs: (name: string) => `Сохранить предпочтения для ${name}`,
   recommendBuiltMix: 'Собранный микс',
   recommendAdjustSliders: 'Настройте пропорции слайдерами',
