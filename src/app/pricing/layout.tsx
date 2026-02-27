@@ -1,18 +1,18 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Pricing',
-  description: 'Choose the right Hookah Torus plan. Free to get started, Pro for active lounges, Enterprise for chains. Inventory management, analytics, API access.',
+  title: 'Pricing — Plans for Every Hookah Lounge',
+  description: '14-day free trial, no card required. Core plan from €79/month for single locations, Multi from €149/month for chains. All-in-one hookah lounge management.',
   keywords: [
     'hookah software pricing',
     'hookah management plans',
     'lounge management cost',
-    'Pro plan',
-    'Enterprise hookah',
+    'hookah lounge SaaS',
+    'shisha bar software',
   ],
   openGraph: {
-    title: 'Pricing | Hookah Torus',
-    description: 'Choose the right plan for your hookah lounge management',
+    title: 'Hookah Torus Pricing — Plans for Every Lounge',
+    description: '14-day free trial. Core €79/mo, Multi €149/mo. All-in-one hookah lounge management.',
     url: 'https://hookahtorus.com/pricing',
   },
   alternates: {
@@ -43,10 +43,10 @@ const faqSchema = {
     },
     {
       "@type": "Question",
-      name: "Is there a free trial for Pro?",
+      name: "Is there a free trial?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes, new users get a 14-day Pro trial with no restrictions.",
+        text: "Yes, new users get a 14-day trial with full access to all Core features. No credit card required.",
       },
     },
     {
@@ -62,7 +62,7 @@ const faqSchema = {
       name: "What happens to my data if I downgrade?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Your data is preserved, but access to older history and additional inventory slots will be limited.",
+        text: "Your data is preserved. Multi features (CRM, waiter tablet, financial reports) become read-only on Core plan.",
       },
     },
     {
@@ -70,7 +70,7 @@ const faqSchema = {
       name: "How does the free trial work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "After signing up you get 14 days of Pro access. No credit card required, cancellation is automatic.",
+        text: "After signing up you get 14 days of full access. No credit card required. After the trial, choose Core (€79/mo) or Multi (€149/mo).",
       },
     },
   ],

@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/AuthContext";
 import { LocaleProviderBridge } from "@/lib/i18n/LocaleProviderBridge";
 import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -179,6 +180,7 @@ export default function RootLayout({
               {children}
               <CookieConsent />
               <Analytics />
+              <SpeedInsights />
             </ThemeProvider>
           </LocaleProviderBridge>
         </AuthProvider>
