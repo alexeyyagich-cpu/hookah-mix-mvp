@@ -73,7 +73,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === '/sw.js' ||
     request.nextUrl.pathname === '/sitemap.xml' ||
     request.nextUrl.pathname === '/robots.txt' ||
-    request.nextUrl.pathname.startsWith('/images')
+    request.nextUrl.pathname.startsWith('/images') ||
+    request.nextUrl.pathname.startsWith('/google') && request.nextUrl.pathname.endsWith('.html')
   const isProtectedPath = !isPublicPath && !isStaticPath
 
   if (isProtectedPath && !user) {
