@@ -360,26 +360,30 @@ export function useSessions(): UseSessionsReturn {
       return null
     }
 
-    // Deduct from inventory if requested
+    // Deduct from inventory if requested (best-effort per item — session already committed)
     if (deductFromInventory) {
       for (const item of items) {
         if (item.tobacco_inventory_id) {
-          // Record transaction (UNIQUE constraint prevents duplicates on retry)
-          await supabase.from('inventory_transactions').insert({
-            profile_id: user.id,
-            ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-            tobacco_inventory_id: item.tobacco_inventory_id,
-            type: 'session',
-            quantity_grams: -item.grams_used,
-            session_id: session.id,
-            notes: `Session: ${item.brand} ${item.flavor}`,
-          })
+          try {
+            // Record transaction (UNIQUE constraint prevents duplicates on retry)
+            await supabase.from('inventory_transactions').insert({
+              profile_id: user.id,
+              ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+              tobacco_inventory_id: item.tobacco_inventory_id,
+              type: 'session',
+              quantity_grams: -item.grams_used,
+              session_id: session.id,
+              notes: `Session: ${item.brand} ${item.flavor}`,
+            })
 
-          // Atomic decrement via RPC — no read-then-write race
-          await supabase.rpc('decrement_tobacco_inventory', {
-            p_inventory_id: item.tobacco_inventory_id,
-            p_grams_used: item.grams_used,
-          })
+            // Atomic decrement via RPC — no read-then-write race
+            await supabase.rpc('decrement_tobacco_inventory', {
+              p_inventory_id: item.tobacco_inventory_id,
+              p_grams_used: item.grams_used,
+            })
+          } catch {
+            if (process.env.NODE_ENV !== 'production') console.error('Inventory deduction failed for', item.tobacco_inventory_id)
+          }
         }
       }
     }
@@ -429,25 +433,31 @@ export function useSessions(): UseSessionsReturn {
     if (transactions) {
       for (const tx of transactions) {
         if (tx.tobacco_inventory_id && tx.quantity_grams < 0) {
-          await supabase.rpc('decrement_tobacco_inventory', {
-            p_inventory_id: tx.tobacco_inventory_id,
-            p_grams_used: tx.quantity_grams, // negative value → increments stock back
-          })
+          try {
+            await supabase.rpc('decrement_tobacco_inventory', {
+              p_inventory_id: tx.tobacco_inventory_id,
+              p_grams_used: tx.quantity_grams, // negative value → increments stock back
+            })
+          } catch {
+            if (process.env.NODE_ENV !== 'production') console.error('Reverse inventory failed for', tx.tobacco_inventory_id)
+          }
         }
       }
     }
 
-    // Delete session items
-    await supabase
-      .from('session_items')
-      .delete()
-      .eq('session_id', id)
+    // Delete session items (best-effort — continue to session delete)
+    try {
+      await supabase.from('session_items').delete().eq('session_id', id)
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to delete session items for', id)
+    }
 
-    // Delete related inventory transactions
-    await supabase
-      .from('inventory_transactions')
-      .delete()
-      .eq('session_id', id)
+    // Delete related inventory transactions (best-effort)
+    try {
+      await supabase.from('inventory_transactions').delete().eq('session_id', id)
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to delete inventory transactions for', id)
+    }
 
     // Delete session
     const { error: deleteError } = await supabase

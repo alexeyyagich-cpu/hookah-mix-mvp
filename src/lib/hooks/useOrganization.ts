@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { Organization, Location, OrgMember, OrgRole } from '@/types/database'
+import { translateError } from '@/lib/utils/translateError'
 
 // Demo data for testing
 const DEMO_ORGANIZATION: Organization = {
@@ -170,7 +171,7 @@ export function useOrganization(): UseOrganizationReturn {
       setActiveLocationId(prev => prev || defaultLocId)
     } catch (err) {
       if (process.env.NODE_ENV !== 'production') console.error('Error loading organization:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load organization')
+      setError(translateError(err as Error))
     } finally {
       setLoading(false)
     }

@@ -125,12 +125,16 @@ export function useBowls(): UseBowlsReturn {
       return newBowl
     }
 
-    // If this is set as default, unset other defaults
+    // If this is set as default, unset other defaults (best-effort before insert)
     if (bowl.is_default) {
-      await supabase
-        .from('bowl_types')
-        .update({ is_default: false })
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      try {
+        await supabase
+          .from('bowl_types')
+          .update({ is_default: false })
+          .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      } catch {
+        if (process.env.NODE_ENV !== 'production') console.error('Failed to unset default bowls')
+      }
     }
 
     // If this is the first bowl, make it default
@@ -205,10 +209,14 @@ export function useBowls(): UseBowlsReturn {
     if (wasDefault && bowls.length > 1) {
       const remaining = bowls.filter(b => b.id !== id)
       if (remaining.length > 0) {
-        await supabase
-          .from('bowl_types')
-          .update({ is_default: true })
-          .eq('id', remaining[0].id)
+        try {
+          await supabase
+            .from('bowl_types')
+            .update({ is_default: true })
+            .eq('id', remaining[0].id)
+        } catch {
+          if (process.env.NODE_ENV !== 'production') console.error('Failed to set new default bowl')
+        }
       }
     }
 
@@ -224,11 +232,15 @@ export function useBowls(): UseBowlsReturn {
       return true
     }
 
-    // Unset all defaults
-    await supabase
-      .from('bowl_types')
-      .update({ is_default: false })
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    // Unset all defaults (best-effort before setting new one)
+    try {
+      await supabase
+        .from('bowl_types')
+        .update({ is_default: false })
+        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to unset default bowls')
+    }
 
     // Set new default
     const { error: updateError } = await supabase

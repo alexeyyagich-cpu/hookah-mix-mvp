@@ -175,15 +175,19 @@ export function useBarInventory(): UseBarInventoryReturn {
     }
 
     if (item.quantity > 0) {
-      await supabase.from('bar_transactions').insert({
-        profile_id: user.id,
-        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-        bar_inventory_id: data.id,
-        type: 'purchase',
-        quantity: item.quantity,
-        unit_type: item.unit_type,
-        notes: 'Initial stock',
-      })
+      try {
+        await supabase.from('bar_transactions').insert({
+          profile_id: user.id,
+          ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+          bar_inventory_id: data.id,
+          type: 'purchase',
+          quantity: item.quantity,
+          unit_type: item.unit_type,
+          notes: 'Initial stock',
+        })
+      } catch {
+        if (process.env.NODE_ENV !== 'production') console.error('Failed to record initial bar transaction for', data.id)
+      }
     }
 
     await fetchInventory()
@@ -225,10 +229,11 @@ export function useBarInventory(): UseBarInventoryReturn {
       return true
     }
 
-    await supabase
-      .from('bar_transactions')
-      .delete()
-      .eq('bar_inventory_id', id)
+    try {
+      await supabase.from('bar_transactions').delete().eq('bar_inventory_id', id)
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to delete bar transactions for', id)
+    }
 
     const { error: deleteError } = await supabase
       .from('bar_inventory')
@@ -271,16 +276,20 @@ export function useBarInventory(): UseBarInventoryReturn {
       return true
     }
 
-    // Record transaction first (source of truth)
-    await supabase.from('bar_transactions').insert({
-      profile_id: user.id,
-      ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-      bar_inventory_id: id,
-      type,
-      quantity: quantityChange,
-      unit_type: item.unit_type,
-      notes,
-    })
+    // Record transaction first (source of truth, best-effort — RPC still runs)
+    try {
+      await supabase.from('bar_transactions').insert({
+        profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+        bar_inventory_id: id,
+        type,
+        quantity: quantityChange,
+        unit_type: item.unit_type,
+        notes,
+      })
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to record bar transaction for', id)
+    }
 
     // Atomic quantity adjustment via RPC — no read-then-write race
     const { error: rpcError } = await supabase.rpc('adjust_bar_inventory', {

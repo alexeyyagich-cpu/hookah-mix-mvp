@@ -154,16 +154,20 @@ export function useInventory(): UseInventoryReturn {
       return null
     }
 
-    // If there's a purchase, add a transaction
+    // If there's a purchase, add a transaction (best-effort — item already created)
     if (tobacco.quantity_grams > 0) {
-      await supabase.from('inventory_transactions').insert({
-        profile_id: user.id,
-        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-        tobacco_inventory_id: data.id,
-        type: 'purchase',
-        quantity_grams: tobacco.quantity_grams,
-        notes: 'Initial stock',
-      })
+      try {
+        await supabase.from('inventory_transactions').insert({
+          profile_id: user.id,
+          ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+          tobacco_inventory_id: data.id,
+          type: 'purchase',
+          quantity_grams: tobacco.quantity_grams,
+          notes: 'Initial stock',
+        })
+      } catch {
+        if (process.env.NODE_ENV !== 'production') console.error('Failed to record initial stock transaction for', data.id)
+      }
     }
 
     await fetchInventory()
@@ -210,11 +214,12 @@ export function useInventory(): UseInventoryReturn {
       return true
     }
 
-    // First delete related transactions
-    await supabase
-      .from('inventory_transactions')
-      .delete()
-      .eq('tobacco_inventory_id', id)
+    // First delete related transactions (best-effort — continue to item delete)
+    try {
+      await supabase.from('inventory_transactions').delete().eq('tobacco_inventory_id', id)
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to delete inventory transactions for', id)
+    }
 
     // Then delete the tobacco
     const { error: deleteError } = await supabase
@@ -299,16 +304,20 @@ export function useInventory(): UseInventoryReturn {
       return true
     }
 
-    // Add transaction record first (source of truth)
-    await supabase.from('inventory_transactions').insert({
-      profile_id: user.id,
-      ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
-      tobacco_inventory_id: id,
-      type,
-      quantity_grams: quantityChange,
-      session_id: sessionId,
-      notes,
-    })
+    // Add transaction record first (source of truth, best-effort — RPC still runs)
+    try {
+      await supabase.from('inventory_transactions').insert({
+        profile_id: user.id,
+        ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
+        tobacco_inventory_id: id,
+        type,
+        quantity_grams: quantityChange,
+        session_id: sessionId,
+        notes,
+      })
+    } catch {
+      if (process.env.NODE_ENV !== 'production') console.error('Failed to record inventory transaction for', id)
+    }
 
     // Atomic quantity adjustment via RPC — no read-then-write race
     const { error: rpcError } = await supabase.rpc('decrement_tobacco_inventory', {

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import type { TelegramConnection } from '@/lib/telegram/types'
+import { translateError } from '@/lib/utils/translateError'
 
 // Demo Telegram connection
 const DEMO_CONNECTION: TelegramConnection = {
@@ -98,7 +99,7 @@ export function useTelegram(): UseTelegramReturn {
       }
       setConnection(data || null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load Telegram connection')
+      setError(translateError(err as Error))
     } finally {
       clearTimeout(safetyTimerRef.current)
       setLoading(false)
@@ -131,7 +132,7 @@ export function useTelegram(): UseTelegramReturn {
       if (updateError) throw updateError
       setConnection(prev => prev ? { ...prev, ...settings, updated_at: new Date().toISOString() } : null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update settings')
+      setError(translateError(err as Error))
     }
   }, [user, supabase, connection, isDemoMode])
 
@@ -155,7 +156,7 @@ export function useTelegram(): UseTelegramReturn {
       if (deleteError) throw deleteError
       setConnection(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to disconnect Telegram')
+      setError(translateError(err as Error))
     }
   }, [user, supabase, connection, isDemoMode])
 

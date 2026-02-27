@@ -172,7 +172,7 @@ export function CommandPalette() {
       />
 
       {/* Palette */}
-      <div ref={paletteRef} role="dialog" aria-modal="true" className="relative w-full max-w-lg mx-4 bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] shadow-2xl overflow-hidden animate-fadeInUp">
+      <div ref={paletteRef} role="dialog" aria-modal="true" aria-label={tc.commandPalette.placeholder} className="relative w-full max-w-lg mx-4 bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] shadow-2xl overflow-hidden animate-fadeInUp">
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border)]">
           <svg className="w-5 h-5 text-[var(--color-textMuted)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -185,6 +185,7 @@ export function CommandPalette() {
             onChange={e => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={tc.commandPalette.placeholder}
+            aria-label={tc.commandPalette.placeholder}
             data-testid="command-palette-input"
             className="flex-1 bg-transparent outline-none text-sm placeholder:text-[var(--color-textMuted)]"
           />

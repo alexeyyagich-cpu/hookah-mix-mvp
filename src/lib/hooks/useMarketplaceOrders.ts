@@ -17,8 +17,9 @@ import { translateError } from '@/lib/utils/translateError'
 function generateOrderNumber(): string {
   const date = new Date()
   const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '')
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
-  return `ORD-${dateStr}-${random}`
+  const timeStr = date.toISOString().slice(11, 19).replace(/:/g, '')
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+  return `ORD-${dateStr}-${timeStr}-${random}`
 }
 
 // Demo orders
@@ -187,7 +188,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
         setOrders(ordersData || [])
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load orders')
+      setError(translateError(err as Error))
       setOrders([])
     } finally {
       setLoading(false)
@@ -289,12 +290,14 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
 
     if (itemsError) {
       setError(translateError(itemsError))
-      // Note: Order was created but items failed - should handle rollback
+      // Rollback orphaned order
+      await supabase.from('marketplace_orders').delete().eq('id', orderData.id)
+      return null
     }
 
     await fetchOrders()
     return orderData
-  }, [user, isDemoMode, supabase, fetchOrders])
+  }, [user, isDemoMode, supabase, fetchOrders, organizationId])
 
   const updateOrderStatus = useCallback(async (orderId: string, status: OrderStatus): Promise<boolean> => {
     if (!user) return false

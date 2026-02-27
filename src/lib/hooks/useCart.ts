@@ -37,8 +37,8 @@ export function useCart(): UseCartReturn {
     try {
       const stored = localStorage.getItem(CART_STORAGE_KEY)
       if (stored) {
-        const storedCart: StoredCart = JSON.parse(stored)
-        if (storedCart.items && storedCart.items.length > 0) {
+        const storedCart = JSON.parse(stored) as StoredCart
+        if (typeof storedCart?.supplierId === 'string' && Array.isArray(storedCart.items) && storedCart.items.length > 0) {
           // Preserve stored data; full Cart object will be hydrated
           // when user visits the supplier page and addToCart is called
           setStoredCartRef(storedCart)
@@ -64,7 +64,11 @@ export function useCart(): UseCartReturn {
           quantity: item.quantity,
         })),
       }
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toStore))
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toStore))
+      } catch {
+        // Storage quota exceeded — cart persists in memory only
+      }
     } else if (!storedCartRef) {
       // Only remove from localStorage if there's no pending stored cart to hydrate
       localStorage.removeItem(CART_STORAGE_KEY)

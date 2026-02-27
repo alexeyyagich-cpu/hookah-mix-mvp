@@ -6,6 +6,9 @@ import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/li
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
+/** Minimum interval (ms) between guest QR orders for the same table */
+const TABLE_ORDER_COOLDOWN_MS = 30_000
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -65,8 +68,8 @@ export async function POST(
 
   if (recentOrderResult.data) {
     const elapsed = Date.now() - new Date(recentOrderResult.data.created_at).getTime()
-    if (elapsed < 30000) {
-      return NextResponse.json({ error: 'Rate limited', retry_after: Math.ceil((30000 - elapsed) / 1000) }, { status: 429 })
+    if (elapsed < TABLE_ORDER_COOLDOWN_MS) {
+      return NextResponse.json({ error: 'Rate limited', retry_after: Math.ceil((TABLE_ORDER_COOLDOWN_MS - elapsed) / 1000) }, { status: 429 })
     }
   }
 
@@ -87,7 +90,7 @@ export async function POST(
     .single()
 
   if (insertError) {
-    console.error('Failed to create guest order:', insertError)
+    if (process.env.NODE_ENV !== 'production') console.error('Failed to create guest order:', insertError)
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 

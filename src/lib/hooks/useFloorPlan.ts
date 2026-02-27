@@ -236,23 +236,20 @@ export function useFloorPlan(): UseFloorPlanReturn {
 
           switch (payload.eventType) {
             case 'INSERT': {
-              const newRecord = payload.new as FloorTable
               setTables(prev => {
-                if (prev.some(t => t.id === newRecord.id)) return prev
-                return [...prev, newRecord]
+                if (prev.some(t => t.id === record.id)) return prev
+                return [...prev, record]
               })
               break
             }
             case 'UPDATE': {
-              const updated = payload.new as FloorTable
               setTables(prev => prev.map(t =>
-                t.id === updated.id ? updated : t
+                t.id === record.id ? record : t
               ))
               break
             }
             case 'DELETE': {
-              const deleted = payload.old as FloorTable
-              setTables(prev => prev.filter(t => t.id !== deleted.id))
+              setTables(prev => prev.filter(t => t.id !== record.id))
               break
             }
           }
@@ -310,7 +307,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       setTables(prev => [...prev, data])
       return data
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add table')
+      setError(translateError(err as Error))
       return null
     }
   }, [user, supabase, isDemoMode, organizationId, locationId])
@@ -349,7 +346,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
         throw updateError
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update table')
+      setError(translateError(err as Error))
       // Revert optimistic update by refetching
       fetchTables()
     }
@@ -373,7 +370,7 @@ export function useFloorPlan(): UseFloorPlanReturn {
       if (deleteError) throw deleteError
       setTables(prev => prev.filter(t => t.id !== id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete table')
+      setError(translateError(err as Error))
     }
   }, [user, supabase, isDemoMode, organizationId])
 
