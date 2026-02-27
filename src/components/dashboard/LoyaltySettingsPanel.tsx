@@ -38,7 +38,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
       })
       onClose()
     } catch (err) {
-      console.error('Loyalty settings save failed:', err)
+      if (process.env.NODE_ENV !== 'production') console.error('Loyalty settings save failed:', err)
       toast.error(tc.errorSaving)
     } finally {
       setSaving(false)
@@ -69,9 +69,10 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
         {/* Bonus */}
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium">{tm.bonusAccrualPercent}</label>
+            <label htmlFor="loyalty-accrual" className="text-sm font-medium">{tm.bonusAccrualPercent}</label>
             <div className="flex items-center gap-2 mt-1">
               <input
+                id="loyalty-accrual"
                 type="number"
                 inputMode="decimal"
                 value={accrualPercent}
@@ -85,9 +86,10 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
             </div>
           </div>
           <div>
-            <label className="text-sm font-medium">{tm.maxRedemptionPercent}</label>
+            <label htmlFor="loyalty-max-redemption" className="text-sm font-medium">{tm.maxRedemptionPercent}</label>
             <div className="flex items-center gap-2 mt-1">
               <input
+                id="loyalty-max-redemption"
                 type="number"
                 inputMode="decimal"
                 value={maxRedemption}
@@ -107,10 +109,11 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
           <h4 className="font-medium mb-2">{tm.tierThresholds}</h4>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm text-[var(--color-textMuted)]">{tm.tierSilver}</label>
+              <label htmlFor="loyalty-silver-threshold" className="text-sm text-[var(--color-textMuted)]">{tm.tierSilver}</label>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm">€</span>
                 <input
+                  id="loyalty-silver-threshold"
                   type="number"
                   inputMode="decimal"
                   value={silverThreshold}
@@ -121,6 +124,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
                 <span className="text-sm text-[var(--color-textMuted)]">→ {silverDiscount}%</span>
               </div>
               <input
+                id="loyalty-silver-discount"
                 type="number"
                 inputMode="decimal"
                 value={silverDiscount}
@@ -130,13 +134,15 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
                 max="50"
                 step="1"
                 placeholder="%"
+                aria-label={`${tm.tierSilver} %`}
               />
             </div>
             <div>
-              <label className="text-sm text-[var(--color-textMuted)]">{tm.tierGold}</label>
+              <label htmlFor="loyalty-gold-threshold" className="text-sm text-[var(--color-textMuted)]">{tm.tierGold}</label>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm">€</span>
                 <input
+                  id="loyalty-gold-threshold"
                   type="number"
                   inputMode="decimal"
                   value={goldThreshold}
@@ -147,6 +153,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
                 <span className="text-sm text-[var(--color-textMuted)]">→ {goldDiscount}%</span>
               </div>
               <input
+                id="loyalty-gold-discount"
                 type="number"
                 inputMode="decimal"
                 value={goldDiscount}
@@ -156,6 +163,7 @@ export function LoyaltySettingsPanel({ settings, onUpdate, onClose }: LoyaltySet
                 max="50"
                 step="1"
                 placeholder="%"
+                aria-label={`${tm.tierGold} %`}
               />
             </div>
           </div>

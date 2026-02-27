@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import type { TobaccoInventory, KdsOrder, Shift, ShiftReconciliation } from '@/types/database'
 import { useLocale, formatCurrency } from '@/lib/i18n'
@@ -31,6 +31,10 @@ interface Alert {
 export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, shifts, getReconciliation, tm }: AlertsPanelProps) {
   const { locale } = useLocale()
   const [cashShortageAlert, setCashShortageAlert] = useState<Alert | null>(null)
+  const tmRef = useRef(tm)
+  tmRef.current = tm
+  const localeRef = useRef(locale)
+  localeRef.current = locale
 
   // Fetch cash shortage alert async
   useEffect(() => {
@@ -43,7 +47,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       if (recon.cash.difference !== null && recon.cash.difference < 0) {
         setCashShortageAlert({
           id: 'cash-shortage',
-          text: tm.bossCashShortage(formatCurrency(Math.abs(recon.cash.difference), locale)),
+          text: tmRef.current.bossCashShortage(formatCurrency(Math.abs(recon.cash.difference), localeRef.current)),
           severity: 'warning',
           href: '/shifts',
           emoji: '💰',
@@ -55,7 +59,7 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       // Non-critical — skip cash shortage alert on error
     })
     return () => { cancelled = true }
-  }, [shifts, getReconciliation, tm])
+  }, [shifts, getReconciliation])
 
   const alerts: Alert[] = []
 

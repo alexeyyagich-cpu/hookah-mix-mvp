@@ -32,7 +32,7 @@ const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
 
 export default function FloorPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>}>
       <FloorPageInner />
     </Suspense>
   )
@@ -261,13 +261,13 @@ function FloorPageInner() {
           notes: null,
         })
       } catch (e) {
-        console.error('KDS order failed:', e)
+        if (process.env.NODE_ENV !== 'production') console.error('KDS order failed:', e)
       }
 
       setServeStatus('served')
       serveTimerRef.current = setTimeout(() => setServeStatus('idle'), 1500)
     } catch (err) {
-      console.error('Serve error:', err)
+      if (process.env.NODE_ENV !== 'production') console.error('Serve error:', err)
       toast.error(tc.errorSaving)
       setServeStatus('idle')
     }
@@ -295,7 +295,7 @@ function FloorPageInner() {
       setShowQuickReserve(false)
       setQuickForm({ guest_name: '', guest_phone: '', guest_count: '2', reservation_time: '' })
     } catch (err) {
-      console.error('Quick reserve error:', err)
+      if (process.env.NODE_ENV !== 'production') console.error('Quick reserve error:', err)
       toast.error(tc.errorSaving)
     }
     setQuickReserving(false)
@@ -473,6 +473,13 @@ function FloorPageInner() {
           description={tm.noTablesHint}
           action={hasPermission('floor.edit') ? { label: tm.enableEditMode, onClick: () => setIsEditMode(true) } : undefined}
         />
+      ) : filteredTables.length === 0 && zoneFilter && tables.length > 0 ? (
+        <div className="card p-8 text-center">
+          <p className="text-[var(--color-textMuted)]">{tm.noTables}</p>
+          <button type="button" onClick={() => setZoneFilter(null)} className="btn btn-ghost btn-sm mt-3">
+            ← {tc.back}
+          </button>
+        </div>
       ) : (
         <div className="card p-6">
           <FloorPlan
@@ -769,6 +776,7 @@ function FloorPageInner() {
                 value={guestSearch}
                 onChange={(e) => setGuestSearch(e.target.value)}
                 placeholder={tm.guestNamePlaceholder}
+                aria-label={tm.guestNamePlaceholder}
                 className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm mb-2"
               />
               {filteredGuests.length > 0 && (
@@ -859,14 +867,15 @@ function FloorPageInner() {
                     value={quickForm.guest_name}
                     onChange={(e) => setQuickForm(f => ({ ...f, guest_name: e.target.value }))}
                     placeholder={tm.guestNamePlaceholder}
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                    aria-label={tm.guestNamePlaceholder}
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
                   />
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <input
                       type="time"
                       value={quickForm.reservation_time}
                       onChange={(e) => setQuickForm(f => ({ ...f, reservation_time: e.target.value }))}
-                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
                     />
                     <input
                       type="number"
@@ -877,14 +886,16 @@ function FloorPageInner() {
                       max="20"
                       step="1"
                       placeholder={tm.guestCountLabel}
-                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                      aria-label={tm.guestCountLabel}
+                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
                     />
                     <input
                       type="tel"
                       value={quickForm.guest_phone}
                       onChange={(e) => setQuickForm(f => ({ ...f, guest_phone: e.target.value }))}
                       placeholder={tm.guestPhonePlaceholder}
-                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus:outline-none text-sm"
+                      aria-label={tm.guestPhonePlaceholder}
+                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
                     />
                   </div>
                   <div className="flex gap-2">

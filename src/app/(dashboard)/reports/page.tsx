@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useClickOutside } from '@/lib/hooks/useClickOutside'
 import { usePnL } from '@/lib/hooks/usePnL'
 import type { PnLPreset } from '@/lib/hooks/usePnL'
 import { useModules } from '@/lib/hooks/useModules'
@@ -42,15 +43,7 @@ export default function ReportsPage() {
 
   const isCombined = isHookahActive && isBarActive
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
-        setExportMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  useClickOutside(exportMenuRef, () => setExportMenuOpen(false))
 
   const presets: { key: PnLPreset; label: string }[] = [
     { key: '7d', label: tm.period7d },

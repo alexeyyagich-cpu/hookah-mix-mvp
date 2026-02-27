@@ -26,7 +26,6 @@ function Reel({
   isSpinning,
   stopDelay,
 }: {
-  items: Tobacco[];
   finalItem: Tobacco | null;
   isSpinning: boolean;
   stopDelay: number;
@@ -217,7 +216,6 @@ function Reel({
 export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
   const t = useTranslation("hookah");
   const [isSpinning, setIsSpinning] = useState(false);
-  const [reelItems, setReelItems] = useState<Tobacco[][]>([[], [], []]);
   const [results, setResults] = useState<(Tobacco | null)[]>([null, null, null]);
   const [showResult, setShowResult] = useState(false);
   const spinTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -225,11 +223,6 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
   // Initialize reels + cleanup timers
   useEffect(() => {
     if (isOpen) {
-      setReelItems([
-        shuffleArray(TOBACCOS).slice(0, 15),
-        shuffleArray(TOBACCOS).slice(0, 15),
-        shuffleArray(TOBACCOS).slice(0, 15),
-      ]);
       setResults([null, null, null]);
       setShowResult(false);
     }
@@ -242,13 +235,6 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
     // Reset
     setShowResult(false);
     setResults([null, null, null]);
-
-    // New random items for reels
-    setReelItems([
-      shuffleArray(TOBACCOS).slice(0, 15),
-      shuffleArray(TOBACCOS).slice(0, 15),
-      shuffleArray(TOBACCOS).slice(0, 15),
-    ]);
 
     // Pick 3 random unique tobaccos for result
     const shuffled = shuffleArray(TOBACCOS);
@@ -278,18 +264,28 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
     }
   };
 
+  // Escape key to close
+  useEffect(() => {
+    if (!isOpen || isSpinning) return
+    const handleKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); onClose() }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [isOpen, isSpinning, onClose])
+
   if (!isOpen) return null;
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-[80] bg-black/80 backdrop-blur-sm transition-opacity"
         onClick={!isSpinning ? onClose : undefined}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[90] flex items-center justify-center p-4" role="dialog" aria-modal="true">
         <div
           className="w-full max-w-md rounded-3xl p-6 animate-bounce-in"
           style={{
@@ -313,7 +309,6 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
             {[0, 1, 2].map((index) => (
               <Reel
                 key={index}
-                items={reelItems[index]}
                 finalItem={results[index]}
                 isSpinning={isSpinning || results[index] === null && results.some((r, i) => i < index && r !== null)}
                 stopDelay={1200 + index * 800}

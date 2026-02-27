@@ -81,10 +81,11 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
           </div>
           <button type="button"
             onClick={onClose}
+            aria-label={t.mixDrawerClear}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors hover:bg-[var(--color-bgHover)]"
             style={{ color: "var(--color-textMuted)" }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
@@ -103,6 +104,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
               fill="none"
               stroke="var(--color-textMuted)"
               strokeWidth="2"
+              aria-hidden="true"
             >
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
@@ -110,6 +112,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
             <input
               type="text"
               placeholder={t.mixDrawerSearchPlaceholder}
+              aria-label={t.mixDrawerSearchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1 bg-transparent outline-none text-sm"
@@ -255,7 +258,11 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
       </div>
 
       {/* Expanded content */}
-      {isExpanded && (
+      <div
+        className="grid transition-all duration-200 ease-out"
+        style={{ gridTemplateRows: isExpanded ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
         <div
           className="px-4 pb-4 pt-2 border-t"
           style={{ borderColor: "var(--color-border)" }}
@@ -320,7 +327,8 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
             {t.mixDrawerApply}
           </button>
         </div>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

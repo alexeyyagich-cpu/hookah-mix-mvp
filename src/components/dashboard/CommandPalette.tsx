@@ -62,7 +62,7 @@ export function CommandPalette() {
   const { isFreeTier } = useSubscription()
   const { modules } = useModules()
 
-  const allItems: SearchItem[] = [
+  const allItems: SearchItem[] = useMemo(() => [
     { name: t.overview, href: '/dashboard', Icon: IconDashboard, permission: 'dashboard.view' },
     { name: t.bossDashboard, href: '/boss', Icon: IconCrown, permission: 'dashboard.view', ownerOnly: true, proOnly: true, group: t.overview },
     { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'floor.view', group: t.operationsGroup },
@@ -84,7 +84,7 @@ export function CommandPalette() {
     { name: t.promotions, href: '/promotions', Icon: IconPercent, permission: 'sessions.view', proOnly: true, group: t.businessGroup },
     { name: t.team, href: '/settings/team', Icon: IconUsers, permission: 'team.view', ownerOnly: true, group: t.settingsGroup },
     { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view', group: t.settingsGroup },
-  ]
+  ], [t])
 
   // Filter by permissions (memoized)
   const accessibleItems = useMemo(() => allItems.filter(item => {

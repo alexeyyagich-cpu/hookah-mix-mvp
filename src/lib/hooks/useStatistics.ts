@@ -452,7 +452,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
       recentTransactions: transactions,
       forecasts,
     }
-  }, [sessions, inventory, transactions])
+  }, [sessions, inventory, transactions, lowStockThreshold])
 
   return {
     statistics,

@@ -34,14 +34,17 @@ function PageProgressBar() {
       setVisible(true)
       setProgress(30)
       clearTimeout(timerRef.current)
-      timerRef.current = setTimeout(() => setProgress(70), 100)
+      clearTimeout(innerTimerRef.current)
       timerRef.current = setTimeout(() => {
-        setProgress(100)
-        innerTimerRef.current = setTimeout(() => {
-          setVisible(false)
-          setProgress(0)
+        setProgress(70)
+        timerRef.current = setTimeout(() => {
+          setProgress(100)
+          innerTimerRef.current = setTimeout(() => {
+            setVisible(false)
+            setProgress(0)
+          }, 200)
         }, 200)
-      }, 300)
+      }, 100)
     }
     return () => { clearTimeout(timerRef.current); clearTimeout(innerTimerRef.current) }
   }, [pathname])

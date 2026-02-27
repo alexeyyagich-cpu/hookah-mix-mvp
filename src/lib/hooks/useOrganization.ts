@@ -169,7 +169,7 @@ export function useOrganization(): UseOrganizationReturn {
       const defaultLocId = memberData.location_id || (locData && locData.length > 0 ? locData[0].id : null)
       setActiveLocationId(prev => prev || defaultLocId)
     } catch (err) {
-      console.error('Error loading organization:', err)
+      if (process.env.NODE_ENV !== 'production') console.error('Error loading organization:', err)
       setError(err instanceof Error ? err.message : 'Failed to load organization')
     } finally {
       setLoading(false)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import type { TobaccoInventory, SupplierProduct, Supplier } from '@/types/database'
 import { IconClose, IconRefresh, IconCheck } from '@/components/Icons'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
@@ -37,11 +37,11 @@ export function AutoReorderModal({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   // Filter products that match the tobacco
-  const matchingProducts = products.filter(p =>
+  const matchingProducts = useMemo(() => products.filter(p =>
     p.brand.toLowerCase() === tobacco.brand.toLowerCase() &&
     p.flavor.toLowerCase() === tobacco.flavor.toLowerCase() &&
     p.in_stock
-  )
+  ), [products, tobacco.brand, tobacco.flavor])
 
   // Reset state when modal opens
   useEffect(() => {

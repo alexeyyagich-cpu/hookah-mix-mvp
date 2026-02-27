@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useSessions } from '@/lib/hooks/useSessions'
+import { useClickOutside } from '@/lib/hooks/useClickOutside'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
 import { IconSmoke, IconCalendar, IconWarning, IconBowl, IconPlus, IconExport, IconLock, IconChart } from '@/components/Icons'
@@ -19,7 +20,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export default function SessionsPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<LoadingSpinner />}>
       <SessionsPageInner />
     </Suspense>
   )
@@ -67,15 +68,7 @@ function SessionsPageInner() {
   }, [selectedSession, closeModal])
 
   // Close export menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
-        setExportMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  useClickOutside(exportMenuRef, () => setExportMenuOpen(false))
 
   const filteredSessions = useMemo(() => filter
     ? sessions.filter(session =>

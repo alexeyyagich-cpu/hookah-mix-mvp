@@ -49,12 +49,14 @@ export default function BossPage() {
   const { reviews, averageRating } = useReviews()
   const { tips } = useTips()
 
-  // Live timer for shift duration (60s interval)
+  // Live timer for shift duration (60s interval) — skip when no active shift
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
+    if (!activeShift) return
+    setNow(Date.now())
     const interval = setInterval(() => setNow(Date.now()), 60000)
     return () => clearInterval(interval)
-  }, [])
+  }, [activeShift])
 
   const shiftDurationMs = activeShift
     ? now - new Date(activeShift.opened_at).getTime()

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
@@ -56,7 +56,7 @@ export function useTelegram(): UseTelegramReturn {
       })
       .catch((err) => {
         if (err instanceof DOMException && err.name === 'AbortError') return
-        console.error('Telegram hook error:', err)
+        if (process.env.NODE_ENV !== 'production') console.error('Telegram hook error:', err)
       })
     return () => controller.abort()
   }, [user, isDemoMode])
@@ -69,16 +69,22 @@ export function useTelegram(): UseTelegramReturn {
     }
   }, [isDemoMode, user])
 
+  const safetyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  // Cleanup safety timer on unmount
+  useEffect(() => () => { clearTimeout(safetyTimerRef.current) }, [])
+
   const fetchConnection = useCallback(async () => {
     if (!user || !supabase) {
       setLoading(false)
       return
     }
 
+    clearTimeout(safetyTimerRef.current)
     setLoading(true)
     setError(null)
 
-    const timeout = setTimeout(() => setLoading(false), 8000)
+    safetyTimerRef.current = setTimeout(() => setLoading(false), 8000)
 
     try {
       const { data, error: fetchError } = await supabase
@@ -93,10 +99,10 @@ export function useTelegram(): UseTelegramReturn {
       setConnection(data || null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load Telegram connection')
+    } finally {
+      clearTimeout(safetyTimerRef.current)
+      setLoading(false)
     }
-
-    clearTimeout(timeout)
-    setLoading(false)
   }, [user, supabase])
 
   useEffect(() => {

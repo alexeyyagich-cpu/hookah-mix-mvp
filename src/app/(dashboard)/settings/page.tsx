@@ -60,6 +60,11 @@ export default function SettingsPage() {
   const [slugSaving, setSlugSaving] = useState(false)
   const [slugMessage, setSlugMessage] = useState('')
   const qrRef = useRef<HTMLCanvasElement>(null)
+  const msgTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const slugMsgTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  // Cleanup message timers on unmount
+  useEffect(() => () => { clearTimeout(msgTimerRef.current); clearTimeout(slugMsgTimerRef.current) }, [])
 
   const menuUrl = venueSlug ? `${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/menu/${venueSlug}` : ''
 
@@ -100,17 +105,21 @@ export default function SettingsPage() {
         setSlugMessage(ts.slugSaved)
         await refreshProfile()
       }
-      setTimeout(() => setSlugMessage(''), TOAST_TIMEOUT)
+      slugMsgTimerRef.current = setTimeout(() => setSlugMessage(''), TOAST_TIMEOUT)
     } finally {
       setSlugSaving(false)
     }
   }, [user, venueSlug, supabase, refreshProfile, ts, tc])
 
-  const handleCopyUrl = useCallback(() => {
-    navigator.clipboard.writeText(menuUrl)
-    setSlugMessage(ts.slugCopied)
-    setTimeout(() => setSlugMessage(''), 2000)
-  }, [menuUrl, ts])
+  const handleCopyUrl = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(menuUrl)
+      setSlugMessage(ts.slugCopied)
+    } catch {
+      setSlugMessage(tc.error)
+    }
+    slugMsgTimerRef.current = setTimeout(() => setSlugMessage(''), 2000)
+  }, [menuUrl, ts, tc])
 
   const handleDownloadQR = useCallback(() => {
     const canvas = qrRef.current
@@ -146,7 +155,7 @@ export default function SettingsPage() {
         setMessage(ts.saved)
         await refreshProfile()
       }
-      setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+      msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } finally {
       setSaving(false)
     }
@@ -172,11 +181,11 @@ export default function SettingsPage() {
       } else {
         const data = await res.json()
         setMessage(tc.error + ': ' + (data.error || ts.deleteError))
-        setTimeout(() => setMessage(''), 5000)
+        msgTimerRef.current = setTimeout(() => setMessage(''), 5000)
       }
     } catch {
       setMessage(ts.deleteError)
-      setTimeout(() => setMessage(''), 5000)
+      msgTimerRef.current = setTimeout(() => setMessage(''), 5000)
     } finally {
       setDeleteLoading(false)
     }
@@ -199,11 +208,11 @@ export default function SettingsPage() {
         window.location.href = data.url
       } else {
         setMessage(tc.error + ': ' + (data.error || ts.portalError))
-        setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+        msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
       }
     } catch (_error) {
       setMessage(ts.portalOpenError)
-      setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+      msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } finally {
       setPortalLoading(false)
     }

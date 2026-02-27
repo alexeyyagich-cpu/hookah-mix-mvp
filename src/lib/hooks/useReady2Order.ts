@@ -47,10 +47,13 @@ export function useReady2Order(): UseReady2OrderReturn {
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
   const pollIntervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const mountedRef = useRef(true)
 
-  // Cleanup popup polling timers on unmount
+  // Cleanup popup polling timers on unmount + mounted guard
   useEffect(() => {
+    mountedRef.current = true
     return () => {
+      mountedRef.current = false
       clearInterval(pollIntervalRef.current)
       clearTimeout(pollTimeoutRef.current)
     }
@@ -177,6 +180,7 @@ export function useReady2Order(): UseReady2OrderReturn {
         throw new Error(data.error || 'Failed to disconnect POS')
       }
 
+      if (!mountedRef.current) return
       setConnection(null)
       setSyncResult(null)
     } catch (err) {
@@ -209,6 +213,7 @@ export function useReady2Order(): UseReady2OrderReturn {
         throw new Error(data.error || 'Sync failed')
       }
 
+      if (!mountedRef.current) return
       setSyncResult(data)
       setConnection(prev => prev ? { ...prev, last_sync_at: new Date().toISOString() } : null)
     } catch (err) {

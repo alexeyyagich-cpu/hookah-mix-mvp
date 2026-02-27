@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
+import { useClickOutside } from '@/lib/hooks/useClickOutside'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useStatistics } from '@/lib/hooks/useStatistics'
@@ -73,15 +74,7 @@ export default function StatisticsPage() {
   const exportMenuRef = useRef<HTMLDivElement>(null)
 
   // Close export menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
-        setExportMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  useClickOutside(exportMenuRef, () => setExportMenuOpen(false))
 
   const handlePeriodChange = (period: typeof selectedPeriod) => {
     setSelectedPeriod(period)
