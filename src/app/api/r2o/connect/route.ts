@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check subscription (Pro+ required)
+    // Check subscription (Core+ required)
     const { data: profile } = await supabase
       .from('profiles')
       .select('subscription_tier, subscription_expires_at')
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     if (!profile || profile.subscription_tier === 'trial') {
       return NextResponse.json(
-        { error: 'Pro subscription required for POS integration' },
+        { error: 'Core subscription required for POS integration' },
         { status: 403 }
       )
     }
