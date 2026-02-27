@@ -116,7 +116,7 @@ async function main() {
       owner_name: OWNER_NAME,
       phone: '+7 999 123-45-67',
       address: 'ул. Арбат 24, Москва',
-      subscription_tier: 'free',
+      subscription_tier: 'trial',
       role: 'owner',
       onboarding_completed: true,
       onboarding_skipped: false,
@@ -131,7 +131,7 @@ async function main() {
     const { error: retry } = await supabase.from('profiles').update({
       business_name: BUSINESS_NAME, owner_name: OWNER_NAME,
       phone: '+7 999 123-45-67', address: 'ул. Арбат 24, Москва',
-      subscription_tier: 'free', role: 'owner',
+      subscription_tier: 'trial', role: 'owner',
       onboarding_completed: true, onboarding_skipped: false, onboarding_step: 'complete',
     }).eq('id', userId)
     if (retry) { console.error('❌ Profile update retry failed:', retry.message); process.exit(1) }

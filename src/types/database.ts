@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'pro' | 'enterprise'
+export type SubscriptionTier = 'trial' | 'core' | 'multi' | 'enterprise'
 
 // Organization roles (multi-tenant system)
 export type OrgRole = 'owner' | 'manager' | 'hookah_master' | 'bartender' | 'cook'
@@ -28,6 +28,8 @@ export interface Profile {
   // Stripe integration
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
+  // Trial
+  trial_expires_at: string | null
   // Onboarding state
   onboarding_completed: boolean
   onboarding_skipped: boolean
@@ -52,6 +54,7 @@ export interface Organization {
   logo_url: string | null
   subscription_tier: SubscriptionTier
   subscription_expires_at: string | null
+  trial_expires_at: string | null
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
   created_at: string
@@ -967,45 +970,50 @@ export interface Cart {
   subtotal: number
 }
 
-// Subscription limits
+// Subscription limits — single source of truth
+// trial = same as core (full access for 14 days)
+// core = single-location hookah lounge (€79/mo)
+// multi = multi-location + CRM + waiter + analytics (€149/mo)
+// enterprise = multi + API + custom integrations (from €299/mo)
+const CORE_LIMITS = {
+  inventory_items: Infinity,
+  bowl_types: Infinity,
+  session_history_days: Infinity,
+  export: true,
+  api_access: false,
+  marketplace: false,
+  auto_reorder: false,
+  pos_integration: true,
+  guest_qr_ordering: true,
+  bar_module: true,
+  bar_inventory_items: Infinity,
+  max_locations: 1,
+  crm: false,
+  waiter_tablet: false,
+  financial_reports: false,
+} as const
+
+const MULTI_LIMITS = {
+  inventory_items: Infinity,
+  bowl_types: Infinity,
+  session_history_days: Infinity,
+  export: true,
+  api_access: true,
+  marketplace: true,
+  auto_reorder: true,
+  pos_integration: true,
+  guest_qr_ordering: true,
+  bar_module: true,
+  bar_inventory_items: Infinity,
+  max_locations: Infinity,
+  crm: true,
+  waiter_tablet: true,
+  financial_reports: true,
+} as const
+
 export const SUBSCRIPTION_LIMITS = {
-  free: {
-    inventory_items: 10,
-    bowl_types: 3,
-    session_history_days: 14,
-    export: false,
-    api_access: false,
-    marketplace: false,
-    auto_reorder: false,
-    pos_integration: false,
-    guest_qr_ordering: false,
-    bar_module: true,
-    bar_inventory_items: 10,
-  },
-  pro: {
-    inventory_items: Infinity,
-    bowl_types: Infinity,
-    session_history_days: Infinity,
-    export: true,
-    api_access: true,
-    marketplace: false,
-    auto_reorder: false,
-    pos_integration: true,
-    guest_qr_ordering: true,
-    bar_module: true,
-    bar_inventory_items: Infinity,
-  },
-  enterprise: {
-    inventory_items: Infinity,
-    bowl_types: Infinity,
-    session_history_days: Infinity,
-    export: true,
-    api_access: true,
-    marketplace: false,
-    auto_reorder: false,
-    pos_integration: true,
-    guest_qr_ordering: true,
-    bar_module: true,
-    bar_inventory_items: Infinity,
-  },
+  trial: CORE_LIMITS,
+  core: CORE_LIMITS,
+  multi: MULTI_LIMITS,
+  enterprise: MULTI_LIMITS,
 } as const

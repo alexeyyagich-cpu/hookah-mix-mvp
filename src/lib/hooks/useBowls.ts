@@ -47,7 +47,7 @@ export function useBowls(): UseBowlsReturn {
   }, [isDemoMode, user])
 
   // Determine limits based on subscription
-  const tier = profile?.subscription_tier || 'free'
+  const tier = profile?.subscription_tier || 'trial'
   const bowlsLimit = SUBSCRIPTION_LIMITS[tier].bowl_types
   const canAddMore = bowls.length < bowlsLimit
 

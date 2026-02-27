@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (!profile || profile.subscription_tier === 'free') {
+    if (!profile || profile.subscription_tier === 'trial') {
       return NextResponse.json(
         { error: 'Pro subscription required for POS integration' },
         { status: 403 }

@@ -183,7 +183,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
 async function updateUserSubscription(userId: string, subscription: Stripe.Subscription) {
   const priceId = subscription.items.data[0]?.price.id
-  const tier = priceId ? PRICE_TO_TIER[priceId] : 'free'
+  const tier = priceId ? PRICE_TO_TIER[priceId] : 'trial'
   const status = subscription.status
 
   // Only update if subscription is active or trialing
@@ -198,7 +198,7 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
     const { error } = await supabase
       .from('profiles')
       .update({
-        subscription_tier: tier || 'pro',
+        subscription_tier: tier || 'core',
         subscription_expires_at: expiresAt,
         stripe_subscription_id: subscription.id,
       })
@@ -213,7 +213,7 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
     await supabase
       .from('profiles')
       .update({
-        subscription_tier: 'free',
+        subscription_tier: 'trial',
         subscription_expires_at: null,
         stripe_subscription_id: status === 'canceled' ? null : subscription.id,
       })
@@ -240,7 +240,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const { error } = await supabase
     .from('profiles')
     .update({
-      subscription_tier: 'free',
+      subscription_tier: 'trial',
       subscription_expires_at: null,
       stripe_subscription_id: null,
     })

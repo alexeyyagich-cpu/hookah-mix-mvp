@@ -53,7 +53,7 @@ export function useInventory(): UseInventoryReturn {
   }, [isDemoMode, user])
 
   // Determine limits based on subscription
-  const tier = profile?.subscription_tier || 'free'
+  const tier = profile?.subscription_tier || 'trial'
   const itemsLimit = SUBSCRIPTION_LIMITS[tier].inventory_items
   const canAddMore = inventory.length < itemsLimit
 

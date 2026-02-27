@@ -24,7 +24,7 @@ interface UseSubscriptionReturn {
 export function useSubscription(): UseSubscriptionReturn {
   const { profile } = useAuth()
 
-  const tier: SubscriptionTier = profile?.subscription_tier || 'free'
+  const tier: SubscriptionTier = profile?.subscription_tier || 'trial'
   const limits = SUBSCRIPTION_LIMITS[tier]
 
   const expiresAt = profile?.subscription_expires_at
@@ -37,14 +37,14 @@ export function useSubscription(): UseSubscriptionReturn {
     ? Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : null
 
-  // If subscription is expired, treat as free tier
-  const effectiveTier = isExpired ? 'free' : tier
+  // If subscription is expired, treat as trial tier
+  const effectiveTier: SubscriptionTier = isExpired ? 'trial' : tier
   const effectiveLimits = SUBSCRIPTION_LIMITS[effectiveTier]
 
   return {
     tier: effectiveTier,
-    isFreeTier: effectiveTier === 'free',
-    isProTier: effectiveTier === 'pro',
+    isFreeTier: effectiveTier === 'trial',
+    isProTier: effectiveTier === 'core',
     isEnterpriseTier: effectiveTier === 'enterprise',
     limits: effectiveLimits,
     isExpired,

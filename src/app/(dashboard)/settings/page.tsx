@@ -218,7 +218,7 @@ export default function SettingsPage() {
     }
   }
 
-  const hasActiveSubscription = profile?.stripe_subscription_id && tier !== 'free'
+  const hasActiveSubscription = profile?.stripe_subscription_id && tier !== 'trial'
 
   const sections = [
     { id: 'general', label: ts.sectionGeneral },
@@ -293,7 +293,7 @@ export default function SettingsPage() {
           <div>
             <h2 className="text-lg font-semibold mb-1">{ts.subscription}</h2>
             <div className="flex items-center gap-2">
-              <span className={`badge ${tier === 'free' ? 'badge-warning' : 'badge-success'}`}>
+              <span className={`badge ${tier === 'trial' ? 'badge-warning' : 'badge-success'}`}>
                 {tier.toUpperCase()}
               </span>
               {isExpired && (
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                 </span>
               )}
             </div>
-            {tier === 'free' && (
+            {tier === 'trial' && (
               <p className="text-sm text-[var(--color-textMuted)] mt-2">
                 {ts.upgradeForFull}
               </p>
@@ -328,7 +328,7 @@ export default function SettingsPage() {
               </button>
             ) : (
               <Link href="/pricing" className="btn btn-primary">
-                {tier === 'free' ? tc.upgrade : ts.changePlan}
+                {tier === 'trial' ? tc.upgrade : ts.changePlan}
               </Link>
             )}
           </div>

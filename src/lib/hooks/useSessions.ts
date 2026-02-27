@@ -164,8 +164,8 @@ export function useSessions(): UseSessionsReturn {
   }, [isDemoMode, user])
 
   // Determine history limit based on subscription
-  const tier = profile?.subscription_tier || 'free'
-  const historyDays = tier === 'free' ? 30 : null // null = unlimited
+  const tier = profile?.subscription_tier || 'trial'
+  const historyDays = tier === 'trial' ? 30 : null // null = unlimited
 
   const fetchSessions = useCallback(async () => {
     if (!user || !supabase) {

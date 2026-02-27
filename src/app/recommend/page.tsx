@@ -43,7 +43,7 @@ export default function RecommendPage() {
   const { user, profile } = useAuth()
   const { inventory, loading: inventoryLoading } = useInventory()
   const { guests, loading: guestsLoading, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
-  const isPro = profile?.subscription_tier === 'pro'
+  const isPro = profile?.subscription_tier !== 'trial'
 
   // Selected preferences
   const [selectedStrength, setSelectedStrength] = useState<StrengthPreference | null>(null)

@@ -24,13 +24,14 @@ const DEMO_PROFILE: Profile = {
   phone: '+48 22 345 6789',
   address: 'ul. Nowy Swiat 42, Warsaw',
   logo_url: null,
-  subscription_tier: 'pro', // Pro for full demo experience
+  subscription_tier: 'multi', // Multi for full demo experience
   subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   role: 'owner', // Demo user is owner by default
   owner_profile_id: null,
   venue_slug: null,
   stripe_customer_id: null,
   stripe_subscription_id: null,
+  trial_expires_at: null,
   // Onboarding completed for demo
   onboarding_completed: true,
   onboarding_skipped: false,

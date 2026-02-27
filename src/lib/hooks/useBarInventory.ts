@@ -81,7 +81,7 @@ export function useBarInventory(): UseBarInventoryReturn {
   }, [isDemoMode, user])
 
   // Subscription limits
-  const tier = profile?.subscription_tier || 'free'
+  const tier = profile?.subscription_tier || 'trial'
   const itemsLimit = SUBSCRIPTION_LIMITS[tier].bar_inventory_items
   const canAddMore = inventory.length < itemsLimit
 
