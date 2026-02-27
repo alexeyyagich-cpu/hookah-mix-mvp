@@ -160,6 +160,13 @@ export const auth = {
   planDescFree: 'Для небольших заведений',
   planDescPro: 'Для активных заведений',
   planDescEnterprise: 'Для сетей заведений',
+  planDescTrial: '14 дней — полный доступ бесплатно',
+  planDescCore: 'Для одного заведения',
+  planDescMulti: 'Для нескольких локаций',
+
+  // Pricing page — Contact / Enterprise
+  contactSales: 'Связаться с нами',
+  priceFrom: (price: string) => `от ${price}/мес`,
 
   // Pricing page — Feature names
   featureInventoryItems: 'Позиций в инвентаре',
@@ -178,6 +185,11 @@ export const auth = {
   featureKds: 'Доска заказов (KDS)',
   featureWaiterTablet: 'Режим официанта',
   featureAllFromPro: 'Всё из Pro',
+  featureAllFromCore: 'Всё из Core',
+  featureAllFromMulti: 'Всё из Multi',
+  featureOneLocation: '1 локация',
+  featureSla: 'SLA гарантия',
+  featureOnboarding: 'Помощь с настройкой',
   featureUnlimitedLocations: 'Неограниченные локации',
   featureAutoOrder: 'Авто-заказ табака',
   featureCustomIntegrations: 'Кастомные интеграции',

@@ -12,28 +12,10 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 // Stripe price IDs (from environment)
 const STRIPE_PRICES = {
-  pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY,
-  pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY,
-  enterprise_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_MONTHLY,
-  enterprise_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_YEARLY,
-}
-
-// Plans are built inside component to use i18n keys
-const PLAN_CONFIG = {
-  free: { priceMonthly: 0, priceYearly: 0 },
-  pro: {
-    priceMonthly: 2900,
-    priceYearly: 27900,
-    stripePriceMonthly: STRIPE_PRICES.pro_monthly,
-    stripePriceYearly: STRIPE_PRICES.pro_yearly,
-    isPopular: true,
-  },
-  enterprise: {
-    priceMonthly: 8900,
-    priceYearly: 85900,
-    stripePriceMonthly: STRIPE_PRICES.enterprise_monthly,
-    stripePriceYearly: STRIPE_PRICES.enterprise_yearly,
-  },
+  core_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_MONTHLY,
+  core_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_YEARLY,
+  multi_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_MULTI_MONTHLY,
+  multi_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_MULTI_YEARLY,
 }
 
 function PricingPageContent() {
@@ -43,59 +25,75 @@ function PricingPageContent() {
 
   const plans = [
     {
-      id: 'free',
-      name: 'Free',
-      priceMonthly: PLAN_CONFIG.free.priceMonthly,
-      priceYearly: PLAN_CONFIG.free.priceYearly,
-      description: ta.planDescFree,
+      id: 'trial' as const,
+      name: 'Trial',
+      priceMonthly: 0,
+      priceYearly: 0,
+      description: ta.planDescTrial,
       features: [
-        { name: ta.featureInventoryItems, value: '10', included: true },
+        { name: ta.featureInventoryItems, value: '\u221E', included: true },
+        { name: ta.featureBowlTypes, value: '\u221E', included: true },
         { name: ta.featureSessionHistory, value: ta.featureSessionDays('14'), included: true },
-        { name: ta.featureBowlTypes, value: '3', included: true },
-        { name: ta.featureBasicStats, included: true },
         { name: ta.featureBarModule, included: true },
+        { name: ta.featureKds, included: true },
+        { name: ta.featureExportCsvPdf, included: true },
+        { name: ta.featureOneLocation, included: true },
       ],
     },
     {
-      id: 'pro',
-      name: 'Pro',
-      priceMonthly: PLAN_CONFIG.pro.priceMonthly,
-      priceYearly: PLAN_CONFIG.pro.priceYearly,
-      stripePriceMonthly: PLAN_CONFIG.pro.stripePriceMonthly,
-      stripePriceYearly: PLAN_CONFIG.pro.stripePriceYearly,
-      description: ta.planDescPro,
+      id: 'core' as const,
+      name: 'Core',
+      priceMonthly: 7900,
+      priceYearly: 79000,
+      stripePriceMonthly: STRIPE_PRICES.core_monthly,
+      stripePriceYearly: STRIPE_PRICES.core_yearly,
+      description: ta.planDescCore,
       features: [
         { name: ta.featureInventoryItems, value: '\u221E', included: true },
-        { name: ta.featureSessionHistory, value: '\u221E', included: true },
         { name: ta.featureBowlTypes, value: '\u221E', included: true },
+        { name: ta.featureSessionHistory, value: '\u221E', included: true },
         { name: ta.featureFullStats, included: true },
         { name: ta.featureBarModule, included: true },
         { name: ta.featureCocktailRecipes, included: true },
         { name: ta.featureKds, included: true },
         { name: ta.featureTeamManagement, included: true },
         { name: ta.featureExportCsvPdf, included: true },
-        { name: ta.featureEmailNotifications, included: true },
+        { name: ta.featureOneLocation, included: true },
       ],
       isPopular: true,
     },
     {
-      id: 'enterprise',
-      name: 'Enterprise',
-      priceMonthly: PLAN_CONFIG.enterprise.priceMonthly,
-      priceYearly: PLAN_CONFIG.enterprise.priceYearly,
-      stripePriceMonthly: PLAN_CONFIG.enterprise.stripePriceMonthly,
-      stripePriceYearly: PLAN_CONFIG.enterprise.stripePriceYearly,
-      description: ta.planDescEnterprise,
+      id: 'multi' as const,
+      name: 'Multi',
+      priceMonthly: 14900,
+      priceYearly: 149000,
+      stripePriceMonthly: STRIPE_PRICES.multi_monthly,
+      stripePriceYearly: STRIPE_PRICES.multi_yearly,
+      description: ta.planDescMulti,
       features: [
-        { name: ta.featureAllFromPro, value: '+', included: true },
+        { name: ta.featureAllFromCore, value: '+', included: true },
         { name: ta.featureWaiterTablet, included: true },
         { name: ta.featureGuestCrm, included: true },
         { name: ta.featureFinancialReports, included: true },
         { name: ta.featureShiftManagement, included: true },
         { name: ta.featureUnlimitedLocations, included: true },
         { name: ta.featureApiAccess, included: true },
-        { name: ta.featurePrioritySupport, included: true },
       ],
+    },
+    {
+      id: 'enterprise' as const,
+      name: 'Enterprise',
+      priceMonthly: 29900, // "from" price
+      priceYearly: 0,
+      description: ta.planDescEnterprise,
+      features: [
+        { name: ta.featureAllFromMulti, value: '+', included: true },
+        { name: ta.featureCustomIntegrations, included: true },
+        { name: ta.featurePrioritySupport, included: true },
+        { name: ta.featureSla, included: true },
+        { name: ta.featureOnboarding, included: true },
+      ],
+      isEnterprise: true,
     },
   ]
   const { tier } = useSubscription()
@@ -117,13 +115,19 @@ function PricingPageContent() {
   const canceled = searchParams.get('canceled')
 
   const handleSelectPlan = async (plan: typeof plans[0]) => {
-    // Free plan - just redirect to register or dashboard
-    if (plan.id === 'free') {
+    // Trial plan - redirect to register or dashboard
+    if (plan.id === 'trial') {
       if (user) {
         window.location.href = '/dashboard'
       } else {
         window.location.href = '/register'
       }
+      return
+    }
+
+    // Enterprise - contact sales
+    if (plan.id === 'enterprise') {
+      window.location.href = 'mailto:htorus@hookahtorus.com?subject=Enterprise%20Plan'
       return
     }
 
@@ -168,7 +172,7 @@ function PricingPageContent() {
     }
   }
 
-  const yearlyDiscount = Math.round((1 - 27900 / (2900 * 12)) * 100)
+  const yearlyDiscount = Math.round((1 - 79000 / (7900 * 12)) * 100)
 
   return (
     <ErrorBoundary sectionName="Pricing">
@@ -203,7 +207,7 @@ function PricingPageContent() {
       </header>
 
       {/* Content */}
-      <main className="max-w-6xl mx-auto px-4 py-16">
+      <main className="max-w-7xl mx-auto px-4 py-16">
         {/* Canceled message */}
         {canceled && (
           <div className="mb-8 p-4 rounded-xl bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 text-center">
@@ -260,16 +264,21 @@ function PricingPageContent() {
         )}
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {plans.map((plan) => {
-            const price = isYearly ? plan.priceYearly : plan.priceMonthly
+            const isEnterprise = 'isEnterprise' in plan && plan.isEnterprise
+            const price = plan.priceYearly === 0 && plan.priceMonthly > 0
+              ? plan.priceMonthly // Enterprise: show "from" price
+              : isYearly ? plan.priceYearly : plan.priceMonthly
             const priceDisplay = price === 0
-              ? ta.priceFree
-              : isYearly
-                ? ta.pricePerYear(`${(price / 100).toFixed(0)}\u20AC`)
-                : ta.pricePerMonth(`${(price / 100).toFixed(0)}\u20AC`)
+              ? plan.id === 'trial' ? ta.priceFree : ta.contactSales
+              : isEnterprise
+                ? ta.priceFrom(`${(price / 100).toFixed(0)}\u20AC`)
+                : isYearly
+                  ? ta.pricePerYear(`${(price / 100).toFixed(0)}\u20AC`)
+                  : ta.pricePerMonth(`${(price / 100).toFixed(0)}\u20AC`)
 
-            const monthlyEquivalent = isYearly && price > 0
+            const monthlyEquivalent = isYearly && price > 0 && !isEnterprise
               ? ta.priceMonthlyEquiv(`${Math.round(price / 12 / 100)}\u20AC`)
               : null
 
@@ -288,9 +297,11 @@ function PricingPageContent() {
                 buttonText={
                   tier === plan.id
                     ? tm.currentPlan
-                    : price === 0
-                      ? ta.startFree
-                      : ta.subscribe
+                    : isEnterprise
+                      ? ta.contactSales
+                      : price === 0
+                        ? ta.startFree
+                        : ta.subscribe
                 }
               />
             )

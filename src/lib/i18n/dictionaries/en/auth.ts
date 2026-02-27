@@ -156,6 +156,12 @@ export const auth: typeof AuthType = {
   planDescFree: 'For small venues',
   planDescPro: 'For active venues',
   planDescEnterprise: 'For venue chains',
+  planDescTrial: '14 days — full access for free',
+  planDescCore: 'For a single location',
+  planDescMulti: 'For multiple locations',
+
+  contactSales: 'Contact Sales',
+  priceFrom: (price: string) => `from ${price}/mo`,
 
   // Pricing page — Feature names
   featureInventoryItems: 'Inventory items',
@@ -174,6 +180,11 @@ export const auth: typeof AuthType = {
   featureKds: 'Order board (KDS)',
   featureWaiterTablet: 'Waiter mode',
   featureAllFromPro: 'Everything from Pro',
+  featureAllFromCore: 'Everything from Core',
+  featureAllFromMulti: 'Everything from Multi',
+  featureOneLocation: '1 location',
+  featureSla: 'SLA guarantee',
+  featureOnboarding: 'Onboarding assistance',
   featureUnlimitedLocations: 'Unlimited locations',
   featureAutoOrder: 'Auto-order tobacco',
   featureCustomIntegrations: 'Custom integrations',

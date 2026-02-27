@@ -156,6 +156,12 @@ export const auth: typeof AuthType = {
   planDescFree: 'Für kleine Lokale',
   planDescPro: 'Für aktive Lokale',
   planDescEnterprise: 'Für Lokalketten',
+  planDescTrial: '14 Tage — voller Zugang kostenlos',
+  planDescCore: 'Für eine Filiale',
+  planDescMulti: 'Für mehrere Standorte',
+
+  contactSales: 'Kontakt aufnehmen',
+  priceFrom: (price: string) => `ab ${price}/Monat`,
 
   // Pricing page — Feature names
   featureInventoryItems: 'Inventarpositionen',
@@ -174,6 +180,11 @@ export const auth: typeof AuthType = {
   featureKds: 'Bestelltafel (KDS)',
   featureWaiterTablet: 'Kellner-Modus',
   featureAllFromPro: 'Alles aus Pro',
+  featureAllFromCore: 'Alles aus Core',
+  featureAllFromMulti: 'Alles aus Multi',
+  featureOneLocation: '1 Standort',
+  featureSla: 'SLA-Garantie',
+  featureOnboarding: 'Onboarding-Unterstützung',
   featureUnlimitedLocations: 'Unbegrenzte Standorte',
   featureAutoOrder: 'Auto-Bestellung Tabak',
   featureCustomIntegrations: 'Benutzerdefinierte Integrationen',
