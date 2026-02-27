@@ -131,7 +131,7 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Order Items">
       <div className="space-y-6">
         <div className="h-6 bg-[var(--color-bgHover)] rounded w-32 animate-pulse" />
         <div className="card p-6 animate-pulse">
@@ -145,7 +145,7 @@ export default function OrderDetailPage() {
 
   if (!order) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Order Status">
       <div className="space-y-6">
         <Link
           href="/marketplace/orders"
@@ -169,7 +169,7 @@ export default function OrderDetailPage() {
   const statusAction = STATUS_ACTIONS[order.status]
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Order Detail">
     <div className="space-y-6">
       {/* Back link */}
       <Link

@@ -11,7 +11,7 @@ import type {
   StaffRowEnriched,
 } from '@/types/dashboard-control'
 
-const DEMO_SNAPSHOT: DashboardControlSnapshot = {
+const DEMO_SNAPSHOT = {
   tobacco_usage: {
     total_grams_today: 38,
     cost_today: 6.46,
@@ -69,7 +69,7 @@ const DEMO_SNAPSHOT: DashboardControlSnapshot = {
     bar_margin_pct: 73.5,
     combined_margin_pct: 76.7,
   },
-}
+} as const satisfies DashboardControlSnapshot
 
 function enrichStaffRows(rows: DashboardControlSnapshot['staff_comparison']): StaffRowEnriched[] {
   if (rows.length === 0) return []
@@ -100,6 +100,7 @@ interface UseDashboardControlReturn {
   data: DashboardControlSnapshot | null
   staffEnriched: StaffRowEnriched[]
   loading: boolean
+  refreshing: boolean
   error: string | null
   refresh: () => Promise<void>
 }
@@ -107,6 +108,7 @@ interface UseDashboardControlReturn {
 export function useDashboardControl(): UseDashboardControlReturn {
   const [data, setData] = useState<DashboardControlSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { user, isDemoMode } = useAuth()
   const { organizationId } = useOrganizationContext()
@@ -120,12 +122,13 @@ export function useDashboardControl(): UseDashboardControlReturn {
   }, [isDemoMode, user])
 
   const fetchSnapshot = useCallback(async () => {
-    if (!user || !supabase) {
+    if (isDemoMode || !user || !supabase) {
       setLoading(false)
       return
     }
 
-    setLoading(true)
+    if (!data) setLoading(true)
+    setRefreshing(true)
     setError(null)
 
     try {
@@ -142,10 +145,11 @@ export function useDashboardControl(): UseDashboardControlReturn {
       setData(result as DashboardControlSnapshot)
     } catch (err) {
       setError(translateError(err as Error))
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
     }
-
-    setLoading(false)
-  }, [user, supabase, organizationId])
+  }, [isDemoMode, user, supabase, organizationId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isDemoMode) fetchSnapshot()
@@ -179,6 +183,7 @@ export function useDashboardControl(): UseDashboardControlReturn {
     data,
     staffEnriched,
     loading,
+    refreshing,
     error,
     refresh: fetchSnapshot,
   }

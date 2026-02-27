@@ -15,7 +15,7 @@ import {
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export function ControlDashboard() {
-  const { data, staffEnriched, loading, error } = useDashboardControl()
+  const { data, staffEnriched, loading, refreshing, error } = useDashboardControl()
   const { isHookahActive, isBarActive } = useModules()
   const t = useTranslation('manage')
   const { locale } = useLocale()
@@ -46,6 +46,11 @@ export function ControlDashboard() {
 
   return (
     <div className="space-y-6">
+      {refreshing && (
+        <div className="flex justify-center">
+          <div className="w-4 h-4 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
       {/* Row 1: Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard

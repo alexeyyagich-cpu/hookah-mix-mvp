@@ -50,8 +50,9 @@ export function getClientIp(request: NextRequest): string {
     return realIp
   }
 
-  // Fallback
-  return 'unknown'
+  // Fallback: include user-agent prefix to reduce bucket collision
+  // when multiple clients lack IP headers (rare on Vercel where x-forwarded-for is always set)
+  return 'anon-' + (request.headers.get('user-agent')?.slice(0, 50) || 'no-ua')
 }
 
 export async function checkRateLimit(

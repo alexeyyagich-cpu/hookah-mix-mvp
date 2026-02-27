@@ -12,6 +12,27 @@ interface BrandPieChartProps {
   data: BrandData[]
 }
 
+function polarToCartesian(cx: number, cy: number, r: number, angle: number) {
+  const radians = ((angle - 90) * Math.PI) / 180
+  return {
+    x: cx + r * Math.cos(radians),
+    y: cy + r * Math.sin(radians),
+  }
+}
+
+function createArcPath(startAngle: number, endAngle: number, radius: number) {
+  const start = polarToCartesian(50, 50, radius, endAngle)
+  const end = polarToCartesian(50, 50, radius, startAngle)
+  const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1
+
+  return [
+    'M', start.x, start.y,
+    'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+    'L', 50, 50,
+    'Z'
+  ].join(' ')
+}
+
 // Chart data-series palette — intentionally not theme-variable
 const COLORS = [
   '#F59E0B', // primary
@@ -52,34 +73,12 @@ export function BrandPieChart({ data }: BrandPieChartProps) {
     return segment
   })
 
-  // Create SVG paths
-  const createArcPath = (startAngle: number, endAngle: number, radius: number) => {
-    const start = polarToCartesian(50, 50, radius, endAngle)
-    const end = polarToCartesian(50, 50, radius, startAngle)
-    const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1
-
-    return [
-      'M', start.x, start.y,
-      'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-      'L', 50, 50,
-      'Z'
-    ].join(' ')
-  }
-
-  const polarToCartesian = (cx: number, cy: number, r: number, angle: number) => {
-    const radians = ((angle - 90) * Math.PI) / 180
-    return {
-      x: cx + r * Math.cos(radians),
-      y: cy + r * Math.sin(radians),
-    }
-  }
-
   return (
     <div className="flex items-center gap-6" role="img" aria-label={`${t.chartTotal}: ${total.toFixed(0)}g — ${segments.slice(0, 3).map(s => `${s.brand} ${s.percentage.toFixed(0)}%`).join(', ')}`}>
       {/* Pie Chart */}
       <div className="relative w-40 h-40 flex-shrink-0">
         <svg viewBox="0 0 100 100" className="w-full h-full" aria-hidden="true">
-          {segments.map((segment, index) => (
+          {segments.map((segment) => (
             <path
               key={segment.brand}
               d={createArcPath(segment.startAngle, segment.endAngle, 40)}
@@ -109,13 +108,14 @@ export function BrandPieChart({ data }: BrandPieChartProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex-1 space-y-2">
+      <div className="flex-1 space-y-2" role="list" aria-label={t.chartTotal}>
         {segments.slice(0, 6).map((segment) => (
-          <div key={segment.brand} className="flex items-center justify-between text-sm">
+          <div key={segment.brand} role="listitem" className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: segment.color }}
+                aria-hidden="true"
               />
               <span className="font-medium">{segment.brand}</span>
             </div>

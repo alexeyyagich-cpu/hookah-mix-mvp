@@ -60,7 +60,10 @@ export function ConfirmDialog({
   useEffect(() => {
     if (!visible) return
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose()
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        handleClose()
+      }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
@@ -91,8 +94,9 @@ export function ConfirmDialog({
           <button type="button"
             ref={confirmRef}
             data-testid="confirm-dialog-confirm"
-            onClick={onConfirm}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-80 ${
+            disabled={isClosing}
+            onClick={() => { if (!isClosing) onConfirm() }}
+            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-50 disabled:pointer-events-none ${
               danger
                 ? 'bg-[var(--color-danger)] text-white'
                 : 'bg-[var(--color-primary)] text-[var(--color-bg)]'

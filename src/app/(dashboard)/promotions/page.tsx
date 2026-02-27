@@ -43,7 +43,7 @@ export default function PromotionsPage() {
 
   if (isFreeTier) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Promotion Form">
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.promosTitle}</h1>
         <EmptyState
@@ -114,7 +114,7 @@ export default function PromotionsPage() {
   const promoTypeLabel = (t: PromoType) => tm[`promoType_${t}` as keyof typeof tm] as string
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Promotions">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

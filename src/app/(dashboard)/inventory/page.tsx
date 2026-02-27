@@ -71,13 +71,13 @@ export default function InventoryPage() {
 
   // Close export menu when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: PointerEvent) {
       if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
         setExportMenuOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('pointerdown', handleClickOutside)
+    return () => document.removeEventListener('pointerdown', handleClickOutside)
   }, [])
 
   const handleExport = (format: 'csv' | 'pdf') => {
@@ -128,6 +128,7 @@ export default function InventoryPage() {
   const totalGrams = useMemo(() => inventory.reduce((sum, item) => sum + item.quantity_grams, 0), [inventory])
 
   return (
+    <ErrorBoundary sectionName="Inventory">
     <div className="space-y-6 relative">
       <PageBackground image="/images/inventory-bg.jpg" position="center top" />
 
@@ -145,6 +146,8 @@ export default function InventoryPage() {
             <button type="button"
               onClick={() => canExport && setExportMenuOpen(!exportMenuOpen)}
               disabled={!canExport || inventory.length === 0}
+              aria-haspopup="menu"
+              aria-expanded={exportMenuOpen}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               title={canExport ? t.exportInventory : t.availableOnPro}
             >
@@ -153,8 +156,9 @@ export default function InventoryPage() {
             </button>
 
             {exportMenuOpen && canExport && (
-              <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
+              <div role="menu" className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-lg z-50 overflow-hidden">
                 <button type="button"
+                  role="menuitem"
                   onClick={() => handleExport('csv')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors"
                 >
@@ -162,6 +166,7 @@ export default function InventoryPage() {
                   {t.exportCSV}
                 </button>
                 <button type="button"
+                  role="menuitem"
                   onClick={() => handleExport('pdf')}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--color-bgHover)] flex items-center gap-2 transition-colors border-t border-[var(--color-border)]"
                 >
@@ -365,5 +370,6 @@ export default function InventoryPage() {
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
+    </ErrorBoundary>
   )
 }

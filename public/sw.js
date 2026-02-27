@@ -34,23 +34,15 @@ const NON_CRITICAL_URLS = [
 
 // Install event — precache app shell (critical fail-hard, non-critical fail-soft)
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing', CACHE_NAME)
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       // Critical routes MUST succeed — reject install if they fail
       await cache.addAll(CRITICAL_URLS)
-      console.log('[SW] Critical routes cached:', CRITICAL_URLS.length)
 
       // Non-critical routes — best-effort, each individually
-      const results = await Promise.allSettled(
-        NON_CRITICAL_URLS.map((url) =>
-          cache.add(url).catch((err) => {
-            console.warn('[SW] Non-critical precache skipped:', url, err.message)
-          })
-        )
+      await Promise.allSettled(
+        NON_CRITICAL_URLS.map((url) => cache.add(url))
       )
-      const cached = results.filter((r) => r.status === 'fulfilled').length
-      console.log(`[SW] Non-critical routes cached: ${cached}/${NON_CRITICAL_URLS.length}`)
     })
     // No outer .catch() — if critical routes fail, install rejects and old SW stays active
   )
@@ -59,7 +51,6 @@ self.addEventListener('install', (event) => {
 
 // Activate event — clean up old caches + verify critical routes
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating', CACHE_NAME)
   event.waitUntil(
     caches.keys().then(async (cacheNames) => {
       // Delete old caches
@@ -70,7 +61,13 @@ self.addEventListener('activate', (event) => {
       )
 
       // Health check: verify critical routes are cached
-      const cache = await caches.open(CACHE_NAME)
+      let cache
+      try {
+        cache = await caches.open(CACHE_NAME)
+      } catch {
+        return clients.claim()
+      }
+
       for (const url of CRITICAL_URLS) {
         const cached = await cache.match(url)
         if (!cached) {
@@ -78,7 +75,7 @@ self.addEventListener('activate', (event) => {
           try {
             await cache.add(url)
           } catch (err) {
-            console.error('[SW] Health check failed for', url, err)
+            console.error('[SW] Health check failed for', url, 'version:', CACHE_NAME, err?.message)
           }
         }
       }
@@ -154,8 +151,6 @@ self.addEventListener('fetch', (event) => {
 
 // Push event - handle incoming push notifications
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push received')
-
   let data = {
     title: 'Hookah Torus',
     body: 'New notification',
@@ -222,15 +217,9 @@ self.addEventListener('notificationclick', (event) => {
   )
 })
 
-// Handle notification close
-self.addEventListener('notificationclose', (event) => {
-  console.log('[SW] Notification closed')
-})
-
 // Background Sync — triggered by OS when connectivity is restored
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-mutations') {
-    console.log('[SW] Background sync triggered: sync-mutations')
     event.waitUntil(
       clients.matchAll({ type: 'window', includeUncontrolled: true })
         .then((windowClients) => {

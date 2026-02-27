@@ -4,6 +4,17 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconTimer } from '@/components/Icons'
 
+function formatTime(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600)
+  const mins = Math.floor((totalSeconds % 3600) / 60)
+  const secs = totalSeconds % 60
+
+  if (hours > 0) {
+    return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
+
 interface SessionTimerProps {
   onDurationChange?: (minutes: number) => void
   notificationMinutes?: number
@@ -22,27 +33,23 @@ export function SessionTimer({
   const [isRunning, setIsRunning] = useState(autoStart)
   const [notificationSent, setNotificationSent] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const onDurationChangeRef = useRef(onDurationChange)
+  const notificationSentRef = useRef(false)
+  const sendNotificationRef = useRef<() => void>(() => {})
 
-  const formatTime = (totalSeconds: number): string => {
-    const hours = Math.floor(totalSeconds / 3600)
-    const mins = Math.floor((totalSeconds % 3600) / 60)
-    const secs = totalSeconds % 60
-
-    if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  // Keep refs in sync
+  useEffect(() => { onDurationChangeRef.current = onDurationChange })
+  useEffect(() => {
+    sendNotificationRef.current = () => {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Hookah Torus', {
+          body: t.sessionNotification(notificationMinutes),
+          icon: '/icons/icon-192x192.png',
+          tag: 'session-timer',
+        })
+      }
     }
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
-
-  const sendNotification = useCallback(() => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Hookah Torus', {
-        body: t.sessionNotification(notificationMinutes),
-        icon: '/icons/icon-192x192.png',
-        tag: 'session-timer',
-      })
-    }
-  }, [notificationMinutes])
+  })
 
   useEffect(() => {
     if (isRunning) {
@@ -52,14 +59,15 @@ export function SessionTimer({
           const minutes = Math.floor(newSeconds / 60)
 
           // Send notification at configured time
-          if (!notificationSent && minutes >= notificationMinutes) {
-            sendNotification()
+          if (!notificationSentRef.current && minutes >= notificationMinutes) {
+            sendNotificationRef.current()
+            notificationSentRef.current = true
             setNotificationSent(true)
           }
 
           // Report duration change
-          if (onDurationChange && newSeconds % 60 === 0) {
-            onDurationChange(minutes)
+          if (onDurationChangeRef.current && newSeconds % 60 === 0) {
+            onDurationChangeRef.current(minutes)
           }
 
           return newSeconds
@@ -72,7 +80,7 @@ export function SessionTimer({
         clearInterval(intervalRef.current)
       }
     }
-  }, [isRunning, notificationMinutes, notificationSent, onDurationChange, sendNotification])
+  }, [isRunning, notificationMinutes])
 
   const handleStart = () => {
     setIsRunning(true)
@@ -86,13 +94,14 @@ export function SessionTimer({
     setIsRunning(false)
     setSeconds(0)
     setNotificationSent(false)
-    onDurationChange?.(0)
+    notificationSentRef.current = false
+    onDurationChangeRef.current?.(0)
   }
 
   const handleStop = () => {
     setIsRunning(false)
     const minutes = Math.ceil(seconds / 60)
-    onDurationChange?.(minutes)
+    onDurationChangeRef.current?.(minutes)
     return minutes
   }
 
@@ -255,7 +264,18 @@ export function SessionTimer({
 }
 
 // Hook for using session timer state imperatively
-export function useSessionTimer(notificationMinutes = 45) {
+interface UseSessionTimerReturn {
+  seconds: number
+  isRunning: boolean
+  minutes: number
+  formatted: string
+  start: () => void
+  pause: () => void
+  reset: () => void
+  getDurationMinutes: () => number
+}
+
+export function useSessionTimer(notificationMinutes = 45): UseSessionTimerReturn {
   const [seconds, setSeconds] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -283,7 +303,7 @@ export function useSessionTimer(notificationMinutes = 45) {
     seconds,
     isRunning,
     minutes: Math.floor(seconds / 60),
-    formatted: `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`,
+    formatted: formatTime(seconds),
     start,
     pause,
     reset,

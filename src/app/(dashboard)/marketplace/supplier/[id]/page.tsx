@@ -50,7 +50,7 @@ export default function SupplierPage() {
 
   if (!loading && !supplier) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Supplier Products">
       <div className="space-y-6">
         <Link
           href="/marketplace"
@@ -72,7 +72,7 @@ export default function SupplierPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Supplier">
     <div className="space-y-6">
       {/* Back link */}
       <Link

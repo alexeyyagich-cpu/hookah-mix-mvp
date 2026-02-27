@@ -104,18 +104,18 @@ export default function BossPage() {
 
   // Owner guard — wait for org data to load before checking
   if (orgLoading) return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Boss">
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
     </div>
     </ErrorBoundary>
   )
-  if (!isOwner) return <ErrorBoundary><AccessDenied /></ErrorBoundary>
+  if (!isOwner) return <ErrorBoundary sectionName="Boss"><AccessDenied /></ErrorBoundary>
 
   // Pro guard
   if (isFreeTier) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Boss Reports">
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.bossProRequired}</h1>
         <EmptyState
@@ -132,7 +132,7 @@ export default function BossPage() {
   const lowStockThreshold = notifSettings?.low_stock_threshold ?? LOW_STOCK_THRESHOLD
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Boss">
     <div className="space-y-4 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">

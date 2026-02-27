@@ -33,7 +33,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Marketplace Orders">
     <div className="space-y-6">
       {/* Back link */}
       <Link

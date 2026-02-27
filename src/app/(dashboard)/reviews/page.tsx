@@ -43,7 +43,7 @@ export default function ReviewsPage() {
 
   if (loading) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Review Form">
       <div className="space-y-6">
         <div className="h-8 w-48 bg-[var(--color-bgHover)] rounded animate-pulse" />
         <div className="grid gap-4">
@@ -57,7 +57,7 @@ export default function ReviewsPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Reviews">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

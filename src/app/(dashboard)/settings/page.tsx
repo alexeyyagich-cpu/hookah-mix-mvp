@@ -226,7 +226,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Settings">
     <div className="space-y-6 max-w-2xl">
       {/* Header */}
       <div>

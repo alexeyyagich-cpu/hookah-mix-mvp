@@ -182,7 +182,7 @@ export default function OnboardingPage() {
 
   if (loading) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Onboarding Form">
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
       </div>
@@ -214,7 +214,7 @@ export default function OnboardingPage() {
   )
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Onboarding">
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[var(--color-bg)]">
       {/* Progress bar */}
       {state.currentStep !== 'complete' && (

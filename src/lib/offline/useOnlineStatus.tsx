@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+
 import { getPendingCount, getFailedCount } from './db'
 import { processSyncQueue } from './syncEngine'
 import { createClient } from '@/lib/supabase/client'
@@ -31,13 +32,21 @@ export function OnlineStatusProvider({ children }: { children: React.ReactNode }
   const [isSyncing, setIsSyncing] = useState(false)
   const syncingRef = useRef(false)
 
-  // Track online/offline
+  // Track online/offline with debounce to prevent flickering on flaky connections
+  const onlineTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    const handleOnline = () => {
+      clearTimeout(onlineTimerRef.current)
+      onlineTimerRef.current = setTimeout(() => setIsOnline(true), 1000)
+    }
+    const handleOffline = () => {
+      clearTimeout(onlineTimerRef.current)
+      onlineTimerRef.current = setTimeout(() => setIsOnline(false), 300)
+    }
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
     return () => {
+      clearTimeout(onlineTimerRef.current)
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }

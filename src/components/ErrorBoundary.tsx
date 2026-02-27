@@ -37,7 +37,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(`ErrorBoundary [${this.props.sectionName || 'unknown'}]:`, error, errorInfo)
+    console.error(
+      `ErrorBoundary [${this.props.sectionName || 'unknown'}] at ${new Date().toISOString()}:`,
+      error.message,
+      errorInfo.componentStack?.slice(0, 200)
+    )
   }
 
   render() {

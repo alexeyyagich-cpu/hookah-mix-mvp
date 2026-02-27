@@ -39,13 +39,13 @@ export default function TeamPage() {
 
   // Only owners can access this page — wait for org data to load
   if (orgLoading) return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Team Settings">
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
     </div>
     </ErrorBoundary>
   )
-  if (!isOwner) return <ErrorBoundary><AccessDenied /></ErrorBoundary>
+  if (!isOwner) return <ErrorBoundary sectionName="Team Settings"><AccessDenied /></ErrorBoundary>
 
   const getRoleLabel = (role: OrgRole) => {
     const labels = ORG_ROLE_LABELS[role]
@@ -123,7 +123,7 @@ export default function TeamPage() {
 
   if (loading) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Team Invite">
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" />
       </div>
@@ -132,7 +132,7 @@ export default function TeamPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Team Settings">
     <div className="space-y-6 max-w-3xl">
       {/* Back link */}
       <Link

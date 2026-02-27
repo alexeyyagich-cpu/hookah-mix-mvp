@@ -72,7 +72,7 @@ export default function AutoReorderPage() {
   // Paywall for non-enterprise users
   if (!canUseAutoReorder) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Auto Reorder Form">
       <div className="space-y-6">
         <Link
           href="/marketplace"
@@ -100,7 +100,7 @@ export default function AutoReorderPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Auto Reorder">
     <div className="space-y-6">
       {/* Back link */}
       <Link

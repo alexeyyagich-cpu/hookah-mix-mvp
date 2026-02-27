@@ -11,7 +11,7 @@ import {
   IconTarget,
   IconCalendar,
 } from '@/components/Icons'
-import { useTranslation } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { LoungeFeature } from '@/types/lounge'
 
 // Fallback demo reviews (used when no real reviews loaded)
@@ -68,6 +68,7 @@ const FEATURE_ICONS: Record<LoungeFeature, string> = {
 export default function LoungePageClient({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const t = useTranslation('hookah')
+  const { locale } = useLocale()
   const { lounge, mixes, loading, error } = usePublicLounge(slug)
   const { reviews: realReviews, submitReview, submitting: reviewSubmitting } = usePublicReviews(lounge?.profile_id)
 
@@ -79,7 +80,7 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
     friday: t.loungeDayFri,
     saturday: t.loungeDaySat,
     sunday: t.loungeDaySun,
-  }), [t])
+  }), [t, locale])
 
   const FEATURE_LABELS: Record<LoungeFeature, string> = useMemo(() => ({
     wifi: t.featureWifi,
@@ -95,7 +96,7 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
     playstation: t.featurePlaystation,
     hookah_delivery: t.featureHookahDelivery,
     reservations: t.featureReservations,
-  }), [t])
+  }), [t, locale])
 
   if (loading) {
     return (

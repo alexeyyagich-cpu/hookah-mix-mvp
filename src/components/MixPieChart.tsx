@@ -127,10 +127,11 @@ export default function MixPieChart({ items, size = 200 }: Props) {
       </div>
 
       {/* Legend */}
-      <div className="w-full space-y-2">
+      <div className="w-full space-y-2" role="list" aria-label="Mix composition">
         {paths.map((p) => (
           <div
             key={p.id}
+            role="listitem"
             className="flex items-center justify-between p-2 rounded-lg transition-all hover:scale-[1.02]"
             style={{ background: `color-mix(in srgb, ${p.color} 10%, var(--color-bgHover))` }}
           >

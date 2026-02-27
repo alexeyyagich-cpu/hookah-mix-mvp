@@ -132,7 +132,7 @@ export default function BowlsPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Bowls">
     <div className="space-y-6 relative">
       <PageBackground image={backgroundImage} />
 

@@ -122,7 +122,7 @@ function SessionsPageInner() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Sessions">
     <div className="space-y-6 relative">
       <PageBackground image="/images/sessions-bg.jpg" />
 

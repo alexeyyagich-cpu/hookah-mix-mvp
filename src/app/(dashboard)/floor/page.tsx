@@ -341,7 +341,7 @@ function FloorPageInner() {
   useEffect(() => () => { clearTimeout(serveTimerRef.current); clearTimeout(qrTimerRef.current) }, [])
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Floor Plan">
     <div className="space-y-6">
       {/* Header */}
       <div>

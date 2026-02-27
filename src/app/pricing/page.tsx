@@ -171,7 +171,7 @@ function PricingPageContent() {
   const yearlyDiscount = Math.round((1 - 27900 / (2900 * 12)) * 100)
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Pricing">
     <div className="min-h-screen">
       {/* Header */}
       <header className="p-4 border-b border-[var(--color-border)]">

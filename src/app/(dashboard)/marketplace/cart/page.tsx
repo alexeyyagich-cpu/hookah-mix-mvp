@@ -43,7 +43,7 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Cart Form">
       <div className="space-y-6">
         <Link
           href="/marketplace"
@@ -65,7 +65,7 @@ export default function CartPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Marketplace Cart">
     <div className="space-y-6">
       {/* Back link */}
       <Link

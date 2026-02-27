@@ -80,7 +80,7 @@ export default function GuestsPage() {
 
   if (isFreeTier) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Guest Form">
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.guestsTitle}</h1>
         <EmptyState
@@ -95,7 +95,7 @@ export default function GuestsPage() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Guests">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

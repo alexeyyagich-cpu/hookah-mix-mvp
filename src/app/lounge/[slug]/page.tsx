@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import LoungePageClient from './LoungePageClient'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 function getSupabase() {
   return createClient(
@@ -80,7 +81,9 @@ export default async function LoungePage({ params }: { params: Promise<{ slug: s
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
       )}
-      <LoungePageClient params={params} />
+      <ErrorBoundary sectionName="Lounge">
+        <LoungePageClient params={params} />
+      </ErrorBoundary>
     </>
   )
 }

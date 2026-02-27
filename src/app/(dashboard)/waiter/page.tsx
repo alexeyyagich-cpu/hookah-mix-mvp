@@ -218,7 +218,7 @@ export default function WaiterPage() {
   // Pro guard
   if (isFreeTier) {
     return (
-      <ErrorBoundary>
+      <ErrorBoundary sectionName="Waiter Form">
       <div className="space-y-6">
         <h1 className="text-2xl font-bold">{tm.waiterProRequired}</h1>
         <EmptyState
@@ -235,7 +235,7 @@ export default function WaiterPage() {
   const showTabs = isBarActive && isHookahActive
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary sectionName="Waiter">
     <div className="max-w-lg mx-auto pb-32">
       {/* Header */}
       <div className="mb-4">
