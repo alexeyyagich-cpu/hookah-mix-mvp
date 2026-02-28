@@ -23,7 +23,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 export default function SettingsPage() {
   const { user, profile, refreshProfile, signOut, isDemoMode } = useAuth()
   const { tier, isExpired, daysUntilExpiry, trialDaysLeft, canUsePOS } = useSubscription()
-  const { modules, isHookahActive, isBarActive, canActivateBar, toggleModule, loading: modulesLoading } = useModules()
+  const { isHookahActive, isBarActive, toggleModule, loading: modulesLoading } = useModules()
   const { connection: r2oConnection, loading: r2oLoading, error: r2oError, syncing: r2oSyncing, syncResult: r2oSyncResult, connect: r2oConnect, disconnect: r2oDisconnect, sync: r2oSync, refresh: r2oRefresh } = useReady2Order()
   const searchParams = useSearchParams()
   const { locale, setLocale } = useLocale()
@@ -243,7 +243,7 @@ export default function SettingsPage() {
         setMessage(tc.error + ': ' + (data.error || ts.portalError))
         msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
       }
-    } catch (_error) {
+    } catch {
       setMessage(ts.portalOpenError)
       msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } finally {

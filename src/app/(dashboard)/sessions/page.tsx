@@ -31,7 +31,7 @@ function SessionsPageInner() {
   const tc = useTranslation('common')
   const { locale } = useLocale()
   const { sessions, loading, error, updateSession, deleteSession } = useSessions()
-  const { isTrialTier, isTrialExpired: needsUpgrade, canExport } = useSubscription()
+  const { canExport } = useSubscription()
 
   const searchParams = useSearchParams()
   const router = useRouter()

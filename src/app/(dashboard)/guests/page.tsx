@@ -22,7 +22,7 @@ const TIER_ORDER: Record<LoyaltyTier, number> = { gold: 3, silver: 2, bronze: 1 
 export default function GuestsPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
-  const { guests, loading, error, addGuest, updateGuest, deleteGuest, recordVisit } = useGuests()
+  const { guests, loading, error, addGuest, updateGuest, deleteGuest } = useGuests()
   const { settings: loyaltySettings, updateSettings, getBonusHistory } = useLoyalty()
   const { canUseCRM } = useSubscription()
 

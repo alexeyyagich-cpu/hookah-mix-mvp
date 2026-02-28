@@ -35,7 +35,6 @@ export default function InventoryPage() {
     deleteTobacco,
     adjustQuantity,
     canAddMore,
-    itemsLimit,
   } = useInventory()
   const { canExport } = useSubscription()
   const [importModalOpen, setImportModalOpen] = useState(false)

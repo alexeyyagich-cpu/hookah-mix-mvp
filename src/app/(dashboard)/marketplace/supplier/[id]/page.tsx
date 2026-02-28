@@ -18,7 +18,7 @@ export default function SupplierPage() {
   const params = useParams()
   const supplierId = params.id as string
 
-  const { suppliers, loading: suppliersLoading, getSupplier } = useSuppliers()
+  const { loading: suppliersLoading, getSupplier } = useSuppliers()
   const { products, loading: productsLoading, brands } = useSupplierProducts({ supplierId })
   const {
     cart,
