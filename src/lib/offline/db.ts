@@ -18,6 +18,7 @@ export interface SyncQueueEntry {
   status: 'pending' | 'syncing' | 'failed'
   retryCount: number
   error: string | null
+  lastAttemptAt?: string
   idempotencyKey?: string
   meta?: Record<string, unknown> // compound mutation data (related entities, adjustments)
 }
@@ -135,7 +136,10 @@ export async function updateMutationStatus(
   if (!entry) return
   entry.status = status
   if (error !== undefined) entry.error = error
-  if (status === 'failed' || status === 'pending') entry.retryCount += 1
+  if (status === 'failed' || status === 'pending') {
+    entry.retryCount += 1
+    entry.lastAttemptAt = new Date().toISOString()
+  }
   await db.put('syncQueue', entry)
 }
 

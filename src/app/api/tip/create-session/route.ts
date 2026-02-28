@@ -1,22 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { tipCreateSessionSchema, validateBody } from '@/lib/validation'
-
-let supabaseAdmin: SupabaseClient | null = null
-
-function getSupabaseAdmin(): SupabaseClient {
-  if (!supabaseAdmin) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !key) {
-      throw new Error('Supabase is not configured')
-    }
-    supabaseAdmin = createClient(url, key)
-  }
-  return supabaseAdmin
-}
 
 export async function POST(request: NextRequest) {
   // Rate limit: strict (10/min per IP) for payment session creation
@@ -60,6 +46,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    if (!appUrl) {
+      return NextResponse.json({ error: 'Application URL not configured' }, { status: 500 })
+    }
+
     // If Stripe is configured, create a Checkout session
     if (stripe) {
       const session = await stripe.checkout.sessions.create({
@@ -82,8 +73,8 @@ export async function POST(request: NextRequest) {
           message: safeMessage,
           type: 'tip',
         },
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/tip/${slug}?success=true`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/tip/${slug}`,
+        success_url: `${appUrl}/tip/${slug}?success=true`,
+        cancel_url: `${appUrl}/tip/${slug}`,
       })
 
       return NextResponse.json({ url: session.url })

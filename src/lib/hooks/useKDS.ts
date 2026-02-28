@@ -164,6 +164,7 @@ export function useKDS(): UseKDSReturn {
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
   const lastNewCountRef = useRef(0)
   const audioUnlockedRef = useRef(false)
+  const audioCtxRef = useRef<AudioContext | null>(null)
 
   // Effective profile ID: staff uses owner's ID for venue grouping (legacy fallback)
   const effectiveProfileId = useMemo(() => {
@@ -172,7 +173,11 @@ export function useKDS(): UseKDSReturn {
 
   const playBeep = useCallback(() => {
     try {
-      const ctx = new AudioContext()
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioContext()
+      }
+      const ctx = audioCtxRef.current
+      if (ctx.state === 'suspended') ctx.resume()
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
       osc.type = 'sine'
@@ -183,7 +188,6 @@ export function useKDS(): UseKDSReturn {
       gain.connect(ctx.destination)
       osc.start()
       osc.stop(ctx.currentTime + 0.15)
-      setTimeout(() => ctx.close(), 200)
     } catch {
       // AudioContext may not be available
     }

@@ -423,43 +423,16 @@ export function useSessions(): UseSessionsReturn {
       return true
     }
 
-    // Reverse inventory deductions before deleting
+    // Fetch transactions first (for inventory reversal data + IDs for cleanup)
     const { data: transactions } = await supabase
       .from('inventory_transactions')
-      .select('tobacco_inventory_id, quantity_grams')
+      .select('id, tobacco_inventory_id, quantity_grams')
       .eq('session_id', id)
       .eq('type', 'session')
 
-    if (transactions) {
-      for (const tx of transactions) {
-        if (tx.tobacco_inventory_id && tx.quantity_grams < 0) {
-          try {
-            await supabase.rpc('decrement_tobacco_inventory', {
-              p_inventory_id: tx.tobacco_inventory_id,
-              p_grams_used: tx.quantity_grams, // negative value → increments stock back
-            })
-          } catch {
-            if (process.env.NODE_ENV !== 'production') console.error('Reverse inventory failed for', tx.tobacco_inventory_id)
-          }
-        }
-      }
-    }
-
-    // Delete session items (best-effort — continue to session delete)
-    try {
-      await supabase.from('session_items').delete().eq('session_id', id)
-    } catch {
-      if (process.env.NODE_ENV !== 'production') console.error('Failed to delete session items for', id)
-    }
-
-    // Delete related inventory transactions (best-effort)
-    try {
-      await supabase.from('inventory_transactions').delete().eq('session_id', id)
-    } catch {
-      if (process.env.NODE_ENV !== 'production') console.error('Failed to delete inventory transactions for', id)
-    }
-
-    // Delete session
+    // Delete session FIRST — cascades to session_items (ON DELETE CASCADE),
+    // sets inventory_transactions.session_id to NULL (ON DELETE SET NULL).
+    // If this fails, nothing else is touched — safe to retry.
     const { error: deleteError } = await supabase
       .from('sessions')
       .delete()
@@ -469,6 +442,28 @@ export function useSessions(): UseSessionsReturn {
     if (deleteError) {
       setError(translateError(deleteError))
       return false
+    }
+
+    // Session deleted — now reverse inventory (best-effort, data already safe)
+    if (transactions) {
+      for (const tx of transactions) {
+        if (tx.tobacco_inventory_id && tx.quantity_grams < 0) {
+          try {
+            await supabase.rpc('decrement_tobacco_inventory', {
+              p_inventory_id: tx.tobacco_inventory_id,
+              p_grams_used: tx.quantity_grams, // negative value → increments stock back
+            })
+          } catch {
+            console.error('Reverse inventory failed for', tx.tobacco_inventory_id)
+          }
+        }
+      }
+
+      // Clean up orphaned inventory transactions by ID (session_id is now NULL)
+      const txIds = transactions.map(tx => tx.id).filter(Boolean)
+      if (txIds.length > 0) {
+        await supabase.from('inventory_transactions').delete().in('id', txIds)
+      }
     }
 
     await fetchSessions()

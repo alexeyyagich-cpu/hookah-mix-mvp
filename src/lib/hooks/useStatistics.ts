@@ -270,13 +270,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
         sessionsQuery = sessionsQuery.eq('location_id', locationId)
       }
 
-      const { data: sessionsData, error: sessionsError } = await sessionsQuery
-
-      if (sessionsError) throw sessionsError
-      if (fetchId !== fetchIdRef.current) return // stale
-      setSessions((sessionsData || []) as unknown as SessionWithItems[])
-
-      // Fetch inventory
+      // Build inventory query
       let inventoryQuery = supabase
         .from('tobacco_inventory')
         .select('id, profile_id, tobacco_id, brand, flavor, quantity_grams, purchase_price, package_grams, purchase_date, expiry_date, notes, created_at, updated_at')
@@ -286,13 +280,7 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
         inventoryQuery = inventoryQuery.eq('location_id', locationId)
       }
 
-      const { data: inventoryData, error: inventoryError } = await inventoryQuery
-
-      if (inventoryError) throw inventoryError
-      if (fetchId !== fetchIdRef.current) return // stale
-      setInventory(inventoryData || [])
-
-      // Fetch recent transactions
+      // Build transactions query
       let transactionsQuery = supabase
         .from('inventory_transactions')
         .select('id, profile_id, tobacco_inventory_id, type, quantity_grams, session_id, notes, idempotency_key, created_at')
@@ -304,11 +292,21 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
         transactionsQuery = transactionsQuery.eq('location_id', locationId)
       }
 
-      const { data: transactionsData, error: transactionsError } = await transactionsQuery
+      // Run all three queries in parallel
+      const [sessionsResult, inventoryResult, transactionsResult] = await Promise.all([
+        sessionsQuery,
+        inventoryQuery,
+        transactionsQuery,
+      ])
 
-      if (transactionsError) throw transactionsError
+      if (sessionsResult.error) throw sessionsResult.error
+      if (inventoryResult.error) throw inventoryResult.error
+      if (transactionsResult.error) throw transactionsResult.error
       if (fetchId !== fetchIdRef.current) return // stale
-      setTransactions(transactionsData || [])
+
+      setSessions((sessionsResult.data || []) as unknown as SessionWithItems[])
+      setInventory(inventoryResult.data || [])
+      setTransactions(transactionsResult.data || [])
     } catch (err) {
       if (fetchId !== fetchIdRef.current) return // stale
       setError(translateError(err as Error))

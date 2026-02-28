@@ -1,21 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import Stripe from 'stripe'
-
-let supabaseAdmin: SupabaseClient | null = null
-
-function getSupabaseAdmin(): SupabaseClient {
-  if (!supabaseAdmin) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !key) {
-      throw new Error('Supabase is not configured')
-    }
-    supabaseAdmin = createClient(url, key)
-  }
-  return supabaseAdmin
-}
 
 export const runtime = 'nodejs'
 

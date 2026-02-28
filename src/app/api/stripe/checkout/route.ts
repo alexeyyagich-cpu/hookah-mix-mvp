@@ -1,26 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripe, STRIPE_PRICES } from '@/lib/stripe'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { stripeCheckoutSchema, validateBody } from '@/lib/validation'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
-
-// Create admin Supabase client for server-side operations (lazy init)
-let supabaseAdmin: SupabaseClient | null = null
-
-function getSupabaseAdmin(): SupabaseClient {
-  if (!supabaseAdmin) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !key) {
-      throw new Error('Supabase is not configured')
-    }
-    supabaseAdmin = createClient(url, key)
-  }
-  return supabaseAdmin
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -90,6 +75,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    if (!appUrl) {
+      return NextResponse.json({ error: 'Application URL not configured' }, { status: 500 })
+    }
+
     // Check if user already has a Stripe customer ID
     const supabase = getSupabaseAdmin()
     const { data: profile } = await supabase
@@ -102,8 +92,8 @@ export async function POST(request: NextRequest) {
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
+      success_url: `${appUrl}/settings?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/pricing?canceled=true`,
       metadata: { supabase_user_id: userId },
       subscription_data: { metadata: { supabase_user_id: userId } },
       allow_promotion_codes: true,
@@ -123,10 +113,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url })
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error('Stripe checkout error:', message, error)
+    console.error('Stripe checkout error:', error)
     return NextResponse.json(
-      { error: `Checkout failed: ${message}` },
+      { error: 'Checkout failed. Please try again.' },
       { status: 500 }
     )
   }

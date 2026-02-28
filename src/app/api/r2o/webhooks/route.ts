@@ -64,6 +64,16 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true })
       }
 
+      // Idempotency: skip if this invoice was already processed
+      const { data: existingLog } = await supabaseAdmin
+        .from('r2o_sales_log')
+        .select('id', { count: 'exact', head: true })
+        .eq('profile_id', profileId)
+        .eq('r2o_invoice_id', invoiceData.invoice_id)
+      if (existingLog && existingLog.length > 0) {
+        return NextResponse.json({ received: true, duplicate: true })
+      }
+
       const { data: mappings } = await supabaseAdmin
         .from('r2o_product_mappings')
         .select('r2o_product_id, tobacco_inventory_id')
