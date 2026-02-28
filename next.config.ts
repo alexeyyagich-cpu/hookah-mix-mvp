@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const securityHeaders = [
   {
@@ -38,7 +39,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://*.ingest.sentry.io",
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
       "media-src 'self'",
       "object-src 'none'",
@@ -62,4 +63,18 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Suppress logs during build
+  silent: true,
+
+  // Upload source maps for better stack traces
+  widenClientFileUpload: true,
+
+  // Hide source maps from users
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+
+  // Tree-shake Sentry logger statements
+  disableLogger: true,
+});
