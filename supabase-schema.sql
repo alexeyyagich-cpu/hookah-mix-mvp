@@ -1261,6 +1261,7 @@ CREATE TABLE IF NOT EXISTS public.shifts (
   organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
   location_id UUID REFERENCES public.locations(id) ON DELETE SET NULL,
   opened_by UUID REFERENCES auth.users(id) NOT NULL,
+  opened_by_name TEXT,
   opened_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   closed_at TIMESTAMPTZ,
   starting_cash DECIMAL,
