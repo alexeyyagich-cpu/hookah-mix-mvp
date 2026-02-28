@@ -60,6 +60,9 @@ export function MenuSection({
     )
   }, [search])
 
+  const selectedIds = useMemo(() => new Set(tobaccos.map(t => t.tobacco.id)), [tobaccos])
+  const inventoryByTobaccoId = useMemo(() => new Map(inventory.map(i => [i.tobacco_id, i])), [inventory])
+
   // Bar tab
   if (activeTab === 'bar') {
     const menuRecipes = recipes.filter(r => r.is_on_menu)
@@ -137,9 +140,6 @@ export function MenuSection({
   }
 
   // Hookah tab
-  const selectedIds = useMemo(() => new Set(tobaccos.map(t => t.tobacco.id)), [tobaccos])
-  const inventoryByTobaccoId = useMemo(() => new Map(inventory.map(i => [i.tobacco_id, i])), [inventory])
-
   return (
     <div className="space-y-3">
       {/* Mode toggle */}
