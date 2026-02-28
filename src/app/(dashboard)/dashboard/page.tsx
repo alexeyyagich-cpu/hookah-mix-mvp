@@ -20,7 +20,7 @@ import Link from 'next/link'
 export default function DashboardPage() {
   const { profile } = useAuth()
   const { isHookahActive, isBarActive } = useModules()
-  const { isTrialTier, needsUpgrade } = useSubscription()
+  const { isTrialTier } = useSubscription()
   const th = useTranslation('hookah')
   const tc = useTranslation('common')
 

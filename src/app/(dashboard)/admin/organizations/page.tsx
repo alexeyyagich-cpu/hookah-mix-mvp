@@ -15,7 +15,7 @@ const TIER_COLORS: Record<SubscriptionTier, string> = {
 }
 
 export default function AdminOrganizations() {
-  const { isSuperAdmin, user } = useAuth()
+  const { isSuperAdmin } = useAuth()
   const [orgs, setOrgs] = useState<AdminOrganization[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

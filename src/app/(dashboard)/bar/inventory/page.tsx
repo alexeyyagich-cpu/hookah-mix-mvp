@@ -21,7 +21,6 @@ export default function BarInventoryPage() {
     deleteIngredient,
     adjustQuantity,
     canAddMore,
-    itemsLimit,
   } = useBarInventory()
 
   const [modalOpen, setModalOpen] = useState(false)

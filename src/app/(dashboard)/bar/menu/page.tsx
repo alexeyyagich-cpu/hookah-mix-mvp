@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import Link from 'next/link'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
@@ -26,7 +25,6 @@ export default function BarMenuPage() {
     beer: tb.glassBeer, copper_mug: tb.glassCopperMug, tiki: tb.glassTiki,
     other: tb.glassOther,
   }
-  const DIFFICULTY_LABELS: Record<number, string> = { 1: tb.easy, 2: tb.medium, 3: tb.hard }
   const PORTION_LABELS: Record<string, string> = {
     ml: tb.portionMl, g: tb.portionG, pcs: tb.portionPcs,
     oz: tb.portionOz, cl: tb.portionCl, dash: tb.portionDash,

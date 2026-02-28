@@ -74,7 +74,4 @@ export default withSentryConfig(nextConfig, {
   sourcemaps: {
     deleteSourcemapsAfterUpload: true,
   },
-
-  // Tree-shake Sentry logger statements
-  disableLogger: true,
 });

@@ -32,7 +32,6 @@ export default function BowlsPage() {
     deleteBowl,
     setDefaultBowl,
     canAddMore,
-    bowlsLimit,
   } = useBowls()
 
   const [modalOpen, setModalOpen] = useState(false)
