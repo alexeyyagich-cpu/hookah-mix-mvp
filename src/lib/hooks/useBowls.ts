@@ -9,6 +9,7 @@ import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BowlType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
+import { useTranslation } from '@/lib/i18n'
 // Demo data for testing
 const DEMO_BOWLS: BowlType[] = [
   { id: '1', profile_id: 'demo', name: 'Phunnel Large', capacity_grams: 20, is_default: true, created_at: new Date().toISOString() },
@@ -36,6 +37,7 @@ export function useBowls(): UseBowlsReturn {
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
+  const th = useTranslation('hookah')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -104,7 +106,7 @@ export function useBowls(): UseBowlsReturn {
   ): Promise<BowlType | null> => {
     if (!user) return null
     if (!canAddMore) {
-      setError(`Limit reached (${bowlsLimit} bowls). Upgrade your plan to add more.`)
+      setError(th.freeTierLimit(bowlsLimit))
       return null
     }
 
@@ -156,6 +158,7 @@ export function useBowls(): UseBowlsReturn {
       return null
     }
 
+    setError(null)
     await fetchBowls()
     return data
   }
@@ -254,6 +257,7 @@ export function useBowls(): UseBowlsReturn {
       return false
     }
 
+    setError(null)
     await fetchBowls()
     return true
   }

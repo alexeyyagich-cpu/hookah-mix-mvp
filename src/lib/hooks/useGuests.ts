@@ -380,6 +380,7 @@ export function useGuests(): UseGuestsReturn {
       return null
     }
 
+    setError(null)
     await fetchGuests()
     return data
   }

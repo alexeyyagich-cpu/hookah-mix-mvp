@@ -41,15 +41,16 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
   useEffect(() => () => clearTimeout(timerRef.current), [])
 
   const handleClose = useCallback(() => {
+    if (isClosing) return
     setIsClosing(true)
     timerRef.current = setTimeout(() => {
       setVisible(false)
       setIsClosing(false)
       onClose()
     }, 200)
-  }, [onClose])
+  }, [onClose, isClosing])
 
-  useFocusTrap(dialogRef, true, handleClose)
+  useFocusTrap(dialogRef, visible, handleClose)
 
   const handleConfirm = async () => {
     setLoading(true)

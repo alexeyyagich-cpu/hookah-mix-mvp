@@ -216,6 +216,7 @@ export function useBarSales(): UseBarSalesReturn {
         }
       }
 
+      setError(null)
       setSales(prev => [data, ...prev])
       return data
     } catch (err) {
@@ -244,6 +245,7 @@ export function useBarSales(): UseBarSalesReturn {
         return false
       }
 
+      setError(null)
       setSales(prev => prev.filter(s => s.id !== id))
       return true
     } catch (err) {
