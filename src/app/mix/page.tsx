@@ -724,9 +724,9 @@ function MixPageInner() {
           )}
         </div>
 
-        <div className="grid lg:grid-cols-[1fr,400px] gap-6">
+        <div className="grid lg:grid-cols-[1fr,360px] gap-6">
           {/* Left Column */}
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
             {/* Tobacco Selection */}
             <section className="card card-elevated p-5">
               <div className="flex items-center justify-between mb-5">
@@ -759,42 +759,44 @@ function MixPageInner() {
               {/* Compact filter bar */}
               <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b" style={{ borderColor: "var(--color-border)" }}>
                 {/* Brand dropdown */}
-                <select
-                  value={selectedBrand ?? ""}
-                  onChange={e => setSelectedBrand(e.target.value || null)}
-                  className="pill cursor-pointer appearance-none pr-7 text-sm"
-                  style={{
-                    background: selectedBrand ? "var(--color-primary)" : "var(--color-bgHover)",
-                    color: selectedBrand ? "var(--color-bg)" : "var(--color-text)",
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='${selectedBrand ? '%23111' : '%23999'}' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 8px center',
-                  }}
-                >
-                  <option value="">{t.allBrands}</option>
-                  {BRANDS.map(brand => (
-                    <option key={brand} value={brand}>{brand}</option>
-                  ))}
-                </select>
+                <div className="relative inline-block">
+                  <select
+                    value={selectedBrand ?? ""}
+                    onChange={e => setSelectedBrand(e.target.value || null)}
+                    className="filter-select"
+                    style={{
+                      background: selectedBrand ? "var(--color-primary)" : "var(--color-bgHover)",
+                      color: selectedBrand ? "var(--color-bg)" : "var(--color-text)",
+                      borderColor: selectedBrand ? "var(--color-primary)" : "var(--color-border)",
+                    }}
+                  >
+                    <option value="">{t.allBrands}</option>
+                    {BRANDS.map(brand => (
+                      <option key={brand} value={brand}>{brand}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: selectedBrand ? "var(--color-bg)" : "var(--color-textMuted)" }}>▼</span>
+                </div>
 
                 {/* Category dropdown */}
-                <select
-                  value={selectedCategory ?? ""}
-                  onChange={e => setSelectedCategory((e.target.value || null) as Category | null)}
-                  className="pill cursor-pointer appearance-none pr-7 text-sm"
-                  style={{
-                    background: selectedCategory ? "var(--color-primary)" : "var(--color-bgHover)",
-                    color: selectedCategory ? "var(--color-bg)" : "var(--color-text)",
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='${selectedCategory ? '%23111' : '%23999'}' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 8px center',
-                  }}
-                >
-                  <option value="">🎨 {t.mixFlavorFilter}</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}</option>
-                  ))}
-                </select>
+                <div className="relative inline-block">
+                  <select
+                    value={selectedCategory ?? ""}
+                    onChange={e => setSelectedCategory((e.target.value || null) as Category | null)}
+                    className="filter-select"
+                    style={{
+                      background: selectedCategory ? "var(--color-primary)" : "var(--color-bgHover)",
+                      color: selectedCategory ? "var(--color-bg)" : "var(--color-text)",
+                      borderColor: selectedCategory ? "var(--color-primary)" : "var(--color-border)",
+                    }}
+                  >
+                    <option value="">🎨 {t.mixFlavorFilter}</option>
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}</option>
+                    ))}
+                  </select>
+                  <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px]" style={{ color: selectedCategory ? "var(--color-bg)" : "var(--color-textMuted)" }}>▼</span>
+                </div>
 
                 {/* In-stock toggle - only for business users with inventory */}
                 {isBusinessUser && inventory.length > 0 && (

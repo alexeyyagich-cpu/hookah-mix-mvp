@@ -301,6 +301,27 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
 
+/* ========== FILTER SELECT ========== */
+.filter-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 8px 28px 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.filter-select:hover {
+  border-color: var(--color-borderAccent);
+}
+.filter-select:focus {
+  border-color: var(--color-primary);
+}
+
 /* ========== PILL / CHIP ========== */
 .pill {
   display: inline-flex;
@@ -577,6 +598,8 @@ input[type="range"]::-moz-range-thumb {
 .tobacco-card {
   position: relative;
   padding: 14px;
+  min-height: 120px;
+  min-width: 0;
   background: var(--color-bgHover);
   border: 2px solid var(--color-border);
   border-radius: 16px;
