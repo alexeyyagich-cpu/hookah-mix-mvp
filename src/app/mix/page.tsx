@@ -733,12 +733,12 @@ function MixPageInner() {
                 </span>
               </div>
 
-              {/* Brand filter */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              {/* Brand filter — horizontal scroll */}
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
                 <button
                   type="button"
                   onClick={() => setSelectedBrand(null)}
-                  className={`pill ${selectedBrand === null ? "pill-active" : ""}`}
+                  className={`pill shrink-0 ${selectedBrand === null ? "pill-active" : ""}`}
                 >
                   {t.allBrands}
                 </button>
@@ -747,7 +747,7 @@ function MixPageInner() {
                     type="button"
                     key={brand}
                     onClick={() => setSelectedBrand(prev => prev === brand ? null : brand)}
-                    className={`pill ${selectedBrand === brand ? "pill-active" : ""}`}
+                    className={`pill shrink-0 ${selectedBrand === brand ? "pill-active" : ""}`}
                   >
                     {brand}
                   </button>
