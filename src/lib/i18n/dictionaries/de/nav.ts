@@ -19,7 +19,7 @@ export const nav: typeof NavType = {
   settingsGroup: 'EINSTELLUNGEN',
 
   overview: 'Übersicht',
-  bossDashboard: 'Boss',
+  bossDashboard: 'Steuerung',
   inventory: 'Inventar',
   bowls: 'Köpfe',
   sessions: 'Sitzungen',

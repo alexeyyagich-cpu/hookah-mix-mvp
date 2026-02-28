@@ -269,23 +269,25 @@ export function Sidebar() {
         <div className="text-xs text-[var(--color-textMuted)] mt-1">
           {profile?.owner_name || t.defaultUser}
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {/* Role badge */}
           <span
-            className="badge"
+            className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border"
             style={{
-              // Decorative gradient — pink endpoint intentionally not theme-variable
-              background: isOwner
-                ? 'linear-gradient(135deg, var(--color-primary) 0%, #ec4899 100%)'
-                : 'var(--color-bgHover)',
-              color: isOwner ? 'white' : 'var(--color-text)',
+              borderColor: isOwner ? 'var(--color-primary)' : 'var(--color-border)',
+              color: isOwner ? 'var(--color-primary)' : 'var(--color-textMuted)',
+              background: isOwner ? 'color-mix(in srgb, var(--color-primary) 10%, transparent)' : 'transparent',
             }}
           >
             {roleLabels?.emoji} {roleName}
           </span>
           {/* Subscription badge - only for owners */}
           {isOwner && (
-            <span className={`badge ${isTrialTier ? 'badge-warning' : 'badge-success'}`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${
+              isTrialTier
+                ? 'border-[var(--color-warning)]/40 text-[var(--color-warning)] bg-[var(--color-warning)]/10'
+                : 'border-[var(--color-success)]/40 text-[var(--color-success)] bg-[var(--color-success)]/10'
+            }`}>
               {tier.toUpperCase()}
             </span>
           )}
@@ -354,7 +356,7 @@ export function Sidebar() {
                     aria-current={isActive ? 'page' : undefined}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${
                       isActive
-                        ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                        ? 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-l-[3px] border-[var(--color-primary)]'
                         : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
                     }`}
                   >
@@ -363,7 +365,7 @@ export function Sidebar() {
                     {badgeCount > 0 && (
                       <span className={`ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${
                         isActive
-                          ? 'bg-[var(--color-bg)]/30 text-[var(--color-bg)]'
+                          ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)]'
                           : 'bg-[var(--color-danger)] text-white'
                       }`}>
                         {badgeCount > 99 ? '99+' : badgeCount}

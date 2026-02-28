@@ -21,7 +21,7 @@ export const nav = {
 
   // Items
   overview: 'Обзор',
-  bossDashboard: 'Boss',
+  bossDashboard: 'Управление',
   inventory: 'Инвентарь',
   bowls: 'Чаши',
   sessions: 'Сессии',
