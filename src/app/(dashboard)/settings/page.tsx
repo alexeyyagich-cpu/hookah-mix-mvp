@@ -22,7 +22,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function SettingsPage() {
   const { user, profile, refreshProfile, signOut, isDemoMode } = useAuth()
-  const { tier, isExpired, daysUntilExpiry, canUsePOS } = useSubscription()
+  const { tier, isExpired, daysUntilExpiry, trialDaysLeft, canUsePOS } = useSubscription()
   const { modules, isHookahActive, isBarActive, canActivateBar, toggleModule, loading: modulesLoading } = useModules()
   const { connection: r2oConnection, loading: r2oLoading, error: r2oError, syncing: r2oSyncing, syncResult: r2oSyncResult, connect: r2oConnect, disconnect: r2oDisconnect, sync: r2oSync, refresh: r2oRefresh } = useReady2Order()
   const searchParams = useSearchParams()
@@ -41,14 +41,31 @@ export default function SettingsPage() {
     }
   }, [searchParams, r2oRefresh])
 
-  // Handle Stripe checkout success redirect
+  // Handle Stripe checkout success redirect — poll until webhook updates tier
+  const [activating, setActivating] = useState(false)
   useEffect(() => {
-    if (searchParams.get('success') === 'true') {
-      setMessage(ts.paymentSuccess)
-      refreshProfile()
-      window.history.replaceState({}, '', '/settings')
-    }
-  }, [searchParams, ts.paymentSuccess, refreshProfile])
+    if (searchParams.get('success') !== 'true') return
+    window.history.replaceState({}, '', '/settings')
+    setActivating(true)
+    setMessage(ts.activatingSubscription)
+
+    let attempts = 0
+    const poll = setInterval(async () => {
+      attempts++
+      await refreshProfile()
+      // Profile refreshed — check if tier changed from trial
+      const updated = profile?.subscription_tier
+      if ((updated && updated !== 'trial') || attempts >= 10) {
+        clearInterval(poll)
+        setActivating(false)
+        setMessage(ts.paymentSuccess)
+        msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
+      }
+    }, 2000)
+
+    return () => clearInterval(poll)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings()
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, loading: pushLoading, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
   const { connection: telegramConnection, loading: telegramLoading, connectLink: telegramConnectLink, updateSettings: updateTelegramSettings, disconnect: disconnectTelegram } = useTelegram()
@@ -63,6 +80,13 @@ export default function SettingsPage() {
   const [message, setMessage] = useState('')
   const [portalLoading, setPortalLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+
+  // Refresh profile when user returns from Stripe Portal (tab focus)
+  useEffect(() => {
+    const onFocus = () => { if (document.visibilityState === 'visible') refreshProfile() }
+    document.addEventListener('visibilitychange', onFocus)
+    return () => document.removeEventListener('visibilitychange', onFocus)
+  }, [refreshProfile])
 
   // QR Menu state
   const [venueSlug, setVenueSlug] = useState(profile?.venue_slug || '')
@@ -302,10 +326,10 @@ export default function SettingsPage() {
           <div>
             <h2 className="text-lg font-semibold mb-1">{ts.subscription}</h2>
             <div className="flex items-center gap-2">
-              <span className={`badge ${tier === 'trial' ? 'badge-warning' : 'badge-success'}`}>
-                {tier.toUpperCase()}
+              <span className={`badge ${activating ? 'badge-warning' : tier === 'trial' ? 'badge-warning' : 'badge-success'}`}>
+                {activating ? '…' : tier.toUpperCase()}
               </span>
-              {isExpired && (
+              {isExpired && !activating && (
                 <span className="badge badge-danger">{ts.expired}</span>
               )}
               {daysUntilExpiry !== null && daysUntilExpiry <= 7 && !isExpired && (
@@ -314,12 +338,23 @@ export default function SettingsPage() {
                 </span>
               )}
             </div>
-            {tier === 'trial' && (
+            {/* Expiry / renewal dates */}
+            {!activating && tier === 'trial' && trialDaysLeft !== null && (
+              <p className="text-sm text-[var(--color-textMuted)] mt-1">
+                {ts.trialEndsOn(new Date(profile?.trial_expires_at || '').toLocaleDateString())}
+              </p>
+            )}
+            {!activating && hasActiveSubscription && profile?.subscription_expires_at && (
+              <p className="text-sm text-[var(--color-textMuted)] mt-1">
+                {ts.renewsOn(new Date(profile.subscription_expires_at).toLocaleDateString())}
+              </p>
+            )}
+            {tier === 'trial' && !activating && (
               <p className="text-sm text-[var(--color-textMuted)] mt-2">
                 {ts.upgradeForFull}
               </p>
             )}
-            {hasActiveSubscription && (
+            {hasActiveSubscription && !activating && (
               <p className="text-sm text-[var(--color-textMuted)] mt-2">
                 {ts.manageSubscription}
               </p>
