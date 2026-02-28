@@ -33,13 +33,14 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
   }, [isOpen, defaultName])
 
   const handleClose = useCallback(() => {
+    if (isClosing) return
     setIsClosing(true)
     setTimeout(() => {
       setVisible(false)
       setIsClosing(false)
       onClose()
     }, 200)
-  }, [onClose])
+  }, [onClose, isClosing])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

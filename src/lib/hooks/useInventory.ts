@@ -10,6 +10,7 @@ import { enqueueOfflineMutation } from '@/lib/offline/offlineMutation'
 import type { TobaccoInventory, InventoryTransaction, TransactionType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
+import { useTranslation } from '@/lib/i18n'
 // Demo data for testing (prices in EUR, package_grams = 100g default)
 const _D = 24 * 60 * 60 * 1000
 const DEMO_INVENTORY: TobaccoInventory[] = [
@@ -42,6 +43,7 @@ export function useInventory(): UseInventoryReturn {
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
+  const th = useTranslation('hookah')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -122,7 +124,7 @@ export function useInventory(): UseInventoryReturn {
   ): Promise<TobaccoInventory | null> => {
     if (!user) return null
     if (!canAddMore) {
-      setError(`Limit reached (${itemsLimit} items). Upgrade your plan to add more.`)
+      setError(th.freeTierLimit(itemsLimit))
       return null
     }
 

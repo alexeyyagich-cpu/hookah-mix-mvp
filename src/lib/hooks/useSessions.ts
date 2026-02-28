@@ -210,6 +210,7 @@ export function useSessions(): UseSessionsReturn {
       if (fetchError) {
         if (!cached) { setError(translateError(fetchError)); setSessions([]) }
       } else {
+        setError(null)
         setSessions(data || [])
         await setCachedData('sessions', user.id, data || [])
       }

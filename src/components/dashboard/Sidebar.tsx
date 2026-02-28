@@ -84,24 +84,34 @@ export function Sidebar() {
     if (deltaX < -60) setMobileOpen(false)
   }, [])
 
-  // Collapsible groups — persisted in localStorage
+  // Collapsible groups — persisted in localStorage (scoped to user)
+  const sidebarKey = profile?.id ? `sidebar-collapsed-${profile.id}` : 'sidebar-collapsed'
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
     if (typeof window === 'undefined') return new Set()
     try {
-      const stored = localStorage.getItem('sidebar-collapsed')
+      const stored = localStorage.getItem(sidebarKey)
       return stored ? new Set(JSON.parse(stored)) : new Set()
     } catch { return new Set() }
   })
+
+  // Re-sync when profile loads (initial render may not have user ID)
+  useEffect(() => {
+    if (!profile?.id) return
+    try {
+      const stored = localStorage.getItem(`sidebar-collapsed-${profile.id}`)
+      if (stored) setCollapsedGroups(new Set(JSON.parse(stored)))
+    } catch {}
+  }, [profile?.id])
 
   const toggleGroup = useCallback((label: string) => {
     setCollapsedGroups(prev => {
       const next = new Set(prev)
       if (next.has(label)) next.delete(label)
       else next.add(label)
-      try { localStorage.setItem('sidebar-collapsed', JSON.stringify([...next])) } catch {}
+      try { localStorage.setItem(sidebarKey, JSON.stringify([...next])) } catch {}
       return next
     })
-  }, [])
+  }, [sidebarKey])
 
   const navigationGroups: NavGroup[] = useMemo(() => [
     {
