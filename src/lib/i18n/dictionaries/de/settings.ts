@@ -178,6 +178,7 @@ export const settings: typeof SettingsType = {
   deleteConfirm1: 'Sind Sie sicher? Alle Daten werden unwiderruflich gelöscht.',
   deleteConfirm2: 'Diese Aktion kann nicht rückgängig gemacht werden. Fortfahren?',
   deleteError: 'Konto konnte nicht gelöscht werden',
+  paymentSuccess: 'Zahlung erfolgreich! Ihr Abonnement ist jetzt aktiv.',
   portalError: 'Portal konnte nicht geöffnet werden',
   portalOpenError: 'Fehler beim Öffnen des Abonnementportals',
   qrDownloadError: 'QR-Code konnte nicht heruntergeladen werden',

@@ -178,6 +178,7 @@ export const settings: typeof SettingsType = {
   deleteConfirm1: 'Are you sure? All data will be permanently deleted.',
   deleteConfirm2: 'This action cannot be undone. Continue?',
   deleteError: 'Failed to delete account',
+  paymentSuccess: 'Payment successful! Your subscription is now active.',
   portalError: 'Could not open portal',
   portalOpenError: 'Error opening subscription portal',
   qrDownloadError: 'Failed to download QR code',

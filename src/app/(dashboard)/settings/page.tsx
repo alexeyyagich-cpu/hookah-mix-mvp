@@ -40,6 +40,15 @@ export default function SettingsPage() {
       window.history.replaceState({}, '', '/settings')
     }
   }, [searchParams, r2oRefresh])
+
+  // Handle Stripe checkout success redirect
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      setMessage(ts.paymentSuccess)
+      refreshProfile()
+      window.history.replaceState({}, '', '/settings')
+    }
+  }, [searchParams, ts.paymentSuccess, refreshProfile])
   const { settings: notificationSettings, updateSettings: updateNotificationSettings } = useNotificationSettings()
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, permission: pushPermission, loading: pushLoading, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
   const { connection: telegramConnection, loading: telegramLoading, connectLink: telegramConnectLink, updateSettings: updateTelegramSettings, disconnect: disconnectTelegram } = useTelegram()
