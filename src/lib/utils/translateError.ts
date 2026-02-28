@@ -6,16 +6,7 @@
  * so LoginForm/RegisterForm can map them to their own i18n keys.
  */
 
-import { dictionaries } from '@/lib/i18n/dictionaries'
-import type { Locale } from '@/lib/i18n/types'
-import { DEFAULT_LOCALE, LOCALES } from '@/lib/i18n/types'
-
-function getCurrentLocale(): Locale {
-  if (typeof localStorage === 'undefined') return DEFAULT_LOCALE
-  const saved = localStorage.getItem('hookah-locale') as Locale | null
-  if (saved && LOCALES.includes(saved)) return saved
-  return DEFAULT_LOCALE
-}
+import { getCachedDictionary } from '@/lib/i18n/dictionaries'
 
 type SupabaseError = { message: string; code?: string; details?: string; hint?: string }
 
@@ -34,6 +25,6 @@ export function translateError(error: SupabaseError | Error | string): string {
   if (msg.includes('Email not confirmed')) return 'email_not_confirmed'
 
   // All other errors: return localized generic message
-  const tc = dictionaries[getCurrentLocale()].common
-  return tc.errorGeneric
+  const dict = getCachedDictionary()
+  return dict ? dict.common.errorGeneric : 'Something went wrong'
 }

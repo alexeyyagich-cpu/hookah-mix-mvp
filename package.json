@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:unit": "vitest run",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build --webpack"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

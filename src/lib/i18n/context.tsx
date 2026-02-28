@@ -1,9 +1,9 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import type { Locale } from './types'
 import { DEFAULT_LOCALE, LOCALES } from './types'
-import { dictionaries, type Dictionary } from './dictionaries'
+import { getDictionary, setCachedDictionary, type Dictionary } from './dictionaries'
 
 interface LocaleContextType {
   locale: Locale
@@ -20,6 +20,19 @@ function detectBrowserLocale(): Locale {
   return DEFAULT_LOCALE
 }
 
+function resolveInitialLocale(profileLocale?: string | null): Locale {
+  if (profileLocale && LOCALES.includes(profileLocale as Locale)) {
+    return profileLocale as Locale
+  }
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('hookah-locale') as Locale | null
+      if (saved && LOCALES.includes(saved)) return saved
+    } catch { /* SSR or blocked storage */ }
+  }
+  return detectBrowserLocale()
+}
+
 export function LocaleProvider({
   children,
   profileLocale,
@@ -27,22 +40,28 @@ export function LocaleProvider({
   children: React.ReactNode
   profileLocale?: string | null
 }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
+  const [locale, setLocaleState] = useState<Locale>(() => resolveInitialLocale(profileLocale))
+  const [dictionary, setDictionary] = useState<Dictionary | null>(null)
 
-  // Initialize: profile > localStorage > browser > default
+  // Re-resolve when profile locale arrives (async auth)
   useEffect(() => {
     if (profileLocale && LOCALES.includes(profileLocale as Locale)) {
       setLocaleState(profileLocale as Locale)
       localStorage.setItem('hookah-locale', profileLocale)
-    } else {
-      const saved = localStorage.getItem('hookah-locale') as Locale | null
-      if (saved && LOCALES.includes(saved)) {
-        setLocaleState(saved)
-      } else {
-        setLocaleState(detectBrowserLocale())
-      }
     }
   }, [profileLocale])
+
+  // Load dictionary when locale changes
+  useEffect(() => {
+    let cancelled = false
+    getDictionary(locale).then(dict => {
+      if (!cancelled) {
+        setDictionary(dict)
+        setCachedDictionary(dict)
+      }
+    })
+    return () => { cancelled = true }
+  }, [locale])
 
   // Update html lang attribute
   useEffect(() => {
@@ -54,7 +73,8 @@ export function LocaleProvider({
     localStorage.setItem('hookah-locale', newLocale)
   }, [])
 
-  const dictionary = useMemo(() => dictionaries[locale], [locale])
+  // Don't render children until dictionary is loaded
+  if (!dictionary) return null
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale, dictionary }}>
