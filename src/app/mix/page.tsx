@@ -117,7 +117,7 @@ function MixPageInner() {
   const [isMixesMenuOpen, setIsMixesMenuOpen] = useState(false);
   const [targetCompatibility, setTargetCompatibility] = useState<number | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
-  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [isSlotMachineOpen, setIsSlotMachineOpen] = useState(false);
   const [isQuickSessionOpen, setIsQuickSessionOpen] = useState(false);
@@ -222,6 +222,29 @@ function MixPageInner() {
     return ids;
   }, [inventory]);
 
+  // Set of "brand::flavor" keys for checking mix ingredient availability
+  const inventoryBrandFlavors = useMemo(() => {
+    const set = new Set<string>();
+    for (const inv of inventory) {
+      if (inv.quantity_grams > 0) {
+        set.add(`${inv.brand.toLowerCase()}::${inv.flavor.toLowerCase()}`);
+      }
+    }
+    return set;
+  }, [inventory]);
+
+  const hasInventory = inventory.length > 0;
+
+  // Check if all ingredients of a mix recipe are available in inventory
+  const isMixAvailable = useCallback((mix: MixRecipe) => {
+    if (!hasInventory) return true; // no inventory = show all
+    return mix.ingredients.every(ing =>
+      ing.brand
+        ? inventoryBrandFlavors.has(`${ing.brand.toLowerCase()}::${ing.flavor.toLowerCase()}`)
+        : [...inventoryBrandFlavors].some(key => key.endsWith(`::${ing.flavor.toLowerCase()}`))
+    );
+  }, [hasInventory, inventoryBrandFlavors]);
+
   const filteredTobaccos = useMemo(() => {
     let result = TOBACCOS;
     if (selectedBrand) {
@@ -261,16 +284,16 @@ function MixPageInner() {
   const validation = useMemo(() => validateMix(items), [items]);
   const result = useMemo(() => validation.ok ? calculateMix(items) : null, [items, validation.ok]);
 
-  // Get recommended mixes based on target compatibility
+  // Get recommended mixes based on target compatibility (filtered by inventory)
   const recommendedMixes = useMemo(() => {
     if (targetCompatibility === null || targetCompatibility <= (result?.compatibility.score ?? 0)) {
       return [];
     }
     return MIX_RECIPES
-      .filter(mix => mix.popularity >= 4)
+      .filter(mix => mix.popularity >= 4 && isMixAvailable(mix))
       .sort((a, b) => b.popularity - a.popularity)
       .slice(0, 3);
-  }, [targetCompatibility, result?.compatibility.score]);
+  }, [targetCompatibility, result?.compatibility.score, isMixAvailable]);
 
   // Handle target change from ProgressRing (only show recommendations when significantly higher)
   const handleTargetChange = useCallback((target: number | null) => {
@@ -652,7 +675,7 @@ function MixPageInner() {
                 <button
                   type="button"
                   key={cat}
-                  onClick={() => { setSelectedCategory(cat); setShowCategoryFilter(true); }}
+                  onClick={() => setSelectedCategory(cat)}
                   className="flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all hover:scale-105 active:scale-95"
                   style={{
                     background: 'var(--color-bgCard)',
@@ -733,96 +756,64 @@ function MixPageInner() {
                 </span>
               </div>
 
-              {/* Brand filter — horizontal scroll */}
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-hide">
-                <button
-                  type="button"
-                  onClick={() => setSelectedBrand(null)}
-                  className={`pill shrink-0 ${selectedBrand === null ? "pill-active" : ""}`}
-                >
-                  {t.allBrands}
-                </button>
-                {BRANDS.map(brand => (
-                  <button
-                    type="button"
-                    key={brand}
-                    onClick={() => setSelectedBrand(prev => prev === brand ? null : brand)}
-                    className={`pill shrink-0 ${selectedBrand === brand ? "pill-active" : ""}`}
-                  >
-                    {brand}
-                  </button>
-                ))}
-              </div>
-
-              {/* Category filter toggle */}
-              <div className="mb-5 pb-5 border-b" style={{ borderColor: "var(--color-border)" }}>
-                <button
-                  type="button"
-                  onClick={() => setShowCategoryFilter(prev => !prev)}
-                  className="pill flex items-center gap-2"
+              {/* Compact filter bar */}
+              <div className="flex flex-wrap items-center gap-2 mb-5 pb-5 border-b" style={{ borderColor: "var(--color-border)" }}>
+                {/* Brand dropdown */}
+                <select
+                  value={selectedBrand ?? ""}
+                  onChange={e => setSelectedBrand(e.target.value || null)}
+                  className="pill cursor-pointer appearance-none pr-7 text-sm"
                   style={{
-                    background: selectedCategory || showCategoryFilter ? "var(--color-primary)" : "var(--color-bgHover)",
-                    color: selectedCategory || showCategoryFilter ? "var(--color-bg)" : "var(--color-text)",
+                    background: selectedBrand ? "var(--color-primary)" : "var(--color-bgHover)",
+                    color: selectedBrand ? "var(--color-bg)" : "var(--color-text)",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='${selectedBrand ? '%23111' : '%23999'}' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 8px center',
                   }}
                 >
-                  <span>🎨</span>
-                  <span>{t.mixFlavorFilter}</span>
-                  {selectedCategory && (
-                    <span className="text-xs opacity-80">({CATEGORY_LABELS[selectedCategory]})</span>
-                  )}
-                  <span className={`transition-transform ${showCategoryFilter ? "rotate-180" : ""}`}>▼</span>
-                </button>
+                  <option value="">{t.allBrands}</option>
+                  {BRANDS.map(brand => (
+                    <option key={brand} value={brand}>{brand}</option>
+                  ))}
+                </select>
 
-                {/* Expandable category list */}
-                {showCategoryFilter && (
-                  <div className="flex flex-wrap gap-2 mt-3 animate-fadeInUp">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCategory(null)}
-                      className={`pill ${selectedCategory === null ? "pill-active" : ""}`}
-                    >
-                      {t.mixAllFlavors}
-                    </button>
-                    {CATEGORIES.map(cat => (
-                      <button
-                        type="button"
-                        key={cat}
-                        onClick={() => setSelectedCategory(prev => prev === cat ? null : cat)}
-                        className={`pill ${selectedCategory === cat ? "pill-active" : ""}`}
-                      >
-                        <span className="mr-1">{CATEGORY_EMOJI[cat]}</span>
-                        {CATEGORY_LABELS[cat]}
-                      </button>
-                    ))}
-                  </div>
+                {/* Category dropdown */}
+                <select
+                  value={selectedCategory ?? ""}
+                  onChange={e => setSelectedCategory((e.target.value || null) as Category | null)}
+                  className="pill cursor-pointer appearance-none pr-7 text-sm"
+                  style={{
+                    background: selectedCategory ? "var(--color-primary)" : "var(--color-bgHover)",
+                    color: selectedCategory ? "var(--color-bg)" : "var(--color-text)",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='${selectedCategory ? '%23111' : '%23999'}' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 8px center',
+                  }}
+                >
+                  <option value="">🎨 {t.mixFlavorFilter}</option>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}</option>
+                  ))}
+                </select>
+
+                {/* In-stock toggle - only for business users with inventory */}
+                {isBusinessUser && inventory.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowInStockOnly(prev => !prev)}
+                    className="pill text-sm flex items-center gap-1.5"
+                    style={{
+                      background: showInStockOnly ? "var(--color-primary)" : "var(--color-bgHover)",
+                      color: showInStockOnly ? "var(--color-bg)" : "var(--color-text)",
+                    }}
+                  >
+                    {t.mixInStockOnly}
+                    {showInStockOnly && (
+                      <span className="text-xs opacity-80 tabular-nums">({filteredTobaccos.length})</span>
+                    )}
+                  </button>
                 )}
               </div>
-
-              {/* In-stock toggle - only for business users with inventory */}
-              {isBusinessUser && inventory.length > 0 && (
-                <div className="mb-5 flex items-center justify-between">
-                  <label className="flex items-center gap-3 cursor-pointer select-none">
-                    <div
-                      className="relative w-11 h-6 rounded-full transition-colors"
-                      style={{ background: showInStockOnly ? 'var(--color-primary)' : 'var(--color-bgAccent)' }}
-                      onClick={() => setShowInStockOnly(prev => !prev)}
-                    >
-                      <div
-                        className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
-                        style={{ transform: showInStockOnly ? 'translateX(22px)' : 'translateX(2px)' }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                      {t.mixInStockOnly}
-                    </span>
-                  </label>
-                  {showInStockOnly && (
-                    <span className="text-xs tabular-nums" style={{ color: 'var(--color-textMuted)' }}>
-                      {filteredTobaccos.length} {t.mixInStockCount}
-                    </span>
-                  )}
-                </div>
-              )}
 
               {/* Tobacco grid */}
               <div className="max-h-[480px] overflow-y-auto pr-1 space-y-5">
@@ -1292,6 +1283,7 @@ function MixPageInner() {
         isOpen={isMixesDrawerOpen}
         onClose={() => setIsMixesDrawerOpen(false)}
         onSelectMix={applyMixRecipe}
+        isMixAvailable={isMixAvailable}
       />
 
       {/* Slot Machine */}

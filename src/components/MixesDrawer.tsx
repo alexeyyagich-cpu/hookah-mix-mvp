@@ -10,9 +10,10 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   onSelectMix: (mix: MixRecipe) => void;
+  isMixAvailable?: (mix: MixRecipe) => boolean;
 };
 
-export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
+export default function MixesDrawer({ isOpen, onClose, onSelectMix, isMixAvailable }: Props) {
   const t = useTranslation("hookah");
   const { locale } = useLocale();
   const useEn = locale === "en" || locale === "de";
@@ -33,6 +34,12 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
       desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
+  }).sort((a, b) => {
+    // When inventory check available, sort available mixes first
+    if (!isMixAvailable) return 0;
+    const aOk = isMixAvailable(a) ? 0 : 1;
+    const bOk = isMixAvailable(b) ? 0 : 1;
+    return aOk - bOk;
   });
 
   const handleSelectMix = (mix: MixRecipe) => {
@@ -162,7 +169,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
               </div>
             ) : (
               filteredMixes.map(mix => (
-                <MixCard key={mix.id} mix={mix} onSelect={() => handleSelectMix(mix)} />
+                <MixCard key={mix.id} mix={mix} onSelect={() => handleSelectMix(mix)} available={isMixAvailable ? isMixAvailable(mix) : true} />
               ))
             )}
           </div>
@@ -172,7 +179,7 @@ export default function MixesDrawer({ isOpen, onClose, onSelectMix }: Props) {
   );
 }
 
-function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
+function MixCard({ mix, onSelect, available }: { mix: MixRecipe; onSelect: () => void; available: boolean }) {
   const t = useTranslation("hookah");
   const { locale } = useLocale();
   const useEn = locale === "en" || locale === "de";
@@ -196,6 +203,7 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
       style={{
         background: "var(--color-bgHover)",
         border: "1px solid var(--color-border)",
+        opacity: available ? 1 : 0.45,
       }}
     >
       {/* Card header */}
@@ -238,6 +246,14 @@ function MixCard({ mix, onSelect }: { mix: MixRecipe; onSelect: () => void }) {
             >
               {difficultyLabels[mix.difficulty]}
             </span>
+            {!available && (
+              <span
+                className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                style={{ background: 'var(--color-error)', color: 'white' }}
+              >
+                {t.outOfStock}
+              </span>
+            )}
           </div>
         </div>
 
