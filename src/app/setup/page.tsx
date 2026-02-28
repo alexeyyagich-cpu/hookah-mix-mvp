@@ -20,6 +20,7 @@ import {
 import { useTheme } from "@/lib/ThemeContext";
 import { useTranslation } from "@/lib/i18n";
 import type { MixResult } from "@/logic/mixCalculator";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 type MixItemData = {
   flavor: string;
@@ -51,6 +52,7 @@ export default function SetupPage() {
 
   if (!data) {
     return (
+      <ErrorBoundary sectionName="Setup">
       <div className="min-h-screen transition-theme" style={{ background: "var(--color-bg)" }}>
         {/* Header */}
         <header className="sticky top-0 z-50 glass border-b" style={{ borderColor: "var(--color-border)" }}>
@@ -95,6 +97,7 @@ export default function SetupPage() {
           </div>
         </main>
       </div>
+      </ErrorBoundary>
     );
   }
 
@@ -119,6 +122,7 @@ export default function SetupPage() {
   };
 
   return (
+    <ErrorBoundary sectionName="Setup">
     <div className="min-h-screen transition-theme" style={{ background: "var(--color-bg)" }}>
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b" style={{ borderColor: "var(--color-border)" }}>
@@ -478,5 +482,6 @@ export default function SetupPage() {
         </div>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

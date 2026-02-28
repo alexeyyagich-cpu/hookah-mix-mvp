@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import TermsContent from './TermsContent'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Hookah Torus',
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function TermsPage() {
-  return <TermsContent />
+  return <ErrorBoundary sectionName="Terms"><TermsContent /></ErrorBoundary>
 }

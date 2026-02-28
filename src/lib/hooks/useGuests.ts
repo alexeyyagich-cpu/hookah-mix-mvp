@@ -255,6 +255,7 @@ export function useGuests(): UseGuestsReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('last_visit_at', { ascending: false, nullsFirst: false })
         .order('name', { ascending: true })
+        .limit(200)
 
       if (fetchError) {
         if (!cached) {

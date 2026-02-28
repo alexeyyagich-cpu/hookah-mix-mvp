@@ -92,18 +92,19 @@ export async function updateSession(request: NextRequest) {
     const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
     const isStripeRoute = request.nextUrl.pathname.startsWith('/api/stripe/')
 
-    if (isWriteOp && isApiRoute && !isStripeRoute) {
+    if (isApiRoute && !isStripeRoute) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('subscription_tier, trial_expires_at')
         .eq('id', user.id)
         .single()
 
-      if (
+      const isTrialExpired =
         profile?.subscription_tier === 'trial' &&
         profile?.trial_expires_at &&
         new Date(profile.trial_expires_at) < new Date()
-      ) {
+
+      if (isTrialExpired && isWriteOp) {
         const trialExpiredResponse = NextResponse.json(
           { error: 'Trial expired. Please upgrade to continue.' },
           { status: 402 }
@@ -113,6 +114,11 @@ export async function updateSession(request: NextRequest) {
           trialExpiredResponse.cookies.set(cookie.name, cookie.value)
         }
         return applySecurityHeaders(trialExpiredResponse)
+      }
+
+      // Add warning header on GET for expired trial — non-blocking but signals to client
+      if (isTrialExpired && !isWriteOp) {
+        supabaseResponse.headers.set('X-Trial-Expired', 'true')
       }
     }
   }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import LoginPageClient from './LoginPageClient'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
   title: 'Login — Hookah Torus',
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function LoginPage() {
-  return <LoginPageClient />
+  return <ErrorBoundary sectionName="Login"><LoginPageClient /></ErrorBoundary>
 }

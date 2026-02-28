@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { stripe } from '@/lib/stripe'
+import { logger } from '@/lib/logger'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       try {
         await stripe.subscriptions.cancel(profile.stripe_subscription_id)
       } catch (e) {
-        console.error('Failed to cancel Stripe subscription:', e)
+        logger.error('Failed to cancel Stripe subscription', { error: String(e) })
         // Continue with deletion even if Stripe fails
       }
     }
@@ -70,13 +71,13 @@ export async function POST(request: NextRequest) {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
 
     if (deleteError) {
-      console.error('Account deletion error:', deleteError)
+      logger.error('Account deletion error', { error: String(deleteError) })
       return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Account deletion error:', error)
+    logger.error('Account deletion error', { error: String(error) })
     return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })
   }
 }

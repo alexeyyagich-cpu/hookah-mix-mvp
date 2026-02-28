@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/AuthContext'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useTranslation } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import type { OrgRole } from '@/types/database'
 
@@ -111,6 +112,7 @@ export default function JoinPage() {
   const roleLabel = invite?.role ? ORG_ROLE_LABELS[invite.role] : null
 
   return (
+    <ErrorBoundary sectionName="Join Team">
     <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center p-4">
       <div className="card w-full max-w-md p-8 text-center">
         {state === 'loading' && (
@@ -211,5 +213,6 @@ export default function JoinPage() {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   )
 }

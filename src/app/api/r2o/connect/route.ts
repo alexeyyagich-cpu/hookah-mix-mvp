@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { grantAccessToken } from '@/lib/ready2order/client'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { getUserTier, hasFeatureAccess, featureNotAvailable } from '@/lib/subscriptionGuard'
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +37,12 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Subscription check: R2O integration requires api_access (multi+ tier)
+    const tier = await getUserTier(supabase, user.id)
+    if (!hasFeatureAccess(tier, 'api_access')) {
+      return featureNotAvailable('pos_integration')
     }
 
     // Check subscription (Core+ required)

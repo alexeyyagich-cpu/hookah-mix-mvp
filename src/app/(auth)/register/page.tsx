@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { RegisterForm } from '@/components/auth/RegisterForm'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
   title: 'Register — Hookah Torus',
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function RegisterPage() {
-  return <RegisterForm />
+  return <ErrorBoundary sectionName="Register"><RegisterForm /></ErrorBoundary>
 }

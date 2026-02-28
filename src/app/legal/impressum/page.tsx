@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ImpressumContent from './ImpressumContent'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
   title: 'Impressum — Hookah Torus',
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function ImpressumPage() {
-  return <ImpressumContent />
+  return <ErrorBoundary sectionName="Impressum"><ImpressumContent /></ErrorBoundary>
 }

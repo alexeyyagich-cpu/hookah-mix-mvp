@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import TipPageClient from './TipPageClient'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -44,5 +45,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default function TipPage({ params }: { params: Promise<{ slug: string }> }) {
-  return <TipPageClient params={params} />
+  return <ErrorBoundary sectionName="Tip"><TipPageClient params={params} /></ErrorBoundary>
 }

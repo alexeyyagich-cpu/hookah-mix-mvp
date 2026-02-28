@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe, PRICE_TO_TIER } from '@/lib/stripe'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import Stripe from 'stripe'
+import { logger } from '@/lib/logger'
 
 // Disable body parsing - Stripe requires raw body for signature verification
 export const runtime = 'nodejs'
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     // Verify webhook signature
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
     if (!webhookSecret) {
-      console.error('STRIPE_WEBHOOK_SECRET is not configured')
+      logger.error('STRIPE_WEBHOOK_SECRET is not configured')
       return NextResponse.json(
         { error: 'Webhook secret not configured' },
         { status: 500 }
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
         webhookSecret
       )
     } catch (err) {
-      console.error('Webhook signature verification failed:', err)
+      logger.error('Webhook signature verification failed', { err: String(err) })
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Webhook error:', error)
+    logger.error('Webhook error', { error: String(error) })
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }
@@ -120,7 +121,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.supabase_user_id
 
   if (!userId) {
-    console.error('No user ID found in checkout session')
+    logger.error('No user ID found in checkout session')
     return
   }
 
@@ -156,7 +157,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       .single()
 
     if (!profile) {
-      console.error('Could not find user for subscription:', subscription.id)
+      logger.error('Could not find user for subscription', { subscription_id: subscription.id })
       return
     }
 
@@ -190,7 +191,7 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
       .eq('id', userId)
 
     if (error) {
-      console.error('Failed to update subscription:', error)
+      logger.error('Failed to update subscription', { error: String(error) })
     }
   } else if (status === 'past_due' || status === 'unpaid' || status === 'canceled') {
     // Downgrade to expired trial on failed payment or cancellation
@@ -218,7 +219,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     .single()
 
   if (!profile) {
-    console.error('Could not find user for deleted subscription')
+    logger.error('Could not find user for deleted subscription')
     return
   }
 
@@ -234,7 +235,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     .eq('id', profile.id)
 
   if (error) {
-    console.error('Failed to downgrade subscription:', error)
+    logger.error('Failed to downgrade subscription', { error: String(error) })
   }
 }
 

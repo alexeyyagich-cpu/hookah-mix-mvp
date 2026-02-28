@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
 import type { SubscriptionTier } from '@/types/database'
 
 function getSupabaseClients() {
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(enriched)
   } catch (err) {
-    console.error('Admin organizations error:', err)
+    logger.error('Admin organizations error', { error: String(err) })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
@@ -84,6 +85,13 @@ export async function GET(request: Request) {
 export async function PATCH(request: NextRequest) {
   const rateCheck = await checkRateLimit('admin:organizations:patch', rateLimits.strict)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
+  // Origin check — defense-in-depth against CSRF
+  const origin = request.headers.get('origin')
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
+  if (origin && !appUrl.startsWith(origin)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const clients = getSupabaseClients()
   if (!clients) return NextResponse.json({ error: 'Not configured' }, { status: 503 })
@@ -119,9 +127,18 @@ export async function PATCH(request: NextRequest) {
 
     if (error) throw error
 
+    // Audit log
+    console.info(JSON.stringify({
+      event: 'admin.org.update',
+      admin_user_id: user.id,
+      org_id: id,
+      changes: updates,
+      timestamp: new Date().toISOString(),
+    }))
+
     return NextResponse.json(data)
   } catch (err) {
-    console.error('Admin org update error:', err)
+    logger.error('Admin org update error', { error: String(err) })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

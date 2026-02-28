@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { stripe, STRIPE_PRICES } from '@/lib/stripe'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { logger } from '@/lib/logger'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { stripeCheckoutSchema, validateBody } from '@/lib/validation'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url })
   } catch (error) {
-    console.error('Stripe checkout error:', error)
+    logger.error('Stripe checkout error', { error: String(error) })
     return NextResponse.json(
       { error: 'Checkout failed. Please try again.' },
       { status: 500 }

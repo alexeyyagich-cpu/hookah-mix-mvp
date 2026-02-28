@@ -114,7 +114,7 @@ export function useBarSales(): UseBarSalesReturn {
         .select('*')
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('sold_at', { ascending: false })
-        .limit(500)
+        .limit(200)
 
       if (fetchError) {
         if (!cached) { setError(translateError(fetchError)); setSales([]) }

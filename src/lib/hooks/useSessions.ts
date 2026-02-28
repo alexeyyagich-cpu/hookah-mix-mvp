@@ -197,6 +197,7 @@ export function useSessions(): UseSessionsReturn {
         `)
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
         .order('session_date', { ascending: false })
+        .limit(100)
 
       // Apply date filter for free tier
       if (historyDays) {

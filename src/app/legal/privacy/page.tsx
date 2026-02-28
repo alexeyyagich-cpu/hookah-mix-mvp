@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import PrivacyContent from './PrivacyContent'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — Hookah Torus',
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function PrivacyPage() {
-  return <PrivacyContent />
+  return <ErrorBoundary sectionName="Privacy"><PrivacyContent /></ErrorBoundary>
 }

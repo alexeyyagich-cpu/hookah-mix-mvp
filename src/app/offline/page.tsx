@@ -1,11 +1,13 @@
 'use client'
 
 import { useTranslation } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function OfflinePage() {
   const tc = useTranslation('common')
 
   return (
+    <ErrorBoundary sectionName="Offline">
     <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#0A0A0F', color: '#e5e5e5' }}>
       <div className="max-w-md w-full text-center space-y-6">
         <div className="text-8xl font-bold" style={{ color: '#F59E0B' }}>!</div>
@@ -36,5 +38,6 @@ export default function OfflinePage() {
         </div>
       </div>
     </div>
+    </ErrorBoundary>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import MenuPageClient from './MenuPageClient'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -44,5 +45,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default function MenuPage({ params }: { params: Promise<{ slug: string }> }) {
-  return <MenuPageClient params={params} />
+  return <ErrorBoundary sectionName="Menu"><MenuPageClient params={params} /></ErrorBoundary>
 }

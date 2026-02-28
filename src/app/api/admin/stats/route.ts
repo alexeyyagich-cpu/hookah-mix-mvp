@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
 import type { AdminStats, SubscriptionTier } from '@/types/database'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -107,7 +108,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(stats)
   } catch (err) {
-    console.error('Admin stats error:', err)
+    logger.error('Admin stats error', { error: String(err) })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

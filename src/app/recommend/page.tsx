@@ -27,6 +27,7 @@ import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
 import { IconTarget } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import type { SelectedTobacco } from '@/types/shared'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function RecommendPage() {
   const t = useTranslation('hookah')
@@ -310,6 +311,7 @@ export default function RecommendPage() {
   }, [mixResult, mixItems, router])
 
   return (
+    <ErrorBoundary sectionName="Recommend">
     <div
       className="min-h-screen transition-theme relative overflow-hidden"
       style={{ background: 'var(--color-bg)' }}
@@ -1067,6 +1069,7 @@ export default function RecommendPage() {
         />
       )}
     </div>
+    </ErrorBoundary>
   )
 }
 

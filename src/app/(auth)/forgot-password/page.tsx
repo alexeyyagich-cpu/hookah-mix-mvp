@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
 import { useTranslation } from '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -31,6 +32,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
+    <ErrorBoundary sectionName="Forgot Password">
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <div className="w-20 h-20 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg shadow-[var(--color-primary)]/20">
@@ -105,5 +107,6 @@ export default function ForgotPasswordPage() {
         </form>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

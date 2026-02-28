@@ -16,6 +16,7 @@ import {
   IconCocktail,
   IconWaiter,
 } from '@/components/Icons'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function LandingPage() {
   const { user } = useAuth()
@@ -106,6 +107,7 @@ export default function LandingPage() {
   ]
 
   return (
+    <ErrorBoundary sectionName="Landing">
     <div className="min-h-screen bg-[var(--color-bg)]">
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[var(--color-bg)]/80 border-b border-[var(--color-border)]">
@@ -409,5 +411,6 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+    </ErrorBoundary>
   )
 }
