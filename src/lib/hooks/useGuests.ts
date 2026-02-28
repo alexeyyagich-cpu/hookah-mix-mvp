@@ -424,6 +424,7 @@ export function useGuests(): UseGuestsReturn {
       return false
     }
 
+    setError(null)
     return true
   }
 

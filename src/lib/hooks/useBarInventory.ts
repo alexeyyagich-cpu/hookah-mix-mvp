@@ -220,6 +220,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       return false
     }
 
+    setError(null)
     await fetchInventory()
     return true
   }
@@ -249,6 +250,7 @@ export function useBarInventory(): UseBarInventoryReturn {
       return false
     }
 
+    setError(null)
     await fetchInventory()
     return true
   }

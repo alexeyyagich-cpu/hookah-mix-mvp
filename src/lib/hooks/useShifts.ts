@@ -281,6 +281,7 @@ export function useShifts(): UseShiftsReturn {
       return false
     }
 
+    setError(null)
     setShifts(prev => prev.map(s =>
       s.id === shiftId ? { ...s, ...updates } : s
     ))

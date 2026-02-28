@@ -84,11 +84,11 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
       />
 
       {/* Modal */}
-      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
         <div className={`w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-            <h2 className="font-semibold text-lg">{t.orderConfirmation}</h2>
+            <h2 id="checkout-modal-title" className="font-semibold text-lg">{t.orderConfirmation}</h2>
             {!loading && !success && (
               <button type="button"
                 onClick={handleClose}

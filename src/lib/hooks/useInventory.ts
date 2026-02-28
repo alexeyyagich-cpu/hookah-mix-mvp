@@ -204,6 +204,7 @@ export function useInventory(): UseInventoryReturn {
       return false
     }
 
+    setError(null)
     await fetchInventory()
     return true
   }
@@ -236,6 +237,7 @@ export function useInventory(): UseInventoryReturn {
       return false
     }
 
+    setError(null)
     await fetchInventory()
     return true
   }
