@@ -234,4 +234,6 @@ export const auth = {
   welcomeToTeam: 'Добро пожаловать в команду!',
   redirectingDashboard: 'Перенаправление...',
   error: 'Ошибка',
+  loginFailed: 'Не удалось войти. Попробуйте ещё раз.',
+  registrationFailed: 'Не удалось создать аккаунт. Попробуйте ещё раз.',
 }

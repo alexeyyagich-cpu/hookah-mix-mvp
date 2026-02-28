@@ -160,11 +160,11 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
   if (!visible) return null
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`} role="dialog" aria-modal="true">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-backdropFadeOut' : ''}`} role="dialog" aria-modal="true" aria-labelledby="add-tobacco-title">
       <div ref={dialogRef} className={`w-full max-w-2xl max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] overflow-hidden flex flex-col ${isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
         {/* Header */}
         <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
-          <h2 className="text-xl font-bold">
+          <h2 id="add-tobacco-title" className="text-xl font-bold">
             {isEditing ? t.editTobaccoTitle : t.addTobaccoTitle}
           </h2>
           <button type="button"

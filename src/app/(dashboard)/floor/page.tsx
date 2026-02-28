@@ -793,7 +793,7 @@ function FloorPageInner() {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{g.name}</span>
                         {g.last_mix_snapshot && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--color-success)]/20 text-[var(--color-success)]">mix</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--color-success)]/20 text-[var(--color-success)]">{tm.hasMix}</span>
                         )}
                       </div>
                       {g.visit_count > 0 && (

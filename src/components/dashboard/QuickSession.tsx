@@ -166,10 +166,10 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div ref={dialogRef} role="dialog" aria-modal="true" className="w-full max-w-lg max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] flex flex-col">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="quick-session-title" className="w-full max-w-lg max-h-[90vh] bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] flex flex-col">
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[var(--color-border)] flex items-center justify-between flex-shrink-0">
-          <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+          <h2 id="quick-session-title" className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <IconSmoke size={22} className="text-[var(--color-primary)]" />
             {t.saveSession}
           </h2>

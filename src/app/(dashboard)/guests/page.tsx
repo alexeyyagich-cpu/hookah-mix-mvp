@@ -109,6 +109,7 @@ export default function GuestsPage() {
           <button type="button"
             onClick={() => setShowSettings(!showSettings)}
             className="btn btn-ghost"
+            aria-label={tm.loyaltySettings}
           >
             <IconSettings size={18} />
           </button>
@@ -149,7 +150,7 @@ export default function GuestsPage() {
               value={newPhone}
               onChange={e => setNewPhone(e.target.value)}
               placeholder={tm.guestPhonePlaceholder}
-              className="input w-48"
+              className="input w-full sm:w-48"
             />
             <div className="flex gap-2">
               <button type="button" onClick={handleAddGuest} disabled={!newName.trim()} className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
@@ -215,6 +216,7 @@ export default function GuestsPage() {
           icon={<IconUsers size={32} />}
           title={tm.noGuests}
           description={tm.noGuestsDesc}
+          action={{ label: `+ ${tm.addGuest}`, onClick: () => setShowAddForm(true) }}
         />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

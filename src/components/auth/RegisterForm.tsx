@@ -48,8 +48,8 @@ export function RegisterForm() {
       }
 
       setSuccess(true)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed')
+    } catch {
+      setError(t.registrationFailed)
     } finally {
       setLoading(false)
     }

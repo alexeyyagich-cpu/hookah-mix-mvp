@@ -229,4 +229,6 @@ export const auth: typeof AuthType = {
   welcomeToTeam: 'Welcome to the team!',
   redirectingDashboard: 'Redirecting to dashboard...',
   error: 'Error',
+  loginFailed: 'Login failed. Please try again.',
+  registrationFailed: 'Registration failed. Please try again.',
 }

@@ -35,8 +35,8 @@ export function LoginForm() {
       }
 
       router.push(redirect)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+    } catch {
+      setError(t.loginFailed)
     } finally {
       setLoading(false)
     }

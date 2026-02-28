@@ -18,7 +18,9 @@ import {
   IconExport,
   IconLock,
   IconCocktail,
+  IconChart,
 } from '@/components/Icons'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -193,8 +195,17 @@ export default function ReportsPage() {
         />
       </div>
 
+      {/* Empty state when no data for period */}
+      {!loading && data.totalRevenue === 0 && data.totalCost === 0 && (
+        <EmptyState
+          icon={<IconChart size={32} />}
+          title={tm.noData}
+          description={tm.reportsNoDataHint}
+        />
+      )}
+
       {/* Module tabs */}
-      {isCombined && (
+      {isCombined && (data.totalRevenue > 0 || data.totalCost > 0) && (
         <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1 w-fit">
           {(['all', 'bar', 'hookah'] as ModuleFilter[]).map(filter => (
             <button type="button"
@@ -213,7 +224,7 @@ export default function ReportsPage() {
       )}
 
       {/* Charts */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      {(data.totalRevenue > 0 || data.totalCost > 0) && <div className="grid lg:grid-cols-2 gap-6">
         <div className="card p-5">
           <h2 className="text-lg font-semibold mb-6">{tm.pnlDynamics}</h2>
           {loading ? (
@@ -235,7 +246,7 @@ export default function ReportsPage() {
             <CostBreakdownChart data={filteredCostCategories} />
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Bar details */}
       {isBarActive && showBar && data.bar && (

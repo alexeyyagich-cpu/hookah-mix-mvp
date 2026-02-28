@@ -317,8 +317,8 @@ export default function InventoryPage() {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title={t.deleteItem || 'Delete Item'}
-        message={t.deleteConfirmToast || 'This action cannot be undone.'}
+        title={t.deleteItem}
+        message={t.deleteConfirmToast}
         danger
         onConfirm={async () => {
           if (deleteTarget) {

@@ -229,4 +229,6 @@ export const auth: typeof AuthType = {
   welcomeToTeam: 'Willkommen im Team!',
   redirectingDashboard: 'Weiterleitung...',
   error: 'Fehler',
+  loginFailed: 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+  registrationFailed: 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
 }
