@@ -218,7 +218,7 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
         <div
           className="absolute inset-0 z-[3] rounded-xl pointer-events-none"
           style={{
-            boxShadow: `inset 0 0 0 2px ${tobacco.color}, 0 0 20px ${tobacco.color}40`,
+            boxShadow: `inset 0 0 0 2px ${tobacco.color}, 0 0 10px ${tobacco.color}40`,
           }}
         />
       )}

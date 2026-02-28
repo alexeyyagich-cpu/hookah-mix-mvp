@@ -630,8 +630,8 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--card-color);
   border-width: 3px;
   background: color-mix(in srgb, var(--card-color) 12%, var(--color-bgCard));
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--card-color) 30%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--card-color) 30%, transparent);
 }
 
 .tobacco-card.active::before {

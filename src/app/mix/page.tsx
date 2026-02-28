@@ -818,7 +818,7 @@ function MixPageInner() {
               </div>
 
               {/* Tobacco grid */}
-              <div className="max-h-[480px] overflow-y-auto pr-1 space-y-5">
+              <div className="max-h-[480px] overflow-y-auto space-y-5 p-1 -m-1">
                 {groupedByBrand ? (
                   // Grouped by brand
                   groupedByBrand.map(group => (
