@@ -215,7 +215,8 @@ export function Sidebar() {
   const roleLabels = ORG_ROLE_LABELS[orgRole]
   const roleName = roleLabels ? (locale === 'de' ? roleLabels.de : roleLabels.label) : orgRole
 
-  const NavContent = () => (
+  // Rendered as JSX variable (not a component) to preserve scroll position on re-render
+  const navContent = (
     <>
       {/* Logo */}
       <div className="p-4 border-b border-[var(--color-border)]">
@@ -434,12 +435,12 @@ export function Sidebar() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <NavContent />
+        {navContent}
       </aside>
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex fixed inset-y-0 left-0 z-30 w-72 bg-[var(--color-bgCard)] border-r border-[var(--color-border)] flex-col">
-        <NavContent />
+        {navContent}
       </aside>
     </>
   )
