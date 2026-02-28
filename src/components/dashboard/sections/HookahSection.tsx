@@ -281,13 +281,13 @@ export function HookahSection() {
                   {mix.is_favorite && <IconStar size={14} className="text-[var(--color-warning)]" />}
                 </div>
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {mix.tobaccos.slice(0, 3).map((t, i) => (
+                  {mix.tobaccos.slice(0, 3).map((tobacco, i) => (
                     <span
                       key={i}
                       className="px-1.5 py-0.5 rounded text-xs"
-                      style={{ border: `1px solid ${t.color}` }}
+                      style={{ border: `1px solid ${tobacco.color}` }}
                     >
-                      {t.flavor}
+                      {tobacco.flavor}
                     </span>
                   ))}
                 </div>

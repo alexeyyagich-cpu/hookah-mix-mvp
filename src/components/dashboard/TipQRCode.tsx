@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from '@/lib/i18n'
 
@@ -12,7 +12,9 @@ interface TipQRCodeProps {
 export function TipQRCode({ slug, displayName }: TipQRCodeProps) {
   const ts = useTranslation('settings')
   const svgRef = useRef<HTMLDivElement>(null)
-  const url = `${typeof window !== 'undefined' ? window.location.origin : ''}/tip/${slug}`
+  const [origin, setOrigin] = useState('')
+  useEffect(() => { setOrigin(window.location.origin) }, [])
+  const url = `${origin}/tip/${slug}`
 
   const handleDownload = () => {
     if (!svgRef.current) return

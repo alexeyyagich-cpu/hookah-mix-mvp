@@ -110,7 +110,7 @@ export function PricingCard({
             {tc.loading}
           </>
         ) : (
-          buttonText
+          resolvedButtonText
         )}
       </button>
     </div>

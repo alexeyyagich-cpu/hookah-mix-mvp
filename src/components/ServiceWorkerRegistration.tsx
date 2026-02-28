@@ -7,6 +7,8 @@ import { getPendingCount } from '@/lib/offline/db'
 
 export function ServiceWorkerRegistration() {
   const tc = useTranslation('common')
+  const tcRef = useRef(tc)
+  tcRef.current = tc
   const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
   useEffect(() => {
@@ -40,10 +42,10 @@ export function ServiceWorkerRegistration() {
           if (!mounted) return
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
             // New version available — show toast
-            toast(tc.sw.updateAvailable, {
-              description: tc.sw.updateDescription,
+            toast(tcRef.current.sw.updateAvailable, {
+              description: tcRef.current.sw.updateDescription,
               action: {
-                label: tc.sw.update,
+                label: tcRef.current.sw.update,
                 onClick: async () => {
                   // Wait for pending offline mutations to sync before reloading
                   const pending = await getPendingCount()
@@ -88,7 +90,7 @@ export function ServiceWorkerRegistration() {
         trackedWorker.removeEventListener('statechange', stateChangeHandler)
       }
     }
-  }, [tc])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return null
 }

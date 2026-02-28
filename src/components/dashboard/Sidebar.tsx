@@ -225,7 +225,7 @@ export function Sidebar() {
         setCollapsedGroups(prev => {
           const next = new Set(prev)
           next.delete(group.label!)
-          try { localStorage.setItem('sidebar-collapsed', JSON.stringify([...next])) } catch {}
+          try { localStorage.setItem(sidebarKey, JSON.stringify([...next])) } catch {}
           return next
         })
       }
