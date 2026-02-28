@@ -236,6 +236,16 @@ function MixPageInner() {
     return result;
   }, [selectedBrand, selectedCategory, showInStockOnly, inventoryIds]);
 
+  const groupedByBrand = useMemo(() => {
+    if (selectedBrand) return null; // flat grid when brand is selected
+    const map = new Map<string, typeof TOBACCOS>();
+    for (const t of filteredTobaccos) {
+      if (!map.has(t.brand)) map.set(t.brand, []);
+      map.get(t.brand)!.push(t);
+    }
+    return Array.from(map, ([brand, items]) => ({ brand, items }));
+  }, [filteredTobaccos, selectedBrand]);
+
   const selectedTobaccos = useMemo(
     () => TOBACCOS.filter(t => selectedIds.includes(t.id)),
     [selectedIds]
@@ -815,21 +825,57 @@ function MixPageInner() {
               )}
 
               {/* Tobacco grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1">
-                {filteredTobaccos.map((t) => {
-                  const active = selectedIds.includes(t.id);
-                  const disabled = isAtLimit && !active;
-
-                  return (
-                    <TobaccoCard
-                      key={t.id}
-                      tobacco={t}
-                      isActive={active}
-                      isDisabled={disabled}
-                      onClick={() => !disabled && toggleTobacco(t.id)}
-                    />
-                  );
-                })}
+              <div className="max-h-[480px] overflow-y-auto pr-1 space-y-5">
+                {groupedByBrand ? (
+                  // Grouped by brand
+                  groupedByBrand.map(group => (
+                    <div key={group.brand}>
+                      <div
+                        className="sticky top-0 z-10 flex items-center justify-between px-2 py-2 mb-3 rounded-lg backdrop-blur-md"
+                        style={{ background: 'color-mix(in srgb, var(--color-bgCard) 85%, transparent)' }}
+                      >
+                        <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+                          {group.brand}
+                        </span>
+                        <span className="text-xs tabular-nums" style={{ color: 'var(--color-textMuted)' }}>
+                          {group.items.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {group.items.map((t) => {
+                          const active = selectedIds.includes(t.id);
+                          const disabled = isAtLimit && !active;
+                          return (
+                            <TobaccoCard
+                              key={t.id}
+                              tobacco={t}
+                              isActive={active}
+                              isDisabled={disabled}
+                              onClick={() => !disabled && toggleTobacco(t.id)}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // Flat grid when brand is selected
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {filteredTobaccos.map((t) => {
+                      const active = selectedIds.includes(t.id);
+                      const disabled = isAtLimit && !active;
+                      return (
+                        <TobaccoCard
+                          key={t.id}
+                          tobacco={t}
+                          isActive={active}
+                          isDisabled={disabled}
+                          onClick={() => !disabled && toggleTobacco(t.id)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </section>
 

@@ -131,18 +131,28 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
           LAYER 4: Content
           ════════════════════════════════════════════════════════════════════════ */}
       <div className="relative z-10 h-full flex flex-col">
-        {/* Color indicator dot */}
-        <div
-          className={`
-            absolute top-0 right-0 w-4 h-4 rounded-full transition-all duration-300
-            ${isActive ? "shadow-lg scale-110" : ""}
-            ${isHovered && !isDisabled ? "scale-110" : ""}
-          `}
-          style={{
-            background: tobacco.color,
-            boxShadow: isActive ? `0 0 12px ${tobacco.color}` : undefined,
-          }}
-        />
+        {/* Color indicator / checkmark */}
+        {isActive ? (
+          <div
+            className="absolute top-0 right-0 w-6 h-6 rounded-full flex items-center justify-center shadow-lg"
+            style={{
+              background: tobacco.color,
+              boxShadow: `0 0 14px ${tobacco.color}`,
+            }}
+          >
+            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        ) : (
+          <div
+            className={`
+              absolute top-0 right-0 w-4 h-4 rounded-full transition-all duration-300
+              ${isHovered && !isDisabled ? "scale-110" : ""}
+            `}
+            style={{ background: tobacco.color }}
+          />
+        )}
 
         {/* Brand label */}
         <p
