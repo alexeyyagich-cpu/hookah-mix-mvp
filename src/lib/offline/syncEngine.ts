@@ -9,9 +9,6 @@ import {
 
 const MAX_RETRIES = 3
 
-// Maps temp offline IDs → real server IDs within a single sync batch
-let idMap: Map<string, string> = new Map()
-
 /** Exponential backoff delay: min(1000 * 2^attempt, 30000) + jitter */
 function backoffDelay(retryCount: number): number {
   const base = Math.min(1000 * Math.pow(2, retryCount), 30000)
@@ -25,7 +22,7 @@ export async function processSyncQueue(
   const pending = await getPendingMutations()
   let synced = 0
   let failed = 0
-  idMap = new Map()
+  const idMap = new Map<string, string>()
 
   for (const entry of pending) {
     if (!entry.id) continue
@@ -40,7 +37,7 @@ export async function processSyncQueue(
     await updateMutationStatus(entry.id, 'syncing')
 
     try {
-      await executeMutation(supabase, entry)
+      await executeMutation(supabase, entry, idMap)
       await removeMutation(entry.id)
       synced++
     } catch (err) {
@@ -60,7 +57,7 @@ export async function processSyncQueue(
 }
 
 /** Resolve a single value if it's a temp offline ID that's been synced */
-function resolveId(value: unknown): unknown {
+function resolveId(value: unknown, idMap: Map<string, string>): unknown {
   if (typeof value === 'string' && value.startsWith('offline-') && idMap.has(value)) {
     return idMap.get(value)!
   }
@@ -68,20 +65,21 @@ function resolveId(value: unknown): unknown {
 }
 
 /** Replace any temp offline IDs in a payload object with real server IDs */
-function resolvePayloadIds(payload: Record<string, unknown>): Record<string, unknown> {
+function resolvePayloadIds(payload: Record<string, unknown>, idMap: Map<string, string>): Record<string, unknown> {
   const resolved = { ...payload }
   for (const [key, value] of Object.entries(resolved)) {
-    resolved[key] = resolveId(value)
+    resolved[key] = resolveId(value, idMap)
   }
   return resolved
 }
 
 async function executeMutation(
   supabase: SupabaseClient,
-  entry: SyncQueueEntry
+  entry: SyncQueueEntry,
+  idMap: Map<string, string>
 ): Promise<void> {
   const { table, operation, matchColumn = 'id' } = entry
-  const payload = resolvePayloadIds(entry.payload)
+  const payload = resolvePayloadIds(entry.payload, idMap)
 
   switch (operation) {
     case 'insert': {
@@ -100,7 +98,7 @@ async function executeMutation(
     }
 
     case 'update': {
-      const matchValue = resolveId(payload[matchColumn])
+      const matchValue = resolveId(payload[matchColumn], idMap)
       if (!matchValue) throw new Error(`Missing match column: ${matchColumn}`)
       const updateData = { ...payload }
       delete updateData[matchColumn]
@@ -113,7 +111,7 @@ async function executeMutation(
     }
 
     case 'delete': {
-      const deleteValue = resolveId(payload[matchColumn])
+      const deleteValue = resolveId(payload[matchColumn], idMap)
       if (!deleteValue) throw new Error(`Missing match column: ${matchColumn}`)
       const { error } = await supabase
         .from(table)
@@ -130,7 +128,7 @@ async function executeMutation(
     }
 
     case 'compound': {
-      await executeCompoundMutation(supabase, entry)
+      await executeCompoundMutation(supabase, entry, idMap)
       break
     }
   }
@@ -143,12 +141,13 @@ async function executeMutation(
 
 async function executeCompoundMutation(
   supabase: SupabaseClient,
-  entry: SyncQueueEntry
+  entry: SyncQueueEntry,
+  idMap: Map<string, string>
 ): Promise<void> {
   const { table } = entry
 
   if (table === 'sessions') {
-    await syncSessionCompound(supabase, entry)
+    await syncSessionCompound(supabase, entry, idMap)
     return
   }
 
@@ -174,10 +173,11 @@ async function executeCompoundMutation(
  */
 async function syncSessionCompound(
   supabase: SupabaseClient,
-  entry: SyncQueueEntry
+  entry: SyncQueueEntry,
+  idMap: Map<string, string>
 ): Promise<void> {
   const meta = entry.meta || {}
-  const payload = resolvePayloadIds(entry.payload)
+  const payload = resolvePayloadIds(entry.payload, idMap)
   const entryId = entry.id!
 
   // --- Step 1: Insert session ---

@@ -89,7 +89,11 @@ export async function PATCH(request: NextRequest) {
   // Origin check — defense-in-depth against CSRF
   const origin = request.headers.get('origin')
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
-  if (origin && !appUrl.startsWith(origin)) {
+  try {
+    if (origin && new URL(origin).origin !== new URL(appUrl).origin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  } catch {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
