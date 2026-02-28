@@ -137,7 +137,8 @@ export function MenuSection({
   }
 
   // Hookah tab
-  const selectedIds = tobaccos.map(t => t.tobacco.id)
+  const selectedIds = useMemo(() => new Set(tobaccos.map(t => t.tobacco.id)), [tobaccos])
+  const inventoryByTobaccoId = useMemo(() => new Map(inventory.map(i => [i.tobacco_id, i])), [inventory])
 
   return (
     <div className="space-y-3">
@@ -210,9 +211,9 @@ export function MenuSection({
           {/* Tobacco grid */}
           <div className="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto">
             {filteredTobaccos.map(tobacco => {
-              const isSelected = selectedIds.includes(tobacco.id)
+              const isSelected = selectedIds.has(tobacco.id)
               const isDisabled = tobaccos.length >= 5 && !isSelected
-              const invItem = inventory.find(i => i.tobacco_id === tobacco.id)
+              const invItem = inventoryByTobaccoId.get(tobacco.id)
 
               return (
                 <button type="button"

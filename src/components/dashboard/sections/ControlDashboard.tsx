@@ -14,6 +14,8 @@ import {
 } from '@/components/Icons'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
+const bowlColorMap = { green: 'success', yellow: 'warning', red: 'danger', no_data: 'primary' } as const
+
 export function ControlDashboard() {
   const { data, staffEnriched, loading, refreshing, error } = useDashboardControl()
   const { isHookahActive, isBarActive } = useModules()
@@ -41,8 +43,6 @@ export function ControlDashboard() {
   const combinedRevTrend = revenue_snapshot.combined_revenue_yesterday > 0
     ? Math.round(((revenue_snapshot.combined_revenue_today - revenue_snapshot.combined_revenue_yesterday) / revenue_snapshot.combined_revenue_yesterday) * 100)
     : null
-
-  const bowlColorMap = { green: 'success', yellow: 'warning', red: 'danger', no_data: 'primary' } as const
 
   return (
     <div className="space-y-6">

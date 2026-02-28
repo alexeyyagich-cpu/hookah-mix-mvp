@@ -499,6 +499,7 @@ export default function AnimatedSmokeBackground({ className = "" }: Props) {
   const timeRef = useRef<number>(0);
   const isMobileRef = useRef<boolean>(false);
   const lastMouseMoveRef = useRef<number>(0);
+  const rectRef = useRef<DOMRect | null>(null);
 
   const initClouds = useCallback((width: number, height: number) => {
     cloudsRef.current = [];
@@ -519,9 +520,9 @@ export default function AnimatedSmokeBackground({ className = "" }: Props) {
   const animate = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
+    if (!canvas || !ctx || !rectRef.current) return;
 
-    const rect = canvas.getBoundingClientRect();
+    const rect = rectRef.current;
     timeRef.current += INTENSITY.driftSpeed;
 
     if (!isMobileRef.current) {
@@ -545,6 +546,7 @@ export default function AnimatedSmokeBackground({ className = "" }: Props) {
 
     const setupCanvas = () => {
       const rect = canvas.getBoundingClientRect();
+      rectRef.current = rect;
       const dpr = Math.min(window.devicePixelRatio || 1, PERFORMANCE.maxDPR);
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
@@ -557,7 +559,8 @@ export default function AnimatedSmokeBackground({ className = "" }: Props) {
       const now = performance.now();
       if (now - lastMouseMoveRef.current < PERFORMANCE.mouseThrottleMs) return;
       lastMouseMoveRef.current = now;
-      const rect = canvas.getBoundingClientRect();
+      const rect = rectRef.current;
+      if (!rect) return;
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top, active: true };
     };
 

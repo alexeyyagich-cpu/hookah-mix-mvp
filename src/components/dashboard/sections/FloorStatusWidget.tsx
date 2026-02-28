@@ -11,16 +11,16 @@ export function FloorStatusWidget() {
 
   if (loading || tables.length === 0) return null
 
-  const available = tables.filter(t => t.status === 'available').length
-  const occupied = tables.filter(t => t.status === 'occupied').length
-  const reserved = tables.filter(t => t.status === 'reserved').length
-  const cleaning = tables.filter(t => t.status === 'cleaning').length
+  const counts = tables.reduce((acc, t) => {
+    if (t.status in acc) acc[t.status as keyof typeof acc]++
+    return acc
+  }, { available: 0, occupied: 0, reserved: 0, cleaning: 0 })
 
   const statuses = [
-    { label: t.widgetAvailable, count: available, color: STATUS_COLORS.available.bg },
-    { label: t.widgetOccupied, count: occupied, color: STATUS_COLORS.occupied.bg },
-    { label: t.widgetReserved, count: reserved, color: STATUS_COLORS.reserved.bg },
-    { label: t.widgetCleaning, count: cleaning, color: STATUS_COLORS.cleaning.bg },
+    { label: t.widgetAvailable, count: counts.available, color: STATUS_COLORS.available.bg },
+    { label: t.widgetOccupied, count: counts.occupied, color: STATUS_COLORS.occupied.bg },
+    { label: t.widgetReserved, count: counts.reserved, color: STATUS_COLORS.reserved.bg },
+    { label: t.widgetCleaning, count: counts.cleaning, color: STATUS_COLORS.cleaning.bg },
   ]
 
   return (

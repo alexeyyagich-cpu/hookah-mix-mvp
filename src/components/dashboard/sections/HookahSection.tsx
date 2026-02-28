@@ -61,18 +61,22 @@ export function HookahSection() {
     return () => clearTimeout(timer)
   }, [lowStockItems, notificationSettings?.low_stock_enabled])
 
-  const topMixes = [...savedMixes]
-    .sort((a, b) => b.usage_count - a.usage_count)
-    .slice(0, 3)
+  const topMixes = useMemo(() =>
+    [...savedMixes].sort((a, b) => b.usage_count - a.usage_count).slice(0, 3),
+    [savedMixes]
+  )
 
-  const endingSoon = statistics?.forecasts
-    ?.filter(item =>
-      item.forecast.daysUntilEmpty !== null &&
-      item.forecast.daysUntilEmpty > 0 &&
-      item.forecast.daysUntilEmpty <= 14
-    )
-    .sort((a, b) => (a.forecast.daysUntilEmpty || 0) - (b.forecast.daysUntilEmpty || 0))
-    .slice(0, 4) || []
+  const endingSoon = useMemo(() =>
+    statistics?.forecasts
+      ?.filter(item =>
+        item.forecast.daysUntilEmpty !== null &&
+        item.forecast.daysUntilEmpty > 0 &&
+        item.forecast.daysUntilEmpty <= 14
+      )
+      .sort((a, b) => (a.forecast.daysUntilEmpty || 0) - (b.forecast.daysUntilEmpty || 0))
+      .slice(0, 4) || [],
+    [statistics?.forecasts]
+  )
 
   return (
     <div className="space-y-6">

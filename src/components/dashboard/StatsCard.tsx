@@ -19,20 +19,21 @@ const borderColors = {
   danger: 'var(--color-danger)',
 }
 
-export function StatsCard({ icon, label, value, subtext, trend, color = 'primary' }: StatsCardProps) {
-  const colorClasses = {
-    primary: 'text-[var(--color-primary)]',
-    success: 'text-[var(--color-success)]',
-    warning: 'text-[var(--color-warning)]',
-    danger: 'text-[var(--color-danger)]',
-  }
+const colorClasses = {
+  primary: 'text-[var(--color-primary)]',
+  success: 'text-[var(--color-success)]',
+  warning: 'text-[var(--color-warning)]',
+  danger: 'text-[var(--color-danger)]',
+}
 
-  const bgClasses = {
-    primary: 'bg-[var(--color-primary)]/10',
-    success: 'bg-[var(--color-success)]/10',
-    warning: 'bg-[var(--color-warning)]/10',
-    danger: 'bg-[var(--color-danger)]/10',
-  }
+const bgClasses = {
+  primary: 'bg-[var(--color-primary)]/10',
+  success: 'bg-[var(--color-success)]/10',
+  warning: 'bg-[var(--color-warning)]/10',
+  danger: 'bg-[var(--color-danger)]/10',
+}
+
+export function StatsCard({ icon, label, value, subtext, trend, color = 'primary' }: StatsCardProps) {
 
   return (
     <div

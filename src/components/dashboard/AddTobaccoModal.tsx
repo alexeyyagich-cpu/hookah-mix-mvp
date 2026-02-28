@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
@@ -8,6 +8,8 @@ import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { TOBACCOS } from '@/data/tobaccos'
 import type { TobaccoInventory } from '@/types/database'
 import type { TobaccoBarcode } from '@/lib/data/tobaccoBarcodes'
+
+const BRANDS = Array.from(new Set(TOBACCOS.map(t => t.brand)))
 
 interface AddTobaccoModalProps {
   isOpen: boolean
@@ -105,16 +107,14 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
     setShowCatalog(true)
   }
 
-  const filteredTobaccos = TOBACCOS.filter(t => {
+  const filteredTobaccos = useMemo(() => TOBACCOS.filter(t => {
     if (brandFilter && t.brand !== brandFilter) return false
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
       return t.brand.toLowerCase().includes(q) || t.flavor.toLowerCase().includes(q)
     }
     return true
-  })
-
-  const brands = Array.from(new Set(TOBACCOS.map(t => t.brand)))
+  }), [brandFilter, searchQuery])
 
   const handleSelectFromCatalog = (tobacco: typeof TOBACCOS[0]) => {
     setSelectedTobacco(tobacco.id)
@@ -218,7 +218,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                     >
                       {t.allBrands}
                     </button>
-                    {brands.map(b => (
+                    {BRANDS.map(b => (
                       <button
                         key={b}
                         type="button"
@@ -295,7 +295,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                         required
                       >
                         <option value="">{t.selectBrandOption}</option>
-                        {brands.map((b) => (
+                        {BRANDS.map((b) => (
                           <option key={b} value={b}>{b}</option>
                         ))}
                         <option value="other">{t.otherBrand}</option>
