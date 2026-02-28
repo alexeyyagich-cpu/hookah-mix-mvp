@@ -108,11 +108,8 @@ function MixPageInner() {
   const { inventory, loading: inventoryLoading } = useInventory();
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([TOBACCOS[0].id, TOBACCOS[1].id]);
-  const [percents, setPercents] = useState<Record<string, number>>({
-    [TOBACCOS[0].id]: 60,
-    [TOBACCOS[1].id]: 40,
-  });
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [percents, setPercents] = useState<Record<string, number>>({});
   const [isMixesDrawerOpen, setIsMixesDrawerOpen] = useState(false);
   const [isSavedMixesDrawerOpen, setIsSavedMixesDrawerOpen] = useState(false);
   const [isSaveMixModalOpen, setIsSaveMixModalOpen] = useState(false);
@@ -133,13 +130,9 @@ function MixPageInner() {
   const guestInitRef = React.useRef(false);
   const [showMasterCard, setShowMasterCard] = useState(false);
 
-  // Clear auto-selection in guest mode (useEffect because useSearchParams resolves after first render)
+  // Track guest mode initialization (no auto-selection needed — calculator starts empty)
   React.useEffect(() => {
-    if (isGuestMode && !guestInitRef.current) {
-      guestInitRef.current = true;
-      setSelectedIds([]);
-      setPercents({});
-    }
+    if (isGuestMode) guestInitRef.current = true;
   }, [isGuestMode]);
 
   // Apply a preset mix recipe
@@ -214,18 +207,10 @@ function MixPageInner() {
     }, 100);
   }, []);
 
-  // Apply first popular mix on initial load (without scrolling) — skip in guest mode
+  // Mark as initialized (no auto-selection — calculator starts empty)
   React.useEffect(() => {
-    if (hasInitializedRef.current) return;
     hasInitializedRef.current = true;
-
-    if (isGuestMode) return; // Guest mode starts empty
-
-    const topMix = MIX_RECIPES.find(m => m.popularity >= 5);
-    if (topMix) {
-      applyMixRecipe(topMix, false); // Don't scroll on initial load
-    }
-  }, [applyMixRecipe, isGuestMode]);
+  }, []);
 
   const inventoryIds = useMemo(() => {
     const ids = new Set<string>();
