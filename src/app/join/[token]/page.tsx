@@ -71,7 +71,7 @@ export default function JoinPage() {
     }
 
     loadInvite()
-  }, [token, user])
+  }, [token, user, t.invalidLink])
 
   // Clean up redirect timeout on unmount
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)

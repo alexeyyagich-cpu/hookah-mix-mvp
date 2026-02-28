@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import { useClickOutside } from '@/lib/hooks/useClickOutside'
-import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useStatistics } from '@/lib/hooks/useStatistics'
 import { useStatisticsComparison } from '@/lib/hooks/useStatisticsComparison'

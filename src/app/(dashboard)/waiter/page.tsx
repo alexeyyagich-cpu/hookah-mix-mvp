@@ -10,11 +10,10 @@ import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useModules } from '@/lib/hooks/useModules'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
-import { TOBACCOS, type Tobacco } from '@/data/tobaccos'
+import type { Tobacco } from '@/data/tobaccos'
 import { getHeatRecommendation } from '@/logic/quickRepeatEngine'
 import { IconWaiter, IconLock } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
-import Link from 'next/link'
 import type { BarRecipeWithIngredients, KdsOrderItem, KdsHookahData, StrengthPreference } from '@/types/database'
 import type { BarItemEntry, SelectedTobacco } from '@/types/shared'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -213,7 +212,7 @@ export default function WaiterPage() {
     } finally {
       setSubmitting(false)
     }
-  }, [selectedTableId, barItems, selectedTobaccos, hookahMode, hookahDescription, notes, guestName, tables, createOrder, recordSale, bowls, selectedBowlId, totalGrams, th.orderError])
+  }, [selectedTableId, barItems, selectedTobaccos, hookahMode, hookahDescription, notes, guestName, tables, createOrder, recordSale, bowls, selectedBowlId, totalGrams, th.orderError, locale])
 
   // Multi guard — waiter mode requires Multi or Enterprise
   if (!canUseWaiterTablet) {

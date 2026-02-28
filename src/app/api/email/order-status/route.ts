@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     if (validated.error) {
       return NextResponse.json({ error: validated.error }, { status: 400 })
     }
-    const { profileId, orderId, status, supplierName, orderNumber, total, estimatedDelivery } = validated.data!
+    const { profileId, status, supplierName, orderNumber, total, estimatedDelivery } = validated.data!
 
     // SECURITY: Verify profileId matches authenticated user
     if (user.id !== profileId) {

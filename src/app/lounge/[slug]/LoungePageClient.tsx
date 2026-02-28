@@ -2,6 +2,7 @@
 
 import { use, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePublicLounge } from '@/lib/hooks/useLoungeProfile'
 import { usePublicReviews } from '@/lib/hooks/useReviews'
 import { usePublicReservation } from '@/lib/hooks/useReservations'
@@ -80,7 +81,7 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
     friday: t.loungeDayFri,
     saturday: t.loungeDaySat,
     sunday: t.loungeDaySun,
-  }), [t, locale])
+  }), [t])
 
   const FEATURE_LABELS: Record<LoungeFeature, string> = useMemo(() => ({
     wifi: t.featureWifi,
@@ -96,7 +97,7 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
     playstation: t.featurePlaystation,
     hookah_delivery: t.featureHookahDelivery,
     reservations: t.featureReservations,
-  }), [t, locale])
+  }), [t])
 
   if (loading) {
     return (
@@ -155,10 +156,13 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
       {/* Cover Image */}
       <div className="relative h-64 sm:h-80 overflow-hidden">
         {lounge.cover_image_url ? (
-          <img
+          <Image
             src={lounge.cover_image_url}
             alt={lounge.name}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[var(--color-primary)] to-purple-600" />
