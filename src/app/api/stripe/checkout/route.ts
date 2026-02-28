@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 import { stripe, STRIPE_PRICES } from '@/lib/stripe'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 })
     }
 
-    const { priceId, userId, email, isYearly } = validation.data
+    const { priceId, userId } = validation.data
 
     // SECURITY: Verify userId matches authenticated user
     if (user.id !== userId) {
@@ -89,66 +90,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get or create Stripe customer
-    let customerId: string
-    const supabase = getSupabaseAdmin()
-
     // Check if user already has a Stripe customer ID
+    const supabase = getSupabaseAdmin()
     const { data: profile } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
       .single()
 
-    if (profile?.stripe_customer_id) {
-      customerId = profile.stripe_customer_id
-    } else {
-      // Create new Stripe customer (use auth email, not client-supplied)
-      const customer = await stripe.customers.create({
-        email: user.email || email,
-        metadata: {
-          supabase_user_id: userId,
-        },
-      })
-      customerId = customer.id
-
-      // Save customer ID to profile
-      await supabase
-        .from('profiles')
-        .update({ stripe_customer_id: customerId })
-        .eq('id', userId)
-    }
-
-    // Create checkout session
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
+    // Build checkout session params
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
-      metadata: {
-        supabase_user_id: userId,
-      },
-      subscription_data: {
-        metadata: {
-          supabase_user_id: userId,
-        },
-      },
+      metadata: { supabase_user_id: userId },
+      subscription_data: { metadata: { supabase_user_id: userId } },
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
       locale: 'auto',
-    })
+    }
+
+    if (profile?.stripe_customer_id) {
+      // Returning customer — reuse existing Stripe customer
+      sessionParams.customer = profile.stripe_customer_id
+      sessionParams.customer_update = { name: 'auto', address: 'auto' }
+    }
+    // New customer — no email pre-fill, Stripe creates customer during checkout.
+    // Webhook (handleCheckoutCompleted) links customer_id to the user profile.
+
+    const session = await stripe.checkout.sessions.create(sessionParams)
 
     return NextResponse.json({ sessionId: session.id, url: session.url })
   } catch (error) {
-    console.error('Stripe checkout error:', error)
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('Stripe checkout error:', message, error)
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: `Checkout failed: ${message}` },
       { status: 500 }
     )
   }
