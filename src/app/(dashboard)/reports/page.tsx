@@ -1,14 +1,21 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useClickOutside } from '@/lib/hooks/useClickOutside'
 import { usePnL } from '@/lib/hooks/usePnL'
 import type { PnLPreset } from '@/lib/hooks/usePnL'
 import { useModules } from '@/lib/hooks/useModules'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { StatsCard } from '@/components/dashboard/StatsCard'
-import { PnLChart } from '@/components/dashboard/Charts/PnLChart'
-import { CostBreakdownChart } from '@/components/dashboard/Charts/CostBreakdownChart'
+const PnLChart = dynamic(
+  () => import('@/components/dashboard/Charts/PnLChart').then(m => m.PnLChart),
+  { ssr: false, loading: () => <div className="skeleton h-48 rounded-xl" /> }
+)
+const CostBreakdownChart = dynamic(
+  () => import('@/components/dashboard/Charts/CostBreakdownChart').then(m => m.CostBreakdownChart),
+  { ssr: false, loading: () => <div className="skeleton h-48 rounded-xl" /> }
+)
 import { exportPnLCSV, exportPnLPDF, copyPnLAsText } from '@/lib/utils/exportPnL'
 import {
   IconCoin,

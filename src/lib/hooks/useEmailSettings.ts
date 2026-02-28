@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
 import { useTranslation } from '@/lib/i18n'
-import { isEmailConfigured } from '@/lib/email/resend'
+import { isEmailConfigured } from '@/lib/email/config'
 import type { EmailSettings } from '@/lib/email/types'
 
 // Demo email settings

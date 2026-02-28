@@ -1,11 +1,18 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useAuth } from '@/lib/AuthContext'
 import { useModules } from '@/lib/hooks/useModules'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useTranslation } from '@/lib/i18n'
-import { HookahSection } from '@/components/dashboard/sections/HookahSection'
-import { BarSection } from '@/components/dashboard/sections/BarSection'
+const HookahSection = dynamic(
+  () => import('@/components/dashboard/sections/HookahSection').then(m => m.HookahSection),
+  { loading: () => <div className="skeleton h-64 rounded-xl" /> }
+)
+const BarSection = dynamic(
+  () => import('@/components/dashboard/sections/BarSection').then(m => m.BarSection),
+  { loading: () => <div className="skeleton h-64 rounded-xl" /> }
+)
 import { FloorStatusWidget } from '@/components/dashboard/sections/FloorStatusWidget'
 import { QuickStartCard } from '@/components/dashboard/QuickStartCard'
 import { ControlDashboard } from '@/components/dashboard/sections/ControlDashboard'

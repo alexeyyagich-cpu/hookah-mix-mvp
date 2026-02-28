@@ -10,7 +10,7 @@ import ThemeSwitcher from "@/components/ThemeSwitcher";
 const SmokeCanvasBackground = dynamic(() => import("@/components/SmokeCanvasBackground").then(m => m.SmokeCanvasBackground), { ssr: false });
 import TobaccoCard from "@/components/TobaccoCard";
 const MixesDrawer = dynamic(() => import("@/components/MixesDrawer"), { ssr: false });
-import SlotMachine from "@/components/SlotMachine";
+const SlotMachine = dynamic(() => import("@/components/SlotMachine"), { ssr: false });
 import {
   IconStrength,
   IconHeat,

@@ -17,7 +17,7 @@ import { useKDS } from '@/lib/hooks/useKDS'
 import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useRole } from '@/lib/hooks/useRole'
-import { QRCodeCanvas } from 'qrcode.react'
+import { LazyQRCode as QRCodeCanvas } from '@/components/ui/LazyQRCode'
 import { toast } from 'sonner'
 
 import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
