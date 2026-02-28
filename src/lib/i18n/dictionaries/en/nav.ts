@@ -5,6 +5,12 @@ export const nav: typeof NavType = {
   defaultBusiness: 'My venue',
   defaultUser: 'User',
 
+  adminGroup: 'ADMIN',
+  adminDashboard: 'Control Panel',
+  adminOrganizations: 'Organizations',
+  adminAnalytics: 'Product Analytics',
+  adminSystem: 'System',
+
   operationsGroup: 'OPERATIONS',
   hookahGroup: 'HOOKAH',
   barGroup: 'BAR',

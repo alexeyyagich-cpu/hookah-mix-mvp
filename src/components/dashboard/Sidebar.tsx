@@ -57,7 +57,7 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const { locale } = useLocale()
-  const { profile, signOut } = useAuth()
+  const { profile, signOut, isSuperAdmin } = useAuth()
   const { tier, isTrialTier, isMultiTier, isEnterpriseTier, needsUpgrade } = useSubscription()
   const { organization, orgRole: contextOrgRole } = useOrganizationContext()
   const { orgRole, hasPermission, hasAnyPermission, isOwner } = useRole(contextOrgRole)
@@ -172,7 +172,17 @@ export function Sidebar() {
         { name: t.settings, href: '/settings', Icon: IconSettings, permission: 'settings.view' },
       ],
     },
-  ], [t])
+    // Super-admin section — only visible to platform admins
+    ...(isSuperAdmin ? [{
+      label: t.adminGroup,
+      items: [
+        { name: t.adminDashboard, href: '/admin', Icon: IconCrown, permission: 'dashboard.view' as Permission },
+        { name: t.adminOrganizations, href: '/admin/organizations', Icon: IconUsers, permission: 'dashboard.view' as Permission },
+        { name: t.adminAnalytics, href: '/admin/analytics', Icon: IconChart, permission: 'dashboard.view' as Permission },
+        { name: t.adminSystem, href: '/admin/system', Icon: IconSettings, permission: 'dashboard.view' as Permission },
+      ],
+    }] : []),
+  ], [t, isSuperAdmin])
 
   // Build flat list of all items for active-state matching
   const allItems = useMemo(() => navigationGroups.flatMap(g => g.items), [navigationGroups])

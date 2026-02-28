@@ -51,6 +51,7 @@ interface AuthContextType {
   loading: boolean
   isConfigured: boolean
   isDemoMode: boolean
+  isSuperAdmin: boolean
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signUp: (email: string, password: string, metadata?: { business_name?: string; owner_name?: string }) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
@@ -67,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(isSupabaseConfigured)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
 
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
@@ -85,6 +87,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     return data as Profile
+  }, [supabase])
+
+  const checkSuperAdmin = useCallback(async (userId: string) => {
+    if (!supabase) return false
+    const { data } = await supabase
+      .from('system_superadmins')
+      .select('id')
+      .eq('user_id', userId)
+      .single()
+    return !!data
   }, [supabase])
 
   const refreshProfile = useCallback(async () => {
@@ -121,8 +133,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null)
 
         if (session?.user) {
-          const profileData = await fetchProfile(session.user.id)
-          if (isMounted) setProfile(profileData)
+          const [profileData, superAdmin] = await Promise.all([
+            fetchProfile(session.user.id),
+            checkSuperAdmin(session.user.id),
+          ])
+          if (isMounted) {
+            setProfile(profileData)
+            setIsSuperAdmin(superAdmin)
+          }
         }
       } catch (error) {
         if (process.env.NODE_ENV !== 'production') console.error('Failed to get initial session:', error)
@@ -149,12 +167,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             fetchProfile(session.user.id).then(profileData => {
               if (isMounted) setProfile(profileData)
             })
+            checkSuperAdmin(session.user.id).then(result => {
+              if (isMounted) setIsSuperAdmin(result)
+            })
           }
           setLoading(false)
         } else if (event === 'SIGNED_OUT') {
           setSession(null)
           setUser(null)
           setProfile(null)
+          setIsSuperAdmin(false)
           setLoading(false)
         }
       }
@@ -165,7 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeout)
       subscription.unsubscribe()
     }
-  }, [supabase, fetchProfile])
+  }, [supabase, fetchProfile, checkSuperAdmin])
 
   const signIn = useCallback(async (email: string, password: string) => {
     if (!supabase) {
@@ -240,6 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     isConfigured: isSupabaseConfigured,
     isDemoMode: DEMO_MODE || user?.email === 'demo@hookahtorus.com',
+    isSuperAdmin,
     signIn,
     signUp,
     signOut,
@@ -247,7 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshProfile,
     resetPasswordForEmail,
     updatePassword,
-  }), [user, session, profile, loading, signIn, signUp, signOut, signInDemo, refreshProfile, resetPasswordForEmail, updatePassword])
+  }), [user, session, profile, loading, isSuperAdmin, signIn, signUp, signOut, signInDemo, refreshProfile, resetPasswordForEmail, updatePassword])
 
   return (
     <AuthContext.Provider value={value}>

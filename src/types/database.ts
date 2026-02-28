@@ -1017,3 +1017,33 @@ export const SUBSCRIPTION_LIMITS = {
   multi: MULTI_LIMITS,
   enterprise: MULTI_LIMITS,
 } as const
+
+// =============================================================================
+// SUPER-ADMIN TYPES
+// =============================================================================
+
+export interface AdminOrganization extends Organization {
+  member_count: number
+  location_count: number
+  last_activity: string | null
+  owner_email: string | null
+  owner_name: string | null
+}
+
+export interface AdminStats {
+  total_orgs: number
+  orgs_by_tier: Record<SubscriptionTier, number>
+  active_orgs_7d: number
+  mrr: number
+  trials_expiring_7d: number
+  recent_signups_30d: number
+  trial_to_paid_rate: number
+  total_users: number
+}
+
+export interface AdminOrgDetail extends AdminOrganization {
+  members: OrgMember[]
+  locations: Location[]
+  sessions_count: number
+  bar_sales_count: number
+}

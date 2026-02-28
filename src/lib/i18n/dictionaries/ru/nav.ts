@@ -4,6 +4,13 @@ export const nav = {
   defaultBusiness: 'Мое заведение',
   defaultUser: 'Пользователь',
 
+  // Admin
+  adminGroup: 'АДМИН',
+  adminDashboard: 'Панель управления',
+  adminOrganizations: 'Организации',
+  adminAnalytics: 'Аналитика продукта',
+  adminSystem: 'Система',
+
   // Groups
   operationsGroup: 'ОПЕРАЦИИ',
   hookahGroup: 'КАЛЬЯННАЯ',
