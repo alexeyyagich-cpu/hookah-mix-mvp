@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 import { isEmailConfigured } from '@/lib/email/resend'
 import type { EmailSettings } from '@/lib/email/types'
 
@@ -35,6 +36,7 @@ export function useEmailSettings(): UseEmailSettingsReturn {
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const tc = useTranslation('common')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -90,7 +92,7 @@ export function useEmailSettings(): UseEmailSettingsReturn {
         setSettings(data)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load email settings')
+      setError(err instanceof Error ? err.message : tc.errorLoading)
     } finally {
       clearTimeout(timeout)
       setLoading(false)
@@ -123,7 +125,7 @@ export function useEmailSettings(): UseEmailSettingsReturn {
       if (updateError) throw updateError
       setSettings(prev => prev ? { ...prev, ...updates, updated_at: new Date().toISOString() } : null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update settings')
+      setError(err instanceof Error ? err.message : tc.errorSaving)
     }
   }, [user, supabase, settings, isDemoMode])
 

@@ -57,6 +57,8 @@ export const common: typeof CommonType = {
   errorDeleting: 'Fehler beim Löschen',
   errorLoading: 'Fehler beim Laden',
   errorGeneric: 'Etwas ist schiefgelaufen',
+  insufficientStock: 'Nicht genügend Bestand',
+  venueNotFound: 'Lokal nicht gefunden',
   invalidValue: 'Ungültiger Wert',
 
   roles: {

@@ -116,11 +116,11 @@ export function DeliveryModal({
       />
 
       {/* Modal */}
-      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="delivery-modal-title">
         <div className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl shadow-xl animate-fadeInUp">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-            <h2 className="font-semibold text-lg">
+            <h2 id="delivery-modal-title" className="font-semibold text-lg">
               {step === 'confirm' && t.confirmDeliveryTitle}
               {step === 'inventory' && t.addToInventory}
               {step === 'success' && t.doneLabel}

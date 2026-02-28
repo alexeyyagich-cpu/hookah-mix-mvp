@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useAuth } from '@/lib/AuthContext'
+import { useTranslation } from '@/lib/i18n'
 import type { SavedMix, SavedMixTobacco } from '@/types/database'
 
 // Demo saved mixes
@@ -74,6 +75,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
   const [error, setError] = useState<string | null>(null)
 
   const { user, isDemoMode } = useAuth()
+  const tc = useTranslation('common')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -103,7 +105,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
       if (fetchError) throw fetchError
       setSavedMixes(data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load mixes')
+      setError(err instanceof Error ? err.message : tc.errorLoading)
     }
 
     setLoading(false)
@@ -158,7 +160,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
 
       setSavedMixes(prev => [data, ...prev])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save mix')
+      setError(err instanceof Error ? err.message : tc.errorSaving)
       throw err
     }
   }, [user, supabase, isDemoMode])

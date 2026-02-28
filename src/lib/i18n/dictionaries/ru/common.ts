@@ -61,6 +61,8 @@ export const common = {
   errorDeleting: 'Ошибка удаления',
   errorLoading: 'Ошибка загрузки',
   errorGeneric: 'Что-то пошло не так',
+  insufficientStock: 'Недостаточно запасов',
+  venueNotFound: 'Заведение не найдено',
   invalidValue: 'Некорректное значение',
 
   // Roles

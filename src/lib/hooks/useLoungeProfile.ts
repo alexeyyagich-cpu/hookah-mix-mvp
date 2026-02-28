@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
 import type { LoungeProfile, PublicMix, PublicBarRecipe } from '@/types/lounge'
 import { translateError } from '@/lib/utils/translateError'
+import { useTranslation } from '@/lib/i18n'
 // Demo lounge profile
 const DEMO_LOUNGE: LoungeProfile = {
   id: 'demo-lounge-1',
@@ -119,6 +120,7 @@ interface UseLoungeProfileReturn {
 
 export function useLoungeProfile(): UseLoungeProfileReturn {
   const { user, isDemoMode } = useAuth()
+  const tc = useTranslation('common')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
   const [lounge, setLounge] = useState<LoungeProfile | null>(null)
   const [mixes, setMixes] = useState<PublicMix[]>([])
@@ -204,7 +206,7 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
         }
       } catch (e) {
         if (!mounted) return
-        setError(e instanceof Error ? e.message : 'Failed to load lounge profile')
+        setError(e instanceof Error ? e.message : tc.errorLoading)
       }
       if (mounted) setLoading(false)
     }
@@ -363,6 +365,7 @@ interface UsePublicLoungeReturn {
 }
 
 export function usePublicLounge(slug: string): UsePublicLoungeReturn {
+  const tc = useTranslation('common')
   const [lounge, setLounge] = useState<LoungeProfile | null>(null)
   const [mixes, setMixes] = useState<PublicMix[]>([])
   const [barRecipes, setBarRecipes] = useState<PublicBarRecipe[]>([])
@@ -441,7 +444,7 @@ export function usePublicLounge(slug: string): UsePublicLoungeReturn {
       .catch((err) => {
         if (err?.name === 'AbortError') return
         if (!mounted) return
-        setError(err?.message === 'not_found' ? 'Venue not found' : translateError(err))
+        setError(err?.message === 'not_found' ? tc.venueNotFound : translateError(err))
         setLoading(false)
       })
 

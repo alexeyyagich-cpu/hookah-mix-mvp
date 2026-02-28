@@ -110,11 +110,12 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
         className="relative bg-[var(--color-bgCard)] rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-xl"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="import-modal-title"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-          <h2 className="text-lg font-bold flex items-center gap-2">
+          <h2 id="import-modal-title" className="text-lg font-bold flex items-center gap-2">
             <IconExport size={20} />
             {t.importTitle}
           </h2>

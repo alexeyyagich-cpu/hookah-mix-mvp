@@ -9,6 +9,7 @@ import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BarInventoryItem, BarTransaction, BarTransactionType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
+import { useTranslation } from '@/lib/i18n'
 // Demo bar inventory — Leipzig hookah lounge
 const t = new Date().toISOString()
 const bi = (id: string, name: string, brand: string, cat: BarInventoryItem['category'], unit: string, qty: number, min: number, price: number, pkg: number, notes: string | null = null): BarInventoryItem => ({
@@ -70,6 +71,8 @@ export function useBarInventory(): UseBarInventoryReturn {
   const [error, setError] = useState<string | null>(null)
   const { user, profile, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
+  const tb = useTranslation('bar')
+  const tc = useTranslation('common')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -143,7 +146,7 @@ export function useBarInventory(): UseBarInventoryReturn {
   ): Promise<BarInventoryItem | null> => {
     if (!user) return null
     if (!canAddMore) {
-      setError(`Limit reached (${itemsLimit} items). Upgrade your plan.`)
+      setError(tb.freeTierLimit(itemsLimit))
       return null
     }
 
@@ -263,7 +266,7 @@ export function useBarInventory(): UseBarInventoryReturn {
 
     const newQuantity = item.quantity + quantityChange
     if (newQuantity < 0) {
-      setError('Insufficient stock')
+      setError(tc.insufficientStock)
       return false
     }
 

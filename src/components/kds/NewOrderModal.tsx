@@ -335,12 +335,12 @@ export function NewOrderModal({
   if (!isOpen) return null
 
   return (
-    <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div ref={dialogRef} className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="new-order-title">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={onClose} />
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)] flex items-center justify-between">
-          <h2 className="text-xl font-bold">{t.newOrderHeader}</h2>
+          <h2 id="new-order-title" className="text-xl font-bold">{t.newOrderHeader}</h2>
           <button type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-[var(--color-bgHover)] transition-colors"

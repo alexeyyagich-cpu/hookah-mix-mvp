@@ -44,6 +44,7 @@ export function useInventory(): UseInventoryReturn {
   const { user, profile, isDemoMode } = useAuth()
   const { organizationId, locationId } = useOrganizationContext()
   const th = useTranslation('hookah')
+  const tc = useTranslation('common')
   const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Return demo data if in demo mode
@@ -254,7 +255,7 @@ export function useInventory(): UseInventoryReturn {
 
     const newQuantity = tobacco.quantity_grams + quantityChange
     if (newQuantity < 0) {
-      setError('Insufficient tobacco stock')
+      setError(tc.insufficientStock)
       return false
     }
 
