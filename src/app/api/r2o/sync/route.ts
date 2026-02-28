@@ -6,6 +6,7 @@ import { decrypt } from '@/lib/ready2order/crypto'
 import { createProduct, updateProduct, getProducts } from '@/lib/ready2order/client'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { getUserTier, hasFeatureAccess, featureNotAvailable } from '@/lib/subscriptionGuard'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -161,7 +162,7 @@ export async function POST(request: NextRequest) {
         }
         synced++
       } catch (err) {
-        console.error(`Failed to sync ${productName}:`, err)
+        logger.error('Failed to sync product', { product: productName, error: String(err) })
         errors++
 
         if (existingMapping) {
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ synced, errors, total: inventory.length })
   } catch (error) {
-    console.error('r2o sync error:', error)
+    logger.error('R2O sync error', { error: String(error) })
     return NextResponse.json(
       { error: 'Sync failed' },
       { status: 500 }

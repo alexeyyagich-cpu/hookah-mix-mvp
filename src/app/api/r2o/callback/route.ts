@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { encrypt } from '@/lib/ready2order/crypto'
 import { registerWebhook, createProductGroup, getAccountId } from '@/lib/ready2order/client'
+import { logger } from '@/lib/logger'
 
 function clearStateCookie(response: NextResponse): NextResponse {
   response.cookies.delete('r2o_state')
@@ -103,13 +104,13 @@ export async function GET(request: NextRequest) {
       })
 
     if (upsertError) {
-      console.error('r2o connection upsert error:', upsertError)
+      logger.error('R2O connection upsert error', { error: String(upsertError) })
       return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=db`))
     }
 
     return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=connected`))
   } catch (error) {
-    console.error('r2o callback error:', error)
+    logger.error('R2O callback error', { error: String(error) })
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
     return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=unknown`))
   }

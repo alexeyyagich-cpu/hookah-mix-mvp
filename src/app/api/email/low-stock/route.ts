@@ -6,6 +6,7 @@ import { sendEmail, generateLowStockEmailHtml, isEmailConfigured } from '@/lib/e
 import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { emailLowStockSchema, validateBody } from '@/lib/validation'
+import { logger } from '@/lib/logger'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -124,13 +125,13 @@ export async function POST(request: NextRequest) {
           requireInteraction: true,
         })
       } catch (pushError) {
-        console.error('Push notification failed:', pushError)
+        logger.error('Push notification failed', { error: String(pushError) })
       }
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Low stock email error:', error)
+    logger.error('Low stock email error', { error: String(error) })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/ready2order/crypto'
 import { deleteWebhook } from '@/lib/ready2order/client'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ disconnected: true })
   } catch (error) {
-    console.error('r2o disconnect error:', error)
+    logger.error('R2O disconnect error', { error: String(error) })
     return NextResponse.json(
       { error: 'Disconnect failed' },
       { status: 500 }

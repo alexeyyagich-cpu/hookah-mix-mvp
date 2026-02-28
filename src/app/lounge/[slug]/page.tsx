@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import LoungePageClient from './LoungePageClient'
@@ -10,7 +11,7 @@ function getSupabase() {
   )
 }
 
-async function fetchLounge(slug: string) {
+const fetchLounge = cache(async (slug: string) => {
   const supabase = getSupabase()
   const { data } = await supabase
     .from('lounge_profiles')
@@ -19,7 +20,7 @@ async function fetchLounge(slug: string) {
     .eq('is_published', true)
     .single()
   return data
-}
+})
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params

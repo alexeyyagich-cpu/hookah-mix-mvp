@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import Anthropic from '@anthropic-ai/sdk'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { ocrExtractResponseSchema } from '@/lib/validation'
+import { logger } from '@/lib/logger'
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 
@@ -117,7 +118,7 @@ Rules:
 
     return NextResponse.json(validated.data)
   } catch (error) {
-    console.error('OCR extraction error:', error)
+    logger.error('OCR extraction error', { error: String(error) })
     return NextResponse.json({ error: 'Extraction failed' }, { status: 500 })
   }
 }

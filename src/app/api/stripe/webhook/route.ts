@@ -273,5 +273,5 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   // Actual downgrade happens via handleSubscriptionUpdate when the
   // subscription status transitions to past_due/unpaid/canceled.
   const customerId = extractId(invoice.customer) ?? 'unknown'
-  console.warn('Payment failed for customer:', customerId, 'invoice:', invoice.id)
+  logger.warn('Payment failed', { customerId, invoiceId: invoice.id })
 }

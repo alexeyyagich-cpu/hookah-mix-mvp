@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { inviteSendSchema, validateBody } from '@/lib/validation'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -134,14 +135,14 @@ export async function POST(req: NextRequest) {
       })
 
       if (!res.ok) {
-        console.error('Resend API error:', res.status, await res.text().catch(() => ''))
+        logger.error('Resend API error', { status: res.status })
         return NextResponse.json({ error: 'Failed to send email' }, { status: 502 })
       }
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Invite send error:', error)
+    logger.error('Invite send error', { error: String(error) })
     return NextResponse.json({ error: 'Failed to send invite' }, { status: 500 })
   }
 }

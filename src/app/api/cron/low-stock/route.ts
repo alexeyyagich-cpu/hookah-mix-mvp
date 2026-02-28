@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   // Rate limit: prevent abuse if cron secret leaks
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     .limit(1000)
 
   if (queryError) {
-    console.error('Cron low-stock query failed:', queryError)
+    logger.error('Cron low-stock query failed', { error: String(queryError) })
     return NextResponse.json({ error: 'Database query failed' }, { status: 500 })
   }
 
@@ -51,25 +52,27 @@ export async function GET(request: NextRequest) {
     byProfile.set(item.profile_id, existing)
   }
 
-  let totalSent = 0
-  for (const [profileId, items] of byProfile) {
-    const count = items.length
-    const body = items
-      .slice(0, 3)
-      .map((i) => `${i.brand} ${i.flavor}: ${i.quantity_grams}g`)
-      .join('\n') + (count > 3 ? `\n...and ${count - 3} more` : '')
+  const results = await Promise.allSettled(
+    [...byProfile.entries()].map(async ([profileId, items]) => {
+      const count = items.length
+      const body = items
+        .slice(0, 3)
+        .map((i) => `${i.brand} ${i.flavor}: ${i.quantity_grams}g`)
+        .join('\n') + (count > 3 ? `\n...and ${count - 3} more` : '')
 
-    try {
-      const sent = await sendPushToUser(profileId, {
+      return sendPushToUser(profileId, {
         title: `Low stock: ${count} ${count === 1 ? 'item' : 'items'}`,
         body,
         tag: 'low-stock-daily',
         url: '/inventory',
       })
-      totalSent += sent
-    } catch (err) {
-      console.error(`Push failed for profile ${profileId}:`, err)
-    }
+    })
+  )
+
+  let totalSent = 0
+  for (const result of results) {
+    if (result.status === 'fulfilled') totalSent += result.value
+    else logger.error('Push failed', { error: String(result.reason) })
   }
 
   return NextResponse.json({ sent: totalSent, profiles: byProfile.size })

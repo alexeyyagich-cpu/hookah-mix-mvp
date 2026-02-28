@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { tipCreateSessionSchema, validateBody } from '@/lib/validation'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   // Rate limit: strict (10/min per IP) for payment session creation
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
       { status: 503 }
     )
   } catch (error) {
-    console.error('Tip session error:', error)
+    logger.error('Tip session error', { error: String(error) })
     return NextResponse.json(
       { error: 'Failed to create tip session' },
       { status: 500 }

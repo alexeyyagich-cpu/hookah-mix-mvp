@@ -8,6 +8,7 @@ import {
 } from '@/lib/telegram/bot'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { telegramUpdateSchema } from '@/lib/validation'
+import { logger } from '@/lib/logger'
 import type { TelegramUpdate } from '@/lib/telegram/types'
 import type { Session, BarSale, TobaccoInventory, Shift } from '@/types/database'
 import { STRIPE_MESSAGE_MAX_LENGTH } from '@/lib/constants'
@@ -439,7 +440,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (error) {
-    console.error('Telegram webhook error:', error)
+    logger.error('Telegram webhook error', { error: String(error) })
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 })
   }
 }

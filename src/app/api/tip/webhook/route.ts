@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import Stripe from 'stripe'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
     try {
       event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
     } catch (err) {
-      console.error('Tip webhook signature verification failed:', err)
+      logger.error('Tip webhook signature verification failed', { error: String(err) })
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       const amountTotal = session.amount_total
 
       if (!staffProfileId || !amountTotal) {
-        console.error('Missing tip metadata in checkout session')
+        logger.error('Missing tip metadata in checkout session')
         return NextResponse.json({ received: true })
       }
 
@@ -107,14 +108,14 @@ export async function POST(request: NextRequest) {
       })
 
       if (insertError) {
-        console.error('Failed to insert tip:', insertError)
+        logger.error('Failed to insert tip', { error: String(insertError) })
         return NextResponse.json({ error: 'Insert failed' }, { status: 500 })
       }
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Tip webhook error:', error)
+    logger.error('Tip webhook error', { error: String(error) })
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }

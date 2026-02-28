@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { grantAccessToken } from '@/lib/ready2order/client'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { getUserTier, hasFeatureAccess, featureNotAvailable } from '@/lib/subscriptionGuard'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     })
     return response
   } catch (error) {
-    console.error('r2o connect error:', error)
+    logger.error('R2O connect error', { error: String(error) })
     return NextResponse.json(
       { error: 'Failed to initiate POS connection' },
       { status: 500 }

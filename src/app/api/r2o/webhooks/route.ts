@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { timingSafeEqual } from 'crypto'
 import type { R2OWebhookEvent } from '@/lib/ready2order/types'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('r2o webhook error:', error)
+    logger.error('R2O webhook error', { error: String(error) })
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }

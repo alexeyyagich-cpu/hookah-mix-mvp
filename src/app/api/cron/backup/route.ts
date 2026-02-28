@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { logger } from '@/lib/logger'
 
 // All business tables to back up
 const TABLES = [
@@ -70,23 +71,26 @@ export async function GET(request: NextRequest) {
   const dateStr = timestamp.slice(0, 10) // YYYY-MM-DD
 
   try {
-    // Dump all tables
+    // Dump all tables in parallel
     const tables: Record<string, unknown[]> = {}
     let totalRows = 0
     const errors: string[] = []
 
-    for (const table of TABLES) {
-      const { data, error } = await supabase
-        .from(table)
-        .select('*')
-        .limit(50000)
+    const results = await Promise.all(
+      TABLES.map(async (table) => {
+        const { data, error } = await supabase
+          .from(table)
+          .select('*')
+          .limit(50000)
+        return { table, data, error }
+      })
+    )
 
+    for (const { table, data, error } of results) {
       if (error) {
-        // Table might not exist yet — log and continue
         errors.push(`${table}: ${error.message}`)
         continue
       }
-
       tables[table] = data || []
       totalRows += (data || []).length
     }
@@ -114,9 +118,9 @@ export async function GET(request: NextRequest) {
       })
 
     if (uploadError) {
-      console.error('Backup upload failed:', uploadError)
+      logger.error('Backup upload failed', { error: String(uploadError) })
       return NextResponse.json(
-        { error: 'Upload failed', detail: uploadError.message },
+        { error: 'Upload failed' },
         { status: 500 }
       )
     }
@@ -154,9 +158,9 @@ export async function GET(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     })
   } catch (err) {
-    console.error('Backup cron failed:', err)
+    logger.error('Backup cron failed', { error: String(err) })
     return NextResponse.json(
-      { error: 'Backup failed', detail: String(err) },
+      { error: 'Backup failed' },
       { status: 500 }
     )
   }
