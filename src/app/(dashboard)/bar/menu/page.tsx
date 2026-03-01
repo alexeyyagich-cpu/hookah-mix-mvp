@@ -43,6 +43,7 @@ export default function BarMenuPage() {
   } = useBarRecipes()
 
   const [editingPrice, setEditingPrice] = useState<string | null>(null)
+  const [togglingMenu, setTogglingMenu] = useState<string | null>(null)
   const [priceValue, setPriceValue] = useState('')
   const [priceSaving, setPriceSaving] = useState(false)
   const [groupBy, setGroupBy] = useState<'method' | 'none'>('method')
@@ -275,14 +276,18 @@ export default function BarMenuPage() {
                           <td className="px-4 py-3 text-center">
                             <button type="button"
                               onClick={async () => {
+                                setTogglingMenu(recipe.id)
                                 try {
                                   await toggleOnMenu(recipe.id)
                                   toast.success(tc.saved)
                                 } catch {
                                   toast.error(tc.errorSaving)
+                                } finally {
+                                  setTogglingMenu(null)
                                 }
                               }}
-                              className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
+                              disabled={togglingMenu === recipe.id}
+                              className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
                               title={tb.removeFromMenuTitle}
                             >
                               <svg className="w-4 h-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">

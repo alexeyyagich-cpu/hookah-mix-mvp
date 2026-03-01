@@ -95,7 +95,7 @@ export default function TipPageClient({ params }: { params: Promise<{ slug: stri
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <div className="animate-spin w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full" role="status" aria-label="Loading" />
       </div>
     )
   }

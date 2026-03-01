@@ -39,6 +39,7 @@ export default function PromotionsPage() {
   const [maxUses, setMaxUses] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
 
   if (!canUseCRM) {
     return (
@@ -291,14 +292,18 @@ export default function PromotionsPage() {
                 </span>
                 <button type="button"
                   onClick={async () => {
+                    setTogglingId(promo.id)
                     try {
                       await toggleActive(promo.id)
                       toast.success(tc.saved)
                     } catch {
                       toast.error(tc.errorSaving)
+                    } finally {
+                      setTogglingId(null)
                     }
                   }}
-                  className={`shrink-0 w-10 h-6 rounded-full transition-colors relative ${
+                  disabled={togglingId === promo.id}
+                  className={`shrink-0 w-10 h-6 rounded-full transition-colors relative disabled:opacity-50 ${
                     promo.is_active ? 'bg-[var(--color-success)]' : 'bg-[var(--color-bgHover)]'
                   }`}
                 >
