@@ -27,6 +27,7 @@ import {
 } from "@/components/Icons";
 import { MIX_RECIPES, type MixRecipe } from "@/data/mixes";
 import { calculateMix, validateMix, type MixItem } from "@/logic/mixCalculator";
+import { distributePercents, rebalancePercents, type TobaccoItem } from "@/logic/percentDistribution";
 import { useTheme } from "@/lib/ThemeContext";
 import { useAuth } from "@/lib/AuthContext";
 import { QuickSession } from "@/components/dashboard/QuickSession";
@@ -36,7 +37,6 @@ import { useGuests } from "@/lib/hooks/useGuests";
 import { SaveMixModal } from "@/components/mix/SaveMixModal";
 import { SavedMixesDrawer } from "@/components/mix/SavedMixesDrawer";
 import { MixCostBreakdown } from "@/components/mix/MixCostBreakdown";
-import { RecentGuests } from "@/components/guests/RecentGuests";
 import { useInventory } from "@/lib/hooks/useInventory";
 import { SessionTimer } from "@/components/session/SessionTimer";
 import type { MixSnapshot } from "@/types/database";
@@ -44,6 +44,8 @@ import { useTranslation } from "@/lib/i18n";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import Link from "next/link";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { MasterCard } from "./MasterCard";
+import { GuestDrawer } from "./GuestDrawer";
 
 const BRANDS = getBrandNames();
 
@@ -75,10 +77,6 @@ const CATEGORY_EMOJI: Record<Category, string> = {
   spice: "🌶️",
   herbal: "🌿",
 };
-
-function roundToInt(v: number) {
-  return Math.max(0, Math.min(100, Math.round(v)));
-}
 
 function MixPageInner() {
   const t = useTranslation('hookah');
@@ -334,24 +332,8 @@ function MixPageInner() {
   }, []);
 
   const normalizePercents = useCallback((changedId: string, nextValue: number) => {
-    const ids = selectedIds;
-    const n = ids.length;
-    const next: Record<string, number> = { ...percents, [changedId]: roundToInt(nextValue) };
-    const others = ids.filter(id => id !== changedId);
-    const remaining = 100 - next[changedId];
-
-    if (n === 2) {
-      next[others[0]] = remaining;
-    } else {
-      const a = others[0], b = others[1];
-      const curA = percents[a] ?? 0;
-      const curB = percents[b] ?? 0;
-      const sum = curA + curB || 1;
-      next[a] = roundToInt((curA / sum) * remaining);
-      next[b] = remaining - next[a];
-    }
-    setPercents(next);
-  }, [selectedIds, percents]);
+    setPercents(prev => rebalancePercents(prev, changedId, nextValue, selectedIds));
+  }, [selectedIds]);
 
   React.useEffect(() => {
     // Skip normalization if we just applied a mix recipe
@@ -366,35 +348,12 @@ function MixPageInner() {
       const sum = selectedIds.reduce((acc, id) => acc + (next[id] ?? 0), 0);
       const hasZeroPercent = selectedIds.some(id => (next[id] ?? 0) <= 0);
 
-      // Redistribute if sum is not 100 OR if any tobacco has 0% (newly added)
       if ((sum !== 100 || hasZeroPercent) && selectedIds.length >= 2) {
-        // Special caps for specific tobaccos
-        const SUPERNOVA_ID = 'ds1'; // Darkside Supernova - max 2g per 20g bowl = 10%
-        const supernovaCap = 10;
-        const mintCap = 25; // General mint cap
-
-        const tobaccoList = selectedIds.map(id => TOBACCOS.find(t => t.id === id)).filter(Boolean);
-
-        // Separate Supernova, other mints, and non-mints
-        const hasSupernova = selectedIds.includes(SUPERNOVA_ID);
-        const mintIds = tobaccoList
-          .filter(t => t?.category === 'mint' && t?.id !== SUPERNOVA_ID)
-          .map(t => t!.id);
-        const nonMintIds = selectedIds.filter(id => id !== SUPERNOVA_ID && !mintIds.includes(id));
-
-        // Calculate totals with caps
-        const supernovaTotal = hasSupernova ? supernovaCap : 0;
-        const mintTotal = mintIds.length * mintCap;
-        const nonMintTotal = 100 - supernovaTotal - mintTotal;
-
-        // Distribute percentages
-        if (hasSupernova) { next[SUPERNOVA_ID] = supernovaCap; }
-        mintIds.forEach(id => { next[id] = mintCap; });
-
-        // Distribute remaining to non-mint tobaccos
-        const nonMintBase = nonMintIds.length > 0 ? Math.floor(nonMintTotal / nonMintIds.length) : 0;
-        const remainder = nonMintIds.length > 0 ? nonMintTotal - nonMintBase * nonMintIds.length : 0;
-        nonMintIds.forEach((id, idx) => { next[id] = nonMintBase + (idx === 0 ? remainder : 0); });
+        const tobaccoList = selectedIds.map(id => TOBACCOS.find(t => t.id === id)).filter(Boolean) as TobaccoItem[];
+        const distribution = distributePercents(tobaccoList);
+        for (const id of selectedIds) {
+          next[id] = distribution[id] ?? next[id] ?? 0;
+        }
       }
       return next;
     });
@@ -1333,47 +1292,11 @@ function MixPageInner() {
 
       {/* Guests Drawer for Quick Repeat */}
       {isBusinessUser && isGuestsDrawerOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsGuestsDrawerOpen(false)}
-          />
-          {/* Drawer */}
-          <div
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[70] overflow-y-auto animate-slideInRight"
-            style={{
-              background: "var(--color-bg)",
-              borderLeft: "1px solid var(--color-border)",
-            }}
-          >
-            <div className="sticky top-0 z-10 p-4 flex items-center justify-between border-b" style={{ background: "var(--color-bg)", borderColor: "var(--color-border)" }}>
-              <div>
-                <h2 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
-                  {t.mixQuickRepeat}
-                </h2>
-                <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>
-                  {t.mixQuickRepeatHint}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsGuestsDrawerOpen(false)}
-                aria-label={t.mixCloseQuickRepeat}
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ background: "var(--color-bgHover)", color: "var(--color-textMuted)" }}
-              >
-                <IconClose size={20} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="p-4">
-              <RecentGuests
-                onRepeatMix={handleRepeatGuestMix}
-                isPro={profile?.subscription_tier === 'core' || profile?.subscription_tier === 'multi' || profile?.subscription_tier === 'enterprise'}
-              />
-            </div>
-          </div>
-        </>
+        <GuestDrawer
+          onClose={() => setIsGuestsDrawerOpen(false)}
+          onRepeatMix={handleRepeatGuestMix}
+          isPro={profile?.subscription_tier === 'core' || profile?.subscription_tier === 'multi' || profile?.subscription_tier === 'enterprise'}
+        />
       )}
 
       {/* Floating Session Timer */}
@@ -1446,71 +1369,11 @@ function MixPageInner() {
       )}
       {/* Fullscreen "Show to Master" card */}
       {showMasterCard && result && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-          style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}
-          onClick={() => setShowMasterCard(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-3xl p-6 animate-fadeInUp"
-            style={{ background: 'var(--color-bgCard)', border: '1px solid var(--color-border)' }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="text-center mb-5">
-              <p className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
-                {t.guestMixSummary}
-              </p>
-              <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
-                {t.guestCompatibilityShare}: <span style={{ color: 'var(--color-success)', fontWeight: 700 }}>{result.compatibility.score}%</span>
-              </p>
-            </div>
-
-            {/* Tobaccos */}
-            <div className="space-y-3 mb-5">
-              {items.map(it => (
-                <div key={it.tobacco.id} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'var(--color-bgHover)' }}>
-                  <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: it.tobacco.color }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>{it.tobacco.flavor}</p>
-                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>{it.tobacco.brand}</p>
-                  </div>
-                  <span className="text-lg font-bold" style={{ color: 'var(--color-primary)' }}>{it.percent}%</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Setup summary */}
-            <div className="grid grid-cols-2 gap-2 mb-5 text-xs">
-              <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixBowlLabel}</p>
-                <p className="font-semibold capitalize" style={{ color: 'var(--color-text)' }}>{result.setup.bowlType}</p>
-              </div>
-              <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixPackLabel}</p>
-                <p className="font-semibold capitalize" style={{ color: 'var(--color-text)' }}>{result.setup.packing}</p>
-              </div>
-              <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixCoalsLabel}</p>
-                <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{result.setup.coals} {t.mixCoalsPcs}</p>
-              </div>
-              <div className="p-2 rounded-lg text-center" style={{ background: 'var(--color-bgHover)' }}>
-                <p style={{ color: 'var(--color-textMuted)' }}>{t.mixHeatUpLabel}</p>
-                <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{result.setup.heatUpMinutes} {t.mixHeatUpMin}</p>
-              </div>
-            </div>
-
-            {/* Close */}
-            <button
-              type="button"
-              onClick={() => setShowMasterCard(false)}
-              className="w-full py-3 rounded-xl text-sm font-semibold"
-              style={{ background: 'var(--color-primary)', color: 'var(--color-bg)' }}
-            >
-              OK
-            </button>
-          </div>
-        </div>
+        <MasterCard
+          items={items}
+          result={result}
+          onClose={() => setShowMasterCard(false)}
+        />
       )}
     </div>
   );

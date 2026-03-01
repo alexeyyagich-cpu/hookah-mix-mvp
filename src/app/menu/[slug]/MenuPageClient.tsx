@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react'
+import { use, useState, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -9,11 +9,12 @@ import { BrandLoader } from '@/components/BrandLoader'
 import {
   IconSmoke,
   IconTarget,
-  IconCocktail,
 } from '@/components/Icons'
-import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
-import { useTranslation, useLocale, getLocaleName } from '@/lib/i18n'
+import { useTranslation, useLocale } from '@/lib/i18n'
 import type { PublicBarRecipe } from '@/types/lounge'
+import { CartOverlay } from './CartOverlay'
+import { CocktailMenuSection } from './CocktailMenuSection'
+import { useCart } from './useCart'
 
 // Brand identity colors — intentionally not theme-variable
 const BRAND_COLORS: Record<string, string> = {
@@ -36,32 +37,11 @@ function groupByMethod(recipes: PublicBarRecipe[]) {
   return groups
 }
 
-// Cart item type
-interface CartItem {
-  name: string
-  type: 'bar' | 'hookah'
-  quantity: number
-  details: string | null
-}
-
 function MenuPageInner({ slug }: { slug: string }) {
   const searchParams = useSearchParams()
   const tableId = searchParams.get('table')
   const t = useTranslation('hookah')
-  const tb = useTranslation('bar')
   const { locale } = useLocale()
-
-  const METHOD_LABELS: Record<string, string> = {
-    build: tb.methodBuild, stir: tb.methodStir, shake: tb.methodShake,
-    blend: tb.methodBlend, layer: tb.methodLayer, muddle: tb.methodMuddle,
-  }
-  const GLASS_LABELS: Record<string, string> = {
-    highball: tb.glassHighball, rocks: tb.glassRocks, coupe: tb.glassCoupe,
-    flute: tb.glassFlute, martini: tb.glassMartini, collins: tb.glassCollins,
-    hurricane: tb.glassHurricane, shot: tb.glassShot, wine: tb.glassWine,
-    beer: tb.glassBeer, copper_mug: tb.glassCopperMug, tiki: tb.glassTiki,
-    other: tb.glassOther,
-  }
 
   const { lounge, mixes, barRecipes, tobaccoMenu, tables, loading, error } = usePublicLounge(slug)
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
@@ -70,18 +50,16 @@ function MenuPageInner({ slug }: { slug: string }) {
   // Ordering mode state
   const table = useMemo(() => tables.find(t => t.id === tableId) || null, [tables, tableId])
   const isOrderingMode = !!tableId && !!table
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [showCartOverlay, setShowCartOverlay] = useState(false)
-  const [guestName, setGuestName] = useState('')
-  const [orderNotes, setOrderNotes] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [orderSuccess, setOrderSuccess] = useState(false)
-  const [orderError, setOrderError] = useState<string | null>(null)
-  const submittingRef = useRef(false)
 
-  // Hookah ordering
-  const [selectedHookahFlavor, setSelectedHookahFlavor] = useState<{ brand: string; flavor: string } | null>(null)
-  const [hookahStrength, setHookahStrength] = useState<'light' | 'medium' | 'strong'>('medium')
+  const {
+    cart, setCart, showCartOverlay, setShowCartOverlay,
+    guestName, setGuestName, orderNotes, setOrderNotes,
+    submitting, orderSuccess, setOrderSuccess, orderError,
+    selectedHookahFlavor, setSelectedHookahFlavor,
+    hookahStrength, setHookahStrength,
+    cartItemCount, addBarItem, removeBarItem, getBarItemCount,
+    addHookahItem, removeCartItem, submitOrder,
+  } = useCart(slug, tableId, locale)
 
   const hasTobaccoMenu = mixes.length > 0 || tobaccoMenu.length > 0
   const hasCocktailMenu = barRecipes.length > 0
@@ -113,136 +91,6 @@ function MenuPageInner({ slug }: { slug: string }) {
   const signatureMixes = mixes.filter(m => m.is_signature)
   const popularMixes = mixes.filter(m => !m.is_signature).sort((a, b) => b.popularity - a.popularity)
   const cocktailGroups = useMemo(() => groupByMethod(barRecipes), [barRecipes])
-
-  const cartItemCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart])
-
-  // Cart operations
-  const addBarItem = useCallback((recipe: PublicBarRecipe) => {
-    const name = getLocaleName(recipe, locale)
-    setCart(prev => {
-      const existing = prev.find(i => i.name === name && i.type === 'bar')
-      if (existing) {
-        return prev.map(i => i === existing ? { ...i, quantity: i.quantity + 1 } : i)
-      }
-      return [...prev, { name, type: 'bar', quantity: 1, details: null }]
-    })
-  }, [locale])
-
-  const removeBarItem = useCallback((recipe: PublicBarRecipe) => {
-    const name = getLocaleName(recipe, locale)
-    setCart(prev => {
-      const existing = prev.find(i => i.name === name && i.type === 'bar')
-      if (!existing) return prev
-      if (existing.quantity <= 1) return prev.filter(i => i !== existing)
-      return prev.map(i => i === existing ? { ...i, quantity: i.quantity - 1 } : i)
-    })
-  }, [locale])
-
-  const getBarItemCount = useCallback((recipe: PublicBarRecipe) => {
-    const name = getLocaleName(recipe, locale)
-    return cart.find(i => i.name === name && i.type === 'bar')?.quantity || 0
-  }, [cart, locale])
-
-  const addHookahItem = useCallback(() => {
-    if (!selectedHookahFlavor) return
-    const name = `${selectedHookahFlavor.brand} ${selectedHookahFlavor.flavor}`
-    const strengthLabel = hookahStrength === 'light' ? t.strengthLight
-      : hookahStrength === 'strong' ? t.strengthStrong : t.strengthMedium
-    setCart(prev => [...prev, { name, type: 'hookah', quantity: 1, details: strengthLabel }])
-    setSelectedHookahFlavor(null)
-  }, [selectedHookahFlavor, hookahStrength, t])
-
-  const removeCartItem = useCallback((index: number) => {
-    setCart(prev => prev.filter((_, i) => i !== index))
-  }, [])
-
-  // Escape key to close cart overlay
-  const handleCartEscape = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') setShowCartOverlay(false)
-  }, [])
-
-  useEffect(() => {
-    if (!showCartOverlay) return
-    window.addEventListener('keydown', handleCartEscape)
-    return () => window.removeEventListener('keydown', handleCartEscape)
-  }, [showCartOverlay, handleCartEscape])
-
-  const submitOrder = useCallback(async () => {
-    if (cart.length === 0 || !tableId || submittingRef.current) return
-    submittingRef.current = true
-    setSubmitting(true)
-    setOrderError(null)
-
-    // Split cart into bar and hookah orders
-    const barItems = cart.filter(i => i.type === 'bar')
-    const hookahItems = cart.filter(i => i.type === 'hookah')
-
-    const requests: Promise<Response>[] = []
-
-    if (barItems.length > 0) {
-      requests.push(
-        fetch(`/api/public/order/${slug}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            table_id: tableId,
-            guest_name: guestName || null,
-            type: 'bar',
-            items: barItems.map(i => ({ name: i.name, quantity: i.quantity, details: i.details })),
-            notes: orderNotes || null,
-          }),
-        })
-      )
-    }
-
-    if (hookahItems.length > 0) {
-      requests.push(
-        fetch(`/api/public/order/${slug}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            table_id: tableId,
-            guest_name: guestName || null,
-            type: 'hookah',
-            items: hookahItems.map(i => ({ name: i.name, quantity: i.quantity, details: i.details })),
-            notes: orderNotes || null,
-          }),
-        })
-      )
-    }
-
-    try {
-      const responses = await Promise.all(requests)
-      for (const res of responses) {
-        if (!res.ok) {
-          let errorMessage = t.orderError
-          if (res.status === 429) {
-            errorMessage = t.orderRateLimit
-          } else {
-            try {
-              const data = await res.json()
-              if (data.error) errorMessage = data.error
-            } catch {
-              // Response body is not valid JSON — use default error message
-            }
-          }
-          setOrderError(errorMessage)
-          setSubmitting(false)
-          submittingRef.current = false
-          return
-        }
-      }
-      setOrderSuccess(true)
-      setCart([])
-      setGuestName('')
-      setOrderNotes('')
-      setShowCartOverlay(false)
-    } catch {
-      setOrderError(t.orderError)
-    }
-    setSubmitting(false)
-    submittingRef.current = false
-  }, [cart, tableId, slug, guestName, orderNotes, t])
 
   // Loading / error / hidden states
   if (loading) {
@@ -374,106 +222,15 @@ function MenuPageInner({ slug }: { slug: string }) {
 
         {/* ===== COCKTAIL MENU SECTION ===== */}
         {hasCocktailMenu && (
-          <section className="mb-12">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <IconCocktail size={24} className="text-[var(--color-primary)]" />
-              {t.menuCocktailCard}
-            </h2>
-
-            <div className="space-y-8">
-              {Object.entries(cocktailGroups).map(([method, recipes]) => {
-                const emoji = COCKTAIL_METHOD_EMOJI[method as keyof typeof COCKTAIL_METHOD_EMOJI] || '\u{1F379}'
-                const label = METHOD_LABELS[method as keyof typeof METHOD_LABELS] || method
-
-                return (
-                  <div key={method}>
-                    <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                      <span className="text-xl">{emoji}</span>
-                      {label}
-                    </h3>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {recipes.map(recipe => {
-                        const itemCount = isOrderingMode ? getBarItemCount(recipe) : 0
-                        return (
-                          <div
-                            key={recipe.id}
-                            className={`card p-5 transition-colors ${
-                              itemCount > 0
-                                ? 'border-emerald-500/50 bg-emerald-500/5'
-                                : 'hover:border-[var(--color-borderAccent)]'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <h4 className="font-semibold">{getLocaleName(recipe, locale)}</h4>
-                                {locale === 'ru' && recipe.name_en && (
-                                  <span className="text-xs text-[var(--color-textMuted)]">{recipe.name_en}</span>
-                                )}
-                                {locale !== 'ru' && recipe.name_en && (
-                                  <span className="text-xs text-[var(--color-textMuted)]">{recipe.name}</span>
-                                )}
-                              </div>
-                              {lounge.show_prices && recipe.menu_price && (
-                                <span className="text-lg font-bold text-[var(--color-primary)] whitespace-nowrap ml-2">
-                                  {recipe.menu_price}{'\u20AC'}
-                                </span>
-                              )}
-                            </div>
-
-                            {recipe.description && (
-                              <p className="text-sm text-[var(--color-textMuted)] mb-3">{recipe.description}</p>
-                            )}
-
-                            <div className="text-sm text-[var(--color-text)]">
-                              {recipe.ingredients.join(' \u00B7 ')}
-                            </div>
-
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--color-border)]">
-                              <div className="flex items-center gap-3 text-xs text-[var(--color-textMuted)]">
-                                {recipe.glass && (
-                                  <span>{GLASS_LABELS[recipe.glass] || recipe.glass}</span>
-                                )}
-                                {recipe.garnish_description && (
-                                  <span>{'\u{1F33F}'} {recipe.garnish_description}</span>
-                                )}
-                              </div>
-
-                              {/* Ordering controls */}
-                              {isOrderingMode && (
-                                <div className="flex items-center gap-2">
-                                  {itemCount > 0 && (
-                                    <>
-                                      <button
-                                        type="button"
-                                        onClick={() => removeBarItem(recipe)}
-                                        className="w-11 h-11 rounded-full bg-[var(--color-bgHover)] hover:bg-[var(--color-error)]/20 text-[var(--color-text)] flex items-center justify-center text-sm font-bold transition-colors"
-                                        aria-label="Decrease quantity"
-                                      >
-                                        -
-                                      </button>
-                                      <span className="text-sm font-bold min-w-[20px] text-center">{itemCount}</span>
-                                    </>
-                                  )}
-                                  <button
-                                    type="button"
-                                    onClick={() => addBarItem(recipe)}
-                                    className="w-11 h-11 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 flex items-center justify-center text-sm font-bold transition-colors"
-                                    aria-label="Add to order"
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </section>
+          <CocktailMenuSection
+            cocktailGroups={cocktailGroups}
+            isOrderingMode={isOrderingMode}
+            showPrices={lounge.show_prices}
+            getBarItemCount={getBarItemCount}
+            addBarItem={addBarItem}
+            removeBarItem={removeBarItem}
+            locale={locale}
+          />
         )}
 
         {/* ===== HOOKAH MENU SECTION ===== */}
@@ -788,87 +545,18 @@ function MenuPageInner({ slug }: { slug: string }) {
 
       {/* ===== CART OVERLAY ===== */}
       {showCartOverlay && (
-        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center" onClick={() => setShowCartOverlay(false)}>
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="bg-[var(--color-bgCard)] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-4">{t.cartSummary}</h3>
-
-              {/* Cart items */}
-              <div className="space-y-3 mb-6">
-                {cart.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 border-b border-[var(--color-border)]">
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-[var(--color-textMuted)]">
-                        {item.type === 'hookah' ? t.hookahRequest : ''}{item.details ? ` \u2014 ${item.details}` : ''}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold">{'\u00D7'}{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeCartItem(i)}
-                        className="text-[var(--color-error)] hover:brightness-110 text-sm"
-                      >
-                        {t.removeFromCart}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Guest name */}
-              <div className="mb-4">
-                <label className="block text-sm text-[var(--color-textMuted)] mb-1">{t.guestNameLabel}</label>
-                <input
-                  type="text"
-                  value={guestName}
-                  onChange={e => setGuestName(e.target.value)}
-                  placeholder={t.guestNamePlaceholder}
-                  className="input w-full"
-                />
-              </div>
-
-              {/* Notes */}
-              <div className="mb-6">
-                <label className="block text-sm text-[var(--color-textMuted)] mb-1">{t.orderNotesLabel}</label>
-                <textarea
-                  value={orderNotes}
-                  onChange={e => setOrderNotes(e.target.value)}
-                  className="input w-full min-h-[60px] resize-none"
-                  rows={2}
-                />
-              </div>
-
-              {orderError && (
-                <div role="alert" className="mb-4 p-3 rounded-xl bg-[var(--color-error)]/10 text-[var(--color-error)] text-sm">{orderError}</div>
-              )}
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCartOverlay(false)}
-                  className="btn btn-ghost flex-1"
-                >
-                  {t.backToMenu}
-                </button>
-                <button
-                  type="button"
-                  onClick={submitOrder}
-                  disabled={submitting || cart.length === 0}
-                  className="btn btn-primary flex-1 disabled:opacity-50"
-                >
-                  {submitting ? t.orderSending : t.orderConfirm}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CartOverlay
+          cart={cart}
+          onClose={() => setShowCartOverlay(false)}
+          onRemoveItem={removeCartItem}
+          onSubmit={submitOrder}
+          submitting={submitting}
+          guestName={guestName}
+          onGuestNameChange={setGuestName}
+          orderNotes={orderNotes}
+          onOrderNotesChange={setOrderNotes}
+          orderError={orderError}
+        />
       )}
     </div>
   )
