@@ -366,7 +366,7 @@ export function Sidebar() {
                       <span className={`ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${
                         isActive
                           ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)]'
-                          : 'bg-[var(--color-danger)] text-white'
+                          : 'bg-[var(--color-danger)] text-[var(--color-bg)]'
                       }`}>
                         {badgeCount > 99 ? '99+' : badgeCount}
                       </span>

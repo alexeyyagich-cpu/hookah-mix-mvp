@@ -13,6 +13,7 @@ export const common: typeof CommonType = {
   search: 'Search',
   back: 'Back',
   next: 'Next',
+  refresh: 'Refresh',
   retry: 'Try again',
   optional: 'optional',
   copy: 'Copy',

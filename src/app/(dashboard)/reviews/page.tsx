@@ -18,6 +18,7 @@ export default function ReviewsPage() {
   const { reviews, loading, averageRating, totalCount, togglePublished, deleteReview } = useReviews()
   const [filter, setFilter] = useState<Filter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
   const filteredReviews = useMemo(() => reviews.filter(r => {
@@ -149,14 +150,19 @@ export default function ReviewsPage() {
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <button type="button"
                         onClick={async () => {
+                          if (togglingId) return
+                          setTogglingId(review.id)
                           try {
                             await togglePublished(review.id, !review.is_published)
                             toast.success(tc.saved)
                           } catch {
                             toast.error(tc.errorSaving)
+                          } finally {
+                            setTogglingId(null)
                           }
                         }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/20 text-[var(--color-textMuted)] hover:text-[var(--color-primary)]"
+                        disabled={togglingId === review.id}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/20 text-[var(--color-textMuted)] hover:text-[var(--color-primary)] disabled:opacity-50"
                       >
                         {review.is_published ? tm.actionHide : tm.actionPublish}
                       </button>

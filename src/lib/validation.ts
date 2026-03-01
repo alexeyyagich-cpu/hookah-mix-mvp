@@ -131,6 +131,20 @@ export const emailOrderStatusSchema = z.object({
   estimatedDelivery: z.string().max(100).optional(),
 })
 
+// ── /api/push/send ──────────────────────────────────────────────────────
+export const pushSendSchema = z.object({
+  profileId: z.string().uuid(),
+  title: z.string().min(1).max(200),
+  body: z.string().max(500).optional(),
+  tag: z.string().max(100).optional(),
+  url: z.string().max(500).optional(),
+})
+
+// ── /api/stripe/portal ──────────────────────────────────────────────────
+export const stripePortalSchema = z.object({
+  userId: z.string().uuid(),
+})
+
 // ── Helper ──────────────────────────────────────────────────────────────
 /**
  * Validates `body` against `schema`.

@@ -103,7 +103,11 @@ function percentChange(prev: number, curr: number): number | null {
 
 function dateKey(d: Date | string): string {
   const date = typeof d === 'string' ? new Date(d) : d
-  return date.toISOString().split('T')[0]
+  // Use local timezone for date grouping (venue-local date)
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 export function usePnL(): UsePnLReturn {

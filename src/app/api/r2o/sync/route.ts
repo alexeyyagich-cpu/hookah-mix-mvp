@@ -80,10 +80,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Get existing product mappings
-    const { data: existingMappings } = await supabase
+    const { data: existingMappings, error: mappingsError } = await supabase
       .from('r2o_product_mappings')
       .select('id, profile_id, tobacco_inventory_id, r2o_product_id, r2o_product_name, sync_status, last_synced_at')
       .eq('profile_id', user.id)
+
+    if (mappingsError) {
+      logger.error('Failed to fetch product mappings', { error: String(mappingsError) })
+    }
 
     const mappingsByInventoryId = new Map(
       (existingMappings || []).map(m => [m.tobacco_inventory_id, m])
@@ -111,7 +115,7 @@ export async function POST(request: NextRequest) {
             ...(connection.product_group_id ? { product_group_id: connection.product_group_id } : {}),
           })
 
-          await supabaseAdmin
+          const { error: updateMappingError } = await supabaseAdmin
             .from('r2o_product_mappings')
             .update({
               sync_status: 'synced',
@@ -119,6 +123,10 @@ export async function POST(request: NextRequest) {
               r2o_product_name: productName,
             })
             .eq('id', existingMapping.id)
+
+          if (updateMappingError) {
+            logger.error('Failed to update product mapping', { error: String(updateMappingError), product: productName })
+          }
         } else {
           // Check if product already exists in r2o by name
           const existingR2O = r2oProductsByName.get(productName)
@@ -175,10 +183,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Update last sync timestamp
-    await supabaseAdmin
+    const { error: syncTsError } = await supabaseAdmin
       .from('r2o_connections')
       .update({ last_sync_at: new Date().toISOString() })
       .eq('profile_id', user.id)
+
+    if (syncTsError) {
+      logger.error('Failed to update sync timestamp', { error: String(syncTsError) })
+    }
 
     return NextResponse.json({ synced, errors, total: inventory.length })
   } catch (error) {

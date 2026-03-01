@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { AccessDenied } from '@/components/ui/AccessDenied'
 import Link from 'next/link'
 import type { Organization, OrgMember, Location } from '@/types/database'
 
@@ -56,11 +57,7 @@ export default function AdminOrgDetail() {
   useEffect(() => { fetchOrg() }, [fetchOrg])
 
   if (!isSuperAdmin) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p style={{ color: 'var(--color-textMuted)' }}>Access denied</p>
-      </div>
-    )
+    return <AccessDenied />
   }
 
   if (loading) {

@@ -64,7 +64,6 @@ export async function updateSession(request: NextRequest) {
     // Specific public API routes (individual routes handle their own auth)
     '/api/health', '/api/public', '/api/stripe/webhook',
     '/api/telegram/webhook', '/api/r2o/webhooks', '/api/cron',
-    '/api/invite/accept',
   ]
   const isPublicPath = publicPaths.some(path =>
     request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/')

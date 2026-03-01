@@ -53,7 +53,7 @@ export function PricingCard({
       {/* Current Badge */}
       {isCurrent && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="px-4 py-1 rounded-full bg-[var(--color-success)] text-white text-xs font-semibold">
+          <span className="px-4 py-1 rounded-full bg-[var(--color-success)] text-[var(--color-bg)] text-xs font-semibold">
             {tc.pricing.currentPlan}
           </span>
         </div>

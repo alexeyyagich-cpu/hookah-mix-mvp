@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (emailSettings && (!emailSettings.email_notifications_enabled || !emailSettings.low_stock_email)) {
-      return NextResponse.json({ message: 'Low stock emails disabled' }, { status: 200 })
+      return NextResponse.json({ message: 'Low stock emails disabled' }, { status: 204 })
     }
 
     // Generate and send email

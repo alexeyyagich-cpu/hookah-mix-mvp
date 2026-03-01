@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { AccessDenied } from '@/components/ui/AccessDenied'
 import Link from 'next/link'
 import type { AdminOrganization, SubscriptionTier } from '@/types/database'
 
@@ -93,11 +94,7 @@ export default function AdminOrganizations() {
   }, [updateOrg])
 
   if (!isSuperAdmin) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p style={{ color: 'var(--color-textMuted)' }}>Access denied</p>
-      </div>
-    )
+    return <AccessDenied />
   }
 
   // Filter & search

@@ -359,7 +359,7 @@ export default function SlotMachine({ isOpen, onClose, onResult }: Props) {
               <>
                 <button type="button"
                   onClick={handleConfirm}
-                  className="w-full py-4 rounded-2xl font-bold text-lg bg-[var(--color-success)] text-white hover:brightness-110 active:scale-95 transition-all"
+                  className="w-full py-4 rounded-2xl font-bold text-lg bg-[var(--color-success)] text-[var(--color-bg)] hover:brightness-110 active:scale-95 transition-all"
                 >
                   ✅ {t.mixSlotApply}
                 </button>

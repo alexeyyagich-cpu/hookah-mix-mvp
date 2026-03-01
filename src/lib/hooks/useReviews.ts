@@ -119,6 +119,12 @@ export function useReviews(): UseReviewsReturn {
 
     if (!user || !supabase) return
 
+    // Optimistic update with rollback
+    const previousReviews = reviews
+    setReviews(prev => prev.map(r =>
+      r.id === id ? { ...r, is_published: isPublished } : r
+    ))
+
     try {
       const { error: updateError } = await supabase
         .from('reviews')
@@ -127,13 +133,12 @@ export function useReviews(): UseReviewsReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (updateError) throw updateError
-      setReviews(prev => prev.map(r =>
-        r.id === id ? { ...r, is_published: isPublished } : r
-      ))
     } catch (err) {
+      setReviews(previousReviews)
       setError(err instanceof Error ? err.message : 'Failed to update review')
+      throw err
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, reviews])
 
   const deleteReview = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -143,6 +148,10 @@ export function useReviews(): UseReviewsReturn {
 
     if (!user || !supabase) return
 
+    // Optimistic update with rollback
+    const previousReviews = reviews
+    setReviews(prev => prev.filter(r => r.id !== id))
+
     try {
       const { error: deleteError } = await supabase
         .from('reviews')
@@ -151,11 +160,12 @@ export function useReviews(): UseReviewsReturn {
         .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
 
       if (deleteError) throw deleteError
-      setReviews(prev => prev.filter(r => r.id !== id))
     } catch (err) {
+      setReviews(previousReviews)
       setError(err instanceof Error ? err.message : 'Failed to delete review')
+      throw err
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, reviews])
 
   const averageRating = reviews.length > 0
     ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length) * 10) / 10

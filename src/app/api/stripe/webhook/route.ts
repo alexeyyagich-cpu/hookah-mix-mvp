@@ -130,10 +130,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   // Link Stripe customer ID to profile
   if (customerId) {
-    await supabase
+    const { error: linkError } = await supabase
       .from('profiles')
       .update({ stripe_customer_id: customerId })
       .eq('id', userId)
+
+    if (linkError) {
+      logger.error('Failed to link Stripe customer ID', { error: String(linkError), userId })
+    }
   }
 
   // If a subscription was created, update the profile
@@ -196,7 +200,7 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
   } else if (status === 'past_due' || status === 'unpaid' || status === 'canceled') {
     // Downgrade to expired trial on failed payment or cancellation
     const supabase = getSupabaseAdmin()
-    await supabase
+    const { error: downgradeError } = await supabase
       .from('profiles')
       .update({
         subscription_tier: 'trial',
@@ -205,6 +209,10 @@ async function updateUserSubscription(userId: string, subscription: Stripe.Subsc
         stripe_subscription_id: status === 'canceled' ? null : subscription.id,
       })
       .eq('id', userId)
+
+    if (downgradeError) {
+      logger.error('Failed to downgrade subscription', { error: String(downgradeError), userId })
+    }
   }
 }
 

@@ -288,7 +288,8 @@ export function useBarSales(): UseBarSalesReturn {
     // Revenue by day
     const dayMap = new Map<string, { revenue: number; cost: number }>()
     for (const s of periodSales) {
-      const dateKey = new Date(s.sold_at).toISOString().split('T')[0]
+      const d = new Date(s.sold_at)
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
       const existing = dayMap.get(dateKey) || { revenue: 0, cost: 0 }
       dayMap.set(dateKey, {
         revenue: existing.revenue + s.total_revenue,

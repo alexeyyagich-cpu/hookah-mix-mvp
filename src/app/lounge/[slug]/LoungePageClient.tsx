@@ -194,7 +194,7 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
             <div className="flex-1">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold mb-1">{lounge.name}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-1 truncate">{lounge.name}</h1>
                   <div className="flex items-center gap-3 text-sm text-[var(--color-textMuted)]">
                     {lounge.city && <span>{lounge.city}</span>}
                     {lounge.rating && (

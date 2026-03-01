@@ -384,7 +384,8 @@ export function useStatistics(options: UseStatisticsOptions = {}): UseStatistics
     // Daily consumption
     const dailyMap = new Map<string, { grams: number; sessions: number }>()
     sessions.forEach(session => {
-      const date = new Date(session.session_date).toISOString().split('T')[0]
+      const sd = new Date(session.session_date)
+      const date = `${sd.getFullYear()}-${String(sd.getMonth() + 1).padStart(2, '0')}-${String(sd.getDate()).padStart(2, '0')}`
       const existing = dailyMap.get(date) || { grams: 0, sessions: 0 }
       existing.grams += session.total_grams
       existing.sessions += 1

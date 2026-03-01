@@ -315,6 +315,9 @@ export function useFloorPlan(): UseFloorPlanReturn {
   const updateTable = useCallback(async (id: string, updates: Partial<FloorTable>) => {
     const now = new Date().toISOString()
 
+    // Snapshot for rollback
+    const previousTables = tables
+
     // Optimistic update — apply locally immediately
     setTables(prev => prev.map(t =>
       t.id === id ? { ...t, ...updates, updated_at: now } : t
@@ -347,10 +350,10 @@ export function useFloorPlan(): UseFloorPlanReturn {
       }
     } catch (err) {
       setError(translateError(err as Error))
-      // Revert optimistic update by refetching
-      fetchTables()
+      // Revert optimistic update to previous state
+      setTables(previousTables)
     }
-  }, [user, supabase, isDemoMode, organizationId, fetchTables])
+  }, [user, supabase, isDemoMode, organizationId, tables])
 
   const deleteTable = useCallback(async (id: string) => {
     if (isDemoMode) {

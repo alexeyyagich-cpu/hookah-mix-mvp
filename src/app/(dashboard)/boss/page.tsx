@@ -150,8 +150,8 @@ export default function BossPage() {
           onClick={doRefresh}
           disabled={refreshing}
           className="p-2 rounded-xl hover:bg-[var(--color-bgHover)] transition-colors disabled:opacity-50"
-          title="Refresh"
-          aria-label="Refresh"
+          title={tc.refresh}
+          aria-label={tc.refresh}
         >
           <IconRefresh size={20} className={refreshing ? 'animate-spin' : ''} />
         </button>

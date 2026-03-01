@@ -111,6 +111,7 @@ export default function BowlsPage() {
     return () => window.removeEventListener('keydown', handleKey)
   }, [modalOpen, closeModal])
 
+  const [addingPreset, setAddingPreset] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const handleDelete = async (id: string) => {
@@ -195,15 +196,20 @@ export default function BowlsPage() {
               <button type="button"
                 key={preset.name}
                 onClick={async () => {
-                  if (canAddMore) {
-                    await addBowl({
-                      name: preset.name,
-                      capacity_grams: preset.capacity,
-                      is_default: bowls.length === 0,
-                    })
+                  if (canAddMore && !addingPreset) {
+                    setAddingPreset(preset.name)
+                    try {
+                      await addBowl({
+                        name: preset.name,
+                        capacity_grams: preset.capacity,
+                        is_default: bowls.length === 0,
+                      })
+                    } finally {
+                      setAddingPreset(null)
+                    }
                   }
                 }}
-                disabled={!canAddMore}
+                disabled={!canAddMore || addingPreset === preset.name}
                 className="p-4 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] hover:border-[var(--color-primary)] text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="font-medium">{preset.name}</div>

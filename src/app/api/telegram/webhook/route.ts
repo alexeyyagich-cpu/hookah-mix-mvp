@@ -154,9 +154,9 @@ async function fetchStockText(supabase: SupabaseClient, profileId: string) {
 async function fetchShiftText(supabase: SupabaseClient, profileId: string) {
   const shiftsRes = await supabase
     .from('shifts').select('id, profile_id, opened_by, opened_by_name, opened_at, closed_at, starting_cash, closing_cash, status')
-    .eq('profile_id', profileId).order('opened_at', { ascending: false }).limit(1)
+    .eq('profile_id', profileId).order('opened_at', { ascending: false }).limit(1).maybeSingle()
 
-  const shift: Shift | undefined = (shiftsRes.data as Shift[] | null)?.[0]
+  const shift: Shift | null = shiftsRes.data as Shift | null
   if (!shift) return formatShiftReport(null)
 
   const start = new Date(shift.opened_at)
@@ -263,9 +263,13 @@ export async function POST(request: NextRequest) {
         }
 
         const newValue = !connection[field]
-        await supabase.from('telegram_connections')
+        const { error: toggleError } = await supabase.from('telegram_connections')
           .update({ [field]: newValue, updated_at: new Date().toISOString() })
           .eq('id', connection.id)
+
+        if (toggleError) {
+          logger.error('Failed to toggle telegram setting', { error: String(toggleError), field })
+        }
 
         const label = field.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
         await answerCallbackQuery(cq.id, `${label}: ${newValue ? '✅ On' : '❌ Off'}`)

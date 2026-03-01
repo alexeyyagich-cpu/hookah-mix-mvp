@@ -13,6 +13,7 @@ export const common = {
   back: 'Назад',
   next: 'Далее',
   retry: 'Попробовать снова',
+  refresh: 'Обновить',
   optional: 'необязательно',
   copy: 'Копировать',
   download: 'Скачать',

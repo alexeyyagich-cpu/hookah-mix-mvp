@@ -136,7 +136,7 @@ export default function GuestsPage() {
 
       {/* Add Guest Form */}
       {showAddForm && (
-        <div className="card p-4">
+        <form className="card p-4" onSubmit={(e) => { e.preventDefault(); handleAddGuest() }}>
           <h3 className="font-semibold mb-3">{tm.addGuest}</h3>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
@@ -155,7 +155,7 @@ export default function GuestsPage() {
               className="input w-full sm:w-48"
             />
             <div className="flex gap-2">
-              <button type="button" onClick={handleAddGuest} disabled={!newName.trim()} className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+              <button type="submit" disabled={!newName.trim()} className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
                 {tm.save}
               </button>
               <button type="button" onClick={() => setShowAddForm(false)} className="btn btn-ghost">
@@ -163,7 +163,7 @@ export default function GuestsPage() {
               </button>
             </div>
           </div>
-        </div>
+        </form>
       )}
 
       {/* Search & Sort */}

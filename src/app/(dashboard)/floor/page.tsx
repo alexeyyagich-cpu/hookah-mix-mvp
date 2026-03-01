@@ -67,6 +67,7 @@ function FloorPageInner() {
   const qrTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [qrTableId, setQrTableId] = useState<string | null>(null)
   const [quickReserving, setQuickReserving] = useState(false)
+  const [statusChanging, setStatusChanging] = useState(false)
   const searchParams = useSearchParams()
   const router = useRouter()
   const zoneFilter = searchParams.get('zone') || null
@@ -730,34 +731,36 @@ function FloorPageInner() {
               <button type="button"
                 key={status}
                 onClick={async () => {
+                  if (statusChanging) return
                   if (status === 'occupied' && activeSelectedTable.status !== 'occupied') {
-                    // Show guest picker to start a proper session
                     setShowGuestPicker(true)
                     setShowQuickReserve(false)
                     setShowLinkPicker(false)
                     return
                   }
                   if (status === 'reserved' && activeSelectedTable.status !== 'reserved') {
-                    // Show quick reserve form instead of just toggling
                     setShowQuickReserve(true)
                     setShowLinkPicker(false)
                     setShowGuestPicker(false)
                     return
                   }
-                  if (status === 'available' && linkedReservation) {
-                    // Unlink reservation when freeing table
-                    await handleUnlinkReservation()
-                    return
+                  setStatusChanging(true)
+                  try {
+                    if (status === 'available' && linkedReservation) {
+                      await handleUnlinkReservation()
+                      return
+                    }
+                    if (status === 'available' && activeSelectedTable.session_start_time) {
+                      await handleEndSession()
+                      await setTableStatus(activeSelectedTable.id, 'available')
+                      return
+                    }
+                    await setTableStatus(activeSelectedTable.id, status)
+                  } finally {
+                    setStatusChanging(false)
                   }
-                  if (status === 'available' && activeSelectedTable.session_start_time) {
-                    // End session when freeing table
-                    await handleEndSession()
-                    await setTableStatus(activeSelectedTable.id, 'available')
-                    return
-                  }
-                  await setTableStatus(activeSelectedTable.id, status)
                 }}
-                disabled={activeSelectedTable.status === status}
+                disabled={activeSelectedTable.status === status || statusChanging}
                 aria-pressed={activeSelectedTable.status === status}
                 className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{
@@ -865,7 +868,7 @@ function FloorPageInner() {
 
               {/* Or create new reservation */}
               {!showLinkPicker && (
-                <div className="space-y-3">
+                <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); handleQuickReserve() }}>
                   <input
                     type="text"
                     value={quickForm.guest_name}
@@ -909,15 +912,14 @@ function FloorPageInner() {
                     >
                       {tm.cancelBtn}
                     </button>
-                    <button type="button"
-                      onClick={handleQuickReserve}
+                    <button type="submit"
                       disabled={quickReserving || !quickForm.guest_name || !quickForm.reservation_time}
                       className="btn btn-warning btn-sm flex-1"
                     >
                       {quickReserving ? tm.reserving : tm.reserveBtn}
                     </button>
                   </div>
-                </div>
+                </form>
               )}
             </div>
           )}

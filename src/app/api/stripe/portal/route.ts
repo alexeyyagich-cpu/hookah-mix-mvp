@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/logger'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { stripePortalSchema, validateBody } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,20 +44,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let body: Record<string, unknown>
+    let raw: unknown
     try {
-      body = await request.json()
+      raw = await request.json()
     } catch {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
     }
-    const { userId } = body
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Missing user ID' },
-        { status: 400 }
-      )
+    const result = validateBody(stripePortalSchema, raw)
+    if ('error' in result) {
+      return NextResponse.json({ error: result.error }, { status: 400 })
     }
+    const { userId } = result.data
 
     // SECURITY: Verify userId matches authenticated user
     if (user.id !== userId) {

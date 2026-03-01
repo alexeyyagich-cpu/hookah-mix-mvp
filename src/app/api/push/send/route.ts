@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { timingSafeEqual } from 'crypto'
 import { sendPushToUser } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { pushSendSchema, validateBody } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
@@ -16,13 +17,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { profileId, title, body, tag, url } = await request.json()
-
-    if (!profileId || !title) {
-      return NextResponse.json({ error: 'Missing profileId or title' }, { status: 400 })
+    const raw = await request.json()
+    const result = validateBody(pushSendSchema, raw)
+    if ('error' in result) {
+      return NextResponse.json({ error: result.error }, { status: 400 })
     }
+    const { profileId, title, body, tag, url } = result.data
 
-    const sent = await sendPushToUser(profileId, { title, body, tag, url })
+    const sent = await sendPushToUser(profileId, { title, body: body || '', tag, url })
 
     return NextResponse.json({ ok: true, sent })
   } catch {

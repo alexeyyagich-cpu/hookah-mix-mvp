@@ -54,7 +54,7 @@ export function WaiterCart({
   if (sent) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-40 p-4">
-        <div className="max-w-lg mx-auto p-4 rounded-2xl bg-[var(--color-success)] text-white text-center font-semibold shadow-lg animate-fadeInUp">
+        <div className="max-w-lg mx-auto p-4 rounded-2xl bg-[var(--color-success)] text-[var(--color-bg)] text-center font-semibold shadow-lg animate-fadeInUp">
           {String(tm.waiterOrderSent)}
         </div>
       </div>

@@ -383,10 +383,16 @@ export default function TeamPage() {
                     ) : (
                       <button
                         type="button"
+                        disabled={actionLoading === `tip-${member.id}`}
                         onClick={async () => {
-                          await createStaffProfile(member.id, member.display_name || 'Staff')
+                          setActionLoading(`tip-${member.id}`)
+                          try {
+                            await createStaffProfile(member.id, member.display_name || 'Staff')
+                          } finally {
+                            setActionLoading(null)
+                          }
                         }}
-                        className="text-xs px-3 py-1 rounded-full font-medium bg-[var(--color-primary)]/20 text-[var(--color-primary)]"
+                        className="text-xs px-3 py-1 rounded-full font-medium bg-[var(--color-primary)]/20 text-[var(--color-primary)] disabled:opacity-50"
                       >
                         {ts.tipCreateProfile}
                       </button>

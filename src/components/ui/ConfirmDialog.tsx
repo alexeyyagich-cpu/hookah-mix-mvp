@@ -10,7 +10,7 @@ interface ConfirmDialogProps {
   confirmLabel?: string
   cancelLabel?: string
   danger?: boolean
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
   onCancel: () => void
 }
 
@@ -31,6 +31,7 @@ export function ConfirmDialog({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [visible, setVisible] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const [confirming, setConfirming] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -94,11 +95,19 @@ export function ConfirmDialog({
           <button type="button"
             ref={confirmRef}
             data-testid="confirm-dialog-confirm"
-            disabled={isClosing}
-            onClick={() => { if (!isClosing) onConfirm() }}
+            disabled={isClosing || confirming}
+            onClick={async () => {
+              if (isClosing || confirming) return
+              setConfirming(true)
+              try {
+                await onConfirm()
+              } finally {
+                setConfirming(false)
+              }
+            }}
             className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-50 disabled:pointer-events-none ${
               danger
-                ? 'bg-[var(--color-danger)] text-white'
+                ? 'bg-[var(--color-danger)] text-[var(--color-bg)]'
                 : 'bg-[var(--color-primary)] text-[var(--color-bg)]'
             }`}
           >
