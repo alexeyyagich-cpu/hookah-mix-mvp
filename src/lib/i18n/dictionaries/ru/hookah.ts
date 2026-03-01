@@ -293,7 +293,7 @@ export const hookah = {
   enterManually: 'Ввести вручную',
   barcodeNotFound: 'Штрих-код не найден в базе',
   scanInstruction: 'Наведите камеру на штрих-код упаковки табака',
-  scanButton: 'Сканировать',
+  scanButton: 'Штрихкод',
 
   // Mix components
   mixSlotTitle: 'Слот-машина миксов',
@@ -744,7 +744,7 @@ export const hookah = {
   importColPackage: 'Упаковка (г)',
 
   // OCR Invoice Scan
-  ocrBtn: 'Сканировать',
+  ocrBtn: 'Накладная',
   ocrTitle: 'Сканирование накладной',
   ocrUpload: 'Сфотографируйте или загрузите накладную',
   ocrFormats: 'JPEG, PNG, WebP',

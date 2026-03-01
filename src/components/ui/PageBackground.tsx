@@ -20,7 +20,7 @@ export function PageBackground({ image, position = 'center' }: PageBackgroundPro
 
   return createPortal(
     <div
-      className="absolute inset-0 opacity-[0.15]"
+      className="absolute inset-0 opacity-[0.10]"
       style={{
         backgroundImage: `url(${image})`,
         backgroundSize: 'cover',

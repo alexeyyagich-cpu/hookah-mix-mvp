@@ -287,7 +287,7 @@ export const hookah: typeof HookahType = {
   enterManually: 'Enter manually',
   barcodeNotFound: 'Barcode not found in database',
   scanInstruction: 'Point your camera at the tobacco package barcode',
-  scanButton: 'Scan',
+  scanButton: 'Barcode',
 
   // Mix components
   mixSlotTitle: 'Mix Slot Machine',
@@ -738,7 +738,7 @@ export const hookah: typeof HookahType = {
   importColPackage: 'Package (g)',
 
   // OCR Invoice Scan
-  ocrBtn: 'Scan',
+  ocrBtn: 'Invoice',
   ocrTitle: 'Scan Invoice',
   ocrUpload: 'Take a photo or upload an invoice',
   ocrFormats: 'JPEG, PNG, WebP',

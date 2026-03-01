@@ -89,112 +89,118 @@ export function BarSection() {
         </div>
       )}
 
-      {/* Revenue Chart + Top Cocktails */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">{t.barRevenueTitle}</h2>
-            <Link href="/bar/sales" className="text-sm text-[var(--color-primary)] hover:underline">
-              {t.allSalesLink}
-            </Link>
+      {/* Empty state — no sales at all */}
+      {!loading && analytics.totalSales === 0 ? (
+        <div className="card p-6 text-center text-[var(--color-textMuted)]">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
+            <IconCocktail size={24} />
           </div>
-          {loading ? (
-            <div className="h-48 flex items-center justify-center">
-              <LoadingSpinner size="lg" />
-            </div>
-          ) : (
-            <BarRevenueChart data={analytics.revenueByDay} />
-          )}
+          <p>{t.noSalesYet}</p>
+          <p className="text-sm mt-2">{t.recordFirstSale}</p>
+          <Link href="/bar/sales" className="btn btn-primary btn-sm mt-4 inline-flex">
+            {t.allSalesLink}
+          </Link>
         </div>
-
-        <div className="card p-5">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">{t.topCocktails}</h2>
-            <Link href="/bar/recipes" className="text-sm text-[var(--color-primary)] hover:underline">
-              {t.allRecipes}
-            </Link>
-          </div>
-          {analytics.topCocktails.length === 0 ? (
-            <div className="text-center py-8 text-[var(--color-textMuted)]">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
-                <IconCocktail size={24} />
+      ) : (
+        <>
+          {/* Revenue Chart + Top Cocktails */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">{t.barRevenueTitle}</h2>
+                <Link href="/bar/sales" className="text-sm text-[var(--color-primary)] hover:underline">
+                  {t.allSalesLink}
+                </Link>
               </div>
-              <p>{t.noSalesYet}</p>
-              <p className="text-sm mt-2">{t.recordFirstSale}</p>
+              {loading ? (
+                <div className="h-48 flex items-center justify-center">
+                  <LoadingSpinner size="lg" />
+                </div>
+              ) : (
+                <BarRevenueChart data={analytics.revenueByDay} />
+              )}
             </div>
-          ) : (
-            <div className="space-y-3">
-              {analytics.topCocktails.slice(0, 5).map((cocktail, i) => (
-                <div
-                  key={cocktail.name}
-                  className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)]"
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="w-6 h-6 shrink-0 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">
-                      {i + 1}
-                    </span>
-                    <span className="font-medium truncate">{cocktail.name}</span>
+
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">{t.topCocktails}</h2>
+                <Link href="/bar/recipes" className="text-sm text-[var(--color-primary)] hover:underline">
+                  {t.allRecipes}
+                </Link>
+              </div>
+              {analytics.topCocktails.length === 0 ? (
+                <div className="text-center py-8 text-[var(--color-textMuted)]">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
+                    <IconCocktail size={24} />
                   </div>
-                  <div className="text-right shrink-0">
-                    <div className="text-sm font-medium">{cocktail.count} {t.pcsShort}</div>
-                    <div className="text-xs text-[var(--color-textMuted)]">{formatCurrency(cocktail.revenue, locale)}</div>
+                  <p>{t.noSalesYet}</p>
+                  <p className="text-sm mt-2">{t.recordFirstSale}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {analytics.topCocktails.slice(0, 5).map((cocktail, i) => (
+                    <div
+                      key={cocktail.name}
+                      className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)]"
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className="w-6 h-6 shrink-0 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-xs font-bold text-[var(--color-primary)]">
+                          {i + 1}
+                        </span>
+                        <span className="font-medium truncate">{cocktail.name}</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-sm font-medium">{cocktail.count} {t.pcsShort}</div>
+                        <div className="text-xs text-[var(--color-textMuted)]">{formatCurrency(cocktail.revenue, locale)}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Recent Sales */}
+          <div className="card p-5">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">{t.recentSales}</h2>
+              <Link href="/bar/sales" className="text-sm text-[var(--color-primary)] hover:underline">
+                {t.allSalesLink}
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {recentSales.map((sale) => (
+                <div
+                  key={sale.id}
+                  className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className="w-10 h-10 shrink-0 rounded-lg bg-[var(--color-success)]/10 flex items-center justify-center text-[var(--color-success)]">
+                      <IconCocktail size={20} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">
+                        {sale.recipe_name} {sale.quantity > 1 ? `×${sale.quantity}` : ''}
+                      </div>
+                      <div className="text-sm text-[var(--color-textMuted)]">
+                        {formatDateTime(sale.sold_at, locale)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-[var(--color-success)]">
+                      {formatCurrency(sale.total_revenue, locale)}
+                    </div>
+                    <div className="text-xs text-[var(--color-textMuted)]">
+                      {t.costShort} {formatCurrency(sale.total_cost, locale)}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Recent Sales */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold">{t.recentSales}</h2>
-          <Link href="/bar/sales" className="text-sm text-[var(--color-primary)] hover:underline">
-            {t.allSalesLink}
-          </Link>
-        </div>
-        {recentSales.length === 0 ? (
-          <div className="text-center py-8 text-[var(--color-textMuted)]">
-            <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-center">
-              <IconCocktail size={24} />
-            </div>
-            <p>{t.noSalesYet}</p>
-            <p className="text-sm mt-2">{t.recordFirstSale}</p>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {recentSales.map((sale) => (
-              <div
-                key={sale.id}
-                className="p-4 rounded-xl bg-[var(--color-bgHover)] flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-4 min-w-0 flex-1">
-                  <div className="w-10 h-10 shrink-0 rounded-lg bg-[var(--color-success)]/10 flex items-center justify-center text-[var(--color-success)]">
-                    <IconCocktail size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">
-                      {sale.recipe_name} {sale.quantity > 1 ? `×${sale.quantity}` : ''}
-                    </div>
-                    <div className="text-sm text-[var(--color-textMuted)]">
-                      {formatDateTime(sale.sold_at, locale)}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-[var(--color-success)]">
-                    {formatCurrency(sale.total_revenue, locale)}
-                  </div>
-                  <div className="text-xs text-[var(--color-textMuted)]">
-                    {t.costShort} {formatCurrency(sale.total_cost, locale)}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   )
 }

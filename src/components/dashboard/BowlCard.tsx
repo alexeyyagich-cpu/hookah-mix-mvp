@@ -20,16 +20,14 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
           <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)]">
             <IconBowl size={24} />
           </div>
-          <div>
-            <h3 className="font-semibold flex items-center gap-2">
-              {bowl.name}
+          <div className="min-w-0">
+            <h3 className="font-semibold truncate">{bowl.name}</h3>
+            <div className="flex items-center gap-2 text-sm text-[var(--color-textMuted)]">
+              <span>{t.bowlCapacityLabel}: <span className="text-[var(--color-text)]">{bowl.capacity_grams}g</span></span>
               {bowl.is_default && (
-                <span className="badge badge-primary text-[10px]">{t.defaultBowl}</span>
+                <span className="badge badge-primary text-[10px] shrink-0">{t.defaultBowl}</span>
               )}
-            </h3>
-            <p className="text-sm text-[var(--color-textMuted)]">
-              {t.bowlCapacityLabel}: <span className="text-[var(--color-text)]">{bowl.capacity_grams}g</span>
-            </p>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-1">
