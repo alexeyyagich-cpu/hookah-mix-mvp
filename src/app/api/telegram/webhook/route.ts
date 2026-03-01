@@ -107,11 +107,15 @@ async function fetchReportText(supabase: SupabaseClient, profileId: string) {
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
 
-  const [sessionsRes, barRes] = await Promise.all([
+  const [sessionsRes, barRes, txRes] = await Promise.all([
     supabase.from('sessions').select('total_grams, selling_price')
       .eq('profile_id', profileId).gte('session_date', todayStart.toISOString()),
     supabase.from('bar_sales').select('total_revenue, total_cost, quantity')
       .eq('profile_id', profileId).gte('sold_at', todayStart.toISOString()),
+    supabase.from('inventory_transactions')
+      .select('quantity_grams, tobacco_inventory:tobacco_inventory_id(purchase_price, package_grams)')
+      .eq('profile_id', profileId).eq('type', 'session')
+      .gte('created_at', todayStart.toISOString()),
   ])
 
   const s: Pick<Session, 'total_grams' | 'selling_price'>[] = sessionsRes.data || []
@@ -119,7 +123,19 @@ async function fetchReportText(supabase: SupabaseClient, profileId: string) {
   const hookahRevenue = s.reduce((sum, x) => sum + (x.selling_price || 0), 0)
   const barRevenue = b.reduce((sum, x) => sum + x.total_revenue, 0)
   const barCost = b.reduce((sum, x) => sum + x.total_cost, 0)
+
+  // Compute hookah tobacco cost from inventory transactions
+  let tobaccoCost = 0
+  for (const tx of (txRes.data || [])) {
+    // Supabase returns FK join as object (single relation) but typed as array
+    const inv = tx.tobacco_inventory as unknown as { purchase_price: number | null; package_grams: number | null } | null
+    if (inv?.purchase_price && inv?.package_grams && inv.package_grams > 0) {
+      tobaccoCost += Math.abs(tx.quantity_grams) * (inv.purchase_price / inv.package_grams)
+    }
+  }
+
   const totalRevenue = hookahRevenue + barRevenue
+  const totalCost = barCost + tobaccoCost
 
   return formatDailyReport({
     sessions: s.length,
@@ -128,8 +144,8 @@ async function fetchReportText(supabase: SupabaseClient, profileId: string) {
     barSales: b.reduce((sum, x) => sum + x.quantity, 0),
     barRevenue,
     totalRevenue,
-    totalCost: barCost,
-    profit: totalRevenue - barCost,
+    totalCost,
+    profit: totalRevenue - totalCost,
   })
 }
 

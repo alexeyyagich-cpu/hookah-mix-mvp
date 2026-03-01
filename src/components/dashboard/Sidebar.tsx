@@ -125,7 +125,7 @@ export function Sidebar() {
       label: t.operationsGroup,
       items: [
         { name: t.floorPlan, href: '/floor', Icon: IconFloor, permission: 'floor.view' },
-        { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: ['sessions.create', 'kds.kitchen'] },
+        { name: t.kdsOrders, href: '/kds', Icon: IconMenuList, permission: ['sessions.create', 'kds.kitchen', 'kds.bar'] },
         { name: t.waiter, href: '/waiter', Icon: IconWaiter, permission: 'sessions.create', proOnly: true },
         { name: t.shifts, href: '/shifts', Icon: IconTimer, permission: 'sessions.create' },
       ],

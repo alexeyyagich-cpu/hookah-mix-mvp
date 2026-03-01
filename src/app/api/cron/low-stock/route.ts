@@ -27,20 +27,36 @@ export async function GET(request: NextRequest) {
 
   const supabase = createClient(supabaseUrl, supabaseKey)
 
-  // Find all profiles with low stock items (< 50g)
-  const { data: lowStockItems, error: queryError } = await supabase
+  // Fetch per-profile thresholds
+  const { data: settingsRows } = await supabase
+    .from('notification_settings')
+    .select('profile_id, low_stock_threshold')
+
+  const thresholdByProfile = new Map<string, number>()
+  for (const row of settingsRows || []) {
+    thresholdByProfile.set(row.profile_id, row.low_stock_threshold ?? 50)
+  }
+  const defaultThreshold = 50
+
+  // Find all inventory items with stock > 0
+  const { data: allItems, error: queryError } = await supabase
     .from('tobacco_inventory')
     .select('profile_id, brand, flavor, quantity_grams')
-    .lt('quantity_grams', 50)
     .gt('quantity_grams', 0)
-    .limit(1000)
+    .limit(2000)
 
   if (queryError) {
     logger.error('Cron low-stock query failed', { error: String(queryError) })
     return NextResponse.json({ error: 'Database query failed' }, { status: 500 })
   }
 
-  if (!lowStockItems || lowStockItems.length === 0) {
+  // Filter items below their profile's threshold
+  const lowStockItems = (allItems || []).filter(item => {
+    const threshold = thresholdByProfile.get(item.profile_id) ?? defaultThreshold
+    return item.quantity_grams < threshold
+  })
+
+  if (lowStockItems.length === 0) {
     return NextResponse.json({ message: 'No low stock items', sent: 0 })
   }
 
