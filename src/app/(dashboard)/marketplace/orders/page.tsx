@@ -73,7 +73,7 @@ export default function OrdersPage() {
               onClick={() => setStatusFilter(tab.key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'bg-[var(--color-primary)] text-white'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                   : 'bg-[var(--color-bgCard)] border border-[var(--color-border)] hover:bg-[var(--color-bgHover)]'
               }`}
             >

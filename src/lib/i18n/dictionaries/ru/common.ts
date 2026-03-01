@@ -170,6 +170,9 @@ export const common = {
     placeholder: 'Перейти к странице...',
     noResults: 'Ничего не найдено',
     hint: '⌘K для быстрого перехода',
+    navigate: 'навигация',
+    select: 'выбор',
+    close: 'закрыть',
   },
 
   // Cookie consent

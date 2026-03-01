@@ -117,7 +117,7 @@ export function MenuSection({
                     <span className="text-sm font-bold min-w-[20px] text-center">{inCart.quantity}</span>
                     <button type="button"
                       onClick={() => onUpdateBarItemQty(recipe.id, 1)}
-                      className="w-8 h-8 rounded-lg bg-[var(--color-primary)] text-white flex items-center justify-center"
+                      className="w-8 h-8 rounded-lg bg-[var(--color-primary)] text-[var(--color-bg)] flex items-center justify-center"
                     >
                       <IconPlus size={14} />
                     </button>
@@ -148,7 +148,7 @@ export function MenuSection({
           onClick={() => onSetHookahMode('structured')}
           className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
             hookahMode === 'structured'
-              ? 'bg-[var(--color-primary)] text-white'
+              ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
               : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
           }`}
         >
@@ -158,7 +158,7 @@ export function MenuSection({
           onClick={() => onSetHookahMode('freetext')}
           className={`flex-1 py-2 rounded-xl text-xs font-medium transition-colors ${
             hookahMode === 'freetext'
-              ? 'bg-[var(--color-primary)] text-white'
+              ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
               : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
           }`}
         >

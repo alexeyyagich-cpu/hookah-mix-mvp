@@ -356,7 +356,7 @@ export function Sidebar() {
                     aria-current={isActive ? 'page' : undefined}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${
                       isActive
-                        ? 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-l-[3px] border-[var(--color-primary)]'
+                        ? 'bg-[var(--color-primary)]/15 text-[var(--color-primary)] border-l-[3px] border-[var(--color-primary)] pl-[calc(1rem-3px)]'
                         : 'text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)] hover:text-[var(--color-text)]'
                     }`}
                   >

@@ -505,7 +505,7 @@ export function NewOrderModal({
                   onClick={() => setHookahMode('structured')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     hookahMode === 'structured'
-                      ? 'bg-[var(--color-primary)] text-white'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                   }`}
                 >
@@ -515,7 +515,7 @@ export function NewOrderModal({
                   onClick={() => setHookahMode('freetext')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     hookahMode === 'freetext'
-                      ? 'bg-[var(--color-primary)] text-white'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                   }`}
                 >
@@ -727,7 +727,7 @@ export function NewOrderModal({
             disabled={!canSubmit}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               canSubmit
-                ? 'bg-[var(--color-primary)] text-white hover:opacity-90'
+                ? 'bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90'
                 : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] cursor-not-allowed'
             }`}
           >

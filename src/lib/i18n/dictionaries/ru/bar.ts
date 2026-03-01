@@ -170,6 +170,7 @@ export const bar = {
   catSignature: 'Авторские',
   ingredientsShort: 'ингр.',
   nameRequired: 'Название *',
+  nameEnLabel: 'Название (EN)',
   methodLabel: 'Метод',
   glassLabel: 'Бокал',
   difficultyLabel: 'Сложность',

@@ -160,7 +160,9 @@ export function CartDrawer({
                 </button>
                 <Link
                   href="/marketplace/cart"
-                  onClick={onClose}
+                  onClick={cart.subtotal < cart.supplier.min_order_amount ? (e: React.MouseEvent) => e.preventDefault() : onClose}
+                  tabIndex={cart.subtotal < cart.supplier.min_order_amount ? -1 : undefined}
+                  aria-disabled={cart.subtotal < cart.supplier.min_order_amount || undefined}
                   className={`btn btn-primary flex-1 text-center ${
                     cart.subtotal < cart.supplier.min_order_amount
                       ? 'opacity-50 pointer-events-none'

@@ -342,7 +342,7 @@ export default function LoungeProfileSettings() {
                 onClick={() => toggleFeature(key)}
                 className={`px-3 py-1.5 rounded-xl text-sm border transition-colors ${
                   features.includes(key)
-                    ? 'bg-[var(--color-primary)] text-white border-[var(--color-primary)]'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-bg)] border-[var(--color-primary)]'
                     : 'bg-[var(--color-bgCard)] border-[var(--color-border)] hover:bg-[var(--color-bgHover)]'
                 }`}
               >

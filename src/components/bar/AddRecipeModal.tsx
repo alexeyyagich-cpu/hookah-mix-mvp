@@ -233,7 +233,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={onClose} />
-      <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="add-recipe-title" className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl">
+      <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="add-recipe-title" className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl animate-fadeInUp">
         <div className="sticky top-0 z-10 bg-[var(--color-bgCard)] px-6 pt-6 pb-4 border-b border-[var(--color-border)]">
           <div className="flex items-center justify-between">
             <h2 id="add-recipe-title" className="text-lg font-bold">
@@ -340,7 +340,7 @@ export function AddRecipeModal({ isOpen, onClose, onSave, editingRecipe }: AddRe
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium">English name</label>
+                  <label className="block text-sm font-medium">{t.nameEnLabel}</label>
                   <input
                     type="text" value={nameEn} onChange={e => setNameEn(e.target.value)}
                     className="input"

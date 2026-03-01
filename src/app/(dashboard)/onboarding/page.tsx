@@ -492,7 +492,7 @@ export default function OnboardingPage() {
                         onClick={() => setTobaccoBrand(b)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                           tobaccoBrand === b
-                            ? 'bg-[var(--color-primary)] text-white'
+                            ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                             : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                         }`}
                       >

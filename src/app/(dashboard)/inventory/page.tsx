@@ -11,7 +11,7 @@ import { ScanButton } from '@/components/inventory/BarcodeScanner'
 import { ImportModal } from '@/components/dashboard/ImportModal'
 import { InvoiceScanModal } from '@/components/dashboard/InvoiceScanModal'
 import { exportInventoryCSV, exportInventoryPDF } from '@/lib/utils/exportReport'
-import { IconExport, IconChart, IconLock, IconScan } from '@/components/Icons'
+import { IconExport, IconChart, IconLock, IconScan, IconWarning } from '@/components/Icons'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -243,7 +243,7 @@ export default function InventoryPage() {
       {error && (
         <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">❌</span>
+            <IconWarning size={24} className="text-[var(--color-danger)] shrink-0" />
             <p className="text-[var(--color-danger)]">{error}</p>
           </div>
         </div>

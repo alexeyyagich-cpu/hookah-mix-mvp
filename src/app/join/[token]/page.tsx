@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { isSupabaseConfigured } from '@/lib/config'
 import { useTranslation } from '@/lib/i18n'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { IconWarning } from '@/components/Icons'
 import { ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
 import type { OrgRole } from '@/types/database'
 
@@ -201,8 +202,8 @@ export default function JoinPage() {
 
         {state === 'error' && (
           <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-danger)]/10 flex items-center justify-center text-3xl">
-              ❌
+            <div className="w-16 h-16 mx-auto rounded-full bg-[var(--color-danger)]/10 flex items-center justify-center">
+              <IconWarning size={32} className="text-[var(--color-danger)]" />
             </div>
             <h2 className="text-xl font-bold">{t.error}</h2>
             <p className="text-[var(--color-textMuted)]">{errorMsg}</p>

@@ -233,7 +233,7 @@ function PricingPageContent() {
             onClick={() => setIsYearly(false)}
             className={`px-4 py-2 rounded-xl font-medium transition-colors ${
               !isYearly
-                ? 'bg-[var(--color-primary)] text-white'
+                ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                 : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
             }`}
           >
@@ -244,7 +244,7 @@ function PricingPageContent() {
             onClick={() => setIsYearly(true)}
             className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center gap-2 ${
               isYearly
-                ? 'bg-[var(--color-primary)] text-white'
+                ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                 : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
             }`}
           >

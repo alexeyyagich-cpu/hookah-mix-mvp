@@ -8,6 +8,8 @@ import type { PnLPreset } from '@/lib/hooks/usePnL'
 import { useModules } from '@/lib/hooks/useModules'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { StatsCard } from '@/components/dashboard/StatsCard'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { PageBackground } from '@/components/ui/PageBackground'
 const PnLChart = dynamic(
   () => import('@/components/dashboard/Charts/PnLChart').then(m => m.PnLChart),
   { ssr: false, loading: () => <div className="skeleton h-48 rounded-xl" /> }
@@ -96,6 +98,7 @@ export default function ReportsPage() {
   return (
     <ErrorBoundary sectionName="Reports">
     <div className="space-y-6">
+      <PageBackground image="/images/statistics-bg.jpg" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -114,7 +117,7 @@ export default function ReportsPage() {
                 onClick={() => setSelectedPreset(key)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                   selectedPreset === key
-                    ? 'bg-[var(--color-primary)] text-white'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                     : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                 }`}
               >
@@ -220,7 +223,7 @@ export default function ReportsPage() {
               onClick={() => setModuleFilter(filter)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 moduleFilter === filter
-                  ? 'bg-[var(--color-primary)] text-white'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                   : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
               }`}
             >
@@ -236,7 +239,7 @@ export default function ReportsPage() {
           <h2 className="text-lg font-semibold mb-6">{tm.pnlDynamics}</h2>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : (
             <PnLChart data={data.dailyPnL} showHookah={showHookah && isHookahActive} />
@@ -247,7 +250,7 @@ export default function ReportsPage() {
           <h2 className="text-lg font-semibold mb-6">{tm.costStructure}</h2>
           {loading ? (
             <div className="h-48 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : (
             <CostBreakdownChart data={filteredCostCategories} />

@@ -76,7 +76,7 @@ export function OrderTimeline({
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
                     isCompleted
-                      ? 'bg-[var(--color-primary)] text-white'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)]'
                   } ${isCurrent ? 'ring-4 ring-[var(--color-primary)]/20' : ''}`}
                 >

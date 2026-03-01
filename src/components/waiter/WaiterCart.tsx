@@ -136,7 +136,7 @@ export function WaiterCart({
             onClick={onToggle}
             className="flex items-center gap-2 flex-1 min-w-0"
           >
-            <span className="w-7 h-7 rounded-full bg-[var(--color-primary)] text-white text-xs font-bold flex items-center justify-center">
+            <span className="w-7 h-7 rounded-full bg-[var(--color-primary)] text-[var(--color-bg)] text-xs font-bold flex items-center justify-center">
               {totalItems}
             </span>
             <div className="text-left min-w-0">
@@ -150,7 +150,7 @@ export function WaiterCart({
           <button type="button"
             onClick={onSubmit}
             disabled={submitting}
-            className="px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold transition-all disabled:opacity-50 active:scale-95"
+            className="px-5 py-2.5 rounded-xl bg-[var(--color-primary)] text-[var(--color-bg)] text-sm font-semibold transition-all disabled:opacity-50 active:scale-95"
           >
             {submitting ? '...' : String(tm.waiterSendToKds)}
           </button>

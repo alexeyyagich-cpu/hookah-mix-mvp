@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import type { BarInventoryItem } from '@/types/database'
 import { BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
 
@@ -89,7 +90,7 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
   if (loading) {
     return (
       <div className="card p-8 text-center" role="status" aria-live="polite">
-        <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+        <LoadingSpinner size="lg" className="mx-auto" />
         <p className="mt-4 text-[var(--color-textMuted)]">{t.loadingBarInventory}</p>
       </div>
     )
@@ -220,13 +221,13 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                       <div className="flex items-center justify-end gap-2">
                         <button type="button"
                           onClick={() => onEdit(item)}
-                          className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors"
+                          className="min-w-[44px] min-h-[44px] px-3 py-2 rounded-lg text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bgHover)] transition-colors"
                         >
                           {t.editShort}
                         </button>
                         <button type="button"
                           onClick={() => setDeleteTarget(item.id)}
-                          className="text-xs transition-colors text-[var(--color-textMuted)] hover:text-[var(--color-danger)]"
+                          className="min-w-[44px] min-h-[44px] px-3 py-2 rounded-lg text-xs transition-colors text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
                         >
                           {t.deleteShort}
                         </button>

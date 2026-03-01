@@ -37,7 +37,7 @@ export function TableSelector({ tables, selectedId, onSelect, tm }: TableSelecto
               onClick={() => onSelect(table.id)}
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 isSelected
-                  ? 'bg-[var(--color-primary)] text-white shadow-lg'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)] shadow-lg'
                   : 'bg-[var(--color-bgCard)] border border-[var(--color-border)] text-[var(--color-text)]'
               }`}
             >

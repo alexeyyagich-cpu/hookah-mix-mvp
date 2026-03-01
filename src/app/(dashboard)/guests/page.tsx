@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import type { Guest, LoyaltyTier } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { PageBackground } from '@/components/ui/PageBackground'
 
 type SortBy = 'name' | 'visits' | 'spent' | 'tier' | 'recent'
 
@@ -97,6 +98,7 @@ export default function GuestsPage() {
   return (
     <ErrorBoundary sectionName="Guests">
     <div className="space-y-6">
+      <PageBackground image="/images/dashboard-bg.jpg" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -177,7 +179,7 @@ export default function GuestsPage() {
             className="input pl-10 w-full"
           />
         </div>
-        <div className="flex rounded-xl bg-[var(--color-bgCard)] border border-[var(--color-border)] p-1">
+        <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1">
           {([
             { key: 'recent' as SortBy, label: tm.sortRecent },
             { key: 'visits' as SortBy, label: tm.sortVisits },
@@ -189,7 +191,7 @@ export default function GuestsPage() {
               onClick={() => setSortBy(s.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 sortBy === s.key
-                  ? 'bg-[var(--color-primary)] text-white'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                   : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
               }`}
             >

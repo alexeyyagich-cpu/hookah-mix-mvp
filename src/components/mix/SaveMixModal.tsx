@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { IconClose } from '@/components/Icons'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
@@ -93,7 +94,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
               aria-label={t.mixSaveClose}
               className="icon-btn icon-btn-sm icon-btn-ghost"
             >
-              <span aria-hidden="true">×</span>
+              <IconClose size={20} aria-hidden="true" />
             </button>
           </div>
 

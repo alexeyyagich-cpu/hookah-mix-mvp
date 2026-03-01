@@ -419,7 +419,7 @@ export function QuickSession({ isOpen, onClose, onSave, initialMix }: QuickSessi
                   onClick={() => setSellingPrice(String(price))}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                     sellingPrice === String(price)
-                      ? 'bg-[var(--color-primary)] text-white'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                   }`}
                 >

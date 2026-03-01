@@ -233,15 +233,15 @@ export function CommandPalette() {
         <div className="px-4 py-2 border-t border-[var(--color-border)] flex items-center gap-4 text-[10px] text-[var(--color-textMuted)]">
           <span className="flex items-center gap-1">
             <kbd className="px-1 py-0.5 bg-[var(--color-bgHover)] rounded border border-[var(--color-border)]">↑↓</kbd>
-            navigate
+            {tc.commandPalette.navigate}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="px-1 py-0.5 bg-[var(--color-bgHover)] rounded border border-[var(--color-border)]">↵</kbd>
-            select
+            {tc.commandPalette.select}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="px-1 py-0.5 bg-[var(--color-bgHover)] rounded border border-[var(--color-border)]">esc</kbd>
-            close
+            {tc.commandPalette.close}
           </span>
         </div>
       </div>

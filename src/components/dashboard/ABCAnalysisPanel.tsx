@@ -68,7 +68,7 @@ export function ABCAnalysisPanel() {
             onClick={() => setMode(m.key)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               mode === m.key
-                ? 'bg-[var(--color-primary)] text-white'
+                ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                 : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
             }`}
           >

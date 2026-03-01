@@ -128,7 +128,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
             {(['upload', 'mapping', 'preview', 'done'] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center gap-2">
                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  step === s ? 'bg-[var(--color-primary)] text-white' :
+                  step === s ? 'bg-[var(--color-primary)] text-[var(--color-bg)]' :
                   (['upload', 'mapping', 'preview', 'done'].indexOf(step) > i ? 'bg-[var(--color-success)] text-white' : 'bg-[var(--color-bgHover)]')
                 }`}>
                   {i + 1}

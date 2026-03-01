@@ -23,6 +23,7 @@ import {
   IconTarget,
   IconStar,
   IconMix,
+  IconClose,
 } from "@/components/Icons";
 import { MIX_RECIPES, type MixRecipe } from "@/data/mixes";
 import { calculateMix, validateMix, type MixItem } from "@/logic/mixCalculator";
@@ -1242,7 +1243,7 @@ function MixPageInner() {
                 aria-label={t.mixCloseRecommendations}
                 className="icon-btn icon-btn-sm icon-btn-ghost"
               >
-                <span aria-hidden="true">×</span>
+                <IconClose size={20} aria-hidden="true" />
               </button>
             </div>
             <div className="space-y-2">
@@ -1362,7 +1363,7 @@ function MixPageInner() {
                 className="w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ background: "var(--color-bgHover)", color: "var(--color-textMuted)" }}
               >
-                <span aria-hidden="true">×</span>
+                <IconClose size={20} aria-hidden="true" />
               </button>
             </div>
             <div className="p-4">

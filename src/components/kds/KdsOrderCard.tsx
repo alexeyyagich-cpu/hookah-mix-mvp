@@ -26,7 +26,7 @@ const BORDER_COLORS: Record<string, string> = {
 }
 
 const ACTION_STYLES: Record<string, string> = {
-  new: 'bg-[var(--color-primary)] text-white hover:opacity-90',
+  new: 'bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90',
   preparing: 'bg-[var(--color-success)] text-white hover:opacity-90',
   ready: 'border border-[var(--color-border)] text-[var(--color-textMuted)] hover:bg-[var(--color-bgHover)]',
 }

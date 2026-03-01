@@ -610,7 +610,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                       onClick={() => setHookahStrength(s)}
                       className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         hookahStrength === s
-                          ? 'bg-[var(--color-primary)] text-white'
+                          ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                           : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                       }`}
                     >
@@ -627,7 +627,7 @@ function MenuPageInner({ slug }: { slug: string }) {
                   onClick={() => setSelectedBrand(null)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     !selectedBrand
-                      ? 'bg-[var(--color-primary)] text-white'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                   }`}
                 >

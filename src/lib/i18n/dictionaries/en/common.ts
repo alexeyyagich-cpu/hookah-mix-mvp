@@ -152,6 +152,9 @@ export const common: typeof CommonType = {
     placeholder: 'Go to page...',
     noResults: 'No results found',
     hint: '⌘K to quick navigate',
+    navigate: 'navigate',
+    select: 'select',
+    close: 'close',
   },
 
   // Cookie consent

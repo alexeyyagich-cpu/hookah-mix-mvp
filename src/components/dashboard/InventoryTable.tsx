@@ -8,7 +8,7 @@ import type { TobaccoInventory } from '@/types/database'
 import type { ForecastResult } from '@/lib/utils/forecast'
 import { formatForecastDays, getForecastColor } from '@/lib/utils/forecast'
 import { useSubscription } from '@/lib/hooks/useSubscription'
-import { IconShop } from '@/components/Icons'
+import { IconShop, IconEdit, IconTrash } from '@/components/Icons'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
@@ -245,7 +245,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                             title={t.editItem}
                             aria-label={t.editItem}
                           >
-                            ✏️
+                            <IconEdit size={16} />
                           </button>
                           <button type="button"
                             onClick={() => onDelete(item.id)}
@@ -253,7 +253,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                             title={t.deleteItem}
                             aria-label={t.deleteItem}
                           >
-                            🗑️
+                            <IconTrash size={16} />
                           </button>
                         </div>
                       </td>

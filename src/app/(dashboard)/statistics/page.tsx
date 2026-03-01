@@ -267,7 +267,7 @@ export default function StatisticsPage() {
 
           {comparisonLoading ? (
             <div className="card p-12 text-center">
-              <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" className="mx-auto" />
               <p className="mt-4 text-[var(--color-textMuted)]">{tm.loadingComparison}</p>
             </div>
           ) : !periodA || !periodB || !comparison ? (
@@ -368,7 +368,7 @@ export default function StatisticsPage() {
       {/* Overview Mode */}
       {viewMode === 'overview' && loading ? (
         <div className="card p-12 text-center">
-          <div className="w-8 h-8 mx-auto border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+          <LoadingSpinner size="lg" className="mx-auto" />
           <p className="mt-4 text-[var(--color-textMuted)]">{tm.loadingStats}</p>
         </div>
       ) : viewMode === 'overview' && !statistics ? (

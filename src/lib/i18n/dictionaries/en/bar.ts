@@ -165,6 +165,7 @@ export const bar: typeof BarType = {
   catSignature: 'Signature',
   ingredientsShort: 'ingr.',
   nameRequired: 'Name *',
+  nameEnLabel: 'English name',
   methodLabel: 'Method',
   glassLabel: 'Glass',
   difficultyLabel: 'Difficulty',

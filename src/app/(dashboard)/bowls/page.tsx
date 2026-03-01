@@ -7,7 +7,7 @@ import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
 import { useTranslation } from '@/lib/i18n'
 import { toast } from 'sonner'
-import { IconBowl } from '@/components/Icons'
+import { IconBowl, IconWarning } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -153,7 +153,7 @@ export default function BowlsPage() {
       {error && (
         <div className="card p-4 border-[var(--color-danger)]/50 bg-[var(--color-danger)]/5">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">❌</span>
+            <IconWarning size={24} className="text-[var(--color-danger)] shrink-0" />
             <p className="text-[var(--color-danger)]">{error}</p>
           </div>
         </div>

@@ -96,7 +96,7 @@ export function MixNotes({ notes, onSave, placeholder }: MixNotesProps) {
           <button
             type="button"
             onClick={handleSave}
-            className="px-3 py-1 text-xs rounded-lg bg-[var(--color-primary)] text-white hover:opacity-90"
+            className="px-3 py-1 text-xs rounded-lg bg-[var(--color-primary)] text-[var(--color-bg)] hover:opacity-90"
           >
             {t.mixNoteSave}
           </button>

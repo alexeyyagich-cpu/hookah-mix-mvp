@@ -10,7 +10,7 @@ import {
   type QuickRepeatResult,
   type QuickRepeatError,
 } from '@/logic/quickRepeatEngine'
-import { IconFire } from '@/components/Icons'
+import { IconFire, IconClose } from '@/components/Icons'
 import type { Guest, MixSnapshot } from '@/types/database'
 import { TOBACCOS } from '@/data/tobaccos'
 
@@ -147,7 +147,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
               aria-label={t.guestCloseInfo}
               className="icon-btn icon-btn-sm icon-btn-ghost"
             >
-              <span aria-hidden="true">×</span>
+              <IconClose size={20} aria-hidden="true" />
             </button>
           </div>
 

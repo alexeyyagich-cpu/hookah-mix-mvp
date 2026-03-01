@@ -6,6 +6,8 @@ import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { BarInventoryTable } from '@/components/bar/BarInventoryTable'
 import { AddBarIngredientModal } from '@/components/bar/AddBarIngredientModal'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { StatsCard } from '@/components/dashboard/StatsCard'
+import { IconBar, IconInventory, IconWarning, IconChart } from '@/components/Icons'
 import { useTranslation } from '@/lib/i18n'
 import type { BarInventoryItem } from '@/types/database'
 
@@ -99,26 +101,30 @@ export default function BarInventoryPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{t.totalItems}</div>
-          <div className="text-2xl font-bold mt-1">{totalItems}</div>
-        </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{t.volumeLiquids}</div>
-          <div className="text-2xl font-bold mt-1">{(totalVolumeMl / 1000).toFixed(1)}{t.litersShort}</div>
-        </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{t.runningLow}</div>
-          <div className="text-2xl font-bold text-[var(--color-warning)] mt-1">
-            {lowStockItems.length}
-          </div>
-        </div>
-        <div className="card p-4">
-          <div className="text-sm text-[var(--color-textMuted)]">{t.outOfStock}</div>
-          <div className="text-2xl font-bold text-[var(--color-danger)] mt-1">
-            {outOfStockItems.length}
-          </div>
-        </div>
+        <StatsCard
+          icon={<IconBar size={20} />}
+          label={t.totalItems}
+          value={totalItems}
+          color="primary"
+        />
+        <StatsCard
+          icon={<IconInventory size={20} />}
+          label={t.volumeLiquids}
+          value={`${(totalVolumeMl / 1000).toFixed(1)}${t.litersShort}`}
+          color="primary"
+        />
+        <StatsCard
+          icon={<IconWarning size={20} />}
+          label={t.runningLow}
+          value={lowStockItems.length}
+          color="warning"
+        />
+        <StatsCard
+          icon={<IconChart size={20} />}
+          label={t.outOfStock}
+          value={outOfStockItems.length}
+          color="danger"
+        />
       </div>
 
       {/* Error */}

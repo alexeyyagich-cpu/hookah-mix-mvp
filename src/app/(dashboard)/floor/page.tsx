@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 
 import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
   pending: 'var(--color-warning)',
@@ -32,7 +33,7 @@ const RESERVATION_STATUS_COLORS: Record<ReservationStatus, string> = {
 
 export default function FloorPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><div className="animate-spin w-8 h-8 border-2 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]"><LoadingSpinner size="lg" /></div>}>
       <FloorPageInner />
     </Suspense>
   )
@@ -433,7 +434,7 @@ function FloorPageInner() {
               aria-pressed={!zoneFilter}
               className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
                 !zoneFilter
-                  ? 'bg-[var(--color-primary)] text-white'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                   : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
               }`}
             >
@@ -446,7 +447,7 @@ function FloorPageInner() {
                 aria-pressed={zoneFilter === z}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
                   zoneFilter === z
-                    ? 'bg-[var(--color-primary)] text-white'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                     : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                 }`}
               >

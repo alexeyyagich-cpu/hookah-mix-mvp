@@ -212,7 +212,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                       onClick={() => setBrandFilter(null)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                         brandFilter === null
-                          ? 'bg-[var(--color-primary)] text-white'
+                          ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                           : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                       }`}
                     >
@@ -225,7 +225,7 @@ export function AddTobaccoModal({ isOpen, onClose, onSave, editingItem, canAddMo
                         onClick={() => setBrandFilter(prev => prev === b ? null : b)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                           brandFilter === b
-                            ? 'bg-[var(--color-primary)] text-white'
+                            ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                             : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
                         }`}
                       >

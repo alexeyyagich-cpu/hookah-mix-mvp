@@ -41,7 +41,7 @@ export default function MarketplacePage() {
           >
             <IconCart size={20} />
             {cartItemCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--color-primary)] text-white text-xs rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--color-primary)] text-[var(--color-bg)] text-xs rounded-full flex items-center justify-center">
                 {cartItemCount}
               </span>
             )}

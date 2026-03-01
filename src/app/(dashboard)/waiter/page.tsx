@@ -267,7 +267,7 @@ export default function WaiterPage() {
                 onClick={() => setActiveTab('bar')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                   activeTab === 'bar'
-                    ? 'bg-[var(--color-primary)] text-white'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                     : 'bg-[var(--color-bgCard)] border border-[var(--color-border)] text-[var(--color-textMuted)]'
                 }`}
               >
@@ -277,7 +277,7 @@ export default function WaiterPage() {
                 onClick={() => setActiveTab('hookah')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                   activeTab === 'hookah'
-                    ? 'bg-[var(--color-primary)] text-white'
+                    ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                     : 'bg-[var(--color-bgCard)] border border-[var(--color-border)] text-[var(--color-textMuted)]'
                 }`}
               >

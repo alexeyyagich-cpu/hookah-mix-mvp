@@ -24,7 +24,7 @@ import {
 } from '@/logic/recommendationEngine'
 import { TOBACCOS, CATEGORY_EMOJI, type Tobacco } from '@/data/tobaccos'
 import { calculateMix, validateMix, type MixItem } from '@/logic/mixCalculator'
-import { IconTarget } from '@/components/Icons'
+import { IconTarget, IconClose } from '@/components/Icons'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import type { SelectedTobacco } from '@/types/shared'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -435,7 +435,7 @@ export default function RecommendPage() {
                   aria-label={t.recommendResetGuest}
                   className="icon-btn icon-btn-sm icon-btn-ghost"
                 >
-                  <span aria-hidden="true">×</span>
+                  <IconClose size={18} aria-hidden="true" />
                 </button>
               </div>
             )}
@@ -823,7 +823,7 @@ export default function RecommendPage() {
                         aria-label={t.recommendRemoveFromMix(tobacco.flavor)}
                         className="icon-btn icon-btn-sm icon-btn-ghost icon-btn-danger"
                       >
-                        <span aria-hidden="true">×</span>
+                        <IconClose size={18} aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -1141,7 +1141,7 @@ function GuestModal({
             aria-label={t.guestModalClose}
             className="icon-btn icon-btn-sm icon-btn-ghost"
           >
-            <span aria-hidden="true">×</span>
+            <IconClose size={20} aria-hidden="true" />
           </button>
         </div>
 

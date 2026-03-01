@@ -118,7 +118,7 @@ export default function KdsPage() {
               onClick={() => setTypeFilter(key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 typeFilter === key
-                  ? 'bg-[var(--color-primary)] text-white'
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                   : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
               }`}
             >
@@ -191,7 +191,7 @@ export default function KdsPage() {
                   onClick={() => setMobileColumn(col.key)}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     mobileColumn === col.key
-                      ? 'bg-[var(--color-primary)] text-white'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
                       : 'text-[var(--color-textMuted)]'
                   }`}
                 >

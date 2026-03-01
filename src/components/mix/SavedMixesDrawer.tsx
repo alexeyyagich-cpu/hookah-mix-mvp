@@ -5,7 +5,8 @@ import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { useSavedMixes } from '@/lib/hooks/useSavedMixes'
-import { IconStar, IconMix, IconTrash } from '@/components/Icons'
+import { IconStar, IconMix, IconTrash, IconClose } from '@/components/Icons'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { MixRating, MixNotes } from './MixRating'
 import type { SavedMix, SavedMixTobacco } from '@/types/database'
@@ -102,7 +103,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
             aria-label={t.mixCloseDrawer}
             className="icon-btn icon-btn-sm icon-btn-ghost"
           >
-            <span aria-hidden="true">×</span>
+            <IconClose size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -156,7 +157,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="flex items-center justify-center h-48">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : filteredMixes.length === 0 ? (
             <div className="text-center py-12" style={{ color: 'var(--color-textMuted)' }}>
@@ -226,10 +227,11 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
                     {mix.tobaccos.map((t, i) => (
                       <span
                         key={i}
-                        className="px-2 py-1 rounded-lg text-xs"
+                        className="px-2.5 py-1 rounded-full text-xs font-medium"
                         style={{
-                          border: `1px solid ${t.color}`,
-                          color: 'var(--color-text)',
+                          background: `${t.color}15`,
+                          border: `1px solid ${t.color}40`,
+                          color: t.color,
                         }}
                       >
                         {t.flavor} ({t.percent}%)

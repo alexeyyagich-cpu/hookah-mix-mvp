@@ -6,7 +6,8 @@ import { useBarSales } from '@/lib/hooks/useBarSales'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { QuickSellPanel } from '@/components/bar/QuickSellPanel'
-import { IconExport, IconLock, IconChart } from '@/components/Icons'
+import { IconExport, IconLock, IconChart, IconCoin, IconTrendUp, IconPercent, IconCocktail } from '@/components/Icons'
+import { StatsCard } from '@/components/dashboard/StatsCard'
 import { exportBarSalesCSV, exportBarSalesPDF } from '@/lib/utils/exportReport'
 import { useTranslation, useLocale, formatCurrency, formatDate, formatDateTime } from '@/lib/i18n'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
@@ -132,30 +133,30 @@ export default function BarSalesPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
-        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-primary)' }}>
-          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.revenue}</div>
-          <div className="text-2xl font-bold tabular-nums mt-1">{formatCurrency(analytics.totalRevenue, locale)}</div>
-        </div>
-        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-success)' }}>
-          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.profit}</div>
-          <div className="text-2xl font-bold tabular-nums text-[var(--color-success)] mt-1">
-            {formatCurrency(analytics.totalProfit, locale)}
-          </div>
-        </div>
-        <div className="card p-4" style={{ borderLeft: '3px solid var(--color-warning)' }}>
-          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.portionsSold}</div>
-          <div className="text-2xl font-bold tabular-nums mt-1">{analytics.totalSales}</div>
-        </div>
-        <div className="card p-4" style={{ borderLeft: `3px solid var(--color-${analytics.avgMargin !== null ? (analytics.avgMargin >= 60 ? 'success' : analytics.avgMargin >= 40 ? 'warning' : 'danger') : 'primary'})` }}>
-          <div className="text-xs font-medium uppercase tracking-wider text-[var(--color-textMuted)]">{tb.margin}</div>
-          <div className={`text-2xl font-bold tabular-nums mt-1 ${
-            analytics.avgMargin !== null
-              ? analytics.avgMargin >= 60 ? 'text-[var(--color-success)]' : analytics.avgMargin >= 40 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
-              : ''
-          }`}>
-            {analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(0)}%` : '—'}
-          </div>
-        </div>
+        <StatsCard
+          icon={<IconCoin size={20} />}
+          label={tb.revenue}
+          value={formatCurrency(analytics.totalRevenue, locale)}
+          color="primary"
+        />
+        <StatsCard
+          icon={<IconTrendUp size={20} />}
+          label={tb.profit}
+          value={formatCurrency(analytics.totalProfit, locale)}
+          color="success"
+        />
+        <StatsCard
+          icon={<IconCocktail size={20} />}
+          label={tb.portionsSold}
+          value={analytics.totalSales}
+          color="warning"
+        />
+        <StatsCard
+          icon={<IconPercent size={20} />}
+          label={tb.margin}
+          value={analytics.avgMargin !== null ? `${analytics.avgMargin.toFixed(0)}%` : '—'}
+          color={analytics.avgMargin !== null ? (analytics.avgMargin >= 60 ? 'success' : analytics.avgMargin >= 40 ? 'warning' : 'danger') : 'primary'}
+        />
       </div>
 
       {/* Tabs */}
