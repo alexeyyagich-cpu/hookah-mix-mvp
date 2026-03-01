@@ -174,7 +174,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                         {item.tobacco.flavor}
                       </span>
                       {!item.available && item.replacement && (
-                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--color-warning)', color: 'white' }}>
+                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--color-warning)', color: 'var(--color-bg)' }}>
                           → {item.replacement.flavor}
                         </span>
                       )}
@@ -234,7 +234,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                 className="w-full py-4 rounded-xl font-semibold text-lg transition-transform active:scale-[0.98]"
                 style={{
                   background: 'var(--color-success)',
-                  color: 'white',
+                  color: 'var(--color-bg)',
                 }}
               >
                 {t.guestRepeatMix}
@@ -292,7 +292,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {guest.last_mix_snapshot ? (
-                      <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--color-success)', color: 'white' }}>
+                      <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--color-success)', color: 'var(--color-bg)' }}>
                         {t.guestHasMix}
                       </span>
                     ) : (
@@ -310,7 +310,7 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
                 {guest.last_mix_snapshot && (
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0"
-                    style={{ background: 'var(--color-success)', color: 'white' }}
+                    style={{ background: 'var(--color-success)', color: 'var(--color-bg)' }}
                   >
                     🔄
                   </div>

@@ -649,7 +649,7 @@ function MixPageInner() {
             {/* Steps */}
             <div className="flex items-center justify-center gap-3 mb-5">
               <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-primary)', color: 'white' }}>1</span>
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--color-primary)', color: 'var(--color-bg)' }}>1</span>
                 <span className="text-sm font-medium hidden sm:inline" style={{ color: 'var(--color-text)' }}>{t.guestStep1}</span>
               </div>
               <span style={{ color: 'var(--color-textMuted)' }}>{'\u2192'}</span>
@@ -1159,7 +1159,7 @@ function MixPageInner() {
                         type="button"
                         onClick={() => setShowMasterCard(true)}
                         className="w-full btn text-sm py-3 flex items-center justify-center gap-2"
-                        style={{ background: 'var(--color-primary)', color: 'white' }}
+                        style={{ background: 'var(--color-primary)', color: 'var(--color-bg)' }}
                       >
                         <span>📋</span>
                         <span>{t.guestShowMaster}</span>
@@ -1436,7 +1436,7 @@ function MixPageInner() {
             className="h-11 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium transition-transform active:scale-95"
             style={{
               background: "var(--color-success)",
-              color: "white",
+              color: "var(--color-bg)",
             }}
           >
             <span aria-hidden="true">📝</span>
@@ -1505,7 +1505,7 @@ function MixPageInner() {
               type="button"
               onClick={() => setShowMasterCard(false)}
               className="w-full py-3 rounded-xl text-sm font-semibold"
-              style={{ background: 'var(--color-primary)', color: 'white' }}
+              style={{ background: 'var(--color-primary)', color: 'var(--color-bg)' }}
             >
               OK
             </button>

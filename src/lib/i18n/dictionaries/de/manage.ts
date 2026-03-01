@@ -43,7 +43,8 @@ export const manage: typeof ManageType = {
   takeOrder: 'Annehmen',
   markReady: 'Fertig',
   markServed: 'Serviert',
-  cancelOrder: 'Stornieren',
+  cancelOrder: 'Bestellung stornieren',
+  cancelOrderWarning: 'Sind Sie sicher, dass Sie diese Bestellung stornieren möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
   orderType: {
     bar: 'Bar',
     hookah: 'Shisha',

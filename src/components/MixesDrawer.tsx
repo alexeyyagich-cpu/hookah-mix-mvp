@@ -249,7 +249,7 @@ function MixCard({ mix, onSelect, available }: { mix: MixRecipe; onSelect: () =>
             {!available && (
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'var(--color-error)', color: 'white' }}
+                style={{ background: 'var(--color-error)', color: 'var(--color-bg)' }}
               >
                 {t.outOfStock}
               </span>

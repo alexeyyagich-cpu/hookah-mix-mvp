@@ -414,7 +414,7 @@ function FloorPageInner() {
                   )}
                 </div>
                 <span
-                  className="px-2 py-0.5 rounded-full text-xs font-medium text-white shrink-0"
+                  className="px-2 py-0.5 rounded-full text-xs font-medium text-[var(--color-bg)] shrink-0"
                   style={{ backgroundColor: RESERVATION_STATUS_COLORS[r.status] }}
                 >
                   {r.status === 'pending' ? tm.statusPending : tm.statusConfirmed}
@@ -530,7 +530,7 @@ function FloorPageInner() {
               className="px-3 py-1 rounded-full text-sm font-medium"
               style={{
                 background: TABLE_STATUS_COLORS[activeSelectedTable.status].bg,
-                color: 'white',
+                color: 'var(--color-bg)',
               }}
             >
               {activeSelectedTable.status === 'available' ? tm.statusAvailable :
@@ -575,7 +575,7 @@ function FloorPageInner() {
 
           {/* Linked Reservation Details */}
           {linkedReservation && (
-            <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--color-warning)', color: 'white', opacity: 0.95 }}>
+            <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--color-warning)', color: 'var(--color-bg)', opacity: 0.95 }}>
               <div className="flex items-center justify-between mb-2">
                 <span className="font-semibold text-sm">{tm.reservationDetails}</span>
                 <button type="button"
@@ -765,7 +765,7 @@ function FloorPageInner() {
                 className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{
                   background: activeSelectedTable.status === status ? color : 'var(--color-bgHover)',
-                  color: activeSelectedTable.status === status ? 'white' : 'var(--color-text)',
+                  color: activeSelectedTable.status === status ? 'var(--color-bg)' : 'var(--color-text)',
                   opacity: activeSelectedTable.status === status ? 1 : 0.8,
                 }}
               >

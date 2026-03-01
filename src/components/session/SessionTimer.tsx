@@ -166,7 +166,7 @@ export function SessionTimer({
                 : 'var(--color-primary)',
             }}
           >
-            <IconTimer size={18} className="text-white" />
+            <IconTimer size={18} className="text-[var(--color-bg)]" />
           </div>
           <div>
             <h3 className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>
@@ -181,7 +181,7 @@ export function SessionTimer({
         {isOvertime && (
           <span
             className="px-2 py-1 rounded-lg text-xs font-bold"
-            style={{ background: 'var(--color-danger)', color: 'white' }}
+            style={{ background: 'var(--color-danger)', color: 'var(--color-bg)' }}
           >
             {t.overtimeMin(minutes - notificationMinutes)}
           </span>
@@ -215,7 +215,7 @@ export function SessionTimer({
             className="flex-1 py-2 rounded-xl font-medium text-sm transition-colors"
             style={{
               background: 'var(--color-success)',
-              color: 'white',
+              color: 'var(--color-bg)',
             }}
           >
             {seconds > 0 ? t.timerResume : t.timerStart}
@@ -226,7 +226,7 @@ export function SessionTimer({
             className="flex-1 py-2 rounded-xl font-medium text-sm transition-colors"
             style={{
               background: 'var(--color-warning)',
-              color: 'white',
+              color: 'var(--color-bg)',
             }}
           >
             {t.timerPause}

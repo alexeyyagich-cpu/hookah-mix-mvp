@@ -755,7 +755,7 @@ function ReviewsCarousel({ reviews, reviewsCount }: { reviews: { id: string; aut
               <div className="card p-5 h-full border border-[var(--color-border)] hover:border-[var(--color-primary)]/50 transition-colors">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-black flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-[var(--color-bg)] flex-shrink-0">
                     {review.author_name.charAt(0)}
                   </div>
                   <div className="min-w-0">

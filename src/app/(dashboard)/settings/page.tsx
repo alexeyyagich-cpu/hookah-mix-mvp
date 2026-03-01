@@ -1108,7 +1108,7 @@ export default function SettingsPage() {
               type="button"
               onClick={handleDeleteAccount}
               disabled={deleteLoading}
-              className="btn bg-[var(--color-danger)] text-white hover:opacity-80 disabled:opacity-50"
+              className="btn bg-[var(--color-danger)] text-[var(--color-bg)] hover:opacity-80 disabled:opacity-50"
             >
               {deleteLoading ? tc.loading : ts.deleteAccount}
             </button>

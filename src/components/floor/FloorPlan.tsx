@@ -629,7 +629,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
                 className="px-4 py-2 rounded-xl text-sm font-medium"
                 style={{
                   background: 'var(--color-danger)',
-                  color: 'white',
+                  color: 'var(--color-bg)',
                 }}
               >
                 {t.deleteBtn}

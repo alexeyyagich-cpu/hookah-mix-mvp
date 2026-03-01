@@ -313,7 +313,7 @@ export default function WaiterPage() {
 
       {/* Error toast */}
       {submitError && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[var(--color-danger)] text-white text-sm font-medium shadow-lg animate-fadeInUp">
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[var(--color-danger)] text-[var(--color-bg)] text-sm font-medium shadow-lg animate-fadeInUp">
           {submitError}
         </div>
       )}

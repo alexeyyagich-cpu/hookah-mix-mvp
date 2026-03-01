@@ -14,10 +14,11 @@ interface BarInventoryTableProps {
   onDelete: (id: string) => void
   onAdjust: (id: string, amount: number) => void
   loading?: boolean
+  deletingId?: string | null
   onAdd?: () => void
 }
 
-export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading, onAdd }: BarInventoryTableProps) {
+export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loading, deletingId, onAdd }: BarInventoryTableProps) {
   const t = useTranslation('bar')
   const tc = useTranslation('common')
   const CATEGORY_LABELS: Record<string, string> = {
@@ -227,7 +228,8 @@ export function BarInventoryTable({ inventory, onEdit, onDelete, onAdjust, loadi
                         </button>
                         <button type="button"
                           onClick={() => setDeleteTarget(item.id)}
-                          className="min-w-[44px] min-h-[44px] px-3 py-2 rounded-lg text-xs transition-colors text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10"
+                          disabled={deletingId === item.id}
+                          className="min-w-[44px] min-h-[44px] px-3 py-2 rounded-lg text-xs transition-colors text-[var(--color-textMuted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 disabled:opacity-50"
                         >
                           {t.deleteShort}
                         </button>

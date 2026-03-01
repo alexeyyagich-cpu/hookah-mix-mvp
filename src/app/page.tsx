@@ -312,7 +312,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {howItWorks.map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-2xl font-bold text-black">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--color-primary)] flex items-center justify-center text-2xl font-bold text-[var(--color-bg)]">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{item.title}</h3>

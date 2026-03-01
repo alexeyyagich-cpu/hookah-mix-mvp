@@ -177,7 +177,7 @@ export default function ReservationsPage() {
 
                       {/* Status badge */}
                       <span
-                        className="px-3 py-1 rounded-full text-xs font-medium text-white flex-shrink-0"
+                        className="px-3 py-1 rounded-full text-xs font-medium text-[var(--color-bg)] flex-shrink-0"
                         style={{ backgroundColor: STATUS_COLORS[reservation.status] }}
                       >
                         {STATUS_LABELS[reservation.status]}

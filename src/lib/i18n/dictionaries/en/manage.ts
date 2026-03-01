@@ -43,7 +43,8 @@ export const manage: typeof ManageType = {
   takeOrder: 'Take',
   markReady: 'Ready',
   markServed: 'Served',
-  cancelOrder: 'Cancel',
+  cancelOrder: 'Cancel Order',
+  cancelOrderWarning: 'Are you sure you want to cancel this order? This action cannot be undone.',
   orderType: {
     bar: 'Bar',
     hookah: 'Hookah',

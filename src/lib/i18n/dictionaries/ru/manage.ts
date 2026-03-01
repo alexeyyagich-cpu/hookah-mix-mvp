@@ -44,7 +44,8 @@ export const manage = {
   takeOrder: 'Взять',
   markReady: 'Готово',
   markServed: 'Подано',
-  cancelOrder: 'Отменить',
+  cancelOrder: 'Отменить заказ',
+  cancelOrderWarning: 'Вы уверены, что хотите отменить этот заказ? Это действие нельзя отменить.',
   orderType: {
     bar: 'Бар',
     hookah: 'Кальянная',

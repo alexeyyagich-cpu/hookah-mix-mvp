@@ -12,6 +12,7 @@ import { useModules } from '@/lib/hooks/useModules'
 import { KdsOrderCard } from '@/components/kds/KdsOrderCard'
 import { NewOrderModal } from '@/components/kds/NewOrderModal'
 import { IconPlus, IconMenuList } from '@/components/Icons'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -46,6 +47,7 @@ export default function KdsPage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [mobileColumn, setMobileColumn] = useState<MobileColumn>('new')
   const [modalOpen, setModalOpen] = useState(false)
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null)
 
   const isCombined = isBarActive && isHookahActive
 
@@ -169,7 +171,7 @@ export default function KdsPage() {
                       key={order.id}
                       order={order}
                       onAction={handleAction}
-                      onCancel={handleCancel}
+                      onCancel={async (id: string) => setCancelTarget(id)}
                     />
                   ))}
                   {col.orders.length === 0 && (
@@ -196,13 +198,13 @@ export default function KdsPage() {
                   }`}
                 >
                   <span className={`w-2 h-2 rounded-full ${
-                    mobileColumn === col.key ? 'bg-white' : col.dot
+                    mobileColumn === col.key ? 'bg-[var(--color-bg)]' : col.dot
                   }`} />
                   {col.label}
                   {col.orders.length > 0 && (
                     <span className={`text-xs px-1.5 rounded-full ${
                       mobileColumn === col.key
-                        ? 'bg-white/20'
+                        ? 'bg-[var(--color-bg)]/20'
                         : 'bg-[var(--color-bgCard)]'
                     }`}>
                       {col.orders.length}
@@ -219,7 +221,7 @@ export default function KdsPage() {
                   key={order.id}
                   order={order}
                   onAction={handleAction}
-                  onCancel={handleCancel}
+                  onCancel={async (id: string) => setCancelTarget(id)}
                 />
               ))}
               {columns.find(c => c.key === mobileColumn)?.orders.length === 0 && (
@@ -232,6 +234,18 @@ export default function KdsPage() {
         </>
       )}
       </ErrorBoundary>
+
+      <ConfirmDialog
+        open={!!cancelTarget}
+        title={tm.cancelOrder}
+        message={tm.cancelOrderWarning}
+        danger
+        onConfirm={async () => {
+          if (cancelTarget) await handleCancel(cancelTarget)
+          setCancelTarget(null)
+        }}
+        onCancel={() => setCancelTarget(null)}
+      />
 
       {/* New Order Modal */}
       <NewOrderModal

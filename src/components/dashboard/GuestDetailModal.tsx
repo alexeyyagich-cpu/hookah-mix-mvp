@@ -213,7 +213,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
                   {guest.last_mix_snapshot.tobaccos.map((t, i) => (
                     <span
                       key={i}
-                      className="text-xs px-2 py-1 rounded-full text-white font-medium"
+                      className="text-xs px-2 py-1 rounded-full text-[var(--color-bg)] font-medium"
                       style={{ backgroundColor: t.color }}
                     >
                       {t.flavor} {t.percent}%

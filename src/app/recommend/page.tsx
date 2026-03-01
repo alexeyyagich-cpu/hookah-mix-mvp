@@ -1330,7 +1330,7 @@ function TobaccoResultCard({
               {tobacco.flavor}
             </span>
             {isSelected && (
-              <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: tobacco.color, color: 'white' }}>
+              <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: tobacco.color, color: 'var(--color-bg)' }}>
                 ✓
               </span>
             )}

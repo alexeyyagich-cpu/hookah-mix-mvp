@@ -186,7 +186,7 @@ export default function ShiftsPage() {
                 <button type="button"
                   onClick={() => setShowCloseModal(true)}
                   className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-                  style={{ background: 'var(--color-danger)', color: 'white' }}
+                  style={{ background: 'var(--color-danger)', color: 'var(--color-bg)' }}
                 >
                   {tm.closeShift}
                 </button>

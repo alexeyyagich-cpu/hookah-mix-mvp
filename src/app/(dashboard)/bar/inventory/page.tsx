@@ -27,6 +27,7 @@ export default function BarInventoryPage() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<BarInventoryItem | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const handleSave = async (item: Omit<BarInventoryItem, 'id' | 'profile_id' | 'created_at' | 'updated_at'>) => {
     try {
@@ -48,11 +49,14 @@ export default function BarInventoryPage() {
   }
 
   const handleDelete = async (id: string) => {
+    setDeletingId(id)
     try {
       await deleteIngredient(id)
       toast.success(tc.deleted)
     } catch {
       toast.error(tc.errorDeleting)
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -77,6 +81,7 @@ export default function BarInventoryPage() {
     .reduce((sum, i) => sum + i.quantity, 0)
 
   return (
+    <ErrorBoundary sectionName="Bar Inventory">
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -142,6 +147,7 @@ export default function BarInventoryPage() {
           onDelete={handleDelete}
           onAdjust={handleAdjust}
           loading={loading}
+          deletingId={deletingId}
           onAdd={() => {
             setEditingItem(null)
             setModalOpen(true)
@@ -162,5 +168,6 @@ export default function BarInventoryPage() {
       />
 
     </div>
+    </ErrorBoundary>
   )
 }

@@ -115,7 +115,7 @@ export default function ReviewsPage() {
             >
               <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-black flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-[var(--color-warning)] flex items-center justify-center text-lg font-bold text-[var(--color-bg)] flex-shrink-0">
                   {review.author_name.charAt(0)}
                 </div>
 

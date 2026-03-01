@@ -113,7 +113,7 @@ export function ABCAnalysisPanel() {
                     width: `${pct}%`,
                     backgroundColor: CATEGORY_COLORS[cat],
                   }}
-                  className="flex items-center justify-center text-xs font-bold text-white"
+                  className="flex items-center justify-center text-xs font-bold text-[var(--color-bg)]"
                 >
                   {pct >= 10 && `${pct.toFixed(0)}%`}
                 </div>
@@ -130,7 +130,7 @@ export function ABCAnalysisPanel() {
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-[var(--color-bg)] flex-shrink-0"
                     style={{ backgroundColor: CATEGORY_COLORS[item.category] }}
                   >
                     {item.category}
