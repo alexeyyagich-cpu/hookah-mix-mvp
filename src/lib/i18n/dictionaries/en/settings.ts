@@ -86,6 +86,7 @@ export const settings: typeof SettingsType = {
   sync: 'Sync',
   syncing: 'Syncing...',
   disconnectPos: 'Disconnect POS',
+  disconnectWarning: 'Are you sure you want to disconnect this integration? You can reconnect later.',
   webhooksNotRegistered: 'Webhooks not registered. Automatic deduction on sales unavailable.',
   posConnectDesc: 'Connect ready2order for automatic product sync, sales tracking and inventory management from your register.',
   connectPos: 'Connect POS',

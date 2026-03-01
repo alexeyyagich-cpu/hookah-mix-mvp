@@ -10,6 +10,7 @@ export const common: typeof CommonType = {
   create: 'Erstellen',
   close: 'Schließen',
   confirm: 'Bestätigen',
+  ok: 'OK',
   search: 'Suchen',
   back: 'Zurück',
   next: 'Weiter',

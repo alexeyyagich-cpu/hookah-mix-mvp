@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { useShifts } from '@/lib/hooks/useShifts'
 import { useModules } from '@/lib/hooks/useModules'
@@ -9,6 +9,8 @@ import { IconTimer, IconPlus, IconClose, IconCoin, IconBowl, IconCocktail, IconM
 import { EmptyState } from '@/components/ui/EmptyState'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
+import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 
 function safeParseFloat(value: string): number | undefined {
   const parsed = parseFloat(value)
@@ -37,6 +39,11 @@ export default function ShiftsPage() {
   const [openNotes, setOpenNotes] = useState('')
   const [closeNotes, setCloseNotes] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const openModalRef = useRef<HTMLDivElement>(null)
+  const closeModalRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(openModalRef, showOpenModal, () => setShowOpenModal(false))
+  useFocusTrap(closeModalRef, showCloseModal, () => setShowCloseModal(false))
+  useBodyScrollLock(showOpenModal || showCloseModal)
 
   // Live duration timer for active shift
   const [now, setNow] = useState(Date.now())
@@ -278,7 +285,7 @@ export default function ShiftsPage() {
       {showOpenModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowOpenModal(false)} />
-          <div className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="open-shift-title">
+          <div ref={openModalRef} className="relative w-full max-w-md rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="open-shift-title">
             <div className="flex items-center justify-between mb-6">
               <h2 id="open-shift-title" className="text-xl font-bold">{tm.openShift}</h2>
               <button type="button" onClick={() => setShowOpenModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
@@ -286,6 +293,7 @@ export default function ShiftsPage() {
               </button>
             </div>
 
+            <form onSubmit={(e) => { e.preventDefault(); handleOpenShift() }}>
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium block mb-1.5">{tm.startingCash} (€)</label>
@@ -318,14 +326,14 @@ export default function ShiftsPage() {
               >
                 {tm.cancelBtn}
               </button>
-              <button type="button"
-                onClick={handleOpenShift}
+              <button type="submit"
                 disabled={submitting}
                 className="btn btn-success btn-sm flex-1"
               >
                 {submitting ? tm.openingShift : tm.openShift}
               </button>
             </div>
+            </form>
           </div>
         </div>
       )}
@@ -334,7 +342,7 @@ export default function ShiftsPage() {
       {showCloseModal && activeShift && closeReconciliation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setShowCloseModal(false)} />
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="close-shift-title">
+          <div ref={closeModalRef} className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="close-shift-title">
             <div className="flex items-center justify-between mb-6">
               <h2 id="close-shift-title" className="text-xl font-bold">{tm.closeShift}</h2>
               <button type="button" onClick={() => setShowCloseModal(false)} className="p-2 rounded-lg hover:bg-[var(--color-bgHover)]" aria-label={tc.close}>
@@ -353,6 +361,7 @@ export default function ShiftsPage() {
               compact
             />
 
+            <form onSubmit={(e) => { e.preventDefault(); handleCloseShift() }}>
             <div className="space-y-4 mt-4">
               <div>
                 <label className="text-sm font-medium block mb-1.5">{tm.closingCash} (€)</label>
@@ -385,14 +394,14 @@ export default function ShiftsPage() {
               >
                 {tm.cancelBtn}
               </button>
-              <button type="button"
-                onClick={handleCloseShift}
+              <button type="submit"
                 disabled={submitting}
                 className="btn btn-danger btn-sm flex-1"
               >
                 {submitting ? tm.closingShift : tm.closeShift}
               </button>
             </div>
+            </form>
           </div>
         </div>
       )}

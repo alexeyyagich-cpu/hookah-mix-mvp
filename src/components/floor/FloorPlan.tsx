@@ -7,6 +7,7 @@ import { useTranslation } from '@/lib/i18n'
 import { IconPlus } from '@/components/Icons'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
 
 export const LONG_SESSION_MINUTES = 120
@@ -448,6 +449,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
   const [zone, setZone] = useState(table?.zone || '')
   const [notes, setNotes] = useState(table?.notes || '')
   const [saving, setSaving] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -625,7 +627,7 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
             {table && onDelete && (
               <button
                 type="button"
-                onClick={onDelete}
+                onClick={() => setConfirmDelete(true)}
                 className="px-4 py-2 rounded-xl text-sm font-medium"
                 style={{
                   background: 'var(--color-danger)',
@@ -635,6 +637,17 @@ function TableModal({ table, existingZones = [], onClose, onSave, onDelete, onSt
                 {t.deleteBtn}
               </button>
             )}
+            <ConfirmDialog
+              open={confirmDelete}
+              title={t.deleteBtn}
+              message={tc.deleteWarning}
+              danger
+              onConfirm={async () => {
+                if (onDelete) await onDelete()
+                setConfirmDelete(false)
+              }}
+              onCancel={() => setConfirmDelete(false)}
+            />
             <div className="flex-1" />
             <button
               type="button"

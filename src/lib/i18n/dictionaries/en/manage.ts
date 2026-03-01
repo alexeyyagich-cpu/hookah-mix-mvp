@@ -661,6 +661,9 @@ export const manage: typeof ManageType = {
   waiterStructured: 'Builder',
   waiterHookahDesc: 'Hookah description',
   waiterHookahDescPlaceholder: 'e.g. light fruity mix',
+  waiterDecreaseQty: 'Decrease quantity',
+  waiterIncreaseQty: 'Increase quantity',
+  waiterRemoveItem: 'Remove item',
 
   // Dashboard Control Panel
   controlTobaccoUsage: 'Tobacco used today',

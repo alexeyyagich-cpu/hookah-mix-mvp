@@ -290,7 +290,14 @@ export default function PromotionsPage() {
                   {promo.usage_count}×
                 </span>
                 <button type="button"
-                  onClick={() => toggleActive(promo.id)}
+                  onClick={async () => {
+                    try {
+                      await toggleActive(promo.id)
+                      toast.success(tc.saved)
+                    } catch {
+                      toast.error(tc.errorSaving)
+                    }
+                  }}
                   className={`shrink-0 w-10 h-6 rounded-full transition-colors relative ${
                     promo.is_active ? 'bg-[var(--color-success)]' : 'bg-[var(--color-bgHover)]'
                   }`}

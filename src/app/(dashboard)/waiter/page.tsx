@@ -150,7 +150,7 @@ export default function WaiterPage() {
 
         if (hookahMode === 'freetext') {
           hookahItems = [{
-            name: 'Hookah',
+            name: tm.waiterHookahTab,
             quantity: 1,
             details: hookahDescription,
           }]

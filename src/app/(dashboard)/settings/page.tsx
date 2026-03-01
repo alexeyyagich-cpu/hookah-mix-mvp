@@ -80,6 +80,7 @@ export default function SettingsPage() {
   const [message, setMessage] = useState('')
   const [portalLoading, setPortalLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [confirmDisconnect, setConfirmDisconnect] = useState<'r2o' | 'telegram' | null>(null)
 
   // Refresh profile when user returns from Stripe Portal (tab focus)
   useEffect(() => {
@@ -915,7 +916,7 @@ export default function SettingsPage() {
               </button>
               <button
                 type="button"
-                onClick={r2oDisconnect}
+                onClick={() => setConfirmDisconnect('r2o')}
                 className="text-sm text-[var(--color-danger)] hover:underline"
               >
                 {ts.disconnectPos}
@@ -1039,7 +1040,7 @@ export default function SettingsPage() {
 
             <button
               type="button"
-              onClick={disconnectTelegram}
+              onClick={() => setConfirmDisconnect('telegram')}
               className="text-sm text-[var(--color-danger)] hover:underline"
             >
               {ts.disconnectTelegram}
@@ -1115,6 +1116,18 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={!!confirmDisconnect}
+        title={confirmDisconnect === 'r2o' ? ts.disconnectPos : ts.disconnectTelegram}
+        message={ts.disconnectWarning}
+        danger
+        onConfirm={async () => {
+          if (confirmDisconnect === 'r2o') await r2oDisconnect()
+          else if (confirmDisconnect === 'telegram') await disconnectTelegram()
+          setConfirmDisconnect(null)
+        }}
+        onCancel={() => setConfirmDisconnect(null)}
+      />
       <ConfirmDialog
         open={showDeleteConfirm}
         title={ts.deleteConfirm1}

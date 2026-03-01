@@ -86,6 +86,7 @@ export const settings: typeof SettingsType = {
   sync: 'Synchronisieren',
   syncing: 'Synchronisierung...',
   disconnectPos: 'POS trennen',
+  disconnectWarning: 'Sind Sie sicher, dass Sie diese Integration trennen möchten? Sie können sie später wieder verbinden.',
   webhooksNotRegistered: 'Webhooks nicht registriert. Automatischer Abzug bei Verkäufen nicht verfügbar.',
   posConnectDesc: 'Verbinden Sie ready2order für automatische Produktsynchronisierung, Verkaufsverfolgung und Bestandsverwaltung.',
   connectPos: 'POS verbinden',

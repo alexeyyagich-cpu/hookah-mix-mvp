@@ -145,10 +145,6 @@ export default function AdminDashboard() {
             <p className="font-semibold" style={{ color: 'var(--color-text)' }}>Analytics →</p>
             <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>Product metrics & funnels</p>
           </Link>
-          <Link href="/admin/system" className="card p-5 hover:opacity-80 transition-opacity">
-            <p className="font-semibold" style={{ color: 'var(--color-text)' }}>System →</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>Backups, health, impersonation</p>
-          </Link>
         </div>
       </div>
     </ErrorBoundary>

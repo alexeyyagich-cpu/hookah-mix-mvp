@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -27,6 +28,7 @@ export function ConfirmDialog({
   const tc = useTranslation('common')
   const resolvedConfirmLabel = confirmLabel ?? tc.confirm
   const resolvedCancelLabel = cancelLabel ?? tc.cancel
+  const dialogRef = useRef<HTMLDivElement>(null)
   const confirmRef = useRef<HTMLButtonElement>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const [visible, setVisible] = useState(false)
@@ -43,6 +45,8 @@ export function ConfirmDialog({
   useEffect(() => {
     if (visible && !isClosing) confirmRef.current?.focus()
   }, [visible, isClosing])
+
+  useFocusTrap(dialogRef, visible && !isClosing)
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -79,7 +83,7 @@ export function ConfirmDialog({
         aria-hidden="true"
         onClick={handleClose}
       />
-      <div role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message" className={`relative w-full max-w-sm rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6 ${
+      <div ref={dialogRef} role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-message" className={`relative w-full max-w-sm rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6 ${
         isClosing ? 'animate-fadeOutDown' : 'animate-scaleIn'
       }`}>
         <h3 id="confirm-title" className="text-lg font-bold mb-2">{title}</h3>

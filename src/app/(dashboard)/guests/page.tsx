@@ -34,6 +34,7 @@ export default function GuestsPage() {
   const [showSettings, setShowSettings] = useState(false)
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
+  const [addingSaving, setAddingSaving] = useState(false)
 
   const filteredGuests = useMemo(() => {
     let result = guests
@@ -67,7 +68,8 @@ export default function GuestsPage() {
   }, [guests, search, sortBy])
 
   const handleAddGuest = async () => {
-    if (!newName.trim()) return
+    if (!newName.trim() || addingSaving) return
+    setAddingSaving(true)
     try {
       await addGuest({ name: newName.trim(), phone: newPhone.trim() || null })
       setNewName('')
@@ -76,6 +78,8 @@ export default function GuestsPage() {
       toast.success(tc.saved)
     } catch {
       toast.error(tc.errorSaving)
+    } finally {
+      setAddingSaving(false)
     }
   }
 
@@ -155,7 +159,7 @@ export default function GuestsPage() {
               className="input w-full sm:w-48"
             />
             <div className="flex gap-2">
-              <button type="submit" disabled={!newName.trim()} className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+              <button type="submit" disabled={!newName.trim() || addingSaving} className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
                 {tm.save}
               </button>
               <button type="button" onClick={() => setShowAddForm(false)} className="btn btn-ghost">

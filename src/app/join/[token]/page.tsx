@@ -175,7 +175,7 @@ export default function JoinPage() {
             <p className="text-[var(--color-textMuted)]">
               {t.inviteDescription(roleLabel?.label || invite.role)}
             </p>
-            <button type="button" onClick={handleAccept} className="btn btn-primary w-full">
+            <button type="button" onClick={handleAccept} disabled={state !== 'ready'} className="btn btn-primary w-full disabled:opacity-50">
               {t.acceptInvite}
             </button>
           </div>

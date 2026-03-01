@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { toast } from 'sonner'
 import Link from 'next/link'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
@@ -44,6 +45,7 @@ export default function ReservationsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null)
 
   const filteredReservations = useMemo(() => reservations.filter(r => {
     if (dateFilter && r.reservation_date !== dateFilter) return false
@@ -57,8 +59,20 @@ export default function ReservationsPage() {
     setDeletingId(id)
     try {
       await deleteReservation(id)
+      toast.success(tc.deleted)
+    } catch {
+      toast.error(tc.errorDeleting)
     } finally {
       setDeletingId(null)
+    }
+  }
+
+  const handleStatusChange = async (id: string, status: 'confirmed' | 'cancelled') => {
+    try {
+      await updateStatus(id, status)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
     }
   }
 
@@ -214,7 +228,7 @@ export default function ReservationsPage() {
                       {/* Actions — only for users with floor.edit permission */}
                       {canEdit && reservation.status === 'pending' && (
                         <button type="button"
-                          onClick={() => updateStatus(reservation.id, 'confirmed')}
+                          onClick={() => handleStatusChange(reservation.id, 'confirmed')}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-success)]/20 text-[var(--color-success)] hover:bg-[var(--color-success)]/30 transition-colors"
                         >
                           {tm.confirmReservation}
@@ -222,7 +236,7 @@ export default function ReservationsPage() {
                       )}
                       {canEdit && (reservation.status === 'pending' || reservation.status === 'confirmed') && (
                         <button type="button"
-                          onClick={() => updateStatus(reservation.id, 'cancelled')}
+                          onClick={() => setCancelTarget(reservation.id)}
                           className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-danger)]/20 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/30 transition-colors"
                         >
                           {tm.cancelAction}
@@ -246,6 +260,17 @@ export default function ReservationsPage() {
           })}
         </div>
       )}
+      <ConfirmDialog
+        open={!!cancelTarget}
+        title={tm.cancelReservation}
+        message={tc.deleteWarning}
+        danger
+        onConfirm={async () => {
+          if (cancelTarget) await handleStatusChange(cancelTarget, 'cancelled')
+          setCancelTarget(null)
+        }}
+        onCancel={() => setCancelTarget(null)}
+      />
       <ConfirmDialog
         open={!!deleteTarget}
         title={tm.deleteReservation}

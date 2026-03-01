@@ -85,7 +85,7 @@ export function GuestDetailModal({ guest, bonusHistory, onClose, onUpdate, onDel
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setEditing(!editing)} className="btn btn-ghost p-2" aria-label="Edit">
+            <button type="button" onClick={() => setEditing(!editing)} className="btn btn-ghost p-2" aria-label={tc.edit}>
               <IconEdit size={18} />
             </button>
             <button type="button" onClick={onClose} className="btn btn-ghost p-2" aria-label={tc.close}>

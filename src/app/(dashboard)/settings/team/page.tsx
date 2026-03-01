@@ -110,8 +110,14 @@ export default function TeamPage() {
 
   const handleResendInvitation = async (invitationId: string) => {
     setActionLoading(`resend-${invitationId}`)
-    await resendInvitation(invitationId)
-    setActionLoading(null)
+    try {
+      await resendInvitation(invitationId)
+      toast.success(tc.saved)
+    } catch {
+      toast.error(tc.errorSaving)
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   const fmtDate = (dateString: string) => formatDate(dateString, locale)

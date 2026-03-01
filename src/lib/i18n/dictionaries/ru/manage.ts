@@ -667,6 +667,9 @@ export const manage = {
   waiterStructured: 'Конструктор',
   waiterHookahDesc: 'Описание кальяна',
   waiterHookahDescPlaceholder: 'Например: лёгкий фруктовый микс',
+  waiterDecreaseQty: 'Уменьшить количество',
+  waiterIncreaseQty: 'Увеличить количество',
+  waiterRemoveItem: 'Удалить позицию',
 
   // Dashboard Control Panel
   controlTobaccoUsage: 'Расход табака сегодня',

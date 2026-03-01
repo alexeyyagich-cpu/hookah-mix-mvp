@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { toast } from 'sonner'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
@@ -12,6 +13,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 export default function BarMenuPage() {
   const tb = useTranslation('bar')
+  const tc = useTranslation('common')
   const { locale } = useLocale()
 
   const METHOD_LABELS: Record<string, string> = {
@@ -42,6 +44,7 @@ export default function BarMenuPage() {
 
   const [editingPrice, setEditingPrice] = useState<string | null>(null)
   const [priceValue, setPriceValue] = useState('')
+  const [priceSaving, setPriceSaving] = useState(false)
   const [groupBy, setGroupBy] = useState<'method' | 'none'>('method')
 
   const menuRecipes = useMemo(
@@ -64,11 +67,15 @@ export default function BarMenuPage() {
   const handlePriceSave = async (recipeId: string) => {
     const price = parseFloat(priceValue)
     if (!isNaN(price) && price >= 0) {
+      setPriceSaving(true)
       try {
         await updateRecipe(recipeId, { menu_price: price })
         setEditingPrice(null)
+        toast.success(tc.saved)
       } catch {
-        // Error displayed by hook
+        toast.error(tc.errorSaving)
+      } finally {
+        setPriceSaving(false)
       }
     } else {
       setEditingPrice(null)
@@ -241,9 +248,10 @@ export default function BarMenuPage() {
                                 />
                                 <button type="button"
                                   onClick={() => handlePriceSave(recipe.id)}
-                                  className="text-xs text-[var(--color-primary)] hover:underline"
+                                  disabled={priceSaving}
+                                  className="text-xs text-[var(--color-primary)] hover:underline disabled:opacity-50"
                                 >
-                                  OK
+                                  {tc.ok}
                                 </button>
                               </div>
                             ) : (
@@ -266,7 +274,14 @@ export default function BarMenuPage() {
                           </td>
                           <td className="px-4 py-3 text-center">
                             <button type="button"
-                              onClick={() => toggleOnMenu(recipe.id)}
+                              onClick={async () => {
+                                try {
+                                  await toggleOnMenu(recipe.id)
+                                  toast.success(tc.saved)
+                                } catch {
+                                  toast.error(tc.errorSaving)
+                                }
+                              }}
                               className="text-xs text-[var(--color-textMuted)] hover:text-[var(--color-danger)] transition-colors"
                               title={tb.removeFromMenuTitle}
                             >

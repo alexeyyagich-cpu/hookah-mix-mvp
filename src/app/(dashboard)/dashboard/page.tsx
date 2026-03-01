@@ -34,6 +34,7 @@ export default function DashboardPage() {
   const isCombined = isHookahActive && isBarActive
 
   return (
+    <ErrorBoundary sectionName="Dashboard">
     <div className="space-y-8 relative">
       <PageBackground image="/images/dashboard-bg.jpg" />
 
@@ -131,5 +132,6 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+    </ErrorBoundary>
   )
 }

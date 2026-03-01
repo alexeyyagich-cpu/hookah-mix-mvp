@@ -9,6 +9,7 @@ export const common = {
   create: 'Создать',
   close: 'Закрыть',
   confirm: 'Подтвердить',
+  ok: 'ОК',
   search: 'Поиск',
   back: 'Назад',
   next: 'Далее',

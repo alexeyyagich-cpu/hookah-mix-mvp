@@ -661,6 +661,9 @@ export const manage: typeof ManageType = {
   waiterStructured: 'Konfigurator',
   waiterHookahDesc: 'Shisha-Beschreibung',
   waiterHookahDescPlaceholder: 'z.B. leichter Fruchtmix',
+  waiterDecreaseQty: 'Menge verringern',
+  waiterIncreaseQty: 'Menge erhöhen',
+  waiterRemoveItem: 'Artikel entfernen',
 
   // Dashboard Control Panel
   controlTobaccoUsage: 'Tabakverbrauch heute',
