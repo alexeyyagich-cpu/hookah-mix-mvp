@@ -1,76 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isSupabaseConfigured } from '@/lib/config'
-import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import type { Reservation, ReservationStatus } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
-
-// Demo reservations
-const DEMO_RESERVATIONS: Reservation[] = [
-  {
-    id: '1',
-    profile_id: 'demo',
-    table_id: '3',
-    guest_name: 'Tomasz Kowalski',
-    guest_phone: '+48 512 345 678',
-    guest_count: 4,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '19:00',
-    duration_minutes: 120,
-    status: 'confirmed',
-    notes: 'Birthday party',
-    source: 'online',
-    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: '2',
-    profile_id: 'demo',
-    table_id: null,
-    guest_name: 'Anna Nowak',
-    guest_phone: '+48 601 987 654',
-    guest_count: 2,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '20:30',
-    duration_minutes: 120,
-    status: 'pending',
-    notes: null,
-    source: 'online',
-    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: '3',
-    profile_id: 'demo',
-    table_id: '1',
-    guest_name: 'Max Weber',
-    guest_phone: null,
-    guest_count: 6,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '21:00',
-    duration_minutes: 180,
-    status: 'confirmed',
-    notes: 'VIP zone',
-    source: 'phone',
-    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: '4',
-    profile_id: 'demo',
-    table_id: null,
-    guest_name: 'Katarzyna Zielinska',
-    guest_phone: '+48 505 123 456',
-    guest_count: 3,
-    reservation_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    reservation_time: '18:00',
-    duration_minutes: 120,
-    status: 'pending',
-    notes: null,
-    source: 'online',
-    created_at: new Date().toISOString(),
-  },
-]
+import { DEMO_RESERVATIONS } from '@/lib/demo'
+import { useSupabaseList } from './useSupabaseList'
+import { applyOrgFilter } from './useOrgFilter'
 
 // ============================================================================
 // Dashboard hook (owner) — full CRUD
@@ -98,67 +36,43 @@ interface UseReservationsReturn {
   refresh: () => Promise<void>
 }
 
+const ORDER_BY = [
+  { column: 'reservation_date', ascending: true },
+  { column: 'reservation_time', ascending: true },
+] as const
+
 export function useReservations(): UseReservationsReturn {
-  const [reservations, setReservations] = useState<Reservation[]>([])
+  const { organizationId, locationId } = useOrganizationContext()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- query type is dynamic per table
+  const modifyQuery = useCallback((query: any) => {
+    if (organizationId && locationId) {
+      return query.eq('location_id', locationId)
+    }
+    return query
+  }, [organizationId, locationId])
+
+  const {
+    items: reservations,
+    setItems: setReservations,
+    loading,
+    error,
+    setError,
+    refresh,
+    supabase,
+    user,
+    isDemoMode,
+  } = useSupabaseList<Reservation>({
+    table: 'reservations',
+    cacheKey: false,
+    orderBy: ORDER_BY,
+    demoData: DEMO_RESERVATIONS,
+    reconnect: false,
+    modifyQuery,
+  })
+
   const reservationsRef = useRef(reservations)
   reservationsRef.current = reservations
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const { user, isDemoMode } = useAuth()
-  const { organizationId, locationId } = useOrganizationContext()
-  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
-  const safetyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  useEffect(() => () => { clearTimeout(safetyTimerRef.current) }, [])
-
-  useEffect(() => {
-    if (isDemoMode && user) {
-      setReservations(DEMO_RESERVATIONS)
-      setLoading(false)
-    }
-  }, [isDemoMode, user])
-
-  const fetchReservations = useCallback(async () => {
-    if (!user || !supabase) {
-      setLoading(false)
-      return
-    }
-
-    clearTimeout(safetyTimerRef.current)
-    setLoading(true)
-    setError(null)
-    safetyTimerRef.current = setTimeout(() => setLoading(false), 8000)
-
-    try {
-      let query = supabase
-        .from('reservations')
-        .select('*')
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-
-      if (organizationId && locationId) {
-        query = query.eq('location_id', locationId)
-      }
-
-      const { data, error: fetchError } = await query
-        .order('reservation_date', { ascending: true })
-        .order('reservation_time', { ascending: true })
-
-      if (fetchError) throw fetchError
-      setReservations(data || [])
-    } catch (err) {
-      setError(translateError(err as Error))
-    } finally {
-      clearTimeout(safetyTimerRef.current)
-      setLoading(false)
-    }
-  }, [user, supabase, organizationId, locationId])
-
-  useEffect(() => {
-    if (!isDemoMode) {
-      fetchReservations()
-    }
-  }, [fetchReservations, isDemoMode])
 
   const createReservation = useCallback(async (input: CreateReservationInput): Promise<Reservation | null> => {
     if (isDemoMode) {
@@ -209,7 +123,7 @@ export function useReservations(): UseReservationsReturn {
       setError(translateError(err as Error))
       return null
     }
-  }, [user, supabase, isDemoMode, organizationId, locationId])
+  }, [user, supabase, isDemoMode, organizationId, locationId, setReservations, setError])
 
   const updateStatus = useCallback(async (id: string, status: ReservationStatus) => {
     if (isDemoMode) {
@@ -227,18 +141,21 @@ export function useReservations(): UseReservationsReturn {
     ))
 
     try {
-      const { error: updateError } = await supabase
-        .from('reservations')
-        .update({ status })
-        .eq('id', id)
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      const { error: updateError } = await applyOrgFilter(
+        supabase
+          .from('reservations')
+          .update({ status })
+          .eq('id', id),
+        organizationId,
+        user.id
+      )
 
       if (updateError) throw updateError
     } catch (err) {
       setReservations(snapshot)
       setError(translateError(err as Error))
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, setReservations, setError])
 
   const assignTable = useCallback(async (id: string, tableId: string | null) => {
     if (isDemoMode) {
@@ -256,18 +173,21 @@ export function useReservations(): UseReservationsReturn {
     ))
 
     try {
-      const { error: updateError } = await supabase
-        .from('reservations')
-        .update({ table_id: tableId })
-        .eq('id', id)
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      const { error: updateError } = await applyOrgFilter(
+        supabase
+          .from('reservations')
+          .update({ table_id: tableId })
+          .eq('id', id),
+        organizationId,
+        user.id
+      )
 
       if (updateError) throw updateError
     } catch (err) {
       setReservations(snapshot)
       setError(translateError(err as Error))
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, setReservations, setError])
 
   const deleteReservation = useCallback(async (id: string) => {
     if (isDemoMode) {
@@ -281,18 +201,21 @@ export function useReservations(): UseReservationsReturn {
     setReservations(prev => prev.filter(r => r.id !== id))
 
     try {
-      const { error: deleteError } = await supabase
-        .from('reservations')
-        .delete()
-        .eq('id', id)
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      const { error: deleteError } = await applyOrgFilter(
+        supabase
+          .from('reservations')
+          .delete()
+          .eq('id', id),
+        organizationId,
+        user.id
+      )
 
       if (deleteError) throw deleteError
     } catch (err) {
       setReservations(snapshot)
       setError(translateError(err as Error))
     }
-  }, [user, supabase, isDemoMode, organizationId])
+  }, [user, supabase, isDemoMode, organizationId, setReservations, setError])
 
   return {
     reservations,
@@ -302,7 +225,7 @@ export function useReservations(): UseReservationsReturn {
     updateStatus,
     assignTable,
     deleteReservation,
-    refresh: fetchReservations,
+    refresh,
   }
 }
 

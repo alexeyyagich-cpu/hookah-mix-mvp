@@ -107,6 +107,8 @@ export interface InviteToken {
 export interface TobaccoInventory {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   tobacco_id: string
   brand: string
   flavor: string
@@ -123,6 +125,8 @@ export interface TobaccoInventory {
 export interface BowlType {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   name: string
   capacity_grams: number
   is_default: boolean
@@ -132,6 +136,8 @@ export interface BowlType {
 export interface Session {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   created_by: string | null
   guest_id: string | null
   bowl_type_id: string | null
@@ -161,6 +167,8 @@ export type TransactionType = 'purchase' | 'session' | 'waste' | 'adjustment'
 export interface InventoryTransaction {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   tobacco_inventory_id: string
   type: TransactionType
   quantity_grams: number
@@ -173,6 +181,8 @@ export interface InventoryTransaction {
 export interface NotificationSettings {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   low_stock_enabled: boolean
   low_stock_threshold: number
   created_at: string
@@ -189,6 +199,7 @@ export interface SavedMixTobacco {
 export interface SavedMix {
   id: string
   profile_id: string
+  organization_id?: string | null
   name: string
   tobaccos: SavedMixTobacco[]
   compatibility_score: number | null
@@ -231,6 +242,7 @@ export type LoyaltyTier = 'bronze' | 'silver' | 'gold'
 export interface Guest {
   id: string
   profile_id: string
+  organization_id?: string | null
   name: string
   phone: string | null
   photo_url: string | null
@@ -251,6 +263,7 @@ export interface Guest {
 export interface LoyaltySettings {
   id: string
   profile_id: string
+  organization_id?: string | null
   bonus_accrual_percent: number
   bonus_max_redemption_percent: number
   tier_silver_threshold: number
@@ -266,6 +279,7 @@ export interface BonusTransaction {
   id: string
   guest_id: string
   profile_id: string
+  organization_id?: string | null
   type: 'accrual' | 'redemption' | 'manual'
   amount: number
   balance_after: number
@@ -291,6 +305,7 @@ export interface PromoRules {
 export interface Promotion {
   id: string
   profile_id: string
+  organization_id?: string | null
   name: string
   type: PromoType
   rules: PromoRules
@@ -310,6 +325,7 @@ export interface Promotion {
 export interface StaffProfile {
   id: string
   profile_id: string
+  organization_id?: string | null
   org_member_id: string
   display_name: string
   photo_url: string | null
@@ -338,6 +354,7 @@ export interface Tip {
 export interface Review {
   id: string
   profile_id: string
+  organization_id?: string | null
   author_name: string
   rating: number  // 1-5
   text: string | null
@@ -355,6 +372,8 @@ export type ReservationSource = 'online' | 'phone' | 'walk_in'
 export interface Reservation {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   table_id: string | null
   guest_name: string
   guest_phone: string | null
@@ -399,170 +418,339 @@ export interface SessionWithItems extends Session {
   bowl_type: BowlType | null
 }
 
+export interface PushSubscription {
+  id: string
+  profile_id: string
+  endpoint: string
+  p256dh: string
+  auth: string
+  created_at: string
+}
+
+export interface TelegramConnectionRow {
+  id: string
+  profile_id: string
+  telegram_user_id: number
+  telegram_username: string | null
+  chat_id: number
+  is_active: boolean
+  notifications_enabled: boolean
+  low_stock_alerts: boolean
+  session_reminders: boolean
+  daily_summary: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface EmailSettingsRow {
+  id: string
+  profile_id: string
+  email_notifications_enabled: boolean
+  low_stock_email: boolean
+  order_updates_email: boolean
+  daily_summary_email: boolean
+  marketing_email: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface SystemSuperadmin {
+  id: string
+  user_id: string
+}
+
+// Flattens interface → plain mapped type so it satisfies Record<string, unknown>.
+// Required because TS interfaces lack the implicit index signature that GenericTable needs.
+type S<T> = { [K in keyof T]: T[K] }
+
+// Auto-generate Insert type: nullable fields become optional, auto-generated fields become optional
+type Ins<T, Auto extends keyof T = never> = S<
+  { [K in keyof T as K extends Auto ? never : null extends T[K] ? never : K]: T[K] }
+  & { [K in keyof T as K extends Auto ? never : null extends T[K] ? K : never]?: T[K] }
+  & { [K in Auto]?: T[K] }
+>
+
 // Database response types
 export interface Database {
   public: {
     Tables: {
       profiles: {
-        Row: Profile
-        Insert: Omit<Profile, 'created_at'> & { created_at?: string }
-        Update: Partial<Omit<Profile, 'id'>>
+        Row: S<Profile>
+        Insert: Ins<Profile, 'created_at'>
+        Update: S<Partial<Omit<Profile, 'id'>>>
+        Relationships: []
       }
       tobacco_inventory: {
-        Row: TobaccoInventory
-        Insert: Omit<TobaccoInventory, 'id' | 'created_at' | 'updated_at'> & {
-          id?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: Partial<Omit<TobaccoInventory, 'id' | 'profile_id'>>
+        Row: S<TobaccoInventory>
+        Insert: Ins<TobaccoInventory, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<TobaccoInventory, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       bowl_types: {
-        Row: BowlType
-        Insert: Omit<BowlType, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<BowlType, 'id' | 'profile_id'>>
+        Row: S<BowlType>
+        Insert: Ins<BowlType, 'id' | 'created_at'>
+        Update: S<Partial<Omit<BowlType, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       sessions: {
-        Row: Session
-        Insert: Omit<Session, 'id'> & { id?: string; duration_minutes?: number | null }
-        Update: Partial<Omit<Session, 'id' | 'profile_id'>>
+        Row: S<Session>
+        Insert: Ins<Session, 'id'>
+        Update: S<Partial<Omit<Session, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       session_items: {
-        Row: SessionItem
-        Insert: Omit<SessionItem, 'id'> & { id?: string }
-        Update: Partial<Omit<SessionItem, 'id' | 'session_id'>>
+        Row: S<SessionItem>
+        Insert: Ins<SessionItem, 'id'>
+        Update: S<Partial<Omit<SessionItem, 'id' | 'session_id'>>>
+        Relationships: []
       }
       inventory_transactions: {
-        Row: InventoryTransaction
-        Insert: Omit<InventoryTransaction, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<InventoryTransaction, 'id' | 'profile_id'>>
+        Row: S<InventoryTransaction>
+        Insert: Ins<InventoryTransaction, 'id' | 'created_at'>
+        Update: S<Partial<Omit<InventoryTransaction, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       notification_settings: {
-        Row: NotificationSettings
-        Insert: Omit<NotificationSettings, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<NotificationSettings, 'id' | 'profile_id'>>
+        Row: S<NotificationSettings>
+        Insert: Ins<NotificationSettings, 'id' | 'created_at'>
+        Update: S<Partial<Omit<NotificationSettings, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       saved_mixes: {
-        Row: SavedMix
-        Insert: Omit<SavedMix, 'id' | 'created_at' | 'usage_count'> & { id?: string; created_at?: string; usage_count?: number }
-        Update: Partial<Omit<SavedMix, 'id' | 'profile_id'>>
+        Row: S<SavedMix>
+        Insert: Ins<SavedMix, 'id' | 'created_at' | 'usage_count'>
+        Update: S<Partial<Omit<SavedMix, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       guests: {
-        Row: Guest
-        Insert: Omit<Guest, 'id' | 'created_at' | 'updated_at' | 'visit_count'> & { id?: string; created_at?: string; updated_at?: string; visit_count?: number }
-        Update: Partial<Omit<Guest, 'id' | 'profile_id'>>
+        Row: S<Guest>
+        Insert: Ins<Guest, 'id' | 'created_at' | 'updated_at' | 'visit_count'>
+        Update: S<Partial<Omit<Guest, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       suppliers: {
-        Row: Supplier
-        Insert: Omit<Supplier, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
-        Update: Partial<Omit<Supplier, 'id'>>
+        Row: S<Supplier>
+        Insert: Ins<Supplier, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<Supplier, 'id'>>>
+        Relationships: []
       }
       supplier_products: {
-        Row: SupplierProduct
-        Insert: Omit<SupplierProduct, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<SupplierProduct, 'id' | 'supplier_id'>>
+        Row: S<SupplierProduct>
+        Insert: Ins<SupplierProduct, 'id' | 'created_at'>
+        Update: S<Partial<Omit<SupplierProduct, 'id' | 'supplier_id'>>>
+        Relationships: []
       }
       marketplace_orders: {
-        Row: MarketplaceOrder
-        Insert: Omit<MarketplaceOrder, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<MarketplaceOrder, 'id' | 'profile_id'>>
+        Row: S<MarketplaceOrder>
+        Insert: Ins<MarketplaceOrder, 'id' | 'created_at'>
+        Update: S<Partial<Omit<MarketplaceOrder, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       marketplace_order_items: {
-        Row: MarketplaceOrderItem
-        Insert: Omit<MarketplaceOrderItem, 'id'> & { id?: string }
-        Update: Partial<Omit<MarketplaceOrderItem, 'id' | 'order_id'>>
+        Row: S<MarketplaceOrderItem>
+        Insert: Ins<MarketplaceOrderItem, 'id'>
+        Update: S<Partial<Omit<MarketplaceOrderItem, 'id' | 'order_id'>>>
+        Relationships: []
       }
       auto_reorder_rules: {
-        Row: AutoReorderRule
-        Insert: Omit<AutoReorderRule, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<AutoReorderRule, 'id' | 'profile_id'>>
+        Row: S<AutoReorderRule>
+        Insert: Ins<AutoReorderRule, 'id' | 'created_at'>
+        Update: S<Partial<Omit<AutoReorderRule, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       reviews: {
-        Row: Review
-        Insert: Omit<Review, 'id' | 'created_at' | 'is_published'> & { id?: string; created_at?: string; is_published?: boolean }
-        Update: Partial<Omit<Review, 'id' | 'profile_id'>>
+        Row: S<Review>
+        Insert: Ins<Review, 'id' | 'created_at' | 'is_published'>
+        Update: S<Partial<Omit<Review, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       reservations: {
-        Row: Reservation
-        Insert: Omit<Reservation, 'id' | 'created_at' | 'status' | 'duration_minutes'> & { id?: string; created_at?: string; status?: ReservationStatus; duration_minutes?: number }
-        Update: Partial<Omit<Reservation, 'id' | 'profile_id'>>
+        Row: S<Reservation>
+        Insert: Ins<Reservation, 'id' | 'created_at' | 'status' | 'duration_minutes'>
+        Update: S<Partial<Omit<Reservation, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       r2o_connections: {
-        Row: R2OConnection
-        Insert: Omit<R2OConnection, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string }
-        Update: Partial<Omit<R2OConnection, 'id' | 'profile_id'>>
+        Row: S<R2OConnection>
+        Insert: Ins<R2OConnection, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<R2OConnection, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       r2o_product_mappings: {
-        Row: R2OProductMapping
-        Insert: Omit<R2OProductMapping, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<R2OProductMapping, 'id' | 'profile_id'>>
+        Row: S<R2OProductMapping>
+        Insert: Ins<R2OProductMapping, 'id' | 'created_at'>
+        Update: S<Partial<Omit<R2OProductMapping, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       r2o_sales_log: {
-        Row: R2OSalesLog
-        Insert: Omit<R2OSalesLog, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<R2OSalesLog, 'id' | 'profile_id'>>
+        Row: S<R2OSalesLog>
+        Insert: Ins<R2OSalesLog, 'id' | 'created_at'>
+        Update: S<Partial<Omit<R2OSalesLog, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       bar_inventory: {
-        Row: BarInventoryItem
-        Insert: Omit<BarInventoryItem, 'id' | 'created_at' | 'updated_at'> & {
-          id?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: Partial<Omit<BarInventoryItem, 'id' | 'profile_id'>>
+        Row: S<BarInventoryItem>
+        Insert: Ins<BarInventoryItem, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<BarInventoryItem, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       bar_transactions: {
-        Row: BarTransaction
-        Insert: Omit<BarTransaction, 'id' | 'created_at'> & { id?: string; created_at?: string }
-        Update: Partial<Omit<BarTransaction, 'id' | 'profile_id'>>
+        Row: S<BarTransaction>
+        Insert: Ins<BarTransaction, 'id' | 'created_at'>
+        Update: S<Partial<Omit<BarTransaction, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       bar_recipes: {
-        Row: BarRecipe
-        Insert: Omit<BarRecipe, 'id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'> & {
-          id?: string
-          created_at?: string
-          updated_at?: string
-          is_on_menu?: boolean
-          is_favorite?: boolean
-        }
-        Update: Partial<Omit<BarRecipe, 'id' | 'profile_id'>>
+        Row: S<BarRecipe>
+        Insert: Ins<BarRecipe, 'id' | 'created_at' | 'updated_at' | 'is_on_menu' | 'is_favorite'>
+        Update: S<Partial<Omit<BarRecipe, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       bar_recipe_ingredients: {
-        Row: BarRecipeIngredient
-        Insert: Omit<BarRecipeIngredient, 'id' | 'created_at' | 'is_optional' | 'sort_order'> & {
-          id?: string
-          created_at?: string
-          is_optional?: boolean
-          sort_order?: number
-        }
-        Update: Partial<Omit<BarRecipeIngredient, 'id' | 'recipe_id'>>
+        Row: S<BarRecipeIngredient>
+        Insert: Ins<BarRecipeIngredient, 'id' | 'created_at' | 'is_optional' | 'sort_order'>
+        Update: S<Partial<Omit<BarRecipeIngredient, 'id' | 'recipe_id'>>>
+        Relationships: []
       }
       bar_sales: {
-        Row: BarSale
-        Insert: Omit<BarSale, 'id' | 'sold_at'> & { id?: string; sold_at?: string }
-        Update: Partial<Omit<BarSale, 'id' | 'profile_id'>>
+        Row: S<BarSale>
+        Insert: Ins<BarSale, 'id' | 'sold_at'>
+        Update: S<Partial<Omit<BarSale, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       kds_orders: {
-        Row: KdsOrder
-        Insert: Omit<KdsOrder, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'status'> & {
-          id?: string
-          created_at?: string
-          updated_at?: string
-          completed_at?: string | null
-          status?: KdsOrderStatus
-        }
-        Update: Partial<Omit<KdsOrder, 'id' | 'profile_id'>>
+        Row: S<KdsOrder>
+        Insert: Ins<KdsOrder, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'status'>
+        Update: S<Partial<Omit<KdsOrder, 'id' | 'profile_id'>>>
+        Relationships: []
       }
       shifts: {
-        Row: Shift
-        Insert: Omit<Shift, 'id' | 'created_at' | 'updated_at' | 'closed_at' | 'status'> & {
-          id?: string
-          created_at?: string
-          updated_at?: string
-          closed_at?: string | null
-          status?: ShiftStatus
-        }
-        Update: Partial<Omit<Shift, 'id' | 'profile_id'>>
+        Row: S<Shift>
+        Insert: Ins<Shift, 'id' | 'created_at' | 'updated_at' | 'closed_at' | 'status'>
+        Update: S<Partial<Omit<Shift, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      floor_tables: {
+        Row: S<FloorTable>
+        Insert: Ins<FloorTable, 'id' | 'created_at' | 'updated_at' | 'status'>
+        Update: S<Partial<Omit<FloorTable, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      organizations: {
+        Row: S<Organization>
+        Insert: Ins<Organization, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<Organization, 'id'>>>
+        Relationships: []
+      }
+      locations: {
+        Row: S<Location>
+        Insert: Ins<Location, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<Location, 'id' | 'organization_id'>>>
+        Relationships: []
+      }
+      org_members: {
+        Row: S<OrgMember>
+        Insert: Ins<OrgMember, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<OrgMember, 'id' | 'organization_id' | 'user_id'>>>
+        Relationships: []
+      }
+      invite_tokens: {
+        Row: S<InviteToken>
+        Insert: Ins<InviteToken, 'id' | 'created_at'>
+        Update: S<Partial<Omit<InviteToken, 'id' | 'organization_id'>>>
+        Relationships: []
+      }
+      promotions: {
+        Row: S<Promotion>
+        Insert: Ins<Promotion, 'id' | 'created_at' | 'updated_at' | 'usage_count'>
+        Update: S<Partial<Omit<Promotion, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      staff_profiles: {
+        Row: S<StaffProfile>
+        Insert: Ins<StaffProfile, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<StaffProfile, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      tips: {
+        Row: S<Tip>
+        Insert: Ins<Tip, 'id' | 'created_at'>
+        Update: S<Partial<Omit<Tip, 'id' | 'staff_profile_id'>>>
+        Relationships: []
+      }
+      bonus_transactions: {
+        Row: S<BonusTransaction>
+        Insert: Ins<BonusTransaction, 'id' | 'created_at'>
+        Update: S<Partial<Omit<BonusTransaction, 'id' | 'guest_id' | 'profile_id'>>>
+        Relationships: []
+      }
+      loyalty_settings: {
+        Row: S<LoyaltySettings>
+        Insert: Ins<LoyaltySettings, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<LoyaltySettings, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: S<PushSubscription>
+        Insert: Ins<PushSubscription, 'id' | 'created_at'>
+        Update: S<Partial<Omit<PushSubscription, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      telegram_connections: {
+        Row: S<TelegramConnectionRow>
+        Insert: Ins<TelegramConnectionRow, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<TelegramConnectionRow, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      email_settings: {
+        Row: S<EmailSettingsRow>
+        Insert: Ins<EmailSettingsRow, 'id' | 'created_at' | 'updated_at'>
+        Update: S<Partial<Omit<EmailSettingsRow, 'id' | 'profile_id'>>>
+        Relationships: []
+      }
+      system_superadmins: {
+        Row: S<SystemSuperadmin>
+        Insert: Ins<SystemSuperadmin, 'id'>
+        Update: S<Partial<Omit<SystemSuperadmin, 'id'>>>
+        Relationships: []
+      }
+      lounge_profiles: {
+        Row: Record<string, unknown>
+        Insert: Record<string, unknown>
+        Update: Record<string, unknown>
+        Relationships: []
+      }
+    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- required by Supabase GenericSchema
+    Views: {}
+    Functions: {
+      decrement_tobacco_inventory: {
+        Args: { p_inventory_id: string; p_grams_used: number }
+        Returns: undefined
+      }
+      adjust_bar_inventory: {
+        Args: { p_inventory_id: string; p_quantity_change: number }
+        Returns: undefined
+      }
+      setup_organization: {
+        Args: { p_name: string; p_type: string; p_slug: string }
+        Returns: unknown
+      }
+      lookup_invite: {
+        Args: { p_token: string }
+        Returns: unknown
+      }
+      accept_invite: {
+        Args: { p_token: string }
+        Returns: unknown
+      }
+      user_has_org_role: {
+        Args: { p_org_id: string; p_roles: string[] }
+        Returns: boolean
+      }
+      dashboard_control_snapshot: {
+        Args: { p_org_id: string | null; p_profile_id: string | null; p_date: string }
+        Returns: unknown
       }
     }
   }
@@ -705,6 +893,7 @@ export interface MarketplaceOrderItem {
 export interface AutoReorderRule {
   id: string
   profile_id: string
+  organization_id?: string | null
   tobacco_inventory_id: string
   supplier_product_id: string
   threshold_grams: number
@@ -782,6 +971,8 @@ export type BarTransactionType = 'purchase' | 'sale' | 'waste' | 'adjustment'
 export interface BarInventoryItem {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   name: string
   brand: string | null
   category: BarIngredientCategory
@@ -800,6 +991,8 @@ export interface BarInventoryItem {
 export interface BarTransaction {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   bar_inventory_id: string
   type: BarTransactionType
   quantity: number
@@ -816,6 +1009,7 @@ export type CocktailCategory = 'classic' | 'tiki' | 'sour' | 'highball' | 'shot'
 export interface BarRecipe {
   id: string
   profile_id: string
+  organization_id?: string | null
   name: string
   name_en: string | null
   description: string | null
@@ -875,6 +1069,8 @@ export interface RecipeCost {
 export interface BarSale {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   recipe_id: string | null
   recipe_name: string
   quantity: number
@@ -934,6 +1130,8 @@ export interface KdsOrderItem {
 export interface KdsOrder {
   id: string
   profile_id: string
+  organization_id?: string | null
+  location_id?: string | null
   created_by: string | null
   table_id: string | null
   table_name: string | null

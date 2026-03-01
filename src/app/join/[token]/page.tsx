@@ -46,12 +46,14 @@ export default function JoinPage() {
 
       // Use secure RPC instead of direct table query
       // (invite_tokens SELECT is restricted to org admins only)
-      const { data, error } = await supabase.rpc('lookup_invite', { p_token: token })
+      const { data: rawData, error } = await supabase.rpc('lookup_invite', { p_token: token })
 
-      if (error || !data) {
+      if (error || !rawData) {
         setState('expired')
         return
       }
+
+      const data = rawData as unknown as InviteData
 
       // Check if expired (server already filters, but double-check client-side)
       if (new Date(data.expires_at) < new Date()) {
@@ -95,9 +97,10 @@ export default function JoinPage() {
 
     try {
       // Use secure RPC: validates email, creates membership, marks accepted — atomically
-      const { data, error } = await supabase.rpc('accept_invite', { p_token: token })
+      const { data: rawAccept, error } = await supabase.rpc('accept_invite', { p_token: token })
 
       if (error) throw error
+      const data = rawAccept as unknown as { success?: boolean }
       if (!data?.success) throw new Error(t.inviteAcceptFailed)
 
       setState('success')

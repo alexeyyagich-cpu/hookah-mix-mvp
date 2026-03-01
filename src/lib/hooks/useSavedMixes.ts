@@ -152,6 +152,7 @@ export function useSavedMixes(): UseSavedMixesReturn {
           name,
           tobaccos,
           compatibility_score: compatibilityScore,
+          is_favorite: false,
         })
         .select()
         .single()

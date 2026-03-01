@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { stripe } from '@/lib/stripe'
 import { logger } from '@/lib/logger'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
+import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
 
 export async function POST(request: NextRequest) {
   // Rate limiting - strict for destructive operations
@@ -16,23 +15,9 @@ export async function POST(request: NextRequest) {
 
   try {
     // Verify authentication
-    const cookieStore = await cookies()
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-        },
-      }
-    )
-
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await getAuthenticatedUser()
+    if (auth.response) return auth.response
+    const { user } = auth
 
     // Require confirmation phrase
     let body: Record<string, unknown>

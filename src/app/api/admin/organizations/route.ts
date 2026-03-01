@@ -1,44 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { logger } from '@/lib/logger'
 import { adminOrgUpdateSchema, validateBody } from '@/lib/validation'
-
-function getSupabaseClients() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !supabaseKey || !anonKey) return null
-  return {
-    admin: createClient(supabaseUrl, supabaseKey),
-    anon: createClient(supabaseUrl, anonKey),
-  }
-}
-
-async function authenticateSuperAdmin(request: Request, clients: NonNullable<ReturnType<typeof getSupabaseClients>>) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) return null
-
-  const { data: { user }, error } = await clients.anon.auth.getUser(authHeader.replace('Bearer ', ''))
-  if (error || !user) return null
-
-  const { data } = await clients.admin.from('system_superadmins').select('id').eq('user_id', user.id).single()
-  return data ? user : null
-}
+import { getAdminUser } from '@/lib/supabase/apiAuth'
 
 export async function GET(request: Request) {
   const rateCheck = await checkRateLimit('admin:organizations', rateLimits.standard)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
-  const clients = getSupabaseClients()
-  if (!clients) return NextResponse.json({ error: 'Not configured' }, { status: 503 })
-
-  const user = await authenticateSuperAdmin(request, clients)
-  if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const admin = await getAdminUser(request)
+  if (admin.response) return admin.response
+  const { adminClient } = admin
 
   try {
     // Get all organizations
-    const { data: orgs, error } = await clients.admin
+    const { data: orgs, error } = await adminClient
       .from('organizations')
       .select('*')
       .order('created_at', { ascending: false })
@@ -48,13 +24,13 @@ export async function GET(request: Request) {
     // Get member counts and owner info for each org
     const orgIds = (orgs || []).map(o => o.id)
 
-    const { data: members } = await clients.admin
+    const { data: members } = await adminClient
       .from('org_members')
       .select('organization_id, user_id, role, display_name, is_active')
       .in('organization_id', orgIds)
       .eq('is_active', true)
 
-    const { data: locations } = await clients.admin
+    const { data: locations } = await adminClient
       .from('locations')
       .select('id, organization_id')
       .in('organization_id', orgIds)
@@ -97,11 +73,9 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const clients = getSupabaseClients()
-  if (!clients) return NextResponse.json({ error: 'Not configured' }, { status: 503 })
-
-  const user = await authenticateSuperAdmin(request, clients)
-  if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const admin = await getAdminUser(request)
+  if (admin.response) return admin.response
+  const { user, adminClient } = admin
 
   try {
     let rawBody: unknown
@@ -124,7 +98,7 @@ export async function PATCH(request: NextRequest) {
     if (trial_expires_at !== undefined) updates.trial_expires_at = trial_expires_at
     if (subscription_expires_at !== undefined) updates.subscription_expires_at = subscription_expires_at
 
-    const { data, error } = await clients.admin
+    const { data, error } = await adminClient
       .from('organizations')
       .update(updates)
       .eq('id', id)

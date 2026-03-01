@@ -1,48 +1,16 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { logger } from '@/lib/logger'
+import { getAdminUser } from '@/lib/supabase/apiAuth'
 import type { AdminStats, SubscriptionTier } from '@/types/database'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function verifySuperAdmin(supabase: any, userId: string): Promise<boolean> {
-  const { data } = await supabase
-    .from('system_superadmins')
-    .select('id')
-    .eq('user_id', userId)
-    .single()
-  return !!data
-}
 
 export async function GET(request: Request) {
   const rateCheck = await checkRateLimit('admin:stats', rateLimits.standard)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ error: 'Not configured' }, { status: 503 })
-  }
-
-  // Auth: extract user from Authorization header or cookie
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey)
-  const anonClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '')
-
-  // Verify JWT and get user
-  const { data: { user }, error: authError } = await anonClient.auth.getUser(authHeader.replace('Bearer ', ''))
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Verify superadmin
-  if (!(await verifySuperAdmin(supabase, user.id))) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  const admin = await getAdminUser(request)
+  if (admin.response) return admin.response
+  const { adminClient: supabase } = admin
 
   try {
     const now = new Date()

@@ -195,7 +195,7 @@ export function useOnboarding(): UseOnboardingReturn {
           const { error: rpcErr } = await supabase.rpc('setup_organization', {
             p_name: profile?.business_name || 'My Lounge',
             p_type: state.businessType || 'hookah_bar',
-            p_slug: profile?.venue_slug || null,
+            p_slug: profile?.venue_slug ?? '',
           })
           // RPC is idempotent — ignore errors silently
           if (rpcErr && process.env.NODE_ENV !== 'production') console.error('setup_organization:', rpcErr)
@@ -231,7 +231,7 @@ export function useOnboarding(): UseOnboardingReturn {
           const { error: rpcErr } = await supabase.rpc('setup_organization', {
             p_name: profile?.business_name || 'My Lounge',
             p_type: state.businessType || 'hookah_bar',
-            p_slug: profile?.venue_slug || null,
+            p_slug: profile?.venue_slug ?? '',
           })
           // RPC is idempotent — ignore errors silently
           if (rpcErr && process.env.NODE_ENV !== 'production') console.error('setup_organization:', rpcErr)

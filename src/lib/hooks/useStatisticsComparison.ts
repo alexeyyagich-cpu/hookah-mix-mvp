@@ -216,7 +216,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
 
       if (errorA) throw errorA
       if (fetchId !== fetchIdRef.current) return // stale
-      setSessionsA(dataA || [])
+      setSessionsA((dataA || []) as unknown as SessionWithItems[])
 
       // Fetch period B sessions
       let queryB = supabase
@@ -234,7 +234,7 @@ export function useStatisticsComparison(): UseStatisticsComparisonReturn {
 
       if (errorB) throw errorB
       if (fetchId !== fetchIdRef.current) return // stale
-      setSessionsB(dataB || [])
+      setSessionsB((dataB || []) as unknown as SessionWithItems[])
     } catch (err) {
       if (fetchId !== fetchIdRef.current) return // stale
       setError(err instanceof Error ? err.message : 'Failed to load data')

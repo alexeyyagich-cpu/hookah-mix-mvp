@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { encrypt } from '@/lib/ready2order/crypto'
 import { registerWebhook, createProductGroup, getAccountId } from '@/lib/ready2order/client'
 import { logger } from '@/lib/logger'
+import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
 
 function clearStateCookie(response: NextResponse): NextResponse {
   response.cookies.delete('r2o_state')
@@ -36,23 +36,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify authentication
-    // (cookieStore already available from above)
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-        },
-      }
-    )
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const auth = await getAuthenticatedUser()
+    if (!auth.user) {
       return clearStateCookie(NextResponse.redirect(`${appUrl}/settings?r2o=error&reason=auth`))
     }
+    const { user } = auth
 
     // Encrypt the account token
     const { encrypted, iv } = encrypt(accountToken)

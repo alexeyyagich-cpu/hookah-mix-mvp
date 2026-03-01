@@ -148,6 +148,7 @@ export function usePromotions(): UsePromotionsReturn {
         name: promo.name,
         type: promo.type,
         rules: promo.rules,
+        is_active: true,
         max_uses: promo.max_uses || null,
       })
       .select()

@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/logger'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { stripePortalSchema, validateBody } from '@/lib/validation'
+import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,27 +21,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify authentication
-    const cookieStore = await cookies()
-    const supabaseAuth = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-        },
-      }
-    )
-
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    const auth = await getAuthenticatedUser()
+    if (auth.response) return auth.response
+    const { user } = auth
 
     let raw: unknown
     try {

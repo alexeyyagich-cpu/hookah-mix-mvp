@@ -204,6 +204,7 @@ export function useShifts(): UseShiftsReturn {
     const shiftData = {
       profile_id: effectiveProfileId,
       opened_by: user.id,
+      opened_at: new Date().toISOString(),
       ...(organizationId ? { organization_id: organizationId, location_id: locationId } : {}),
       starting_cash: input?.starting_cash ?? null,
       open_notes: input?.open_notes ?? null,
@@ -379,7 +380,7 @@ export function useShifts(): UseShiftsReturn {
       supabase.from('org_members').select('user_id, display_name, hourly_rate, sales_commission_percent').eq('organization_id', organizationId || ''),
     ])
 
-    const sessions = sessionsRes.data || []
+    const sessions = (sessionsRes.data || []) as unknown as { id: string; profile_id: string; selling_price: number | null; total_grams: number; compatibility_score: number | null; session_date: string; session_items: { tobacco_id: string; brand: string; flavor: string; grams_used: number }[] }[]
     const sales = salesRes.data || []
     const kdsOrders = kdsRes.data || []
     const tobaccoInventory = inventoryRes.data || []

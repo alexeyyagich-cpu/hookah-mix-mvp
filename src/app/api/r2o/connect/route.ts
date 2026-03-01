@@ -1,11 +1,10 @@
 import { randomBytes } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { grantAccessToken } from '@/lib/ready2order/client'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { getUserTier, hasFeatureAccess, featureNotAvailable } from '@/lib/subscriptionGuard'
 import { logger } from '@/lib/logger'
+import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,23 +21,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify authentication
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-        },
-      }
-    )
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await getAuthenticatedUser()
+    if (auth.response) return auth.response
+    const { user, supabase } = auth
 
     // Subscription check: R2O integration requires api_access (multi+ tier)
     const tier = await getUserTier(supabase, user.id)

@@ -1,157 +1,17 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { isSupabaseConfigured } from '@/lib/config'
-import { useAuth } from '@/lib/AuthContext'
-import { useOrganizationContext } from '@/lib/hooks/useOrganization'
-import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { Guest, MixSnapshot, StrengthPreference, FlavorProfile } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
 import {
   cacheGuestsLocally,
-  getCachedGuests,
   queueGuestUpdate,
   getRecentGuests as getRecentGuestsFromList,
   searchGuests as searchGuestsFromList,
 } from '@/logic/quickRepeatEngine'
-
-// Demo data with mix snapshots for testing
-const DEMO_GUESTS: Guest[] = [
-  {
-    id: '1',
-    profile_id: 'demo',
-    name: 'Alex',
-    phone: '+48 512 345 678',
-    photo_url: null,
-    notes: 'Regular guest, likes strong mixes',
-    strength_preference: 'strong',
-    flavor_profiles: ['fresh', 'citrus'],
-    last_mix_snapshot: {
-      id: 'snap_demo_1',
-      tobaccos: [
-        { tobacco_id: 'mh1', brand: 'Musthave', flavor: 'Pinkman', percent: 50, color: '#EC4899' },
-        { tobacco_id: 'ds1', brand: 'Darkside', flavor: 'Supernova', percent: 25, color: '#06B6D4' },
-        { tobacco_id: 'ds2', brand: 'Darkside', flavor: 'Bananapapa', percent: 25, color: '#FACC15' },
-      ],
-      total_grams: 20,
-      strength: 'strong',
-      compatibility_score: 85,
-      bowl_type: 'Phunnel',
-      heat_setup: { coals: 4, packing: 'dense' },
-      created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    bonus_balance: 25.50,
-    discount_percent: 10,
-    total_spent: 540,
-    loyalty_tier: 'gold',
-    visit_count: 12,
-    last_visit_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    profile_id: 'demo',
-    name: 'Maria',
-    phone: '+49 170 987 6543',
-    photo_url: null,
-    notes: 'Prefers light fruity mixes',
-    strength_preference: 'light',
-    flavor_profiles: ['fruity', 'sweet'],
-    last_mix_snapshot: {
-      id: 'snap_demo_2',
-      tobaccos: [
-        { tobacco_id: 'af4', brand: 'Al Fakher', flavor: 'Watermelon', percent: 60, color: '#FB7185' },
-        { tobacco_id: 'fm3', brand: 'Fumari', flavor: 'Ambrosia', percent: 40, color: '#FBBF24' },
-      ],
-      total_grams: 18,
-      strength: 'light',
-      compatibility_score: 92,
-      bowl_type: 'Turkish',
-      heat_setup: { coals: 3, packing: 'fluffy' },
-      created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    bonus_balance: 12,
-    discount_percent: 5,
-    total_spent: 280,
-    loyalty_tier: 'silver',
-    visit_count: 8,
-    last_visit_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    profile_id: 'demo',
-    name: 'David',
-    phone: null,
-    photo_url: null,
-    notes: null,
-    strength_preference: 'medium',
-    flavor_profiles: ['spicy', 'citrus'],
-    last_mix_snapshot: null, // No previous mix
-    bonus_balance: 0,
-    discount_percent: 0,
-    total_spent: 45,
-    loyalty_tier: 'bronze',
-    visit_count: 3,
-    last_visit_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    profile_id: 'demo',
-    name: 'Anna',
-    phone: '+48 601 555 123',
-    photo_url: null,
-    notes: 'VIP guest',
-    strength_preference: 'medium',
-    flavor_profiles: ['fruity', 'fresh'],
-    last_mix_snapshot: {
-      id: 'snap_demo_4',
-      tobaccos: [
-        { tobacco_id: 'ds3', brand: 'Darkside', flavor: 'Falling Star', percent: 45, color: '#F59E0B' },
-        { tobacco_id: 'tg1', brand: 'Tangiers', flavor: 'Cane Mint', percent: 25, color: '#10B981' },
-        { tobacco_id: 'mh5', brand: 'Musthave', flavor: 'Lemon', percent: 30, color: '#FCD34D' },
-      ],
-      total_grams: 22,
-      strength: 'medium',
-      compatibility_score: 78,
-      bowl_type: 'Phunnel',
-      heat_setup: { coals: 3, packing: 'semi-dense' },
-      created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    bonus_balance: 45,
-    discount_percent: 10,
-    total_spent: 750,
-    loyalty_tier: 'gold',
-    visit_count: 15,
-    last_visit_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    profile_id: 'demo',
-    name: 'Tomasz',
-    phone: null,
-    photo_url: null,
-    notes: 'First-time visitor, came with Anna',
-    strength_preference: 'light',
-    flavor_profiles: ['sweet', 'fruity'],
-    last_mix_snapshot: null,
-    bonus_balance: 0,
-    discount_percent: 0,
-    total_spent: 15,
-    loyalty_tier: 'bronze',
-    visit_count: 1,
-    last_visit_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-]
+import { DEMO_GUESTS } from '@/lib/demo'
+import { useSupabaseList } from './useSupabaseList'
+import { applyOrgFilter } from './useOrgFilter'
 
 export interface NewGuest {
   name: string
@@ -178,14 +38,24 @@ interface UseGuestsReturn {
   refresh: () => Promise<void>
 }
 
+const ORDER_BY = [
+  { column: 'last_visit_at', ascending: false, nullsFirst: false },
+  { column: 'name', ascending: true },
+] as const
+
 export function useGuests(): UseGuestsReturn {
-  const [guests, setGuests] = useState<Guest[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const {
+    items: guests, setItems: setGuests, loading, error, setError, refresh,
+    supabase, user, organizationId, isDemoMode,
+  } = useSupabaseList<Guest>({
+    table: 'guests',
+    cacheKey: 'guests',
+    orderBy: ORDER_BY,
+    limit: 200,
+    demoData: DEMO_GUESTS,
+  })
+
   const [isOffline, setIsOffline] = useState(false)
-  const { user, isDemoMode } = useAuth()
-  const { organizationId } = useOrganizationContext()
-  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
 
   // Monitor online/offline status
   useEffect(() => {
@@ -204,94 +74,12 @@ export function useGuests(): UseGuestsReturn {
     }
   }, [])
 
-  // Return demo data if in demo mode
-  useEffect(() => {
-    if (isDemoMode && user) {
-      setGuests(DEMO_GUESTS)
-      setLoading(false)
-    }
-  }, [isDemoMode, user])
-
   // Cache guests locally whenever they change
   useEffect(() => {
     if (guests.length > 0 && !isDemoMode) {
       cacheGuestsLocally(guests)
     }
   }, [guests, isDemoMode])
-
-  const fetchGuests = useCallback(async () => {
-    if (!user || !supabase) {
-      setGuests([])
-      setLoading(false)
-      return
-    }
-
-    // Try IndexedDB cache first for instant display
-    const cached = await getCachedData<Guest>('guests', user.id)
-    if (cached) {
-      setGuests(cached.data)
-      setLoading(false)
-    }
-
-    // If offline, stop here (also try localStorage fallback)
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      if (!cached) {
-        const lsCached = getCachedGuests()
-        if (lsCached) {
-          setGuests(lsCached)
-          setLoading(false)
-        }
-      }
-      return
-    }
-
-    if (!cached) setLoading(true)
-    setError(null)
-
-    try {
-      const { data, error: fetchError } = await supabase
-        .from('guests')
-        .select('*')
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-        .order('last_visit_at', { ascending: false, nullsFirst: false })
-        .order('name', { ascending: true })
-        .limit(200)
-
-      if (fetchError) {
-        if (!cached) {
-          // Try localStorage fallback
-          const lsCached = getCachedGuests()
-          if (lsCached) {
-            setGuests(lsCached)
-            setIsOffline(true)
-          } else {
-            setError(translateError(fetchError))
-            setGuests([])
-          }
-        }
-      } else {
-        setGuests(data || [])
-        await setCachedData('guests', user.id, data || [])
-      }
-    } catch {
-      // Network error — keep cache if available
-      if (!cached) {
-        const lsCached = getCachedGuests()
-        if (lsCached) {
-          setGuests(lsCached)
-          setIsOffline(true)
-        }
-      }
-    }
-
-    setLoading(false)
-  }, [user, supabase, organizationId])
-
-  useEffect(() => {
-    if (!isDemoMode) {
-      fetchGuests()
-    }
-  }, [fetchGuests, isDemoMode])
 
   // Get recent guests (last 10 who visited)
   const recentGuests = useMemo(() => {
@@ -372,6 +160,12 @@ export function useGuests(): UseGuestsReturn {
         notes: guest.notes || null,
         strength_preference: guest.strength_preference || null,
         flavor_profiles: guest.flavor_profiles || [],
+        last_mix_snapshot: null,
+        last_visit_at: null,
+        bonus_balance: 0,
+        discount_percent: 0,
+        total_spent: 0,
+        loyalty_tier: 'bronze',
       })
       .select()
       .single()
@@ -382,7 +176,7 @@ export function useGuests(): UseGuestsReturn {
     }
 
     setError(null)
-    await fetchGuests()
+    await refresh()
     return data
   }
 
@@ -410,18 +204,21 @@ export function useGuests(): UseGuestsReturn {
 
     if (!user || !supabase) return false
 
-    const { error: updateError } = await supabase
-      .from('guests')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: updateError } = await applyOrgFilter(
+      supabase
+        .from('guests')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id),
+      organizationId,
+      user.id
+    )
 
     if (updateError) {
       setError(translateError(updateError))
-      await fetchGuests() // Revert on error
+      await refresh() // Revert on error
       return false
     }
 
@@ -437,18 +234,21 @@ export function useGuests(): UseGuestsReturn {
 
     if (!user || !supabase) return false
 
-    const { error: deleteError } = await supabase
-      .from('guests')
-      .delete()
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: deleteError } = await applyOrgFilter(
+      supabase
+        .from('guests')
+        .delete()
+        .eq('id', id),
+      organizationId,
+      user.id
+    )
 
     if (deleteError) {
       setError(translateError(deleteError))
       return false
     }
 
-    await fetchGuests()
+    await refresh()
     return true
   }
 
@@ -486,15 +286,18 @@ export function useGuests(): UseGuestsReturn {
 
     if (!user || !supabase) return false
 
-    const { error: updateError } = await supabase
-      .from('guests')
-      .update(updates)
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: updateError } = await applyOrgFilter(
+      supabase
+        .from('guests')
+        .update(updates)
+        .eq('id', id),
+      organizationId,
+      user.id
+    )
 
     if (updateError) {
       setError(translateError(updateError))
-      await fetchGuests()
+      await refresh()
       return false
     }
 
@@ -530,15 +333,18 @@ export function useGuests(): UseGuestsReturn {
 
     if (!user || !supabase) return false
 
-    const { error: updateError } = await supabase
-      .from('guests')
-      .update(updates)
-      .eq('id', guestId)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: updateError } = await applyOrgFilter(
+      supabase
+        .from('guests')
+        .update(updates)
+        .eq('id', guestId),
+      organizationId,
+      user.id
+    )
 
     if (updateError) {
       setError(translateError(updateError))
-      await fetchGuests()
+      await refresh()
       return false
     }
 
@@ -558,6 +364,6 @@ export function useGuests(): UseGuestsReturn {
     saveMixSnapshot,
     searchGuests,
     getGuestById,
-    refresh: fetchGuests,
+    refresh,
   }
 }

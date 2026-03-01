@@ -99,7 +99,7 @@ export function useAutoReorder(): UseAutoReorderReturn {
       setError(translateError(fetchError))
       setRules([])
     } else {
-      setRules(data || [])
+      setRules((data || []) as unknown as AutoReorderRuleWithDetails[])
     }
 
     setLoading(false)

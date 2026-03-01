@@ -227,6 +227,7 @@ export function useTeam(): UseTeamReturn {
           location_id: locationId || null,
           email: email.toLowerCase(),
           role,
+          token: crypto.randomUUID(),
           invited_by: user.id,
           expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         })

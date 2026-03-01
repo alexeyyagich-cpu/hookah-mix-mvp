@@ -1,65 +1,14 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { isSupabaseConfigured } from '@/lib/config'
-import { useAuth } from '@/lib/AuthContext'
-import { useOrganizationContext } from '@/lib/hooks/useOrganization'
-import { getCachedData, setCachedData } from '@/lib/offline/db'
+import { useCallback } from 'react'
 import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { useBarRecipes } from '@/lib/hooks/useBarRecipes'
 import { PORTION_CONVERSIONS } from '@/data/bar-ingredients'
 import type { BarSale, BarAnalytics, BarRecipeWithIngredients } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
-// Demo sales data (past 7 days)
-function generateDemoSales(): BarSale[] {
-  const now = new Date()
-  const sales: BarSale[] = []
-  const cocktails = [
-    { name: 'Mojito', price: 9, cost: 2.4, recipe_id: 'demo-r1' },
-    { name: 'Negroni', price: 11, cost: 3.2, recipe_id: 'demo-r2' },
-    { name: 'Gin & Tonic', price: 8, cost: 1.9, recipe_id: 'demo-r3' },
-    { name: 'Aperol Spritz', price: 9, cost: 2.6, recipe_id: 'demo-r4' },
-    { name: 'Espresso Martini', price: 11, cost: 3.0, recipe_id: 'demo-r7' },
-    { name: 'Leipzig Sour', price: 12, cost: 3.5, recipe_id: 'demo-r8' },
-    { name: 'Moscow Mule', price: 9, cost: 2.1, recipe_id: 'demo-r11' },
-    { name: 'Tropical Hookah', price: 7, cost: 1.5, recipe_id: 'demo-r10' },
-  ]
-
-  for (let day = 0; day < 7; day++) {
-    const date = new Date(now)
-    date.setDate(date.getDate() - day)
-    const salesPerDay = 3 + Math.floor(Math.random() * 5)
-
-    for (let j = 0; j < salesPerDay; j++) {
-      const cocktail = cocktails[Math.floor(Math.random() * cocktails.length)]
-      const qty = 1 + Math.floor(Math.random() * 2)
-      const revenue = cocktail.price * qty
-      const cost = cocktail.cost * qty
-      const margin = ((revenue - cost) / revenue) * 100
-
-      date.setHours(14 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60))
-
-      sales.push({
-        id: `demo-sale-${day}-${j}`,
-        profile_id: 'demo',
-        recipe_id: cocktail.recipe_id,
-        recipe_name: cocktail.name,
-        quantity: qty,
-        unit_price: cocktail.price,
-        total_revenue: revenue,
-        total_cost: cost,
-        margin_percent: margin,
-        table_id: null,
-        guest_name: null,
-        notes: null,
-        sold_at: date.toISOString(),
-      })
-    }
-  }
-
-  return sales.sort((a, b) => new Date(b.sold_at).getTime() - new Date(a.sold_at).getTime())
-}
+import { generateDemoSales } from '@/lib/demo'
+import { useSupabaseList } from './useSupabaseList'
+import { applyOrgFilter } from './useOrgFilter'
 
 interface UseBarSalesReturn {
   sales: BarSale[]
@@ -71,75 +20,22 @@ interface UseBarSalesReturn {
   refresh: () => Promise<void>
 }
 
+const ORDER_BY = [{ column: 'sold_at', ascending: false }] as const
+
 export function useBarSales(): UseBarSalesReturn {
-  const [sales, setSales] = useState<BarSale[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const { user, isDemoMode } = useAuth()
-  const { organizationId, locationId } = useOrganizationContext()
+  const {
+    items: sales, setItems: setSales, loading, error, setError, refresh,
+    supabase, user, organizationId, locationId, isDemoMode,
+  } = useSupabaseList<BarSale>({
+    table: 'bar_sales',
+    cacheKey: 'bar_sales',
+    orderBy: ORDER_BY,
+    limit: 200,
+    demoData: () => generateDemoSales(),
+  })
+
   const { inventory, adjustQuantity } = useBarInventory()
   const { calculateCost } = useBarRecipes(inventory)
-  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
-
-  useEffect(() => {
-    if (isDemoMode && user) {
-      setSales(generateDemoSales())
-      setLoading(false)
-    }
-  }, [isDemoMode, user])
-
-  const fetchSales = useCallback(async () => {
-    if (!user || !supabase) {
-      setSales([])
-      setLoading(false)
-      return
-    }
-
-    // Try cache first for instant display
-    const cached = await getCachedData<BarSale>('bar_sales', user.id)
-    if (cached) {
-      setSales(cached.data)
-      setLoading(false)
-    }
-
-    // If offline, stop here
-    if (typeof navigator !== 'undefined' && !navigator.onLine) return
-
-    if (!cached) setLoading(true)
-    setError(null)
-
-    try {
-      const { data, error: fetchError } = await supabase
-        .from('bar_sales')
-        .select('*')
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-        .order('sold_at', { ascending: false })
-        .limit(200)
-
-      if (fetchError) {
-        if (!cached) { setError(translateError(fetchError)); setSales([]) }
-      } else {
-        setSales(data || [])
-        await setCachedData('bar_sales', user.id, data || [])
-      }
-    } catch {
-      // Network error — keep cache if available
-    }
-
-    setLoading(false)
-  }, [user, supabase, organizationId])
-
-  useEffect(() => {
-    if (!isDemoMode) fetchSales()
-  }, [fetchSales, isDemoMode])
-
-  // Refetch after reconnect
-  useEffect(() => {
-    let tid: ReturnType<typeof setTimeout>
-    const handleOnline = () => { tid = setTimeout(fetchSales, 3000) }
-    window.addEventListener('online', handleOnline)
-    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
-  }, [fetchSales])
 
   const recordSale = useCallback(async (
     recipe: BarRecipeWithIngredients,
@@ -223,7 +119,7 @@ export function useBarSales(): UseBarSalesReturn {
       setError(translateError(err as Error))
       return null
     }
-  }, [user, isDemoMode, supabase, calculateCost, adjustQuantity, organizationId, locationId])
+  }, [user, isDemoMode, supabase, calculateCost, adjustQuantity, organizationId, locationId, setSales, setError])
 
   const deleteSale = useCallback(async (id: string): Promise<boolean> => {
     if (!user) return false
@@ -234,11 +130,10 @@ export function useBarSales(): UseBarSalesReturn {
     }
 
     try {
-      const { error: deleteError } = await supabase
-        .from('bar_sales')
-        .delete()
-        .eq('id', id)
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      const { error: deleteError } = await applyOrgFilter(
+        supabase.from('bar_sales').delete().eq('id', id),
+        organizationId, user.id
+      )
 
       if (deleteError) {
         setError(translateError(deleteError))
@@ -252,7 +147,7 @@ export function useBarSales(): UseBarSalesReturn {
       setError(translateError(err as Error))
       return false
     }
-  }, [user, isDemoMode, supabase, organizationId])
+  }, [user, isDemoMode, supabase, organizationId, setSales, setError])
 
   const getAnalytics = useCallback((days: number = 7): BarAnalytics => {
     const cutoff = new Date()
@@ -330,6 +225,6 @@ export function useBarSales(): UseBarSalesReturn {
     recordSale,
     deleteSale,
     getAnalytics,
-    refresh: fetchSales,
+    refresh,
   }
 }

@@ -238,7 +238,7 @@ export function usePublicReviews(profileId: string | undefined, orgId?: string):
       const { data, error: insertError } = await supabase
         .from('reviews')
         .insert({
-          profile_id: profileId || null,
+          profile_id: profileId ?? '',
           ...(orgId ? { organization_id: orgId } : {}),
           author_name: review.author_name,
           rating: review.rating,

@@ -185,7 +185,7 @@ export function useMarketplaceOrders(): UseMarketplaceOrdersReturn {
         setError(translateError(ordersError))
         setOrders([])
       } else {
-        setOrders(ordersData || [])
+        setOrders((ordersData || []) as unknown as MarketplaceOrderWithItems[])
       }
     } catch (err) {
       setError(translateError(err as Error))

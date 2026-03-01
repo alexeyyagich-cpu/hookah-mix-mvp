@@ -165,16 +165,17 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
 
         if (data) {
           // Map DB row to LoungeProfile type
+          const row = data as unknown as LoungeProfile
           setLounge({
-            ...data,
+            ...row,
             latitude: null,
             longitude: null,
-            features: data.features || [],
-            working_hours: data.working_hours || null,
-            is_published: data.is_published ?? false,
-            show_menu: data.show_menu ?? true,
-            show_prices: data.show_prices ?? true,
-            show_popular_mixes: data.show_popular_mixes ?? true,
+            features: row.features || [],
+            working_hours: row.working_hours || null,
+            is_published: row.is_published ?? false,
+            show_menu: row.show_menu ?? true,
+            show_prices: row.show_prices ?? true,
+            show_popular_mixes: row.show_popular_mixes ?? true,
           })
         } else {
           setLounge(null)
@@ -194,7 +195,7 @@ export function useLoungeProfile(): UseLoungeProfileReturn {
         if (savedMixes && data) {
           setMixes(savedMixes.map(m => ({
             id: m.id,
-            lounge_id: data.id,
+            lounge_id: (data as unknown as LoungeProfile).id,
             name: m.name,
             description: m.notes || null,
             tobaccos: m.tobaccos || [],

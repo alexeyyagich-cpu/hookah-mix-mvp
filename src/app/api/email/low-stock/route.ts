@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { sendEmail, generateLowStockEmailHtml, isEmailConfigured } from '@/lib/email/resend'
 import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { emailLowStockSchema, validateBody } from '@/lib/validation'
 import { logger } from '@/lib/logger'
+import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 export async function POST(request: NextRequest) {
@@ -23,30 +21,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Email service not configured' }, { status: 503 })
   }
 
-  if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseServiceKey) {
     return NextResponse.json({ error: 'Supabase not configured' }, { status: 503 })
   }
 
   try {
     // Verify authentication
-    const cookieStore = await cookies()
-    const supabaseAuth = createServerClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-        },
-      }
-    )
-
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await getAuthenticatedUser()
+    if (auth.response) return auth.response
+    const { user } = auth
 
     let rawBody: unknown
     try {

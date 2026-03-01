@@ -3,21 +3,21 @@
 import { Suspense, useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { FloorPlan, STATUS_COLORS as TABLE_STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
+import { FloorPlan, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
+import FloorTablePanel from '@/components/floor/FloorTablePanel'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { IconSettings, IconCalendar, IconFloor } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { useTranslation, useLocale, formatTime } from '@/lib/i18n'
+import { useTranslation } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useKDS } from '@/lib/hooks/useKDS'
 import { quickRepeatGuest } from '@/logic/quickRepeatEngine'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
 import { useRole } from '@/lib/hooks/useRole'
-import { LazyQRCode as QRCodeCanvas } from '@/components/ui/LazyQRCode'
 import { toast } from 'sonner'
 
 import type { FloorTable, ReservationStatus, Guest } from '@/types/database'
@@ -42,7 +42,6 @@ export default function FloorPage() {
 function FloorPageInner() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
-  const { locale } = useLocale()
   const { user, profile } = useAuth()
   const { orgRole: contextOrgRole } = useOrganizationContext()
   const { hasPermission } = useRole(contextOrgRole)
@@ -340,6 +339,25 @@ function FloorPageInner() {
     }, 100)
   }, [profile?.venue_slug, tm])
 
+  const handleStatusChange = async (status: 'available' | 'occupied' | 'reserved' | 'cleaning') => {
+    if (!activeSelectedTable || statusChanging) return
+    setStatusChanging(true)
+    try {
+      if (status === 'available' && linkedReservation) {
+        await handleUnlinkReservation()
+        return
+      }
+      if (status === 'available' && activeSelectedTable.session_start_time) {
+        await handleEndSession()
+        await setTableStatus(activeSelectedTable.id, 'available')
+        return
+      }
+      await setTableStatus(activeSelectedTable.id, status)
+    } finally {
+      setStatusChanging(false)
+    }
+  }
+
   useEffect(() => () => { clearTimeout(serveTimerRef.current); clearTimeout(qrTimerRef.current) }, [])
 
   return (
@@ -502,439 +520,50 @@ function FloorPageInner() {
 
       {/* Selected Table Info */}
       {activeSelectedTable && !isEditMode && (
-        <div
-          className="card p-6"
-          style={{
-            borderColor: TABLE_STATUS_COLORS[activeSelectedTable.status].bg,
-            borderWidth: '2px',
+        <FloorTablePanel
+          table={activeSelectedTable}
+          linkedReservation={linkedReservation}
+          unlinkedReservations={unlinkedReservations}
+          filteredGuests={filteredGuests}
+          occupiedGuest={occupiedGuest}
+          serveRepeatResult={serveRepeatResult}
+          serveStatus={serveStatus}
+          deductInventory={deductInventory}
+          statusChanging={statusChanging}
+          quickReserving={quickReserving}
+          guestSearch={guestSearch}
+          showQuickReserve={showQuickReserve}
+          showGuestPicker={showGuestPicker}
+          showLinkPicker={showLinkPicker}
+          quickForm={quickForm}
+          qrTableId={qrTableId}
+          qrCanvasRef={qrCanvasRef}
+          venueSlug={profile?.venue_slug}
+          onStartSession={handleStartSession}
+          onEndSession={handleEndSession}
+          onConfirmServe={handleConfirmServe}
+          onQuickReserve={handleQuickReserve}
+          onLinkReservation={handleLinkReservation}
+          onUnlinkReservation={handleUnlinkReservation}
+          onDownloadQr={handleDownloadQr}
+          onStatusChange={handleStatusChange}
+          onClose={() => {
+            setSelectedTable(null)
+            setShowQuickReserve(false)
+            setShowLinkPicker(false)
+            setShowGuestPicker(false)
+            setGuestSearch('')
+            setSelectedGuestObj(null)
+            setServeStatus('idle')
           }}
-        >
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold">{activeSelectedTable.name}</h2>
-                <button type="button"
-                  onClick={(e) => { e.stopPropagation(); handleDownloadQr(activeSelectedTable); }}
-                  className="min-w-[44px] min-h-[44px] p-2.5 rounded text-xs text-[var(--color-textMuted)] hover:text-[var(--color-text)] hover:bg-[var(--color-bgCard)] flex items-center justify-center"
-                  title={tm.downloadTableQr}
-                  aria-label={tm.downloadTableQr}
-                >
-                  QR
-                </button>
-              </div>
-              <p className="text-sm text-[var(--color-textMuted)]">
-                {tm.capacity(activeSelectedTable.capacity)}
-              </p>
-            </div>
-            <span
-              className="px-3 py-1 rounded-full text-sm font-medium"
-              style={{
-                background: TABLE_STATUS_COLORS[activeSelectedTable.status].bg,
-                color: 'var(--color-bg)',
-              }}
-            >
-              {activeSelectedTable.status === 'available' ? tm.statusAvailable :
-               activeSelectedTable.status === 'occupied' ? tm.statusOccupied :
-               activeSelectedTable.status === 'reserved' ? tm.statusReserved :
-               tm.statusCleaning}
-            </span>
-          </div>
-
-          {activeSelectedTable.current_guest_name && (
-            <div className="mb-4">
-              <p className="text-sm text-[var(--color-textMuted)]">{tm.currentGuest}</p>
-              <p className="font-medium">{activeSelectedTable.current_guest_name}</p>
-            </div>
-          )}
-
-          {activeSelectedTable.session_start_time && (
-            <div className="mb-4">
-              <p className="text-sm text-[var(--color-textMuted)]">{tm.sessionStart}</p>
-              <p className="font-medium">
-                {formatTime(activeSelectedTable.session_start_time, locale)}
-              </p>
-            </div>
-          )}
-
-          {/* Long session warning */}
-          {activeSelectedTable.status === 'occupied' && activeSelectedTable.session_start_time &&
-            (Date.now() - new Date(activeSelectedTable.session_start_time).getTime()) / 60000 >= LONG_SESSION_MINUTES && (
-            <div className="mb-4 p-3 rounded-xl bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/30 flex items-center gap-2">
-              <span className="text-lg">&#9888;</span>
-              <span className="text-sm font-medium text-[var(--color-warning)]">
-                {tm.floorSessionExceeds(Math.floor((Date.now() - new Date(activeSelectedTable.session_start_time).getTime()) / 60000))}
-              </span>
-            </div>
-          )}
-
-          {activeSelectedTable.notes && (
-            <div className="p-3 rounded-xl bg-[var(--color-bgHover)] mb-4">
-              <p className="text-sm text-[var(--color-textMuted)]">{activeSelectedTable.notes}</p>
-            </div>
-          )}
-
-          {/* Linked Reservation Details */}
-          {linkedReservation && (
-            <div className="p-4 rounded-xl mb-4" style={{ background: 'var(--color-warning)', color: 'var(--color-bg)', opacity: 0.95 }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-sm">{tm.reservationDetails}</span>
-                <button type="button"
-                  onClick={handleUnlinkReservation}
-                  className="text-xs px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
-                >
-                  {tm.unlinkReservation}
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="opacity-80">{tm.reservationGuest}:</span>{' '}
-                  <span className="font-medium">{linkedReservation.guest_name}</span>
-                </div>
-                <div>
-                  <span className="opacity-80">{tm.reservationTime}:</span>{' '}
-                  <span className="font-medium">{linkedReservation.reservation_time.slice(0, 5)}</span>
-                </div>
-                <div>
-                  <span className="opacity-80">{tm.reservationGuests}:</span>{' '}
-                  <span className="font-medium">{linkedReservation.guest_count}</span>
-                </div>
-                {linkedReservation.guest_phone && (
-                  <div>
-                    <span className="opacity-80">{tm.reservationPhone}:</span>{' '}
-                    <span className="font-medium">{linkedReservation.guest_phone}</span>
-                  </div>
-                )}
-              </div>
-              {linkedReservation.notes && (
-                <div className="mt-2 text-sm">
-                  <span className="opacity-80">{tm.reservationNotes}:</span>{' '}
-                  {linkedReservation.notes}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Session action buttons */}
-          {activeSelectedTable.status === 'occupied' && activeSelectedTable.session_start_time && (
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-[var(--color-danger)] animate-pulse" />
-                <span className="text-sm font-medium text-[var(--color-danger)]">{tm.sessionActive}</span>
-              </div>
-              <button type="button"
-                onClick={handleEndSession}
-                className="btn btn-danger btn-sm w-full"
-              >
-                {tm.endSessionBtn}
-              </button>
-            </div>
-          )}
-
-          {/* One-Tap Serve Panel */}
-          {activeSelectedTable.status === 'occupied' && occupiedGuest && serveRepeatResult && (
-            <div className="mb-4 p-4 rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/5">
-              {serveRepeatResult.success ? (
-                <>
-                  <h3 className="font-semibold text-sm mb-3">{tm.lastMixOf(occupiedGuest.name)}</h3>
-
-                  {/* Tobacco pills */}
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {serveRepeatResult.tobaccos.map((rt, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-1 rounded-full text-xs font-medium"
-                        style={{
-                          background: rt.tobacco.color + '20',
-                          color: rt.tobacco.color,
-                          border: `1px solid ${rt.tobacco.color}40`,
-                          opacity: rt.available ? 1 : 0.5,
-                          textDecoration: !rt.available && !rt.replacement ? 'line-through' : 'none',
-                        }}
-                      >
-                        {rt.tobacco.flavor} ({rt.percent}%)
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Mix details */}
-                  <p className="text-xs text-[var(--color-textMuted)] mb-2">
-                    {tm.serveGrams(serveRepeatResult.snapshot.total_grams)}
-                    {serveRepeatResult.snapshot.bowl_type && ` · ${serveRepeatResult.snapshot.bowl_type}`}
-                    {serveRepeatResult.snapshot.heat_setup && ` · ${tm.serveCoals(serveRepeatResult.snapshot.heat_setup.coals)}`}
-                  </p>
-
-                  {/* Warnings */}
-                  {serveRepeatResult.warnings.length > 0 && (
-                    <div className="mb-3 space-y-1">
-                      {serveRepeatResult.warnings.map((w, i) => (
-                        <p key={i} className="text-xs px-2 py-1 rounded-lg bg-[var(--color-warning)]/10 text-[var(--color-warning)]">
-                          {w.message}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Deduct toggle */}
-                  <label className="flex items-center gap-2 mb-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={deductInventory}
-                      onChange={(e) => setDeductInventory(e.target.checked)}
-                      className="w-4 h-4 rounded accent-[var(--color-success)]"
-                    />
-                    <span className="text-sm">{tm.deductFromStock}</span>
-                  </label>
-
-                  {/* Serve + Create new mix buttons */}
-                  <div className="flex gap-2">
-                    <button type="button"
-                      onClick={handleConfirmServe}
-                      disabled={serveStatus !== 'idle'}
-                      className="btn btn-success btn-sm flex-1 disabled:opacity-60"
-                    >
-                      {serveStatus === 'serving' ? tm.serving :
-                       serveStatus === 'served' ? tm.served :
-                       tm.serveLastMix}
-                    </button>
-                    <Link
-                      href="/mix"
-                      className="btn btn-ghost btn-sm flex-1"
-                    >
-                      {tm.createNewMix}
-                    </Link>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-[var(--color-textMuted)] mb-3">
-                    {tm.noSavedMix(occupiedGuest.name)}
-                  </p>
-                  <Link
-                    href="/mix"
-                    className="btn btn-primary btn-sm w-full"
-                  >
-                    {tm.createNewMix}
-                  </Link>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Status change buttons */}
-          <div className="grid grid-cols-2 gap-2">
-            {([
-              { status: 'available' as const, label: tm.statusAvailable, color: 'var(--color-success)' },
-              { status: 'occupied' as const, label: tm.statusOccupied, color: 'var(--color-danger)' },
-              { status: 'reserved' as const, label: tm.statusReserved, color: 'var(--color-warning)' },
-              { status: 'cleaning' as const, label: tm.statusCleaning, color: 'var(--color-textMuted)' },
-            ] as const).map(({ status, label, color }) => (
-              <button type="button"
-                key={status}
-                onClick={async () => {
-                  if (statusChanging) return
-                  if (status === 'occupied' && activeSelectedTable.status !== 'occupied') {
-                    setShowGuestPicker(true)
-                    setShowQuickReserve(false)
-                    setShowLinkPicker(false)
-                    return
-                  }
-                  if (status === 'reserved' && activeSelectedTable.status !== 'reserved') {
-                    setShowQuickReserve(true)
-                    setShowLinkPicker(false)
-                    setShowGuestPicker(false)
-                    return
-                  }
-                  setStatusChanging(true)
-                  try {
-                    if (status === 'available' && linkedReservation) {
-                      await handleUnlinkReservation()
-                      return
-                    }
-                    if (status === 'available' && activeSelectedTable.session_start_time) {
-                      await handleEndSession()
-                      await setTableStatus(activeSelectedTable.id, 'available')
-                      return
-                    }
-                    await setTableStatus(activeSelectedTable.id, status)
-                  } finally {
-                    setStatusChanging(false)
-                  }
-                }}
-                disabled={activeSelectedTable.status === status || statusChanging}
-                aria-pressed={activeSelectedTable.status === status}
-                className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
-                style={{
-                  background: activeSelectedTable.status === status ? color : 'var(--color-bgHover)',
-                  color: activeSelectedTable.status === status ? 'var(--color-bg)' : 'var(--color-text)',
-                  opacity: activeSelectedTable.status === status ? 1 : 0.8,
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Guest Picker (for starting session) */}
-          {showGuestPicker && (
-            <div className="mt-4 p-4 rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5">
-              <h3 className="font-semibold text-sm mb-3">{tm.guestOptional}</h3>
-              <input
-                type="text"
-                value={guestSearch}
-                onChange={(e) => setGuestSearch(e.target.value)}
-                placeholder={tm.guestNamePlaceholder}
-                aria-label={tm.guestNamePlaceholder}
-                className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm mb-2"
-              />
-              {filteredGuests.length > 0 && (
-                <div className="mb-2 max-h-40 overflow-y-auto space-y-1">
-                  {filteredGuests.map(g => (
-                    <button type="button"
-                      key={g.id}
-                      onClick={() => handleStartSession(g.name, g)}
-                      className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--color-bgHover)] hover:bg-[var(--color-primary)]/10 transition-colors text-left text-sm"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{g.name}</span>
-                        {g.last_mix_snapshot && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--color-success)]/20 text-[var(--color-success)]">{tm.hasMix}</span>
-                        )}
-                      </div>
-                      {g.visit_count > 0 && (
-                        <span className="text-xs text-[var(--color-textMuted)]">{g.visit_count}x</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <div className="flex gap-2">
-                <button type="button"
-                  onClick={() => { setShowGuestPicker(false); setGuestSearch('') }}
-                  className="btn btn-ghost btn-sm flex-1"
-                >
-                  {tm.cancelBtn}
-                </button>
-                <button type="button"
-                  onClick={() => handleStartSession(guestSearch || '')}
-                  className="btn btn-primary btn-sm flex-1"
-                >
-                  {tm.startSessionBtn}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Quick Reserve Form */}
-          {showQuickReserve && (
-            <div className="mt-4 p-4 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/5">
-              <h3 className="font-semibold text-sm mb-3">{tm.quickReserve}</h3>
-
-              {/* Option to link existing reservation */}
-              {unlinkedReservations.length > 0 && !showLinkPicker && (
-                <button type="button"
-                  onClick={() => setShowLinkPicker(true)}
-                  className="w-full mb-3 px-3 py-2 rounded-xl text-sm font-medium border border-dashed border-[var(--color-warning)] text-[var(--color-warning)] hover:bg-[var(--color-warning)]/10 transition-colors"
-                >
-                  {tm.linkReservation} ({unlinkedReservations.length})
-                </button>
-              )}
-
-              {/* Link picker */}
-              {showLinkPicker && (
-                <div className="mb-3 space-y-2">
-                  {unlinkedReservations.map(r => (
-                    <button type="button"
-                      key={r.id}
-                      onClick={() => handleLinkReservation(r.id)}
-                      className="w-full flex items-center justify-between p-3 rounded-xl bg-[var(--color-bgHover)] hover:bg-[var(--color-warning)]/10 transition-colors text-left"
-                    >
-                      <div>
-                        <span className="font-medium text-sm">{r.guest_name}</span>
-                        <span className="text-xs text-[var(--color-textMuted)] ml-2">
-                          {r.guest_count} {tm.guestCountShort}
-                        </span>
-                      </div>
-                      <span className="font-mono text-sm font-semibold">{r.reservation_time.slice(0, 5)}</span>
-                    </button>
-                  ))}
-                  <button type="button"
-                    onClick={() => setShowLinkPicker(false)}
-                    className="w-full text-xs text-[var(--color-textMuted)] py-1"
-                  >
-                    {tm.cancelBtn}
-                  </button>
-                </div>
-              )}
-
-              {/* Or create new reservation */}
-              {!showLinkPicker && (
-                <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); handleQuickReserve() }}>
-                  <input
-                    type="text"
-                    value={quickForm.guest_name}
-                    onChange={(e) => setQuickForm(f => ({ ...f, guest_name: e.target.value }))}
-                    placeholder={tm.guestNamePlaceholder}
-                    aria-label={tm.guestNamePlaceholder}
-                    className="w-full px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
-                  />
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <input
-                      type="time"
-                      value={quickForm.reservation_time}
-                      onChange={(e) => setQuickForm(f => ({ ...f, reservation_time: e.target.value }))}
-                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
-                    />
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      value={quickForm.guest_count}
-                      onChange={(e) => setQuickForm(f => ({ ...f, guest_count: e.target.value }))}
-                      min="1"
-                      max="20"
-                      step="1"
-                      placeholder={tm.guestCountLabel}
-                      aria-label={tm.guestCountLabel}
-                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
-                    />
-                    <input
-                      type="tel"
-                      value={quickForm.guest_phone}
-                      onChange={(e) => setQuickForm(f => ({ ...f, guest_phone: e.target.value }))}
-                      placeholder={tm.guestPhonePlaceholder}
-                      aria-label={tm.guestPhonePlaceholder}
-                      className="px-3 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-warning)] focus-visible:ring-2 focus-visible:ring-[var(--color-warning)] focus:outline-none text-sm"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <button type="button"
-                      onClick={() => setShowQuickReserve(false)}
-                      className="btn btn-ghost btn-sm flex-1"
-                    >
-                      {tm.cancelBtn}
-                    </button>
-                    <button type="submit"
-                      disabled={quickReserving || !quickForm.guest_name || !quickForm.reservation_time}
-                      className="btn btn-warning btn-sm flex-1"
-                    >
-                      {quickReserving ? tm.reserving : tm.reserveBtn}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          )}
-
-          <button type="button"
-            onClick={() => { setSelectedTable(null); setShowQuickReserve(false); setShowLinkPicker(false); setShowGuestPicker(false); setGuestSearch(''); setSelectedGuestObj(null); setServeStatus('idle') }}
-            className="mt-3 px-4 py-2 rounded-xl text-sm w-full"
-            style={{
-              background: 'var(--color-bgHover)',
-              color: 'var(--color-text)',
-            }}
-          >
-            {tc.close}
-          </button>
-        </div>
+          onGuestSearchChange={setGuestSearch}
+          onShowQuickReserve={setShowQuickReserve}
+          onShowGuestPicker={setShowGuestPicker}
+          onShowLinkPicker={setShowLinkPicker}
+          onQuickFormChange={(field, value) => setQuickForm(f => ({ ...f, [field]: value }))}
+          onDeductInventoryChange={setDeductInventory}
+          onSetQrTableId={setQrTableId}
+        />
       )}
 
       {/* Help text */}
@@ -949,17 +578,6 @@ function FloorPageInner() {
         </div>
       )}
 
-      {/* Hidden QR canvas for download */}
-      {qrTableId && profile?.venue_slug && (
-        <div className="fixed -left-[9999px]" aria-hidden="true">
-          <QRCodeCanvas
-            ref={qrCanvasRef}
-            value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/menu/${profile.venue_slug}?table=${qrTableId}`}
-            size={512}
-            level="M"
-          />
-        </div>
-      )}
     </div>
     </ErrorBoundary>
   )

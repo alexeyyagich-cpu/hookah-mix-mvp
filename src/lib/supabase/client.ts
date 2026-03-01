@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { supabaseUrl, supabaseAnonKey } from '@/lib/config'
+import type { Database } from '@/types/database'
 
 // Re-entrant mutex to prevent concurrent token refreshes
 // without deadlocking when Supabase calls lock from within lock
@@ -36,7 +37,7 @@ const authLock = async <R>(_name: string, _acquireTimeout: number, fn: () => Pro
 let singleton: ReturnType<typeof buildClient> | undefined
 
 function buildClient() {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey, { auth: { lock: authLock } })
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, { auth: { lock: authLock } })
 }
 
 export function createClient() {

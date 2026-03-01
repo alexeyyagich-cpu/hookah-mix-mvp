@@ -156,6 +156,7 @@ export function useTips(): UseTipsReturn {
         org_member_id: memberId,
         display_name: displayName,
         tip_slug: slug,
+        is_tip_enabled: true,
       })
       .select()
       .single()

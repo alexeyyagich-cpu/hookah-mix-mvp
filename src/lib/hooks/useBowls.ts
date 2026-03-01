@@ -1,21 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { isSupabaseConfigured } from '@/lib/config'
-import { useAuth } from '@/lib/AuthContext'
-import { useOrganizationContext } from '@/lib/hooks/useOrganization'
-import { getCachedData, setCachedData } from '@/lib/offline/db'
 import type { BowlType } from '@/types/database'
 import { SUBSCRIPTION_LIMITS } from '@/types/database'
 import { translateError } from '@/lib/utils/translateError'
 import { useTranslation } from '@/lib/i18n'
-// Demo data for testing
-const DEMO_BOWLS: BowlType[] = [
-  { id: '1', profile_id: 'demo', name: 'Phunnel Large', capacity_grams: 20, is_default: true, created_at: new Date().toISOString() },
-  { id: '2', profile_id: 'demo', name: 'Phunnel Medium', capacity_grams: 15, is_default: false, created_at: new Date().toISOString() },
-  { id: '3', profile_id: 'demo', name: 'Turka Classic', capacity_grams: 18, is_default: false, created_at: new Date().toISOString() },
-]
+import { DEMO_BOWLS } from '@/lib/demo'
+import { useSupabaseList } from './useSupabaseList'
+import { applyOrgFilter } from './useOrgFilter'
 
 interface UseBowlsReturn {
   bowls: BowlType[]
@@ -31,22 +22,20 @@ interface UseBowlsReturn {
   bowlsLimit: number
 }
 
-export function useBowls(): UseBowlsReturn {
-  const [bowls, setBowls] = useState<BowlType[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const { user, profile, isDemoMode } = useAuth()
-  const { organizationId, locationId } = useOrganizationContext()
-  const th = useTranslation('hookah')
-  const supabase = useMemo(() => isSupabaseConfigured ? createClient() : null, [])
+const ORDER_BY = [{ column: 'name', ascending: true }] as const
 
-  // Return demo data if in demo mode
-  useEffect(() => {
-    if (isDemoMode && user) {
-      setBowls(DEMO_BOWLS)
-      setLoading(false)
-    }
-  }, [isDemoMode, user])
+export function useBowls(): UseBowlsReturn {
+  const {
+    items: bowls, setItems: setBowls, loading, error, setError, refresh,
+    supabase, user, profile, organizationId, locationId, isDemoMode,
+  } = useSupabaseList<BowlType>({
+    table: 'bowl_types',
+    cacheKey: 'bowls',
+    orderBy: ORDER_BY,
+    demoData: DEMO_BOWLS,
+  })
+
+  const th = useTranslation('hookah')
 
   // Determine limits based on subscription
   const tier = profile?.subscription_tier || 'trial'
@@ -54,52 +43,6 @@ export function useBowls(): UseBowlsReturn {
   const canAddMore = bowls.length < bowlsLimit
 
   const defaultBowl = bowls.find(b => b.is_default) || bowls[0] || null
-
-  const fetchBowls = useCallback(async () => {
-    if (!user || !supabase) {
-      setBowls([])
-      setLoading(false)
-      return
-    }
-
-    const cached = await getCachedData<BowlType>('bowls', user.id)
-    if (cached) { setBowls(cached.data); setLoading(false) }
-    if (typeof navigator !== 'undefined' && !navigator.onLine) return
-
-    if (!cached) setLoading(true)
-    setError(null)
-
-    try {
-      const { data, error: fetchError } = await supabase
-        .from('bowl_types')
-        .select('*')
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
-        .order('name', { ascending: true })
-
-      if (fetchError) {
-        if (!cached) { setError(translateError(fetchError)); setBowls([]) }
-      } else {
-        setBowls(data || [])
-        await setCachedData('bowls', user.id, data || [])
-      }
-    } catch {
-      // Network error — keep cache
-    }
-
-    setLoading(false)
-  }, [user, supabase, organizationId])
-
-  useEffect(() => {
-    if (!isDemoMode) fetchBowls()
-  }, [fetchBowls, isDemoMode])
-
-  // Refetch after reconnect
-  useEffect(() => {
-    let tid: ReturnType<typeof setTimeout>
-    const handleOnline = () => { tid = setTimeout(fetchBowls, 3000) }
-    window.addEventListener('online', handleOnline)
-    return () => { clearTimeout(tid); window.removeEventListener('online', handleOnline) }
-  }, [fetchBowls])
 
   const addBowl = async (
     bowl: Omit<BowlType, 'id' | 'profile_id' | 'created_at'>
@@ -130,10 +73,10 @@ export function useBowls(): UseBowlsReturn {
     // If this is set as default, unset other defaults (best-effort before insert)
     if (bowl.is_default) {
       try {
-        await supabase
-          .from('bowl_types')
-          .update({ is_default: false })
-          .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+        await applyOrgFilter(
+          supabase.from('bowl_types').update({ is_default: false }),
+          organizationId, user.id
+        )
       } catch {
         if (process.env.NODE_ENV !== 'production') console.error('Failed to unset default bowls')
       }
@@ -159,7 +102,7 @@ export function useBowls(): UseBowlsReturn {
     }
 
     setError(null)
-    await fetchBowls()
+    await refresh()
     return data
   }
 
@@ -171,18 +114,17 @@ export function useBowls(): UseBowlsReturn {
       return true
     }
 
-    const { error: updateError } = await supabase
-      .from('bowl_types')
-      .update(updates)
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: updateError } = await applyOrgFilter(
+      supabase.from('bowl_types').update(updates).eq('id', id),
+      organizationId, user.id
+    )
 
     if (updateError) {
       setError(translateError(updateError))
       return false
     }
 
-    await fetchBowls()
+    await refresh()
     return true
   }
 
@@ -197,11 +139,10 @@ export function useBowls(): UseBowlsReturn {
     const bowl = bowls.find(b => b.id === id)
     const wasDefault = bowl?.is_default
 
-    const { error: deleteError } = await supabase
-      .from('bowl_types')
-      .delete()
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: deleteError } = await applyOrgFilter(
+      supabase.from('bowl_types').delete().eq('id', id),
+      organizationId, user.id
+    )
 
     if (deleteError) {
       setError(translateError(deleteError))
@@ -223,7 +164,7 @@ export function useBowls(): UseBowlsReturn {
       }
     }
 
-    await fetchBowls()
+    await refresh()
     return true
   }
 
@@ -237,20 +178,19 @@ export function useBowls(): UseBowlsReturn {
 
     // Unset all defaults (best-effort before setting new one)
     try {
-      await supabase
-        .from('bowl_types')
-        .update({ is_default: false })
-        .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+      await applyOrgFilter(
+        supabase.from('bowl_types').update({ is_default: false }),
+        organizationId, user.id
+      )
     } catch {
       if (process.env.NODE_ENV !== 'production') console.error('Failed to unset default bowls')
     }
 
     // Set new default
-    const { error: updateError } = await supabase
-      .from('bowl_types')
-      .update({ is_default: true })
-      .eq('id', id)
-      .eq(organizationId ? 'organization_id' : 'profile_id', organizationId || user.id)
+    const { error: updateError } = await applyOrgFilter(
+      supabase.from('bowl_types').update({ is_default: true }).eq('id', id),
+      organizationId, user.id
+    )
 
     if (updateError) {
       setError(translateError(updateError))
@@ -258,7 +198,7 @@ export function useBowls(): UseBowlsReturn {
     }
 
     setError(null)
-    await fetchBowls()
+    await refresh()
     return true
   }
 
@@ -271,7 +211,7 @@ export function useBowls(): UseBowlsReturn {
     updateBowl,
     deleteBowl,
     setDefaultBowl,
-    refresh: fetchBowls,
+    refresh,
     canAddMore,
     bowlsLimit,
   }
