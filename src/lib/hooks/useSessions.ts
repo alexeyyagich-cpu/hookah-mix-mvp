@@ -456,7 +456,7 @@ export function useSessions(): UseSessionsReturn {
               p_grams_used: tx.quantity_grams, // negative value → increments stock back
             })
           } catch {
-            console.error('Reverse inventory failed for', tx.tobacco_inventory_id)
+            if (process.env.NODE_ENV !== 'production') console.error('Reverse inventory failed for', tx.tobacco_inventory_id)
           }
         }
       }

@@ -56,7 +56,7 @@ export async function enqueueOfflineMutation<T>({
     if ('serviceWorker' in navigator && 'SyncManager' in window) {
       navigator.serviceWorker.ready.then((reg) => {
         // @ts-expect-error -- SyncManager not in all TS lib types
-        reg.sync?.register('sync-mutations').catch((err) => console.error('Offline mutation error:', err))
+        reg.sync?.register('sync-mutations').catch(() => { /* background sync registration failed — non-critical */ })
       })
     }
   }

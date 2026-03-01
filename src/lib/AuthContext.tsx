@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single()
 
     if (error) {
-      console.error('Error fetching profile:', error.code, error.message)
+      if (process.env.NODE_ENV !== 'production') console.error('Error fetching profile:', error.code, error.message)
       return null
     }
 

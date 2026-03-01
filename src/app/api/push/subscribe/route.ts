@@ -74,6 +74,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const ip = getClientIp(request)
+  const rateCheck = await checkRateLimit(`push-unsub:${ip}`, rateLimits.webhook)
+  if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
+
   if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 })
   }

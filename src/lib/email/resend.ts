@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { formatCurrency } from '@/lib/i18n/format'
+import { logger } from '@/lib/logger'
 
 /** Escape user-provided strings before interpolating into HTML email templates. */
 function esc(s: string): string {
@@ -38,13 +39,13 @@ export async function sendEmail({ to, subject, html, text }: SendEmailOptions): 
     })
 
     if (error) {
-      console.error('Resend error:', error)
+      logger.error('Resend error', { detail: error.message })
       return { success: false, error: error.message }
     }
 
     return { success: true }
   } catch (err) {
-    console.error('Email send error:', err)
+    logger.error('Email send error', { error: err instanceof Error ? err.message : String(err) })
     return { success: false, error: err instanceof Error ? err.message : 'Failed to send email' }
   }
 }

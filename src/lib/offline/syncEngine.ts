@@ -45,7 +45,7 @@ export async function processSyncQueue(
 
       if (entry.retryCount + 1 >= MAX_RETRIES) {
         await updateMutationStatus(entry.id, 'failed', errorMsg)
-        console.warn(`[sync] Permanently failed after ${MAX_RETRIES} retries:`, entry.table, entry.operation, errorMsg)
+        if (process.env.NODE_ENV !== 'production') console.warn(`[sync] Permanently failed after ${MAX_RETRIES} retries:`, entry.table, entry.operation, errorMsg)
       } else {
         await updateMutationStatus(entry.id, 'pending', errorMsg)
       }

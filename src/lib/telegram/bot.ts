@@ -3,6 +3,7 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 import type { TelegramNotification, InlineKeyboardMarkup, InlineKeyboardButton } from './types'
 import { formatCurrency } from '@/lib/i18n/format'
+import { logger } from '@/lib/logger'
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TELEGRAM_WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET
@@ -90,13 +91,13 @@ async function callTelegramApi<T>(method: string, params: Record<string, unknown
     const data = await response.json()
 
     if (!data.ok) {
-      console.error('Telegram API error:', data.description)
+      logger.error('Telegram API error', { description: data.description })
       return null
     }
 
     return data.result as T
   } catch (error) {
-    console.error('Telegram API request failed:', error)
+    logger.error('Telegram API request failed', { error: String(error) })
     return null
   }
 }

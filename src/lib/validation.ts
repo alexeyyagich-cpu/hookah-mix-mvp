@@ -145,6 +145,14 @@ export const stripePortalSchema = z.object({
   userId: z.string().uuid(),
 })
 
+// ── /api/admin/organizations PATCH ───────────────────────────────────────
+export const adminOrgUpdateSchema = z.object({
+  id: z.string().uuid(),
+  subscription_tier: z.enum(['trial', 'core', 'multi', 'enterprise']).optional(),
+  trial_expires_at: z.string().nullable().optional(),
+  subscription_expires_at: z.string().nullable().optional(),
+})
+
 // ── Helper ──────────────────────────────────────────────────────────────
 /**
  * Validates `body` against `schema`.

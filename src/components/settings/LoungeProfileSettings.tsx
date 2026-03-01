@@ -7,7 +7,7 @@ import { useTranslation } from '@/lib/i18n'
 import { TOAST_TIMEOUT } from '@/lib/constants'
 import { LOUNGE_FEATURES } from '@/types/lounge'
 import type { LoungeFeature, WorkingHours, DayHours } from '@/types/lounge'
-import { QRCodeSVG } from 'qrcode.react'
+import { LazyQRCodeSVG as QRCodeSVG } from '@/components/ui/LazyQRCode'
 
 const DAYS: (keyof WorkingHours)[] = [
   'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { logger } from '@/lib/logger'
-import type { SubscriptionTier } from '@/types/database'
+import { adminOrgUpdateSchema, validateBody } from '@/lib/validation'
 
 function getSupabaseClients() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -104,21 +104,23 @@ export async function PATCH(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   try {
-    const body = await request.json()
-    const { id, subscription_tier, trial_expires_at, subscription_expires_at } = body
+    let rawBody: unknown
+    try {
+      rawBody = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+    }
 
-    if (!id) return NextResponse.json({ error: 'Missing org id' }, { status: 400 })
+    const validation = validateBody(adminOrgUpdateSchema, rawBody)
+    if ('error' in validation) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { id, subscription_tier, trial_expires_at, subscription_expires_at } = validation.data
 
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
 
-    if (subscription_tier) {
-      const validTiers: SubscriptionTier[] = ['trial', 'core', 'multi', 'enterprise']
-      if (!validTiers.includes(subscription_tier)) {
-        return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
-      }
-      updates.subscription_tier = subscription_tier
-    }
-
+    if (subscription_tier) updates.subscription_tier = subscription_tier
     if (trial_expires_at !== undefined) updates.trial_expires_at = trial_expires_at
     if (subscription_expires_at !== undefined) updates.subscription_expires_at = subscription_expires_at
 
@@ -132,13 +134,11 @@ export async function PATCH(request: NextRequest) {
     if (error) throw error
 
     // Audit log
-    console.info(JSON.stringify({
-      event: 'admin.org.update',
+    logger.info('admin.org.update', {
       admin_user_id: user.id,
       org_id: id,
-      changes: updates,
-      timestamp: new Date().toISOString(),
-    }))
+      changes: JSON.stringify(updates),
+    })
 
     return NextResponse.json(data)
   } catch (err) {
