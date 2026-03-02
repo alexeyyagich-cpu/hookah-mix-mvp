@@ -48,6 +48,8 @@ export default function NotificationsSection() {
               onClick={() => updateNotificationSettings({
                 low_stock_enabled: !notificationSettings?.low_stock_enabled
               })}
+              aria-label={ts.lowStockNotifications}
+              aria-pressed={!!notificationSettings?.low_stock_enabled}
               className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
                 notificationSettings?.low_stock_enabled
                   ? 'bg-[var(--color-primary)]'
@@ -72,6 +74,7 @@ export default function NotificationsSection() {
             </div>
             <input
               type="range"
+              aria-label={ts.warningThreshold}
               min={10}
               max={200}
               step={10}
@@ -104,6 +107,8 @@ export default function NotificationsSection() {
                   type="button"
                   onClick={() => pushSubscribed ? unsubscribePush() : subscribePush()}
                   disabled={pushLoading || pushPermission === 'denied'}
+                  aria-label={ts.pushNotifications}
+                  aria-pressed={pushSubscribed}
                   className={`relative shrink-0 w-12 h-6 rounded-full transition-colors disabled:opacity-50 ${
                     pushSubscribed
                       ? 'bg-[var(--color-primary)]'
@@ -166,6 +171,8 @@ export default function NotificationsSection() {
                 onClick={() => updateEmailSettings({
                   email_notifications_enabled: !emailSettings?.email_notifications_enabled
                 })}
+                aria-label={ts.emailNotifications}
+                aria-pressed={!!emailSettings?.email_notifications_enabled}
                 className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
                   emailSettings?.email_notifications_enabled
                     ? 'bg-[var(--color-primary)]'
@@ -189,6 +196,8 @@ export default function NotificationsSection() {
                   onClick={() => updateEmailSettings({
                     low_stock_email: !emailSettings?.low_stock_email
                   })}
+                  aria-label={ts.lowStockEmail}
+                  aria-pressed={!!emailSettings?.low_stock_email}
                   className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     emailSettings?.low_stock_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
@@ -206,6 +215,8 @@ export default function NotificationsSection() {
                   onClick={() => updateEmailSettings({
                     order_updates_email: !emailSettings?.order_updates_email
                   })}
+                  aria-label={ts.orderUpdatesEmail}
+                  aria-pressed={!!emailSettings?.order_updates_email}
                   className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     emailSettings?.order_updates_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}
@@ -223,6 +234,8 @@ export default function NotificationsSection() {
                   onClick={() => updateEmailSettings({
                     daily_summary_email: !emailSettings?.daily_summary_email
                   })}
+                  aria-label={ts.dailySummaryEmail}
+                  aria-pressed={!!emailSettings?.daily_summary_email}
                   className={`relative shrink-0 w-10 h-5 rounded-full transition-colors ${
                     emailSettings?.daily_summary_email ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-border)]'
                   }`}

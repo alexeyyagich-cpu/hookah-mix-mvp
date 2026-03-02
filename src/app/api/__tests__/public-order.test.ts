@@ -15,8 +15,8 @@ const { mockSingle, mockMaybeSingle, mockInsertSingle } = vi.hoisted(() => {
 
 let fromCallCount = 0
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: vi.fn(() => {
+vi.mock('@/lib/supabase/admin', () => ({
+  getSupabaseAdmin: vi.fn(() => {
     const builder = {
       select: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),

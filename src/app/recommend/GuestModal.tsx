@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { IconClose } from '@/components/Icons'
 import {
   getAllFlavorProfiles,
@@ -24,6 +25,8 @@ export function GuestModal({
   initialData?: Guest
 }) {
   const t = useTranslation('hookah')
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef, true, onClose)
 
   const STRENGTH_LABEL_I18N: Record<StrengthPreference, string> = {
     light: t.strengthLight, medium: t.strengthMedium, strong: t.strengthStrong,
@@ -67,6 +70,7 @@ export function GuestModal({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="guest-modal-title"

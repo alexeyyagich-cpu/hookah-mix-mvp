@@ -303,6 +303,8 @@ export default function PromotionsPage() {
                     }
                   }}
                   disabled={togglingId === promo.id}
+                  aria-label={tm.toggleActiveLabel}
+                  aria-pressed={promo.is_active}
                   className={`shrink-0 w-10 h-6 rounded-full transition-colors relative disabled:opacity-50 ${
                     promo.is_active ? 'bg-[var(--color-success)]' : 'bg-[var(--color-bgHover)]'
                   }`}

@@ -11,8 +11,8 @@ const { mockCreateClient, mockSendPushToUser, mockIsPushConfigured } = vi.hoiste
   }
 })
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: (...args: unknown[]) => mockCreateClient(...args),
+vi.mock('@/lib/supabase/admin', () => ({
+  getSupabaseAdmin: (...args: unknown[]) => mockCreateClient(...args),
 }))
 
 vi.mock('@/lib/push/server', () => ({

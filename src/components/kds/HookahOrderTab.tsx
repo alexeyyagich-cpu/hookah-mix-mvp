@@ -265,6 +265,7 @@ export default function HookahOrderTab({
                   </span>
                   <input
                     type="range"
+                    aria-label={st.tobacco.flavor}
                     min={5}
                     max={95}
                     value={st.percent}

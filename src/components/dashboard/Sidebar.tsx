@@ -295,7 +295,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation - grouped by section */}
-      <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+      <nav className="flex-1 p-3 space-y-4 overflow-y-auto" aria-label={t.sidebarNav}>
         {filteredGroups.map((group, gi) => {
           const isCollapsed = group.label ? collapsedGroups.has(group.label) : false
           return (

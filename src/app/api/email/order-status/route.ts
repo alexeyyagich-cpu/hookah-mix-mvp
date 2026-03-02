@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { sendEmail, generateOrderStatusEmailHtml, isEmailConfigured } from '@/lib/email/resend'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { emailOrderStatusSchema, validateBody } from '@/lib/validation'
 import { logger } from '@/lib/logger'
 import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 const STATUS_TEXT: Record<string, string> = {
   pending: 'Pending',
@@ -26,10 +23,6 @@ export async function POST(request: NextRequest) {
   }
   if (!isEmailConfigured) {
     return NextResponse.json({ error: 'Email service not configured' }, { status: 503 })
-  }
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 503 })
   }
 
   try {
@@ -55,7 +48,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseAdmin()
 
     // Get profile
     const { data: profile, error: profileError } = await supabase

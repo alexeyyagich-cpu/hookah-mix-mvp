@@ -789,4 +789,8 @@ export const manage: typeof ManageType = {
   presetThisWeek: 'This week vs last',
   presetThisMonth: 'This month vs last',
   presetLast30: 'Last 30 days vs previous',
+
+  // A11y
+  waiterGramsLabel: 'Total grams',
+  toggleActiveLabel: 'Toggle active',
 }

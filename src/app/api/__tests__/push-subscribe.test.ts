@@ -11,8 +11,8 @@ const { mockGetAuthenticatedUser, mockCreateClient } = vi.hoisted(() => {
   }
 })
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: (...args: unknown[]) => mockCreateClient(...args),
+vi.mock('@/lib/supabase/admin', () => ({
+  getSupabaseAdmin: (...args: unknown[]) => mockCreateClient(...args),
 }))
 
 vi.mock('@/lib/rateLimit', () => ({

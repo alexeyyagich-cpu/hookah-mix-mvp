@@ -50,4 +50,5 @@ export const nav: typeof NavType = {
   closeNav: 'Navigationsmenü schließen',
   logoutLabel: 'Vom Konto abmelden',
   proOnlyLabel: (name: string) => `${name} — verfügbar im Multi-Tarif`,
+  sidebarNav: 'Hauptnavigation',
 } as const

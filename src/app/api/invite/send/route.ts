@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { inviteSendSchema, validateBody } from '@/lib/validation'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { logger } from '@/lib/logger'
 import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const resendApiKey = process.env.RESEND_API_KEY
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://hookahtorus.com'
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     const { email, role, organizationId } = validation.data
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseAdmin()
 
     // Verify the authenticated user owns this organization
     const { data: membership } = await supabase

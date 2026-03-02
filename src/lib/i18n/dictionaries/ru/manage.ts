@@ -795,4 +795,8 @@ export const manage = {
   presetThisWeek: 'Эта неделя vs прошлая',
   presetThisMonth: 'Этот месяц vs прошлый',
   presetLast30: 'Последние 30 дней vs предыдущие',
+
+  // A11y
+  waiterGramsLabel: 'Граммовка',
+  toggleActiveLabel: 'Переключить',
 }

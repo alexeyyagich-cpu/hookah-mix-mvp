@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { useGuests } from '@/lib/hooks/useGuests'
 import { useInventory } from '@/lib/hooks/useInventory'
@@ -19,7 +19,7 @@ interface RecentGuestsProps {
   isPro?: boolean
 }
 
-export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) {
+export const RecentGuests = memo(function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) {
   const t = useTranslation('hookah')
   const { recentGuests, loading, isOffline, searchGuests } = useGuests()
   const { inventory, loading: inventoryLoading } = useInventory()
@@ -322,4 +322,4 @@ export function RecentGuests({ onRepeatMix, isPro = false }: RecentGuestsProps) 
       )}
     </div>
   )
-}
+})

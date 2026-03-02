@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   sendMessage, editMessageText, answerCallbackQuery, setMyCommands,
   verifyWebhookSecret, verifyConnectionToken,
@@ -28,16 +29,9 @@ interface TelegramConnection {
   profiles?: { business_name: string | null }
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'
 
 const MAX_MESSAGE_LENGTH = STRIPE_MESSAGE_MAX_LENGTH
-
-function getSupabase(): SupabaseClient | null {
-  if (!supabaseUrl || !supabaseServiceKey) return null
-  return createClient(supabaseUrl, supabaseServiceKey)
-}
 
 // --- Keyboards ---
 
@@ -255,11 +249,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true })
       }
 
-      const supabase = getSupabase()
-      if (!supabase) {
-        await answerCallbackQuery(cq.id, 'Service unavailable')
-        return NextResponse.json({ ok: true })
-      }
+      const supabase = getSupabaseAdmin()
 
       const data = cq.data || ''
 
@@ -359,7 +349,7 @@ export async function POST(request: NextRequest) {
     }
 
     const chatId = message.chat.id
-    const supabase = getSupabase()
+    const supabase = getSupabaseAdmin() as SupabaseClient
 
     // /start with connection token
     if (messageText?.startsWith('/start')) {
@@ -376,8 +366,6 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ ok: true })
         }
 
-        if (!supabase) return NextResponse.json({ ok: true })
-
         const { data: profile } = await supabase
           .from('profiles').select('id, business_name').eq('id', profileId).single()
 
@@ -393,15 +381,16 @@ export async function POST(request: NextRequest) {
           .from('telegram_connections').select('id').eq('profile_id', profileId).single()
 
         if (existing) {
-          await supabase.from('telegram_connections').update({
+          const { error: updateError } = await supabase.from('telegram_connections').update({
             telegram_user_id: message.from?.id,
             telegram_username: message.from?.username || null,
             chat_id: chatId,
             is_active: true,
             updated_at: new Date().toISOString(),
           }).eq('id', existing.id)
+          if (updateError) logger.error('Failed to update telegram connection', { error: String(updateError) })
         } else {
-          await supabase.from('telegram_connections').insert({
+          const { error: insertError } = await supabase.from('telegram_connections').insert({
             profile_id: profileId,
             telegram_user_id: message.from?.id,
             telegram_username: message.from?.username || null,
@@ -412,6 +401,7 @@ export async function POST(request: NextRequest) {
             session_reminders: false,
             daily_summary: false,
           })
+          if (insertError) logger.error('Failed to insert telegram connection', { error: String(insertError) })
         }
 
         // Connected — show welcome + main menu
@@ -421,15 +411,12 @@ export async function POST(request: NextRequest) {
         )
       } else {
         // /start without token — show menu if connected, welcome if not
-        if (supabase) {
-          await sendMainMenu(supabase, chatId)
-        }
+        await sendMainMenu(supabase, chatId)
       }
     }
 
     // Slash commands → show main menu (commands still work via / autocomplete)
     else if (messageText === '/status' || messageText === '/report' || messageText === '/stock' || messageText === '/shift' || messageText === '/help') {
-      if (!supabase) return NextResponse.json({ ok: true })
       const connection = await getConnection(supabase, chatId)
       if (!connection) {
         await sendMessage(chatId, '❌ Not connected. Use the link from app settings.', { parseMode: 'HTML' })
@@ -454,7 +441,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Any other text → show main menu
-    else if (messageText && supabase) {
+    else if (messageText) {
       await sendMainMenu(supabase, chatId)
     }
 

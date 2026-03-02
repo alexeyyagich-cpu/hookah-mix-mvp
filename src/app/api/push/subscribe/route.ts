@@ -1,21 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { pushSubscribeSchema, pushUnsubscribeSchema, validateBody } from '@/lib/validation'
 import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
   const rateCheck = await checkRateLimit(`push-sub:${ip}`, rateLimits.webhook)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
-
-  if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
-    return NextResponse.json({ error: 'Not configured' }, { status: 500 })
-  }
 
   try {
     const auth = await getAuthenticatedUser()
@@ -41,7 +33,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
+    const supabase = getSupabaseAdmin()
 
     await supabase
       .from('push_subscriptions')
@@ -62,10 +54,6 @@ export async function DELETE(request: NextRequest) {
   const ip = getClientIp(request)
   const rateCheck = await checkRateLimit(`push-unsub:${ip}`, rateLimits.webhook)
   if (!rateCheck.success) return rateLimitExceeded(rateCheck.resetIn)
-
-  if (!supabaseUrl || !supabaseServiceKey || !supabaseAnonKey) {
-    return NextResponse.json({ error: 'Not configured' }, { status: 500 })
-  }
 
   try {
     const auth = await getAuthenticatedUser()
@@ -91,7 +79,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const supabase = createClient(supabaseUrl!, supabaseServiceKey!)
+    const supabase = getSupabaseAdmin()
 
     await supabase
       .from('push_subscriptions')

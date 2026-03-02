@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { publicOrderSchema, slugSchema, validateBody } from '@/lib/validation'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { logger } from '@/lib/logger'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 /** Minimum interval (ms) between guest QR orders for the same table */
 const TABLE_ORDER_COOLDOWN_MS = 30_000
@@ -25,10 +22,6 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid slug' }, { status: 400 })
   }
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ error: 'Not configured' }, { status: 500 })
-  }
-
   let body: unknown
   try {
     body = await request.json()
@@ -43,7 +36,7 @@ export async function POST(
 
   const { table_id, guest_name, type, items, notes } = validation.data
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const supabase = getSupabaseAdmin()
 
   // Resolve slug → profile_id
   const { data: profile, error: profileError } = await supabase
@@ -83,7 +76,7 @@ export async function POST(
       table_name: table.name,
       guest_name: guest_name || null,
       type,
-      items,
+      items: items.map(i => ({ ...i, details: i.details ?? null })),
       notes: notes || null,
       source: 'guest_qr',
     })

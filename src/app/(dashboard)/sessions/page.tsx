@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect, useRef, useMemo, useCallback } from 'rea
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useSessions } from '@/lib/hooks/useSessions'
 import { useClickOutside } from '@/lib/hooks/useClickOutside'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { SessionCard } from '@/components/dashboard/SessionCard'
 import { IconSmoke, IconWarning, IconBowl, IconPlus, IconExport, IconLock, IconChart } from '@/components/Icons'
@@ -58,14 +59,8 @@ function SessionsPageInner() {
 
   useEffect(() => () => { clearTimeout(closeTimerRef.current) }, [])
 
-  useEffect(() => {
-    if (!selectedSession) return
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [selectedSession, closeModal])
+  const modalRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(modalRef, !!selectedSession, closeModal)
 
   // Close export menu on outside click
   useClickOutside(exportMenuRef, () => setExportMenuOpen(false))
@@ -224,7 +219,7 @@ function SessionsPageInner() {
       {/* Session Detail Modal */}
       {selectedSession && (
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm ${closingModal ? 'animate-backdropFadeOut' : ''}`}>
-          <div role="dialog" aria-modal="true" aria-labelledby="session-modal-title" className={`w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] ${closingModal ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
+          <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="session-modal-title" className={`w-full max-w-lg bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)] ${closingModal ? 'animate-fadeOutDown' : 'animate-scaleIn'}`}>
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 id="session-modal-title" className="text-xl font-bold">{t.sessionDetails}</h2>
               <button type="button"

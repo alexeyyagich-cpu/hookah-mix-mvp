@@ -139,6 +139,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
+              aria-label={t.mixSortLabel}
               className="px-2 py-1 rounded-lg text-sm"
               style={{
                 background: 'var(--color-bgHover)',

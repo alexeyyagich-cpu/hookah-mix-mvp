@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { useBowls } from '@/lib/hooks/useBowls'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { BowlCard } from '@/components/dashboard/BowlCard'
 import type { BowlType } from '@/types/database'
 import { BOWL_PRESETS } from '@/data/bowls'
@@ -95,6 +96,8 @@ export default function BowlsPage() {
     setModalOpen(true)
   }
 
+  const modalRef = useRef<HTMLDivElement>(null)
+
   const closeModal = useCallback(() => {
     setModalOpen(false)
     setEditingBowl(null)
@@ -102,14 +105,7 @@ export default function BowlsPage() {
     setCapacity('')
   }, [])
 
-  useEffect(() => {
-    if (!modalOpen) return
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal()
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [modalOpen, closeModal])
+  useFocusTrap(modalRef, modalOpen, closeModal)
 
   const [addingPreset, setAddingPreset] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
@@ -223,7 +219,7 @@ export default function BowlsPage() {
       {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div role="dialog" aria-modal="true" aria-labelledby="bowl-modal-title" className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
+          <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="bowl-modal-title" className="w-full max-w-md bg-[var(--color-bgCard)] rounded-2xl border border-[var(--color-border)]">
             <div className="p-6 border-b border-[var(--color-border)] flex items-center justify-between">
               <h2 id="bowl-modal-title" className="text-xl font-bold">
                 {editingBowl ? t.editBowl : t.addBowl}

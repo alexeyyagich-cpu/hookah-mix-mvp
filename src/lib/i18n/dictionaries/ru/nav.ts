@@ -54,4 +54,5 @@ export const nav = {
   closeNav: 'Закрыть меню навигации',
   logoutLabel: 'Выйти из аккаунта',
   proOnlyLabel: (name: string) => `${name} — доступно на тарифе Multi`,
+  sidebarNav: 'Навигация',
 }

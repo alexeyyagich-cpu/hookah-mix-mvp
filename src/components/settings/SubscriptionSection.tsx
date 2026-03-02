@@ -18,6 +18,7 @@ export default function SubscriptionSection() {
   const [activating, setActivating] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
   const msgTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   // Cleanup message timer on unmount
@@ -65,10 +66,12 @@ export default function SubscriptionSection() {
       if (data.url) {
         window.location.href = data.url
       } else {
-        setMessage(tc.error + ': ' + (data.error || ts.portalError))
+        setIsError(true)
+        setMessage(data.error || ts.portalError)
         msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
       }
     } catch {
+      setIsError(true)
       setMessage(ts.portalOpenError)
       msgTimerRef.current = setTimeout(() => setMessage(''), TOAST_TIMEOUT)
     } finally {
@@ -82,7 +85,7 @@ export default function SubscriptionSection() {
     <>
       {message && (
         <div className={`p-4 rounded-lg ${
-          message.includes(tc.error)
+          isError
             ? 'bg-[var(--color-danger)]/10 text-[var(--color-danger)]'
             : 'bg-[var(--color-success)]/10 text-[var(--color-success)]'
         }`}>

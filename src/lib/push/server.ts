@@ -1,5 +1,5 @@
 import webpush from 'web-push'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || ''
@@ -22,11 +22,7 @@ interface PushPayload {
 export async function sendPushToUser(profileId: string, payload: PushPayload): Promise<number> {
   if (!isPushConfigured) return 0
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !supabaseKey) return 0
-
-  const supabase = createClient(supabaseUrl, supabaseKey)
+  const supabase = getSupabaseAdmin()
 
   const { data: subscriptions } = await supabase
     .from('push_subscriptions')

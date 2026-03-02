@@ -13,7 +13,7 @@ const {
   // Set env vars in hoisted block so they're available when the route module loads
   process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
   process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'
-  process.env.NEXT_PUBLIC_BASE_URL = 'https://hookahtorus.com'
+  process.env.NEXT_PUBLIC_APP_URL = 'https://hookahtorus.com'
   process.env.RESEND_API_KEY = 'test-resend-key'
 
   const _mockFetch = vi.fn()
@@ -46,8 +46,8 @@ vi.mock('@/lib/rateLimit', () => ({
 
 let singleCallCount = 0
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: vi.fn(() => {
+vi.mock('@/lib/supabase/admin', () => ({
+  getSupabaseAdmin: vi.fn(() => {
     const builder = {
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),

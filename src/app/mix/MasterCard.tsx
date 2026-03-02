@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { useTranslation } from "@/lib/i18n";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import type { MixItem, MixResult } from "@/logic/mixCalculator";
 
 
@@ -13,6 +15,8 @@ interface MasterCardProps {
 export function MasterCard({ items, result, onClose }: MasterCardProps) {
   const t = useTranslation('hookah');
   const tc = useTranslation('common');
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, true, onClose);
 
   return (
     <div
@@ -21,6 +25,7 @@ export function MasterCard({ items, result, onClose }: MasterCardProps) {
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="master-card-title"

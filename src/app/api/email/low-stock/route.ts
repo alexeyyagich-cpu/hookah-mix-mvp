@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { sendEmail, generateLowStockEmailHtml, isEmailConfigured } from '@/lib/email/resend'
 import { sendPushToUser, isPushConfigured } from '@/lib/push/server'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { emailLowStockSchema, validateBody } from '@/lib/validation'
 import { logger } from '@/lib/logger'
 import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 export async function POST(request: NextRequest) {
   // Rate limiting - strict for email endpoints
@@ -19,10 +16,6 @@ export async function POST(request: NextRequest) {
   }
   if (!isEmailConfigured) {
     return NextResponse.json({ error: 'Email service not configured' }, { status: 503 })
-  }
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return NextResponse.json({ error: 'Supabase not configured' }, { status: 503 })
   }
 
   try {
@@ -48,7 +41,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const supabase = getSupabaseAdmin()
 
     // Get profile and email settings
     const { data: profile, error: profileError } = await supabase

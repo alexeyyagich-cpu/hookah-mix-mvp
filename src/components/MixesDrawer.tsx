@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useTranslation, useLocale } from "@/lib/i18n";
 import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import { useBodyScrollLock } from "@/lib/hooks/useBodyScrollLock";

@@ -86,8 +86,13 @@ export default function TeamPage() {
 
   const handleRoleChange = async (memberId: string, newRole: OrgRole) => {
     setActionLoading(`role-${memberId}`)
-    await updateMemberRole(memberId, newRole)
-    setActionLoading(null)
+    try {
+      await updateMemberRole(memberId, newRole)
+    } catch {
+      toast.error(tc.errorSaving)
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   const handleCancelInvitation = (invitationId: string) => {
@@ -209,6 +214,7 @@ export default function TeamPage() {
                         value={member.role}
                         onChange={(e) => handleRoleChange(member.id, e.target.value as OrgRole)}
                         disabled={actionLoading === `role-${member.id}`}
+                        aria-label={tm.memberRole}
                         className="text-xs px-2 py-1 rounded-lg bg-[var(--color-bgHover)] border border-[var(--color-border)] cursor-pointer"
                       >
                         {INVITABLE_ROLES.map(r => (
@@ -377,7 +383,12 @@ export default function TeamPage() {
                     {profile ? (
                       <button
                         type="button"
-                        onClick={() => toggleTipEnabled(profile.id)}
+                        onClick={async () => {
+                          setActionLoading(`tip-${profile.id}`)
+                          try { await toggleTipEnabled(profile.id) } catch { toast.error(tc.errorSaving) } finally { setActionLoading(null) }
+                        }}
+                        disabled={actionLoading === `tip-${profile.id}`}
+                        aria-pressed={profile.is_tip_enabled}
                         className={`text-xs px-3 py-1 rounded-full font-medium ${
                           profile.is_tip_enabled
                             ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]'
