@@ -65,9 +65,9 @@ export function OfflineIndicator() {
   }
 
   const LABELS: Record<string, string> = {
-    sessions: 'Session',
-    kds_orders: 'KDS Order',
-    tobacco_inventory: 'Inventory',
+    sessions: tc.offline.labelSession,
+    kds_orders: tc.offline.labelKdsOrder,
+    tobacco_inventory: tc.offline.labelInventory,
   }
 
   return (

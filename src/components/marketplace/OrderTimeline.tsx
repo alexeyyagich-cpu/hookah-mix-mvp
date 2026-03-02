@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { OrderStatus } from '@/types/database'
 import { IconPackage, IconCheck, IconTruck, IconClose } from '@/components/Icons'
 import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
@@ -18,7 +19,7 @@ const STATUS_ICONS: { key: OrderStatus; Icon: typeof IconPackage }[] = [
   { key: 'delivered', Icon: IconCheck },
 ]
 
-export function OrderTimeline({
+export const OrderTimeline = memo(function OrderTimeline({
   status,
   createdAt,
   estimatedDeliveryDate,
@@ -122,4 +123,4 @@ export function OrderTimeline({
       </div>
     </div>
   )
-}
+})

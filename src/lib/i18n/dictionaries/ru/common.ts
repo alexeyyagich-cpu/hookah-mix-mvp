@@ -113,6 +113,9 @@ export const common = {
     syncFailed: (count: string) => `${count} изм. не удалось синхронизировать`,
     cachedData: 'Показаны сохранённые данные',
     queuedOffline: 'Сохранено оффлайн',
+    labelSession: 'Сессия',
+    labelKdsOrder: 'Заказ KDS',
+    labelInventory: 'Инвентарь',
   },
 
   // Error page

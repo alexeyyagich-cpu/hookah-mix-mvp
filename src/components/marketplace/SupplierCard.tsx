@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Supplier } from '@/types/database'
@@ -10,7 +11,7 @@ interface SupplierCardProps {
   supplier: Supplier
 }
 
-export function SupplierCard({ supplier }: SupplierCardProps) {
+export const SupplierCard = memo(function SupplierCard({ supplier }: SupplierCardProps) {
   const t = useTranslation('market')
   return (
     <Link
@@ -68,4 +69,4 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
       </div>
     </Link>
   )
-}
+})

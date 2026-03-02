@@ -213,6 +213,7 @@ export default function ReservationsPage() {
                       ) : canEdit ? (
                         <select
                           value=""
+                          aria-label={tm.assignTable}
                           onChange={(e) => {
                             if (e.target.value) assignTable(reservation.id, e.target.value)
                           }}

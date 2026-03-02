@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import type { MarketplaceOrderWithItems, OrderStatus } from '@/types/database'
 import { IconPackage, IconTruck, IconCheck, IconClose, IconChevronRight } from '@/components/Icons'
@@ -17,7 +18,7 @@ const STATUS_STYLE: Record<OrderStatus, { colorClass: string; bgClass: string; I
   cancelled: { colorClass: 'text-[var(--color-danger)]', bgClass: 'bg-[var(--color-danger)]/10', Icon: IconClose },
 }
 
-export function OrderCard({ order }: OrderCardProps) {
+export const OrderCard = memo(function OrderCard({ order }: OrderCardProps) {
   const t = useTranslation('market')
   const { locale } = useLocale()
 
@@ -103,4 +104,4 @@ export function OrderCard({ order }: OrderCardProps) {
       )}
     </Link>
   )
-}
+})

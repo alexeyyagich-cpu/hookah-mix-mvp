@@ -178,6 +178,7 @@ export default function BarRecipesPage() {
         />
         <select
           value={filterMethod}
+          aria-label={tb.methodLabel}
           onChange={e => setFilterMethod(e.target.value as FilterMethod)}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >
@@ -188,6 +189,7 @@ export default function BarRecipesPage() {
         </select>
         <select
           value={filterMenu}
+          aria-label={tb.menuFilterLabel}
           onChange={e => setFilterMenu(e.target.value as FilterMenu)}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >

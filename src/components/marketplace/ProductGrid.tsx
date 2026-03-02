@@ -13,6 +13,7 @@ interface ProductGridProps {
   onAddToCart: (product: SupplierProduct, supplier: Supplier, quantity: number) => void
   getItemQuantity: (productId: string) => number
   canAddToCart: (supplierId: string) => boolean
+  onClearCart?: () => void
   loading?: boolean
 }
 
@@ -23,6 +24,7 @@ export function ProductGrid({
   onAddToCart,
   getItemQuantity,
   canAddToCart,
+  onClearCart,
   loading,
 }: ProductGridProps) {
   const t = useTranslation('market')
@@ -80,6 +82,7 @@ export function ProductGrid({
           <input
             type="text"
             placeholder={t.searchByBrandOrFlavor}
+            aria-label={t.searchByBrandOrFlavor}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input pl-10 w-full"
@@ -89,6 +92,7 @@ export function ProductGrid({
         {/* Brand filter */}
         <select
           value={selectedBrand}
+          aria-label={t.allBrands}
           onChange={(e) => setSelectedBrand(e.target.value)}
           className="input w-full sm:w-48"
         >
@@ -115,12 +119,14 @@ export function ProductGrid({
         <div className="card p-4 border-[var(--color-warning)]/50 bg-[var(--color-warning)]/5">
           <p className="text-sm">
             {t.otherSupplierWarning}
-            <button type="button"
-              onClick={() => {/* Clear cart handled in parent */}}
-              className="ml-2 text-[var(--color-primary)] underline"
-            >
-              {t.clearCartToAdd}
-            </button>
+            {onClearCart && (
+              <button type="button"
+                onClick={onClearCart}
+                className="ml-2 text-[var(--color-primary)] underline"
+              >
+                {t.clearCartToAdd}
+              </button>
+            )}
             {t.toAddFromThisSupplier}
           </p>
         </div>

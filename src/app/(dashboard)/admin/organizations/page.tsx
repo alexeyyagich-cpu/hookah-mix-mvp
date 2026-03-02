@@ -216,6 +216,7 @@ export default function AdminOrganizations() {
                   )}
                   <select
                     value=""
+                    aria-label="Change subscription tier"
                     onChange={e => {
                       if (e.target.value) changeTier(org.id, e.target.value as SubscriptionTier)
                     }}

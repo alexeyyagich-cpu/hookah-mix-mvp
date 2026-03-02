@@ -118,6 +118,7 @@ export default function BarMenuPage() {
         </div>
         <select
           value={groupBy}
+          aria-label={tb.groupByLabel}
           onChange={e => setGroupBy(e.target.value as 'method' | 'none')}
           className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
         >

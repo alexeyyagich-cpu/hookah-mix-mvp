@@ -103,6 +103,9 @@ export const common: typeof CommonType = {
     syncFailed: (count: string) => `${count} Änderungen fehlgeschlagen`,
     cachedData: 'Gespeicherte Daten werden angezeigt',
     queuedOffline: 'Offline gespeichert',
+    labelSession: 'Sitzung',
+    labelKdsOrder: 'KDS-Bestellung',
+    labelInventory: 'Inventar',
   },
 
   errorPage: {

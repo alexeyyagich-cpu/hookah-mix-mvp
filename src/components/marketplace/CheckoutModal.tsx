@@ -112,7 +112,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onConfirm }: CheckoutModa
                   {t.trackInOrders}
                 </p>
                 <button type="button" onClick={() => { clearTimeout(timerRef.current); handleClose() }} className="btn btn-primary mt-4 w-full">
-                  {tc.close || 'Close'}
+                  {tc.close}
                 </button>
               </div>
             ) : (

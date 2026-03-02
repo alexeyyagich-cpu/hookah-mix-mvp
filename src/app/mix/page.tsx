@@ -723,6 +723,7 @@ function MixPageInner() {
                 <div className="relative inline-block">
                   <select
                     value={selectedBrand ?? ""}
+                    aria-label={t.allBrands}
                     onChange={e => setSelectedBrand(e.target.value || null)}
                     className="filter-select"
                     style={{
@@ -743,6 +744,7 @@ function MixPageInner() {
                 <div className="relative inline-block">
                   <select
                     value={selectedCategory ?? ""}
+                    aria-label={t.mixFlavorFilter}
                     onChange={e => setSelectedCategory((e.target.value || null) as Category | null)}
                     className="filter-select"
                     style={{

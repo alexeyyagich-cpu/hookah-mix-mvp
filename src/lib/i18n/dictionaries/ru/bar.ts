@@ -320,4 +320,7 @@ export const bar = {
 
   // Approaching limit warnings
   approachingBarLimit: (current: number, max: number) => `${current}/${max} ингредиентов — приближаетесь к лимиту`,
+  groupByLabel: 'Группировка',
+  menuFilterLabel: 'Фильтр меню',
+  periodLabel: 'Период',
 }

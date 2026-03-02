@@ -121,6 +121,7 @@ export default function BarSalesPage() {
 
           <select
             value={period}
+            aria-label={tb.periodLabel}
             onChange={e => setPeriod(Number(e.target.value) as Period)}
             className="px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none text-sm"
           >

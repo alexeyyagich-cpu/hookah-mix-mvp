@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation, useLocale, getLocaleName, formatCurrency } from '@/lib/i18n'
 import type { BarRecipeWithIngredients, RecipeCost } from '@/types/database'
 import { COCKTAIL_METHOD_EMOJI } from '@/data/bar-recipes'
@@ -13,7 +14,7 @@ interface RecipeCardProps {
   onDelete: () => void
 }
 
-export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdit, onDelete }: RecipeCardProps) {
+export const RecipeCard = memo(function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdit, onDelete }: RecipeCardProps) {
   const t = useTranslation('bar')
   const { locale } = useLocale()
 
@@ -142,4 +143,4 @@ export function RecipeCard({ recipe, cost, onToggleMenu, onToggleFavorite, onEdi
       </div>
     </div>
   )
-}
+})

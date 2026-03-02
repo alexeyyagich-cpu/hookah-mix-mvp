@@ -315,4 +315,7 @@ export const bar: typeof BarType = {
 
   // Approaching limit warnings
   approachingBarLimit: (current: number, max: number) => `${current}/${max} Zutaten — Limit fast erreicht`,
+  groupByLabel: 'Gruppierung',
+  menuFilterLabel: 'Menüfilter',
+  periodLabel: 'Zeitraum',
 } as const
