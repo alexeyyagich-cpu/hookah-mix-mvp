@@ -203,6 +203,7 @@ export default function AdminOrganizations() {
                 <div className="flex gap-2 flex-shrink-0">
                   {org.subscription_tier === 'trial' && (
                     <button
+                      type="button"
                       onClick={() => extendTrial(org.id)}
                       disabled={actionLoading === org.id}
                       className="text-xs px-3 py-1.5 rounded-lg font-medium"

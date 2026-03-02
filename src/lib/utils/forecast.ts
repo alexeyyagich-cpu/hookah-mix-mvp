@@ -90,18 +90,28 @@ export function calculateForecast(
   }
 }
 
+export interface ForecastTranslations {
+  forecastOutOfStock: string
+  forecastDay: string
+  forecastDays: string
+  forecastWeek: string
+  forecastWeeks: string
+  forecastMonth: string
+  forecastMonths: string
+}
+
 /**
  * Format forecast days for display
  */
-export function formatForecastDays(days: number | null): string {
+export function formatForecastDays(days: number | null, t: ForecastTranslations): string {
   if (days === null) return '∞'
-  if (days <= 0) return 'Out of stock'
-  if (days === 1) return '~1 day'
-  if (days < 7) return `~${days} days`
-  if (days < 14) return '~1 week'
-  if (days < 30) return `~${Math.round(days / 7)} weeks`
-  if (days < 60) return '~1 month'
-  return `~${Math.round(days / 30)} months`
+  if (days <= 0) return t.forecastOutOfStock
+  if (days === 1) return t.forecastDay.replace('{n}', '1')
+  if (days < 7) return t.forecastDays.replace('{n}', String(days))
+  if (days < 14) return t.forecastWeek.replace('{n}', '1')
+  if (days < 30) return t.forecastWeeks.replace('{n}', String(Math.round(days / 7)))
+  if (days < 60) return t.forecastMonth.replace('{n}', '1')
+  return t.forecastMonths.replace('{n}', String(Math.round(days / 30)))
 }
 
 /**

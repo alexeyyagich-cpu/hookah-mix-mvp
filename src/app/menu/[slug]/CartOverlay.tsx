@@ -42,11 +42,12 @@ export function CartOverlay({
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="cart-overlay-title"
         className="bg-[var(--color-bgCard)] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         <div className="p-6">
-          <h3 className="text-xl font-bold mb-4">{t.cartSummary}</h3>
+          <h3 id="cart-overlay-title" className="text-xl font-bold mb-4">{t.cartSummary}</h3>
 
           {/* Cart items */}
           <div className="space-y-3 mb-6">

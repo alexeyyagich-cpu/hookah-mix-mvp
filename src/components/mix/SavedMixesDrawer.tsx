@@ -79,6 +79,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
         ref={drawerRef}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="saved-mixes-title"
         className="fixed right-0 top-0 h-full w-full max-w-md z-[70] animate-slideInRight overflow-hidden flex flex-col"
         style={{
           background: 'var(--color-bgCard)',
@@ -91,7 +92,7 @@ export function SavedMixesDrawer({ isOpen, onClose, onSelectMix }: SavedMixesDra
           style={{ borderColor: 'var(--color-border)' }}
         >
           <div>
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+            <h2 id="saved-mixes-title" className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
               {t.mixMyMixes}
             </h2>
             <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>

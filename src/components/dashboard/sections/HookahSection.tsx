@@ -26,6 +26,7 @@ import { LOW_STOCK_THRESHOLD } from '@/lib/constants'
 
 export function HookahSection() {
   const t = useTranslation('manage')
+  const th = useTranslation('hookah')
   const { locale } = useLocale()
   const { inventory } = useInventory()
   const { sessions } = useSessions()
@@ -254,7 +255,7 @@ export function HookahSection() {
                       className="text-sm font-medium"
                       style={{ color: colorVar }}
                     >
-                      {formatForecastDays(item.forecast.daysUntilEmpty)}
+                      {formatForecastDays(item.forecast.daysUntilEmpty, th)}
                     </span>
                   </div>
                 </div>

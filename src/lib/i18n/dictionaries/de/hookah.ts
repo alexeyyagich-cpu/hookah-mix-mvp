@@ -126,6 +126,13 @@ export const hookah: typeof HookahType = {
   confidenceLabel: (level: string) =>
     `Zuverlässigkeit: ${level === 'high' ? 'hoch' : 'mittel'}`,
   confidenceLow: 'Wenig Daten',
+  forecastOutOfStock: 'Nicht vorrätig',
+  forecastDay: '~{n} Tag',
+  forecastDays: '~{n} Tage',
+  forecastWeek: '~{n} Woche',
+  forecastWeeks: '~{n} Wochen',
+  forecastMonth: '~{n} Monat',
+  forecastMonths: '~{n} Monate',
   orderAction: 'Bestellen',
 
   // Sessions page

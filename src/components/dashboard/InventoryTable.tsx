@@ -220,7 +220,7 @@ export function InventoryTable({ inventory, forecasts, lowStockThreshold = LOW_S
                                 style={{ color: colorVar }}
                                 title={forecast.confidence !== 'low' ? t.confidenceLabel(forecast.confidence) : t.confidenceLow}
                               >
-                                {formatForecastDays(forecast.daysUntilEmpty)}
+                                {formatForecastDays(forecast.daysUntilEmpty, t)}
                               </span>
                             )
                           })()}

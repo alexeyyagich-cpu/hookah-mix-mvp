@@ -132,6 +132,13 @@ export const hookah = {
   confidenceLabel: (level: string) =>
     `Уверенность: ${level === 'high' ? 'высокая' : 'средняя'}`,
   confidenceLow: 'Мало данных',
+  forecastOutOfStock: 'Нет в наличии',
+  forecastDay: '~{n} день',
+  forecastDays: '~{n} дн.',
+  forecastWeek: '~{n} нед.',
+  forecastWeeks: '~{n} нед.',
+  forecastMonth: '~{n} мес.',
+  forecastMonths: '~{n} мес.',
   orderAction: 'Заказать',
 
   // Sessions page

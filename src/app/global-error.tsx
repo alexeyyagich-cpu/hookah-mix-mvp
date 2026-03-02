@@ -15,7 +15,7 @@ export default function GlobalError({
   }, [error])
 
   return (
-    <html lang="de">
+    <html lang="en">
       <body>
         <div style={{
           display: 'flex',
@@ -27,7 +27,7 @@ export default function GlobalError({
           padding: '2rem',
           textAlign: 'center',
         }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Something went wrong</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Something went wrong / Etwas ist schiefgelaufen / Что-то пошло не так</h2>
           <button
             onClick={reset}
             style={{
@@ -40,7 +40,7 @@ export default function GlobalError({
               fontSize: '1rem',
             }}
           >
-            Try again
+            Try again / Erneut versuchen / Попробовать снова
           </button>
         </div>
       </body>

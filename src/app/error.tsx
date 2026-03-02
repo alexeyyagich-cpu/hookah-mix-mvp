@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n'
 
@@ -14,7 +15,7 @@ export default function GlobalError({
   const tc = useTranslation('common')
 
   useEffect(() => {
-    console.error('Unhandled error:', error)
+    Sentry.captureException(error)
   }, [error])
 
   return (

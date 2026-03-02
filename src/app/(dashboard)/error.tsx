@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { useTranslation } from '@/lib/i18n'
 
 export default function DashboardError({
@@ -13,7 +14,7 @@ export default function DashboardError({
   const tc = useTranslation('common')
 
   useEffect(() => {
-    console.error('Dashboard error:', error)
+    Sentry.captureException(error)
   }, [error])
 
   return (
@@ -21,7 +22,7 @@ export default function DashboardError({
       <div className="card p-8 text-center max-w-md">
         <h1 className="text-xl font-bold mb-2">{tc.errorGeneric}</h1>
         <p className="text-sm text-[var(--color-textMuted)] mb-4">
-          {error.message || tc.errorPage.description}
+          {tc.errorPage.description}
         </p>
         <button type="button" onClick={reset} className="btn btn-primary">
           {tc.retry}

@@ -180,9 +180,11 @@ export default function LoungePageClient({ params }: { params: Promise<{ slug: s
             {/* Logo */}
             <div className="flex-shrink-0">
               {lounge.logo_url ? (
-                <img
+                <Image
                   src={lounge.logo_url}
                   alt={lounge.name}
+                  width={96}
+                  height={96}
                   className="w-24 h-24 rounded-2xl object-cover border-4 border-[var(--color-bg)]"
                 />
               ) : (
