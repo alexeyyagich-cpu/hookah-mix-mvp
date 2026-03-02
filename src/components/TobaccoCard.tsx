@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/lib/i18n";
 import { type Tobacco, getFlavorImage } from "@/data/tobaccos";
@@ -51,7 +51,7 @@ type Props = {
 // COMPONENT
 // =============================================================================
 
-export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: Props) {
+const TobaccoCard = memo(function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: Props) {
   const tc = useTranslation('common');
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -224,4 +224,6 @@ export default function TobaccoCard({ tobacco, isActive, isDisabled, onClick }: 
       )}
     </button>
   );
-}
+})
+
+export default TobaccoCard

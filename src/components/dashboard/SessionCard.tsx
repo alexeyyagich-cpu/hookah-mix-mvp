@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation, useLocale, formatDateTime } from '@/lib/i18n'
 import type { SessionWithItems } from '@/types/database'
 
@@ -10,7 +11,7 @@ interface SessionCardProps {
   onRate: (id: string, rating: number) => void
 }
 
-export function SessionCard({ session, onView, onDelete, onRate }: SessionCardProps) {
+export const SessionCard = memo(function SessionCard({ session, onView, onDelete, onRate }: SessionCardProps) {
   const t = useTranslation('hookah')
   const { locale } = useLocale()
   const formattedDate = formatDateTime(session.session_date, locale)
@@ -106,4 +107,4 @@ export function SessionCard({ session, onView, onDelete, onRate }: SessionCardPr
       </div>
     </div>
   )
-}
+})

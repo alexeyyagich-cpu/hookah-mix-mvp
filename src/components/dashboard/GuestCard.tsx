@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Guest, LoyaltyTier } from '@/types/database'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import { IconStar, IconCoin } from '@/components/Icons'
@@ -22,7 +23,7 @@ interface GuestCardProps {
   onClick: () => void
 }
 
-export function GuestCard({ guest, onClick }: GuestCardProps) {
+export const GuestCard = memo(function GuestCard({ guest, onClick }: GuestCardProps) {
   const tm = useTranslation('manage')
   const { locale } = useLocale()
 
@@ -78,4 +79,4 @@ export function GuestCard({ guest, onClick }: GuestCardProps) {
       )}
     </button>
   )
-}
+})
