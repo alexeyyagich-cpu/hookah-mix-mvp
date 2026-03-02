@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import type { FloorTable, TableStatus } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
@@ -10,7 +11,7 @@ interface FloorMiniMapProps {
   tm: Dictionary['manage']
 }
 
-export function FloorMiniMap({ tables, tm }: FloorMiniMapProps) {
+export const FloorMiniMap = memo(function FloorMiniMap({ tables, tm }: FloorMiniMapProps) {
   if (tables.length === 0) return null
 
   return (
@@ -45,4 +46,4 @@ export function FloorMiniMap({ tables, tm }: FloorMiniMapProps) {
       </div>
     </div>
   )
-}
+})

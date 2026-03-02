@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { SUBSCRIPTION_LIMITS, type SubscriptionTier } from '@/types/database'
 
 export type SubscriptionFeature = keyof typeof SUBSCRIPTION_LIMITS.core
@@ -33,8 +34,7 @@ export function featureNotAvailable(feature: string) {
  * Returns 'trial' if profile not found.
  */
 export async function getUserTier(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
+  supabase: SupabaseClient,
   userId: string
 ): Promise<SubscriptionTier> {
   const { data } = await supabase

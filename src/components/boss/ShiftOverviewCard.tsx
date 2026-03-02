@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import type { Shift, ShiftReconciliation } from '@/types/database'
 import { useLocale, formatCurrency } from '@/lib/i18n'
@@ -21,7 +22,7 @@ function formatDuration(ms: number): string {
   return `${hours}h ${minutes}m`
 }
 
-export function ShiftOverviewCard({ activeShift, reconciliation, shiftDurationMs, onQuickOpen, opening, tm }: ShiftOverviewCardProps) {
+export const ShiftOverviewCard = memo(function ShiftOverviewCard({ activeShift, reconciliation, shiftDurationMs, onQuickOpen, opening, tm }: ShiftOverviewCardProps) {
   const { locale } = useLocale()
 
   if (!activeShift) {
@@ -95,4 +96,4 @@ export function ShiftOverviewCard({ activeShift, reconciliation, shiftDurationMs
       </div>
     </div>
   )
-}
+})

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { memo, useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import type { TobaccoInventory, KdsOrder, Shift, ShiftReconciliation } from '@/types/database'
 import { useLocale, formatCurrency } from '@/lib/i18n'
@@ -28,7 +28,7 @@ interface Alert {
   emoji: string
 }
 
-export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, shifts, getReconciliation, tm }: AlertsPanelProps) {
+export const AlertsPanel = memo(function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, shifts, getReconciliation, tm }: AlertsPanelProps) {
   const { locale } = useLocale()
   const [cashShortageAlert, setCashShortageAlert] = useState<Alert | null>(null)
   const tmRef = useRef(tm)
@@ -162,4 +162,4 @@ export function AlertsPanel({ inventory, lowStockThreshold, kdsOrders, reviews, 
       )}
     </div>
   )
-}
+})

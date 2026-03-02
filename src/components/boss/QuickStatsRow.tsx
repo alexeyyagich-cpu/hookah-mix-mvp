@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Session, KdsOrder, Tip } from '@/types/database'
 import { useLocale, formatCurrency } from '@/lib/i18n'
 import type { Dictionary } from '@/lib/i18n'
@@ -13,7 +14,7 @@ interface QuickStatsRowProps {
   tm: Dictionary['manage']
 }
 
-export function QuickStatsRow({ sessions, avgRating, tips, kdsOrders, todayStr, tm }: QuickStatsRowProps) {
+export const QuickStatsRow = memo(function QuickStatsRow({ sessions, avgRating, tips, kdsOrders, todayStr, tm }: QuickStatsRowProps) {
   const { locale } = useLocale()
   const todaySessions = sessions.filter(s => s.session_date.startsWith(todayStr)).length
   const todayTips = tips
@@ -38,4 +39,4 @@ export function QuickStatsRow({ sessions, avgRating, tips, kdsOrders, todayStr, 
       ))}
     </div>
   )
-}
+})

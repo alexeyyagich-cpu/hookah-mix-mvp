@@ -880,6 +880,7 @@ function MixPageInner() {
                         max={100}
                         value={it.percent}
                         onChange={(e) => normalizePercents(it.tobacco.id, Number(e.target.value))}
+                        aria-label={it.tobacco.flavor}
                         style={{ ["--slider-color" as string]: it.tobacco.color }}
                       />
                     </div>

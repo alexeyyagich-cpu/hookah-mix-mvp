@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Link from 'next/link'
 import type { Shift, FloorTable, KdsOrder } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
@@ -19,7 +20,7 @@ function formatDurationShort(ms: number): string {
   return `${hours}h ${minutes}m`
 }
 
-export function LiveStatusBar({ activeShift, tables, kdsOrders, shiftDurationMs, tm }: LiveStatusBarProps) {
+export const LiveStatusBar = memo(function LiveStatusBar({ activeShift, tables, kdsOrders, shiftDurationMs, tm }: LiveStatusBarProps) {
   const occupied = tables.filter(t => t.status === 'occupied').length
   const totalTables = tables.length
   const activeOrders = kdsOrders.length
@@ -55,4 +56,4 @@ export function LiveStatusBar({ activeShift, tables, kdsOrders, shiftDurationMs,
       </Link>
     </div>
   )
-}
+})

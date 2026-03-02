@@ -67,12 +67,15 @@ export function GuestModal({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guest-modal-title"
         className="w-full max-w-md rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
         style={{ background: 'var(--color-bg)' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+          <h2 id="guest-modal-title" className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
             {initialData ? t.guestModalEditTitle : t.guestModalNewTitle}
           </h2>
           <button
@@ -88,10 +91,11 @@ export function GuestModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
           <div>
-            <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
+            <label htmlFor="guest-name" className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
               {t.guestModalNameLabel}
             </label>
             <input
+              id="guest-name"
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
@@ -108,10 +112,11 @@ export function GuestModal({
 
           {/* Phone */}
           <div>
-            <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
+            <label htmlFor="guest-phone" className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
               {t.guestModalPhoneLabel}
             </label>
             <input
+              id="guest-phone"
               type="tel"
               value={phone}
               onChange={e => setPhone(e.target.value)}
@@ -185,10 +190,11 @@ export function GuestModal({
 
           {/* Notes */}
           <div>
-            <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
+            <label htmlFor="guest-notes" className="text-sm font-medium mb-2 block" style={{ color: 'var(--color-textMuted)' }}>
               {t.guestModalNotesLabel}
             </label>
             <textarea
+              id="guest-notes"
               value={notes}
               onChange={e => setNotes(e.target.value)}
               placeholder={t.guestModalNotesPlaceholder}

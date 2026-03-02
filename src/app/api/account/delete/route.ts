@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { stripe } from '@/lib/stripe'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { logger } from '@/lib/logger'
 import { checkRateLimit, getClientIp, rateLimits, rateLimitExceeded } from '@/lib/rateLimit'
 import { getAuthenticatedUser } from '@/lib/supabase/apiAuth'
@@ -30,10 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid confirmation' }, { status: 400 })
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Load profile to check for Stripe subscription
     const { data: profile } = await supabaseAdmin

@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Session, BarSale } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
 import { useLocale, formatCurrency } from '@/lib/i18n'
@@ -12,7 +13,7 @@ interface RevenueCardProps {
   tm: Dictionary['manage']
 }
 
-export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: RevenueCardProps) {
+export const RevenueCard = memo(function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: RevenueCardProps) {
   const { locale } = useLocale()
   const todayHookah = sessions
     .filter(s => s.session_date.startsWith(todayStr) && s.selling_price)
@@ -71,4 +72,4 @@ export function RevenueCard({ sessions, sales, todayStr, yesterdayStr, tm }: Rev
       )}
     </div>
   )
-}
+})

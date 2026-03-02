@@ -780,6 +780,7 @@ export default function RecommendPage() {
                       max={100}
                       value={percent}
                       onChange={(e) => updatePercent(tobacco.id, Number(e.target.value))}
+                      aria-label={tobacco.flavor}
                       style={{ ['--slider-color' as string]: tobacco.color }}
                     />
                   </div>

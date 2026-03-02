@@ -3,6 +3,7 @@
 import { useTranslation } from "@/lib/i18n";
 import type { MixItem, MixResult } from "@/logic/mixCalculator";
 
+
 interface MasterCardProps {
   items: MixItem[];
   result: MixResult;
@@ -11,6 +12,7 @@ interface MasterCardProps {
 
 export function MasterCard({ items, result, onClose }: MasterCardProps) {
   const t = useTranslation('hookah');
+  const tc = useTranslation('common');
 
   return (
     <div
@@ -19,13 +21,16 @@ export function MasterCard({ items, result, onClose }: MasterCardProps) {
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="master-card-title"
         className="w-full max-w-sm rounded-3xl p-6 animate-fadeInUp"
         style={{ background: 'var(--color-bgCard)', border: '1px solid var(--color-border)' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="text-center mb-5">
-          <p className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
+          <p id="master-card-title" className="text-lg font-bold" style={{ color: 'var(--color-text)' }}>
             {t.guestMixSummary}
           </p>
           <p className="text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
@@ -74,7 +79,7 @@ export function MasterCard({ items, result, onClose }: MasterCardProps) {
           className="w-full py-3 rounded-xl text-sm font-semibold"
           style={{ background: 'var(--color-primary)', color: 'var(--color-bg)' }}
         >
-          OK
+          {tc.ok}
         </button>
       </div>
     </div>

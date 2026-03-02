@@ -438,15 +438,16 @@ export default function TeamPage() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="card w-full max-w-md p-6">
-            <h2 className="text-xl font-bold mb-4">{tm.inviteMember}</h2>
+          <div role="dialog" aria-modal="true" aria-labelledby="invite-modal-title" className="card w-full max-w-md p-6">
+            <h2 id="invite-modal-title" className="text-xl font-bold mb-4">{tm.inviteMember}</h2>
 
             <form onSubmit={handleInvite} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label htmlFor="invite-email" className="block text-sm font-medium mb-2">
                   {tm.staffEmailLabel}
                 </label>
                 <input
+                  id="invite-email"
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}

@@ -24,6 +24,9 @@ export function GuestDrawer({ onClose, onRepeatMix, isPro }: GuestDrawerProps) {
       />
       {/* Drawer */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guest-drawer-title"
         className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[70] overflow-y-auto animate-slideInRight"
         style={{
           background: "var(--color-bg)",
@@ -32,7 +35,7 @@ export function GuestDrawer({ onClose, onRepeatMix, isPro }: GuestDrawerProps) {
       >
         <div className="sticky top-0 z-10 p-4 flex items-center justify-between border-b" style={{ background: "var(--color-bg)", borderColor: "var(--color-border)" }}>
           <div>
-            <h2 className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
+            <h2 id="guest-drawer-title" className="text-lg font-semibold" style={{ color: "var(--color-text)" }}>
               {t.mixQuickRepeat}
             </h2>
             <p className="text-xs" style={{ color: "var(--color-textMuted)" }}>

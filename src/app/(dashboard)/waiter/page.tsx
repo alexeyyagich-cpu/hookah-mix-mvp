@@ -57,6 +57,7 @@ export default function WaiterPage() {
   const [sent, setSent] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const errorTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const sentTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const selectedTable = tables.find(t => t.id === selectedTableId)
 
@@ -204,7 +205,8 @@ export default function WaiterPage() {
       setGuestName('')
       setCartExpanded(false)
       setSent(true)
-      setTimeout(() => setSent(false), 2000)
+      clearTimeout(sentTimerRef.current)
+      sentTimerRef.current = setTimeout(() => setSent(false), 2000)
     } catch {
       setSubmitError(th.orderError)
       clearTimeout(errorTimerRef.current ?? undefined)

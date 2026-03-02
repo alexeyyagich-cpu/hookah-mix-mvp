@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { SessionWithItems, BarSale, KdsOrder, Tip } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
 import { useLocale, formatCurrency } from '@/lib/i18n'
@@ -42,7 +43,7 @@ function timeAgo(isoDate: string, tm: Dictionary['manage']): string {
   return tm.bossTimeAgo(days, 'd')
 }
 
-export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: ActivityFeedProps) {
+export const ActivityFeed = memo(function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: ActivityFeedProps) {
   const { locale } = useLocale()
   const events: ActivityEvent[] = []
 
@@ -132,4 +133,4 @@ export function ActivityFeed({ sessions, sales, kdsOrders, reviews, tips, tm }: 
       )}
     </div>
   )
-}
+})
