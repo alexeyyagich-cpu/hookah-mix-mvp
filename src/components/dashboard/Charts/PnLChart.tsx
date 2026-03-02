@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { PnLLineItem } from '@/lib/hooks/usePnL'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 
@@ -8,7 +9,7 @@ interface PnLChartProps {
   showHookah?: boolean
 }
 
-export function PnLChart({ data, showHookah = true }: PnLChartProps) {
+export const PnLChart = memo(function PnLChart({ data, showHookah = true }: PnLChartProps) {
   const t = useTranslation('manage')
   const { locale } = useLocale()
 
@@ -112,4 +113,4 @@ export function PnLChart({ data, showHookah = true }: PnLChartProps) {
       </div>
     </div>
   )
-}
+})

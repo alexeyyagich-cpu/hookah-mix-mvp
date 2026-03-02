@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconWarning } from '@/components/Icons'
 import Link from 'next/link'
@@ -9,7 +10,7 @@ interface Props {
   items: LowStockItem[]
 }
 
-export function LowStockAlertPanel({ items }: Props) {
+export const LowStockAlertPanel = memo(function LowStockAlertPanel({ items }: Props) {
   const t = useTranslation('manage')
 
   return (
@@ -61,4 +62,4 @@ export function LowStockAlertPanel({ items }: Props) {
       </div>
     </div>
   )
-}
+})

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/AuthContext'
 import { useOrganizationContext } from '@/lib/hooks/useOrganization'
@@ -116,7 +116,7 @@ export function useTeam(): UseTeamReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const loadTeam = useCallback(async () => {
     if (!user) {
@@ -173,7 +173,7 @@ export function useTeam(): UseTeamReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, isDemoMode, organizationId, supabase])
+  }, [user, isDemoMode, organizationId])
 
   useEffect(() => {
     loadTeam()

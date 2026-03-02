@@ -1,16 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { mockCreateClient } = vi.hoisted(() => {
+const { mockGetSupabaseAdmin } = vi.hoisted(() => {
   process.env.R2O_WEBHOOK_SECRET = 'test-webhook-secret'
-  process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
-  process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'
   return {
-    mockCreateClient: vi.fn(),
+    mockGetSupabaseAdmin: vi.fn(),
   }
 })
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: (...args: unknown[]) => mockCreateClient(...args),
+vi.mock('@/lib/supabase/admin', () => ({
+  getSupabaseAdmin: () => mockGetSupabaseAdmin(),
 }))
 
 vi.mock('@/lib/logger', () => ({
@@ -92,14 +90,14 @@ describe('POST /api/r2o/webhooks', () => {
 
   it('returns 400 when missing event or accountId', async () => {
     const supabase = makeMockSupabase()
-    mockCreateClient.mockReturnValue(supabase)
+    mockGetSupabaseAdmin.mockReturnValue(supabase)
     const res = await POST(makeRequest({ event: 'invoice.created' }))
     expect(res.status).toBe(400)
   })
 
   it('returns received:true when no connection found', async () => {
     const supabase = makeMockSupabase({ connection: null })
-    mockCreateClient.mockReturnValue(supabase)
+    mockGetSupabaseAdmin.mockReturnValue(supabase)
     const res = await POST(makeRequest({ event: 'invoice.created', accountId: 'unknown-123' }))
     const json = await res.json()
     expect(res.status).toBe(200)
@@ -108,7 +106,7 @@ describe('POST /api/r2o/webhooks', () => {
 
   it('returns received:true for non-invoice events', async () => {
     const supabase = makeMockSupabase({ connection: { profile_id: 'user-123' } })
-    mockCreateClient.mockReturnValue(supabase)
+    mockGetSupabaseAdmin.mockReturnValue(supabase)
     const res = await POST(makeRequest({ event: 'product.updated', accountId: 'acc-123' }))
     const json = await res.json()
     expect(res.status).toBe(200)
@@ -117,7 +115,7 @@ describe('POST /api/r2o/webhooks', () => {
 
   it('returns received:true when invoice_id is missing', async () => {
     const supabase = makeMockSupabase({ connection: { profile_id: 'user-123' } })
-    mockCreateClient.mockReturnValue(supabase)
+    mockGetSupabaseAdmin.mockReturnValue(supabase)
     const res = await POST(makeRequest({
       event: 'invoice.created',
       accountId: 'acc-123',

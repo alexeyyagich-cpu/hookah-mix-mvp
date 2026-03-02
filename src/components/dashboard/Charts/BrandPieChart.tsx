@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 interface BrandData {
@@ -44,7 +45,7 @@ const COLORS = [
   '#84CC16', // lime
 ]
 
-export function BrandPieChart({ data }: BrandPieChartProps) {
+export const BrandPieChart = memo(function BrandPieChart({ data }: BrandPieChartProps) {
   const t = useTranslation('manage')
 
   if (!data || data.length === 0) {
@@ -127,4 +128,4 @@ export function BrandPieChart({ data }: BrandPieChartProps) {
       </div>
     </div>
   )
-}
+})

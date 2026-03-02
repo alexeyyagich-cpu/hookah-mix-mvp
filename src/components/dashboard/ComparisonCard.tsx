@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { memo, ReactNode } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 interface ComparisonCardProps {
@@ -13,7 +13,7 @@ interface ComparisonCardProps {
   invertColor?: boolean  // For cases where negative is good
 }
 
-export function ComparisonCard({
+export const ComparisonCard = memo(function ComparisonCard({
   icon,
   label,
   periodAValue,
@@ -72,4 +72,4 @@ export function ComparisonCard({
       </div>
     </div>
   )
-}
+})

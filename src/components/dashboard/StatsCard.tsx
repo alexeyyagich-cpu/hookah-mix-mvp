@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { memo, ReactNode } from 'react'
 
 interface StatsCardProps {
   icon: ReactNode
@@ -33,7 +33,7 @@ const bgClasses = {
   danger: 'bg-[var(--color-danger)]/10',
 }
 
-export function StatsCard({ icon, label, value, subtext, trend, color = 'primary' }: StatsCardProps) {
+export const StatsCard = memo(function StatsCard({ icon, label, value, subtext, trend, color = 'primary' }: StatsCardProps) {
 
   return (
     <div
@@ -67,4 +67,4 @@ export function StatsCard({ icon, label, value, subtext, trend, color = 'primary
       )}
     </div>
   )
-}
+})

@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 
 interface FlavorData {
@@ -13,7 +14,7 @@ interface PopularFlavorsChartProps {
   data: FlavorData[]
 }
 
-export function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
+export const PopularFlavorsChart = memo(function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
   const t = useTranslation('manage')
 
   if (!data || data.length === 0) {
@@ -68,4 +69,4 @@ export function PopularFlavorsChart({ data }: PopularFlavorsChartProps) {
       })}
     </div>
   )
-}
+})

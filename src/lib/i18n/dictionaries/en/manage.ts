@@ -635,6 +635,8 @@ export const manage: typeof ManageType = {
   bossProRequiredDesc: 'Real-time venue monitoring and alerts are available on the Multi plan.',
   bossRefreshing: 'Refreshing...',
   bossLastUpdated: (time: string) => `Updated ${time}`,
+  bossCash: 'Cash',
+  bossBarSales: 'Bar Sales',
 
   // Mobile Waiter
   waiterTitle: 'Waiter',

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { timingSafeEqual } from 'crypto'
 import type { R2OWebhookEvent } from '@/lib/ready2order/types'
 import { logger } from '@/lib/logger'
@@ -32,10 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid webhook payload' }, { status: 400 })
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Find the profile associated with this r2o account by accountId (direct lookup)
     const { data: connection } = await supabaseAdmin

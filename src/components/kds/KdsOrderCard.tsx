@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconTimer, IconCocktail, IconBowl, IconClose } from '@/components/Icons'
 import type { KdsOrder, KdsOrderStatus, KdsHookahData } from '@/types/database'
@@ -45,7 +45,7 @@ function getTimerColor(ms: number): string {
   return 'text-[var(--color-danger)]'
 }
 
-export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
+export const KdsOrderCard = memo(function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
   const t = useTranslation('manage')
 
   const ACTION_LABELS: Record<string, string> = {
@@ -208,4 +208,4 @@ export function KdsOrderCard({ order, onAction, onCancel }: KdsOrderCardProps) {
       </button>
     </div>
   )
-}
+})

@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconUsers } from '@/components/Icons'
 import { ScrollableTable } from '@/components/ui/ScrollableTable'
@@ -9,7 +10,7 @@ interface Props {
   rows: StaffRowEnriched[]
 }
 
-export function StaffComparisonTable({ rows }: Props) {
+export const StaffComparisonTable = memo(function StaffComparisonTable({ rows }: Props) {
   const t = useTranslation('manage')
 
   return (
@@ -79,4 +80,4 @@ export function StaffComparisonTable({ rows }: Props) {
       </ScrollableTable>
     </div>
   )
-}
+})

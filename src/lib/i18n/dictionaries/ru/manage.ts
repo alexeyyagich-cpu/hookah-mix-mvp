@@ -641,6 +641,8 @@ export const manage = {
   bossProRequiredDesc: 'Мониторинг заведения в реальном времени доступен на тарифе Multi.',
   bossRefreshing: 'Обновление...',
   bossLastUpdated: (time: string) => `Обновлено ${time}`,
+  bossCash: 'Касса',
+  bossBarSales: 'Продажи бара',
 
   // Mobile Waiter
   waiterTitle: 'Официант',

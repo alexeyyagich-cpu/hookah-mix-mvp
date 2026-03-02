@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation, useLocale, formatCurrency, formatDate } from '@/lib/i18n'
 
 interface DayRevenue {
@@ -12,7 +13,7 @@ interface BarRevenueChartProps {
   data: DayRevenue[]
 }
 
-export function BarRevenueChart({ data }: BarRevenueChartProps) {
+export const BarRevenueChart = memo(function BarRevenueChart({ data }: BarRevenueChartProps) {
   const t = useTranslation('manage')
   const { locale } = useLocale()
 
@@ -84,4 +85,4 @@ export function BarRevenueChart({ data }: BarRevenueChartProps) {
       </div>
     </div>
   )
-}
+})

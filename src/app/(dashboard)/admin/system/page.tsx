@@ -126,6 +126,7 @@ export default function AdminSystem() {
               Backups
             </h2>
             <button
+              type="button"
               onClick={triggerBackup}
               disabled={triggering}
               className="text-sm px-3 py-1.5 rounded-lg font-medium"

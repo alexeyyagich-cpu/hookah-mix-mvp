@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { IconBowl, IconStar, IconEdit, IconTrash } from '@/components/Icons'
 import type { BowlType } from '@/types/database'
@@ -11,7 +12,7 @@ interface BowlCardProps {
   onSetDefault: (id: string) => void
 }
 
-export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps) {
+export const BowlCard = memo(function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps) {
   const t = useTranslation('hookah')
   return (
     <div className={`card p-5 ${bowl.is_default ? 'border-[var(--color-primary)]' : ''}`}>
@@ -58,4 +59,4 @@ export function BowlCard({ bowl, onEdit, onDelete, onSetDefault }: BowlCardProps
       </div>
     </div>
   )
-}
+})

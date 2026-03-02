@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { useTranslation, useLocale, formatDate } from '@/lib/i18n'
 
 interface DailyData {
@@ -13,7 +13,7 @@ interface ConsumptionChartProps {
   data: DailyData[]
 }
 
-export function ConsumptionChart({ data }: ConsumptionChartProps) {
+export const ConsumptionChart = memo(function ConsumptionChart({ data }: ConsumptionChartProps) {
   const t = useTranslation('manage')
   const { locale } = useLocale()
   const maxGrams = useMemo(() => data && data.length > 0 ? Math.max(...data.map(d => d.grams), 1) : 1, [data])
@@ -78,4 +78,4 @@ export function ConsumptionChart({ data }: ConsumptionChartProps) {
       </div>
     </div>
   )
-}
+})

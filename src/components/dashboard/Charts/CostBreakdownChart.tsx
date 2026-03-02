@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { CostCategory } from '@/lib/hooks/usePnL'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 
@@ -42,7 +43,7 @@ function createArcPath(startAngle: number, endAngle: number, radius: number) {
   ].join(' ')
 }
 
-export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
+export const CostBreakdownChart = memo(function CostBreakdownChart({ data }: CostBreakdownChartProps) {
   const t = useTranslation('manage')
   const { locale } = useLocale()
 
@@ -145,4 +146,4 @@ export function CostBreakdownChart({ data }: CostBreakdownChartProps) {
       </div>
     </div>
   )
-}
+})

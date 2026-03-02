@@ -57,6 +57,7 @@ export default function AdminDashboard() {
             </p>
           </div>
           <button
+            type="button"
             onClick={fetchStats}
             disabled={loading}
             className="btn btn-sm"

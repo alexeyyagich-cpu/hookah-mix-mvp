@@ -635,6 +635,8 @@ export const manage: typeof ManageType = {
   bossProRequiredDesc: 'Echtzeit-Monitoring und Warnungen sind im Multi-Tarif verfügbar.',
   bossRefreshing: 'Aktualisierung...',
   bossLastUpdated: (time: string) => `Aktualisiert ${time}`,
+  bossCash: 'Kasse',
+  bossBarSales: 'Bar-Verkäufe',
 
   // Mobile Waiter
   waiterTitle: 'Kellner',

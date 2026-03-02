@@ -72,23 +72,23 @@ export const ShiftOverviewCard = memo(function ShiftOverviewCard({ activeShift, 
           </div>
         )}
         <div>
-          <div className="text-[10px] text-[var(--color-textMuted)] uppercase">Duration</div>
+          <div className="text-[10px] text-[var(--color-textMuted)] uppercase">{tm.shiftDuration}</div>
           <div className="text-sm font-semibold">{formatDuration(shiftDurationMs)}</div>
         </div>
         {activeShift.starting_cash !== null && (
           <div>
-            <div className="text-[10px] text-[var(--color-textMuted)] uppercase">Cash</div>
+            <div className="text-[10px] text-[var(--color-textMuted)] uppercase">{tm.bossCash}</div>
             <div className="text-sm font-semibold">{formatCurrency(activeShift.starting_cash, locale)}</div>
           </div>
         )}
         {r && (
           <>
             <div>
-              <div className="text-[10px] text-[var(--color-textMuted)] uppercase">Sessions</div>
+              <div className="text-[10px] text-[var(--color-textMuted)] uppercase">{tm.shiftHookahSessions}</div>
               <div className="text-sm font-semibold">{r.hookah.sessionsCount}</div>
             </div>
             <div>
-              <div className="text-[10px] text-[var(--color-textMuted)] uppercase">Bar Sales</div>
+              <div className="text-[10px] text-[var(--color-textMuted)] uppercase">{tm.bossBarSales}</div>
               <div className="text-sm font-semibold">{r.bar.salesCount}</div>
             </div>
           </>

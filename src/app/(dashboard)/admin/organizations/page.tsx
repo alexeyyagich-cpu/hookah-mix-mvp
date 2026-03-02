@@ -139,6 +139,7 @@ export default function AdminOrganizations() {
           <input
             type="text"
             placeholder="Search name, slug..."
+            aria-label="Search organizations"
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="input px-3 py-2 text-sm rounded-lg"
@@ -146,6 +147,7 @@ export default function AdminOrganizations() {
           />
           <select
             value={filterTier}
+            aria-label="Filter by tier"
             onChange={e => setFilterTier(e.target.value)}
             className="filter-select"
             style={{ background: filterTier ? 'var(--color-primary)' : 'var(--color-bgHover)', color: filterTier ? '#fff' : 'var(--color-text)' }}
