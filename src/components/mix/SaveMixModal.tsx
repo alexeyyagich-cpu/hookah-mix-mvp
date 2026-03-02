@@ -78,6 +78,9 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
       <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[70]">
         <div
           ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="save-mix-title"
           className={`rounded-2xl p-6 ${isClosing ? 'animate-fadeOutDown' : 'animate-fadeInUp'}`}
           style={{
             background: 'var(--color-bgCard)',
@@ -86,7 +89,7 @@ export function SaveMixModal({ isOpen, onClose, onSave, defaultName = '' }: Save
           }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
+            <h2 id="save-mix-title" className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
               {t.mixSaveTitle}
             </h2>
             <button type="button"

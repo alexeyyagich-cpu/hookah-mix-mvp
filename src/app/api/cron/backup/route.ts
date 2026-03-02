@@ -76,15 +76,25 @@ export async function GET(request: NextRequest) {
     let totalRows = 0
     const errors: string[] = []
 
-    const results = await Promise.all(
-      TABLES.map(async (table) => {
-        const { data, error } = await supabase
-          .from(table)
-          .select('*')
-          .limit(50000)
-        return { table, data, error }
-      })
+    // Sensitive tables: exclude credential columns from backup
+    const SAFE_SELECTS: Partial<Record<typeof TABLES[number], string>> = {
+      r2o_connections: 'id, profile_id, status, webhook_registered, product_group_id, r2o_account_id, webhook_id, last_sync_at, created_at, updated_at',
+      push_subscriptions: 'id, profile_id, endpoint, created_at',
+      telegram_connections: 'id, profile_id, telegram_user_id, telegram_username, chat_id, is_active, notifications_enabled, low_stock_alerts, session_reminders, daily_summary, created_at, updated_at',
+    }
+
+    const tableQueries = TABLES.map(async (table) => {
+      const { data, error } = await supabase
+        .from(table)
+        .select(SAFE_SELECTS[table] || '*')
+        .limit(50000)
+      return { table, data, error }
+    })
+
+    const deadline = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Backup timeout (8s)')), 8000)
     )
+    const results = await Promise.race([Promise.all(tableQueries), deadline])
 
     for (const { table, data, error } of results) {
       if (error) {

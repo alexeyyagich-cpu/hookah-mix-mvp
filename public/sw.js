@@ -71,11 +71,10 @@ self.addEventListener('activate', (event) => {
       for (const url of CRITICAL_URLS) {
         const cached = await cache.match(url)
         if (!cached) {
-          console.warn('[SW] Health check: re-caching missing critical route:', url)
           try {
             await cache.add(url)
-          } catch (err) {
-            console.error('[SW] Health check failed for', url, 'version:', CACHE_NAME, err?.message)
+          } catch {
+            // Silent — SW has no logger context
           }
         }
       }

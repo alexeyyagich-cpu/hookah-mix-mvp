@@ -52,16 +52,16 @@ export async function GET(request: Request) {
     const paidOrgs = allOrgs.filter(o => o.subscription_tier !== 'trial').length
     const trial_to_paid_rate = totalTrialsEver > 0 ? Math.round((paidOrgs / totalTrialsEver) * 100) : 0
 
-    // Active orgs (had sessions in last 7 days)
-    const { count: activeSessionsCount } = await supabase
-      .from('sessions')
-      .select('profile_id', { count: 'exact', head: true })
-      .gte('created_at', sevenDaysAgo)
-
-    // Total users
-    const { count: totalUsers } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
+    // Active orgs (had sessions in last 7 days) + Total users — parallel
+    const [{ count: activeSessionsCount }, { count: totalUsers }] = await Promise.all([
+      supabase
+        .from('sessions')
+        .select('profile_id', { count: 'exact', head: true })
+        .gte('created_at', sevenDaysAgo),
+      supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true }),
+    ])
 
     const stats: AdminStats = {
       total_orgs,

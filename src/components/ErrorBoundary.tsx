@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { getCachedDictionary } from '@/lib/i18n/dictionaries'
 
 interface Props {
@@ -25,11 +26,12 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error(
-      `ErrorBoundary [${this.props.sectionName || 'unknown'}] at ${new Date().toISOString()}:`,
-      error.message,
-      errorInfo.componentStack?.slice(0, 200)
-    )
+    Sentry.captureException(error, {
+      extra: {
+        sectionName: this.props.sectionName || 'unknown',
+        componentStack: errorInfo.componentStack?.slice(0, 500),
+      },
+    })
   }
 
   render() {
