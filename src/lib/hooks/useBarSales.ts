@@ -10,6 +10,70 @@ import { generateDemoSales } from '@/lib/demo'
 import { useSupabaseList } from './useSupabaseList'
 import { applyOrgFilter } from './useOrgFilter'
 
+export function computeBarAnalytics(sales: BarSale[], days: number = 7): BarAnalytics {
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+
+  const periodSales = sales.filter(s => new Date(s.sold_at) >= cutoff)
+
+  const totalRevenue = periodSales.reduce((sum, s) => sum + s.total_revenue, 0)
+  const totalCost = periodSales.reduce((sum, s) => sum + s.total_cost, 0)
+  const totalProfit = totalRevenue - totalCost
+  const totalSalesCount = periodSales.reduce((sum, s) => sum + s.quantity, 0)
+
+  const margins = periodSales
+    .map(s => s.margin_percent)
+    .filter((m): m is number => m !== null)
+  const avgMargin = margins.length > 0
+    ? margins.reduce((a, b) => a + b, 0) / margins.length
+    : null
+
+  const cocktailMap = new Map<string, { count: number; revenue: number }>()
+  for (const s of periodSales) {
+    const existing = cocktailMap.get(s.recipe_name) || { count: 0, revenue: 0 }
+    cocktailMap.set(s.recipe_name, {
+      count: existing.count + s.quantity,
+      revenue: existing.revenue + s.total_revenue,
+    })
+  }
+  const topCocktails = Array.from(cocktailMap.entries())
+    .map(([name, data]) => ({ name, ...data }))
+    .sort((a, b) => b.count - a.count)
+
+  const dayMap = new Map<string, { revenue: number; cost: number }>()
+  for (const s of periodSales) {
+    const d = new Date(s.sold_at)
+    const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const existing = dayMap.get(dateKey) || { revenue: 0, cost: 0 }
+    dayMap.set(dateKey, {
+      revenue: existing.revenue + s.total_revenue,
+      cost: existing.cost + s.total_cost,
+    })
+  }
+  const revenueByDay = Array.from(dayMap.entries())
+    .map(([date, data]) => ({ date, ...data }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+
+  const categoryMap = new Map<string, number>()
+  for (const s of periodSales) {
+    const key = 'cocktails'
+    categoryMap.set(key, (categoryMap.get(key) || 0) + s.total_cost)
+  }
+  const costByCategory = Array.from(categoryMap.entries())
+    .map(([category, cost]) => ({ category, cost }))
+
+  return {
+    totalRevenue,
+    totalCost,
+    totalProfit,
+    totalSales: totalSalesCount,
+    avgMargin,
+    topCocktails,
+    revenueByDay,
+    costByCategory,
+  }
+}
+
 interface UseBarSalesReturn {
   sales: BarSale[]
   loading: boolean
@@ -150,72 +214,7 @@ export function useBarSales(): UseBarSalesReturn {
   }, [user, isDemoMode, supabase, organizationId, setSales, setError])
 
   const getAnalytics = useCallback((days: number = 7): BarAnalytics => {
-    const cutoff = new Date()
-    cutoff.setDate(cutoff.getDate() - days)
-
-    const periodSales = sales.filter(s => new Date(s.sold_at) >= cutoff)
-
-    const totalRevenue = periodSales.reduce((sum, s) => sum + s.total_revenue, 0)
-    const totalCost = periodSales.reduce((sum, s) => sum + s.total_cost, 0)
-    const totalProfit = totalRevenue - totalCost
-    const totalSalesCount = periodSales.reduce((sum, s) => sum + s.quantity, 0)
-
-    const margins = periodSales
-      .map(s => s.margin_percent)
-      .filter((m): m is number => m !== null)
-    const avgMargin = margins.length > 0
-      ? margins.reduce((a, b) => a + b, 0) / margins.length
-      : null
-
-    // Top cocktails
-    const cocktailMap = new Map<string, { count: number; revenue: number }>()
-    for (const s of periodSales) {
-      const existing = cocktailMap.get(s.recipe_name) || { count: 0, revenue: 0 }
-      cocktailMap.set(s.recipe_name, {
-        count: existing.count + s.quantity,
-        revenue: existing.revenue + s.total_revenue,
-      })
-    }
-    const topCocktails = Array.from(cocktailMap.entries())
-      .map(([name, data]) => ({ name, ...data }))
-      .sort((a, b) => b.count - a.count)
-
-    // Revenue by day
-    const dayMap = new Map<string, { revenue: number; cost: number }>()
-    for (const s of periodSales) {
-      const d = new Date(s.sold_at)
-      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-      const existing = dayMap.get(dateKey) || { revenue: 0, cost: 0 }
-      dayMap.set(dateKey, {
-        revenue: existing.revenue + s.total_revenue,
-        cost: existing.cost + s.total_cost,
-      })
-    }
-    const revenueByDay = Array.from(dayMap.entries())
-      .map(([date, data]) => ({ date, ...data }))
-      .sort((a, b) => a.date.localeCompare(b.date))
-
-    // Cost by ingredient category (from inventory)
-    const categoryMap = new Map<string, number>()
-    for (const s of periodSales) {
-      // Approximate: distribute total cost evenly across "ingredients"
-      // In a real scenario, we'd join with recipe ingredients
-      const key = 'cocktails'
-      categoryMap.set(key, (categoryMap.get(key) || 0) + s.total_cost)
-    }
-    const costByCategory = Array.from(categoryMap.entries())
-      .map(([category, cost]) => ({ category, cost }))
-
-    return {
-      totalRevenue,
-      totalCost,
-      totalProfit,
-      totalSales: totalSalesCount,
-      avgMargin,
-      topCocktails,
-      revenueByDay,
-      costByCategory,
-    }
+    return computeBarAnalytics(sales, days)
   }, [sales])
 
   return {

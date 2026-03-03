@@ -1,25 +1,5 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test'
-
-const BASE_URL = 'http://localhost:3000'
-const DEMO_EMAIL = 'demo@hookahtorus.com'
-const DEMO_PASSWORD = 'demo2026!'
-
-async function loginAsDemo(page: Page) {
-  await page.goto(`${BASE_URL}/login`)
-  await page.waitForLoadState('networkidle')
-  await page.fill('input[type="email"]', DEMO_EMAIL)
-  await page.fill('input[type="password"]', DEMO_PASSWORD)
-  await page.click('button[type="submit"]')
-  await page.waitForURL('**/dashboard', { timeout: 15000 })
-}
-
-async function dismissCookieBanner(page: Page) {
-  const acceptBtn = page.locator('button').filter({ hasText: /Accept|Принять|Akzeptieren/i }).first()
-  if (await acceptBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await acceptBtn.click()
-    await page.waitForTimeout(500)
-  }
-}
+import { BASE_URL, loginAsDemo, dismissOverlays } from './helpers'
 
 async function insertFailedMutations(page: Page, count: number) {
   await page.evaluate((n) => {
@@ -107,7 +87,7 @@ test.describe('Failed Mutation Recovery UI', () => {
     context = await browser.newContext()
     page = await context.newPage()
     await loginAsDemo(page)
-    await dismissCookieBanner(page)
+    await dismissOverlays(page)
   })
 
   test.afterAll(async () => {
@@ -124,7 +104,7 @@ test.describe('Failed Mutation Recovery UI', () => {
     await page.goto(`${BASE_URL}/dashboard`)
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(2000)
-    await dismissCookieBanner(page)
+    await dismissOverlays(page)
 
     await insertFailedMutations(page, 2)
     await page.waitForTimeout(2000)
@@ -151,7 +131,7 @@ test.describe('Failed Mutation Recovery UI', () => {
     await page.goto(`${BASE_URL}/dashboard`)
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(2000)
-    await dismissCookieBanner(page)
+    await dismissOverlays(page)
 
     await insertFailedMutations(page, 3)
     await page.waitForTimeout(2000)
@@ -181,7 +161,7 @@ test.describe('Failed Mutation Recovery UI', () => {
     await page.goto(`${BASE_URL}/dashboard`)
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(2000)
-    await dismissCookieBanner(page)
+    await dismissOverlays(page)
 
     await insertFailedMutations(page, 2)
     await page.waitForTimeout(2000)
@@ -210,7 +190,7 @@ test.describe('Failed Mutation Recovery UI', () => {
     await page.goto(`${BASE_URL}/dashboard`)
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(2000)
-    await dismissCookieBanner(page)
+    await dismissOverlays(page)
 
     await insertFailedMutations(page, 1)
     await page.waitForTimeout(2000)
@@ -240,7 +220,7 @@ test.describe('Failed Mutation Recovery UI', () => {
     await page.goto(`${BASE_URL}/dashboard`)
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(2000)
-    await dismissCookieBanner(page)
+    await dismissOverlays(page)
 
     await insertFailedMutations(page, 3)
     await page.waitForTimeout(2000)

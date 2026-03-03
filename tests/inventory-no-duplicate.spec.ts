@@ -1,6 +1,7 @@
 import { test, expect, type Page, type BrowserContext, type APIRequestContext } from '@playwright/test'
 
-const BASE_URL = 'http://localhost:3000'
+import { BASE_URL, loginAsDemo } from './helpers'
+
 const DEMO_EMAIL = 'demo@hookahtorus.com'
 const DEMO_PASSWORD = 'demo2026!'
 const SUPABASE_URL = 'https://famjbedwdbolzrbghimx.supabase.co'
@@ -11,14 +12,6 @@ const TEST_INVENTORY_ID = '06b2a963-c2a6-443c-b574-db839929f938'
 let accessToken: string
 let userId: string
 
-async function loginAsDemo(page: Page) {
-  await page.goto(`${BASE_URL}/login`)
-  await page.waitForLoadState('networkidle')
-  await page.fill('input[type="email"]', DEMO_EMAIL)
-  await page.fill('input[type="password"]', DEMO_PASSWORD)
-  await page.click('button[type="submit"]')
-  await page.waitForURL('**/dashboard', { timeout: 15000 })
-}
 
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhbWpiZWR3ZGJvbHpyYmdoaW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzQzNzMsImV4cCI6MjA4NjUxMDM3M30.sqw9H1OKCN3Hu8JzV6XJzvRGU6XNlt5ABO-cq_q_sCs'
 

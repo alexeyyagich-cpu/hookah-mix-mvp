@@ -64,9 +64,25 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
+  // Restore demo mode from localStorage (survives HMR and page reloads)
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined' && !isSupabaseConfigured && localStorage.getItem('demo-mode-active') === 'true') {
+      return DEMO_USER
+    }
+    return null
+  })
+  const [session, setSession] = useState<Session | null>(() => {
+    if (typeof window !== 'undefined' && !isSupabaseConfigured && localStorage.getItem('demo-mode-active') === 'true') {
+      return { user: DEMO_USER } as Session
+    }
+    return null
+  })
+  const [profile, setProfile] = useState<Profile | null>(() => {
+    if (typeof window !== 'undefined' && !isSupabaseConfigured && localStorage.getItem('demo-mode-active') === 'true') {
+      return DEMO_PROFILE
+    }
+    return null
+  })
   const [loading, setLoading] = useState(isSupabaseConfigured)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
 
@@ -222,6 +238,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (supabase) {
       await supabase.auth.signOut()
     }
+    // Clear demo mode persistence
+    localStorage.removeItem('demo-mode-active')
     // Clear offline sync queue and cache to prevent data leaking to next user
     await clearSyncQueue()
     await clearAllCache()
@@ -230,8 +248,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null)
   }, [supabase])
 
-  // Demo mode login
+  // Demo mode login — persisted in localStorage to survive HMR and page reloads
   const signInDemo = useCallback(() => {
+    localStorage.setItem('demo-mode-active', 'true')
     setUser(DEMO_USER)
     setProfile(DEMO_PROFILE)
     setSession({ user: DEMO_USER } as Session)

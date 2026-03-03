@@ -1,36 +1,8 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test'
-
-const BASE_URL = 'http://localhost:3000'
-const DEMO_EMAIL = 'demo@hookahtorus.com'
-const DEMO_PASSWORD = 'demo2026!'
+import { BASE_URL, loginAsDemo, dismissOverlays } from './helpers'
 
 let context: BrowserContext
 let page: Page
-
-async function loginAsDemo(page: Page) {
-  await page.goto(`${BASE_URL}/login`)
-  await page.waitForLoadState('networkidle')
-  await page.fill('input[type="email"]', DEMO_EMAIL)
-  await page.fill('input[type="password"]', DEMO_PASSWORD)
-  await page.click('button[type="submit"]')
-  await page.waitForURL('**/dashboard', { timeout: 15000 })
-}
-
-/** Dismiss cookie consent banner + any toast notifications + install banner */
-async function dismissOverlays(page: Page) {
-  // Set cookie consent in localStorage so the banner never shows
-  await page.evaluate(() => {
-    localStorage.setItem('cookie-consent', 'accepted')
-    localStorage.setItem('pwa-install-dismissed', 'true')
-  })
-
-  // Remove any sonner toast sections and cookie/install banners from DOM
-  await page.evaluate(() => {
-    document.querySelectorAll('[data-sonner-toaster], section[aria-label="Notifications alt+T"]').forEach(el => el.remove())
-    document.querySelectorAll('.fixed.bottom-0.left-0.right-0').forEach(el => el.remove())
-  })
-  await page.waitForTimeout(300)
-}
 
 test.describe('Floor Plan — Demo Mode', () => {
   test.beforeAll(async ({ browser }) => {

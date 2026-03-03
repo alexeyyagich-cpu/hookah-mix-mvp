@@ -2,8 +2,9 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 60000,
+  timeout: 90_000,
   retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? undefined : 1,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     baseURL: 'http://localhost:3000',

@@ -1,17 +1,5 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test'
-
-const BASE_URL = 'http://localhost:3000'
-const DEMO_EMAIL = 'demo@hookahtorus.com'
-const DEMO_PASSWORD = 'demo2026!'
-
-async function loginAsDemo(page: Page) {
-  await page.goto(`${BASE_URL}/login`)
-  await page.waitForLoadState('networkidle')
-  await page.fill('input[type="email"]', DEMO_EMAIL)
-  await page.fill('input[type="password"]', DEMO_PASSWORD)
-  await page.click('button[type="submit"]')
-  await page.waitForURL('**/dashboard', { timeout: 15000 })
-}
+import { BASE_URL, loginAsDemo } from './helpers'
 
 test.describe('Offline Mutation Infrastructure', () => {
   let context: BrowserContext
