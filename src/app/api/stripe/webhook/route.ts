@@ -148,7 +148,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 }
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
-  const userId = subscription.metadata.supabase_user_id
+  const userId = subscription.metadata?.supabase_user_id
 
   if (!userId) {
     // Try to find user by customer ID
