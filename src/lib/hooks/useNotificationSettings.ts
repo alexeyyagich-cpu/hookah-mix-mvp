@@ -60,11 +60,11 @@ export function useNotificationSettings(): UseNotificationSettingsReturn {
         if (fetchError.code === 'PGRST116') {
           const { data: newData, error: insertError } = await supabase
             .from('notification_settings')
-            .insert({
+            .upsert({
               profile_id: user.id,
               low_stock_enabled: true,
               low_stock_threshold: 50,
-            })
+            }, { onConflict: 'profile_id' })
             .select()
             .single()
 

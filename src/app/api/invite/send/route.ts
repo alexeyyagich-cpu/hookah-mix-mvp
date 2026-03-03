@@ -81,46 +81,49 @@ export async function POST(req: NextRequest) {
     const orgName = esc(rawOrgName)
 
     // Send email via Resend
-    if (resendApiKey) {
-      const roleLabels: Record<string, string> = {
-        manager: 'Manager',
-        hookah_master: 'Hookah Master',
-        bartender: 'Bartender',
-        cook: 'Cook',
-      }
-      const safeRoleLabel = esc(roleLabels[role] || role)
+    if (!resendApiKey) {
+      logger.error('RESEND_API_KEY not configured — invite email not sent', { email })
+      return NextResponse.json({ error: 'Email service not configured' }, { status: 503 })
+    }
 
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${resendApiKey}`,
-        },
-        body: JSON.stringify({
-          from: 'Hookah Torus <noreply@hookahtorus.com>',
-          to: email,
-          subject: `You're invited to join ${rawOrgName} on Hookah Torus`,
-          html: `
-            <div style="font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-              <h2>You've been invited!</h2>
-              <p><strong>${orgName}</strong> has invited you to join their team as <strong>${safeRoleLabel}</strong>.</p>
-              <p style="margin: 24px 0;">
-                <a href="${joinUrl}" style="display: inline-block; padding: 12px 24px; background: #6366f1; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
-                  Accept Invitation
-                </a>
-              </p>
-              <p style="color: #666; font-size: 14px;">This invitation expires in 7 days.</p>
-              <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
-              <p style="color: #999; font-size: 12px;">Hookah Torus — Smart venue management</p>
-            </div>
-          `,
-        }),
-      })
+    const roleLabels: Record<string, string> = {
+      manager: 'Manager',
+      hookah_master: 'Hookah Master',
+      bartender: 'Bartender',
+      cook: 'Cook',
+    }
+    const safeRoleLabel = esc(roleLabels[role] || role)
 
-      if (!res.ok) {
-        logger.error('Resend API error', { status: res.status })
-        return NextResponse.json({ error: 'Failed to send email' }, { status: 502 })
-      }
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: 'Hookah Torus <noreply@hookahtorus.com>',
+        to: email,
+        subject: `You're invited to join ${rawOrgName} on Hookah Torus`,
+        html: `
+          <div style="font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
+            <h2>You've been invited!</h2>
+            <p><strong>${orgName}</strong> has invited you to join their team as <strong>${safeRoleLabel}</strong>.</p>
+            <p style="margin: 24px 0;">
+              <a href="${joinUrl}" style="display: inline-block; padding: 12px 24px; background: #6366f1; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">
+                Accept Invitation
+              </a>
+            </p>
+            <p style="color: #666; font-size: 14px;">This invitation expires in 7 days.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
+            <p style="color: #999; font-size: 12px;">Hookah Torus — Smart venue management</p>
+          </div>
+        `,
+      }),
+    })
+
+    if (!res.ok) {
+      logger.error('Resend API error', { status: res.status })
+      return NextResponse.json({ error: 'Failed to send email' }, { status: 502 })
     }
 
     return NextResponse.json({ success: true })

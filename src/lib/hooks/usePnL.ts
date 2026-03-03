@@ -120,16 +120,18 @@ export function usePnL(): UsePnLReturn {
 
   const [selectedPreset, setSelectedPreset] = useState<PnLPreset>('30d')
 
-  // Memoize date boundaries so useMemo deps stay stable
+  // Memoize date boundaries — normalized to day start/end for complete daily coverage
   const { days, periodStart, periodEnd, prevStart, prevEnd } = useMemo(() => {
     const d = getPresetDays(selectedPreset)
     const now = new Date()
-    const pEnd = new Date(now)
-    const pStart = new Date(now)
-    pStart.setDate(pStart.getDate() - d)
-    const pvEnd = new Date(pStart)
-    const pvStart = new Date(pStart)
-    pvStart.setDate(pvStart.getDate() - d)
+    // End of today (23:59:59.999)
+    const pEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999)
+    // Start of N days ago (00:00:00.000)
+    const pStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - d, 0, 0, 0, 0)
+    // Previous period: N days before periodStart
+    const pvStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 2 * d, 0, 0, 0, 0)
+    // End of day before current period starts (no overlap)
+    const pvEnd = new Date(pStart.getTime() - 1)
     return { days: d, periodStart: pStart, periodEnd: pEnd, prevStart: pvStart, prevEnd: pvEnd }
   }, [selectedPreset])
 
@@ -175,7 +177,7 @@ export function usePnL(): UsePnLReturn {
     const prevSales = isBarActive
       ? sales.filter(s => {
           const d = new Date(s.sold_at)
-          return d >= prevStart && d < prevEnd
+          return d >= prevStart && d <= prevEnd
         })
       : []
     const prevBarRevenue = prevSales.reduce((s, x) => s + x.total_revenue, 0)
@@ -211,7 +213,7 @@ export function usePnL(): UsePnLReturn {
     const prevSessions = isHookahActive
       ? sessions.filter(s => {
           const d = new Date(s.session_date)
-          return d >= prevStart && d < prevEnd
+          return d >= prevStart && d <= prevEnd
         })
       : []
     let prevHookahCost = 0

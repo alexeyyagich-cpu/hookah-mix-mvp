@@ -165,6 +165,7 @@ export function useKDS(): UseKDSReturn {
   const lastNewCountRef = useRef(0)
   const audioUnlockedRef = useRef(false)
   const audioCtxRef = useRef<AudioContext | null>(null)
+  const fetchOrdersRef = useRef<() => Promise<void>>(async () => {})
 
   // Effective profile ID: staff uses owner's ID for venue grouping (legacy fallback)
   const effectiveProfileId = useMemo(() => {
@@ -267,23 +268,26 @@ export function useKDS(): UseKDSReturn {
     setLoading(false)
   }, [effectiveProfileId, supabase, playBeep, organizationId])
 
+  // Keep ref in sync so interval always calls the latest fetchOrders
+  fetchOrdersRef.current = fetchOrders
+
   // Initial fetch + polling (skip polling when offline)
   useEffect(() => {
     if (isDemoMode) return
 
-    fetchOrders()
+    fetchOrdersRef.current()
 
     const interval = setInterval(() => {
       if (typeof navigator !== 'undefined' && !navigator.onLine) return
       if (typeof document !== 'undefined' && document.hidden) return
-      fetchOrders()
+      fetchOrdersRef.current()
     }, 10000)
 
     // Refetch after reconnect to replace offline temp data with real data
     // Also refetch when a mutation is discarded to reconcile local state
     let onlineTid: ReturnType<typeof setTimeout>
-    const handleOnline = () => { onlineTid = setTimeout(fetchOrders, 3000) }
-    const handleReconcile = () => fetchOrders()
+    const handleOnline = () => { onlineTid = setTimeout(() => fetchOrdersRef.current(), 3000) }
+    const handleReconcile = () => fetchOrdersRef.current()
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline-discard-reconcile', handleReconcile)
 
@@ -293,7 +297,7 @@ export function useKDS(): UseKDSReturn {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline-discard-reconcile', handleReconcile)
     }
-  }, [fetchOrders, isDemoMode])
+  }, [isDemoMode])
 
   const createOrder = useCallback(async (input: CreateKdsOrderInput): Promise<KdsOrder | null> => {
     if (!effectiveProfileId) return null
