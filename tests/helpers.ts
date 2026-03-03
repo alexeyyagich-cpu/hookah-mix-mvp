@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { type Page } from '@playwright/test'
 
 export const BASE_URL = 'http://localhost:3000'
 export const DEMO_EMAIL = 'demo@hookahtorus.com'

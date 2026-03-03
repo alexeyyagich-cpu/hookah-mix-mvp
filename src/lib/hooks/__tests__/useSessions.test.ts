@@ -112,7 +112,7 @@ describe('useSessions', () => {
     let session: unknown
     await act(async () => {
       session = await result.current.createSession(
-        { session_date: '2026-03-03', total_grams: 20, guest_id: null, bowl_type_id: null, compatibility_score: null, notes: null, rating: null, duration_minutes: null, selling_price: 25 },
+        { session_date: '2026-03-03', total_grams: 20, guest_id: null, bowl_type_id: null, compatibility_score: null, notes: null, rating: null, duration_minutes: null, selling_price: 25, created_by: null },
         [{ tobacco_inventory_id: 'inv-1', tobacco_id: 'tob-1', brand: 'Tangiers', flavor: 'Birquq', grams_used: 20, percentage: 100 }],
       )
     })
@@ -132,7 +132,7 @@ describe('useSessions', () => {
     let session: unknown
     await act(async () => {
       session = await result.current.createSession(
-        { session_date: '2026-03-03', total_grams: 20, guest_id: null, bowl_type_id: null, compatibility_score: null, notes: null, rating: null, duration_minutes: null, selling_price: 25 },
+        { session_date: '2026-03-03', total_grams: 20, guest_id: null, bowl_type_id: null, compatibility_score: null, notes: null, rating: null, duration_minutes: null, selling_price: 25, created_by: null },
         [{ tobacco_inventory_id: 'inv-1', tobacco_id: 'tob-1', brand: 'Tangiers', flavor: 'Birquq', grams_used: 20, percentage: 100 }],
       )
     })
@@ -171,7 +171,7 @@ describe('useSessions', () => {
     let session: unknown
     await act(async () => {
       session = await result.current.createSession(
-        { session_date: '2026-03-03', total_grams: 20, guest_id: null, bowl_type_id: null, compatibility_score: null, notes: null, rating: null, duration_minutes: null, selling_price: 25 },
+        { session_date: '2026-03-03', total_grams: 20, guest_id: null, bowl_type_id: null, compatibility_score: null, notes: null, rating: null, duration_minutes: null, selling_price: 25, created_by: null },
         [{ tobacco_inventory_id: 'inv-1', tobacco_id: 'tob-1', brand: 'Tangiers', flavor: 'Birquq', grams_used: 20, percentage: 100 }],
         true, // deductFromInventory
       )
