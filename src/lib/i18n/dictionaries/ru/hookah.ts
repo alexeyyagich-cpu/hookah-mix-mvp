@@ -794,4 +794,8 @@ export const hookah = {
   // Approaching limit warnings
   approachingLimit: (current: number, max: number) => `${current}/${max} позиций — приближаетесь к лимиту`,
   approachingBowlLimit: (current: number, max: number) => `${current}/${max} чаш — приближаетесь к лимиту`,
+
+  // A11y
+  reviewStarLabel: (n: number) => `${n} из 5 звёзд`,
+  removeItem: 'Удалить',
 }

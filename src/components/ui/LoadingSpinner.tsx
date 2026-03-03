@@ -1,6 +1,7 @@
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  label?: string
 }
 
 const SIZES = {
@@ -9,11 +10,11 @@ const SIZES = {
   lg: 'w-8 h-8',
 }
 
-export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'md', className = '', label }: LoadingSpinnerProps) {
   return (
     <div
       role="status"
-      aria-label="Loading"
+      aria-label={label ?? 'Loading'}
       className={`${SIZES[size]} border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin ${className}`}
     />
   )

@@ -1,18 +1,22 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AccessDenied } from '@/components/ui/AccessDenied'
+import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 import type { AdminStats } from '@/types/database'
 
 export default function AdminDashboard() {
   const { isSuperAdmin, user } = useAuth()
+  const t = useTranslation('admin')
+  const tc = useTranslation('common')
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const supabase = useMemo(() => createClient(), [])
 
   const fetchStats = useCallback(async () => {
     if (!user) return
@@ -20,7 +24,6 @@ export default function AdminDashboard() {
     setError(null)
 
     try {
-      const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) throw new Error('No session')
 
@@ -36,7 +39,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, supabase])
 
   useEffect(() => { fetchStats() }, [fetchStats])
 
@@ -50,10 +53,10 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
-              Super Admin
+              {t.superAdmin}
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>
-              Platform overview & management
+              {t.platformOverview}
             </p>
           </div>
           <button
@@ -63,7 +66,7 @@ export default function AdminDashboard() {
             className="btn btn-sm"
             style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)' }}
           >
-            {loading ? '...' : '↻ Refresh'}
+            {loading ? '...' : `↻ ${tc.refresh}`}
           </button>
         </div>
 
@@ -76,24 +79,24 @@ export default function AdminDashboard() {
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCard
-            label="Organizations"
+            label={t.organizations}
             value={stats?.total_orgs ?? '—'}
             loading={loading}
           />
           <KpiCard
-            label="Active (7d)"
+            label={t.activeWeekly}
             value={stats?.active_orgs_7d ?? '—'}
             loading={loading}
             accent="var(--color-success)"
           />
           <KpiCard
-            label="MRR"
+            label={t.mrr}
             value={stats ? `€${stats.mrr}` : '—'}
             loading={loading}
             accent="var(--color-primary)"
           />
           <KpiCard
-            label="Total Users"
+            label={t.totalUsers}
             value={stats?.total_users ?? '—'}
             loading={loading}
           />
@@ -103,13 +106,13 @@ export default function AdminDashboard() {
         {stats && (
           <div className="card p-5">
             <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
-              Subscription Breakdown
+              {t.subscriptionBreakdown}
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <TierCard tier="Trial" count={stats.orgs_by_tier.trial} color="var(--color-textMuted)" />
-              <TierCard tier="Core" count={stats.orgs_by_tier.core} color="var(--color-primary)" />
-              <TierCard tier="Multi" count={stats.orgs_by_tier.multi} color="var(--color-success)" />
-              <TierCard tier="Enterprise" count={stats.orgs_by_tier.enterprise} color="var(--color-warning)" />
+              <TierCard tier={t.trial} count={stats.orgs_by_tier.trial} color="var(--color-textMuted)" />
+              <TierCard tier={t.core} count={stats.orgs_by_tier.core} color="var(--color-primary)" />
+              <TierCard tier={t.multi} count={stats.orgs_by_tier.multi} color="var(--color-success)" />
+              <TierCard tier={t.enterprise} count={stats.orgs_by_tier.enterprise} color="var(--color-warning)" />
             </div>
           </div>
         )}
@@ -117,19 +120,19 @@ export default function AdminDashboard() {
         {/* Metrics Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="card p-5">
-            <p className="text-sm" style={{ color: 'var(--color-textMuted)' }}>Trial → Paid Conversion</p>
+            <p className="text-sm" style={{ color: 'var(--color-textMuted)' }}>{t.trialConversion}</p>
             <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text)' }}>
               {loading ? '—' : `${stats?.trial_to_paid_rate ?? 0}%`}
             </p>
           </div>
           <div className="card p-5">
-            <p className="text-sm" style={{ color: 'var(--color-textMuted)' }}>Trials Expiring (7d)</p>
+            <p className="text-sm" style={{ color: 'var(--color-textMuted)' }}>{t.trialsExpiring}</p>
             <p className="text-3xl font-bold mt-1" style={{ color: stats?.trials_expiring_7d ? 'var(--color-warning)' : 'var(--color-text)' }}>
               {loading ? '—' : stats?.trials_expiring_7d ?? 0}
             </p>
           </div>
           <div className="card p-5">
-            <p className="text-sm" style={{ color: 'var(--color-textMuted)' }}>New Signups (30d)</p>
+            <p className="text-sm" style={{ color: 'var(--color-textMuted)' }}>{t.newSignups}</p>
             <p className="text-3xl font-bold mt-1" style={{ color: 'var(--color-text)' }}>
               {loading ? '—' : stats?.recent_signups_30d ?? 0}
             </p>
@@ -139,12 +142,12 @@ export default function AdminDashboard() {
         {/* Quick Links */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Link href="/admin/organizations" className="card p-5 hover:opacity-80 transition-opacity">
-            <p className="font-semibold" style={{ color: 'var(--color-text)' }}>Organizations →</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>Manage all clients</p>
+            <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{t.organizationsLink}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>{t.manageClients}</p>
           </Link>
           <Link href="/admin/analytics" className="card p-5 hover:opacity-80 transition-opacity">
-            <p className="font-semibold" style={{ color: 'var(--color-text)' }}>Analytics →</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>Product metrics & funnels</p>
+            <p className="font-semibold" style={{ color: 'var(--color-text)' }}>{t.analyticsLink}</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>{t.productMetrics}</p>
           </Link>
         </div>
       </div>

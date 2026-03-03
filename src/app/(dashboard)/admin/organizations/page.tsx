@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AccessDenied } from '@/components/ui/AccessDenied'
+import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 import type { AdminOrganization, SubscriptionTier } from '@/types/database'
 
@@ -17,12 +18,20 @@ const TIER_COLORS: Record<SubscriptionTier, string> = {
 
 export default function AdminOrganizations() {
   const { isSuperAdmin } = useAuth()
+  const t = useTranslation('admin')
   const [orgs, setOrgs] = useState<AdminOrganization[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filterTier, setFilterTier] = useState<string>('')
   const [search, setSearch] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+
+  const daysUntilLabel = useCallback((dateStr: string) => {
+    const diff = daysUntilRaw(dateStr)
+    if (diff < 0) return t.expiredAgo(Math.abs(diff))
+    if (diff === 0) return t.expiresToday
+    return t.daysLeft(diff)
+  }, [t])
 
   const getToken = useCallback(async () => {
     const supabase = createClient()
@@ -117,14 +126,14 @@ export default function AdminOrganizations() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
-              Organizations
+              {t.organizations}
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>
-              {orgs.length} total
+              {t.totalCount(orgs.length)}
             </p>
           </div>
           <Link href="/admin" className="text-sm" style={{ color: 'var(--color-primary)' }}>
-            ← Dashboard
+            {t.backToDashboard}
           </Link>
         </div>
 
@@ -138,8 +147,8 @@ export default function AdminOrganizations() {
         <div className="flex flex-wrap gap-3">
           <input
             type="text"
-            placeholder="Search name, slug..."
-            aria-label="Search organizations"
+            placeholder={t.searchPlaceholder}
+            aria-label={t.searchOrgsLabel}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="input px-3 py-2 text-sm rounded-lg"
@@ -147,16 +156,16 @@ export default function AdminOrganizations() {
           />
           <select
             value={filterTier}
-            aria-label="Filter by tier"
+            aria-label={t.filterByTier}
             onChange={e => setFilterTier(e.target.value)}
             className="filter-select"
             style={{ background: filterTier ? 'var(--color-primary)' : 'var(--color-bgHover)', color: filterTier ? '#fff' : 'var(--color-text)' }}
           >
-            <option value="">All tiers</option>
-            <option value="trial">Trial</option>
-            <option value="core">Core</option>
-            <option value="multi">Multi</option>
-            <option value="enterprise">Enterprise</option>
+            <option value="">{t.allTiers}</option>
+            <option value="trial">{t.trial}</option>
+            <option value="core">{t.core}</option>
+            <option value="multi">{t.multi}</option>
+            <option value="enterprise">{t.enterprise}</option>
           </select>
         </div>
 
@@ -189,13 +198,13 @@ export default function AdminOrganizations() {
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs mt-1" style={{ color: 'var(--color-textMuted)' }}>
                     {org.slug && <span>/{org.slug}</span>}
-                    <span>{org.member_count} members</span>
-                    <span>{org.location_count} locations</span>
-                    {org.owner_name && <span>Owner: {org.owner_name}</span>}
-                    <span>Created: {new Date(org.created_at).toLocaleDateString()}</span>
+                    <span>{org.member_count} {t.members}</span>
+                    <span>{org.location_count} {t.locations}</span>
+                    {org.owner_name && <span>{t.ownerLabel(org.owner_name)}</span>}
+                    <span>{t.createdLabel(new Date(org.created_at).toLocaleDateString())}</span>
                     {org.subscription_tier === 'trial' && org.trial_expires_at && (
                       <span style={{ color: new Date(org.trial_expires_at) < new Date() ? 'var(--color-danger)' : 'var(--color-warning)' }}>
-                        Trial: {daysUntil(org.trial_expires_at)}
+                        Trial: {daysUntilLabel(org.trial_expires_at)}
                       </span>
                     )}
                   </div>
@@ -211,12 +220,12 @@ export default function AdminOrganizations() {
                       className="text-xs px-3 py-1.5 rounded-lg font-medium"
                       style={{ background: 'color-mix(in srgb, var(--color-primary) 20%, transparent)', color: 'var(--color-primary)' }}
                     >
-                      {actionLoading === org.id ? '...' : '+14d trial'}
+                      {actionLoading === org.id ? '...' : t.extendTrialBtn}
                     </button>
                   )}
                   <select
                     value=""
-                    aria-label="Change subscription tier"
+                    aria-label={t.changeTierLabel}
                     onChange={e => {
                       if (e.target.value) changeTier(org.id, e.target.value as SubscriptionTier)
                     }}
@@ -224,7 +233,7 @@ export default function AdminOrganizations() {
                     style={{ background: 'var(--color-bgHover)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }}
                     disabled={actionLoading === org.id}
                   >
-                    <option value="">Change tier...</option>
+                    <option value="">{t.changeTierPlaceholder}</option>
                     {(['trial', 'core', 'multi', 'enterprise'] as SubscriptionTier[])
                       .filter(t => t !== org.subscription_tier)
                       .map(t => <option key={t} value={t}>{t}</option>)
@@ -236,7 +245,7 @@ export default function AdminOrganizations() {
 
             {filtered.length === 0 && (
               <div className="card p-8 text-center" style={{ color: 'var(--color-textMuted)' }}>
-                No organizations found
+                {t.noOrgsFound}
               </div>
             )}
           </div>
@@ -246,9 +255,6 @@ export default function AdminOrganizations() {
   )
 }
 
-function daysUntil(dateStr: string): string {
-  const diff = Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-  if (diff < 0) return `expired ${Math.abs(diff)}d ago`
-  if (diff === 0) return 'expires today'
-  return `${diff}d left`
+function daysUntilRaw(dateStr: string): number {
+  return Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
 }

@@ -130,8 +130,10 @@ export default function ReportsPage() {
           <div className="relative" ref={exportMenuRef}>
             <button type="button"
               onClick={() => canExport ? setExportMenuOpen(!exportMenuOpen) : null}
+              disabled={!canExport}
               className={`btn btn-ghost flex items-center gap-2 text-sm ${!canExport ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={!canExport ? tm.exportProOnly : tm.exportLabel}
+              aria-label={!canExport ? tm.exportProOnly : tm.exportLabel}
             >
               {canExport ? <IconExport size={16} /> : <IconLock size={16} />}
               {tm.exportLabel}

@@ -1,23 +1,25 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AccessDenied } from '@/components/ui/AccessDenied'
+import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 import type { AdminStats } from '@/types/database'
 
 export default function AdminAnalytics() {
   const { isSuperAdmin, user } = useAuth()
+  const t = useTranslation('admin')
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const supabase = useMemo(() => createClient(), [])
 
   const fetchData = useCallback(async () => {
     if (!user) return
     setLoading(true)
     try {
-      const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) return
 
@@ -28,7 +30,7 @@ export default function AdminAnalytics() {
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, supabase])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -44,21 +46,21 @@ export default function AdminAnalytics() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>Product Analytics</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>Revenue, conversion & adoption</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{t.productAnalytics}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>{t.revenueConversionAdoption}</p>
           </div>
-          <Link href="/admin" className="text-sm" style={{ color: 'var(--color-primary)' }}>← Dashboard</Link>
+          <Link href="/admin" className="text-sm" style={{ color: 'var(--color-primary)' }}>{t.backToDashboard}</Link>
         </div>
 
         {/* Revenue */}
         <div className="card p-6">
-          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Revenue</h2>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.revenue}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard label="MRR" value={loading ? '—' : `€${stats?.mrr || 0}`} accent="var(--color-success)" />
-            <MetricCard label="ARR" value={loading ? '—' : `€${arr}`} accent="var(--color-success)" />
-            <MetricCard label="Paying Orgs" value={loading ? '—' : totalPaid} />
+            <MetricCard label={t.mrr} value={loading ? '—' : `€${stats?.mrr || 0}`} accent="var(--color-success)" />
+            <MetricCard label={t.arr} value={loading ? '—' : `€${arr}`} accent="var(--color-success)" />
+            <MetricCard label={t.payingOrgs} value={loading ? '—' : totalPaid} />
             <MetricCard
-              label="ARPU"
+              label={t.arpu}
               value={loading || !totalPaid ? '—' : `€${Math.round((stats?.mrr || 0) / totalPaid)}/mo`}
               accent="var(--color-primary)"
             />
@@ -67,13 +69,13 @@ export default function AdminAnalytics() {
 
         {/* Funnel */}
         <div className="card p-6">
-          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Trial Funnel</h2>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.trialFunnel}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard label="Total Signups" value={loading ? '—' : stats?.total_orgs ?? 0} />
-            <MetricCard label="Active (7d)" value={loading ? '—' : stats?.active_orgs_7d ?? 0} accent="var(--color-success)" />
-            <MetricCard label="Converted to Paid" value={loading ? '—' : totalPaid} accent="var(--color-primary)" />
+            <MetricCard label={t.totalSignups} value={loading ? '—' : stats?.total_orgs ?? 0} />
+            <MetricCard label={t.activeWeekly} value={loading ? '—' : stats?.active_orgs_7d ?? 0} accent="var(--color-success)" />
+            <MetricCard label={t.convertedToPaid} value={loading ? '—' : totalPaid} accent="var(--color-primary)" />
             <MetricCard
-              label="Conversion Rate"
+              label={t.conversionRate}
               value={loading ? '—' : `${stats?.trial_to_paid_rate ?? 0}%`}
               accent={(stats?.trial_to_paid_rate ?? 0) >= 10 ? 'var(--color-success)' : 'var(--color-warning)'}
             />
@@ -83,7 +85,7 @@ export default function AdminAnalytics() {
         {/* Tier Distribution */}
         {stats && (
           <div className="card p-6">
-            <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Tier Distribution</h2>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.tierDistribution}</h2>
             <div className="space-y-3">
               {(['trial', 'core', 'multi', 'enterprise'] as const).map(tier => {
                 const count = stats.orgs_by_tier[tier]
@@ -115,15 +117,15 @@ export default function AdminAnalytics() {
 
         {/* Activity */}
         <div className="card p-6">
-          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Activity</h2>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.activity}</h2>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            <MetricCard label="New Signups (30d)" value={loading ? '—' : stats?.recent_signups_30d ?? 0} />
+            <MetricCard label={t.newSignups} value={loading ? '—' : stats?.recent_signups_30d ?? 0} />
             <MetricCard
-              label="Trials Expiring (7d)"
+              label={t.trialsExpiring}
               value={loading ? '—' : stats?.trials_expiring_7d ?? 0}
               accent={(stats?.trials_expiring_7d ?? 0) > 0 ? 'var(--color-warning)' : undefined}
             />
-            <MetricCard label="Total Users" value={loading ? '—' : stats?.total_users ?? 0} />
+            <MetricCard label={t.totalUsers} value={loading ? '—' : stats?.total_users ?? 0} />
           </div>
         </div>
       </div>

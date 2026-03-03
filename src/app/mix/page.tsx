@@ -902,7 +902,7 @@ function MixPageInner() {
           <div className="space-y-6">
             {/* Visualization */}
             <section className="card card-elevated p-5">
-              <MixPieChart items={items} />
+              <MixPieChart items={items} legendLabel={t.mixComposition} />
             </section>
 
             {/* Results */}

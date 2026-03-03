@@ -207,7 +207,7 @@ export function InvoiceScanModal({ isOpen, onClose, onImport }: InvoiceScanModal
                         step="0.01"
                       />
                     </div>
-                    <button type="button" onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]" aria-label="Remove">
+                    <button type="button" onClick={() => removeItem(i)} className="btn btn-ghost p-1 ml-2 text-[var(--color-danger)]" aria-label={t.removeItem}>
                       <IconClose size={14} />
                     </button>
                   </div>

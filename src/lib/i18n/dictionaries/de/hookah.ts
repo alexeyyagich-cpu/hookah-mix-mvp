@@ -788,4 +788,8 @@ export const hookah: typeof HookahType = {
   // Approaching limit warnings
   approachingLimit: (current: number, max: number) => `${current}/${max} Artikel — Limit fast erreicht`,
   approachingBowlLimit: (current: number, max: number) => `${current}/${max} Köpfe — Limit fast erreicht`,
+
+  // A11y
+  reviewStarLabel: (n: number) => `${n} von 5 Sternen`,
+  removeItem: 'Entfernen',
 }

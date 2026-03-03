@@ -113,7 +113,7 @@ export function CocktailMenuSection({
                                   type="button"
                                   onClick={() => removeBarItem(recipe)}
                                   className="w-11 h-11 rounded-full bg-[var(--color-bgHover)] hover:bg-[var(--color-error)]/20 text-[var(--color-text)] flex items-center justify-center text-sm font-bold transition-colors"
-                                  aria-label="Decrease quantity"
+                                  aria-label={tb.decreaseQuantity}
                                 >
                                   -
                                 </button>
@@ -124,7 +124,7 @@ export function CocktailMenuSection({
                               type="button"
                               onClick={() => addBarItem(recipe)}
                               className="w-11 h-11 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 flex items-center justify-center text-sm font-bold transition-colors"
-                              aria-label="Add to order"
+                              aria-label={tb.addToOrder}
                             >
                               +
                             </button>

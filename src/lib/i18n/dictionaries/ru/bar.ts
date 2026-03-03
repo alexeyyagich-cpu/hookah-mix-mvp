@@ -323,4 +323,8 @@ export const bar = {
   groupByLabel: 'Группировка',
   menuFilterLabel: 'Фильтр меню',
   periodLabel: 'Период',
+
+  // A11y
+  decreaseQuantity: 'Уменьшить',
+  addToOrder: 'Добавить в заказ',
 }

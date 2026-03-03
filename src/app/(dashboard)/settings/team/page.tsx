@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTeam } from '@/lib/hooks/useTeam'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useTips } from '@/lib/hooks/useTips'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { useRole, ORG_ROLE_LABELS } from '@/lib/hooks/useRole'
@@ -30,6 +31,8 @@ export default function TeamPage() {
   const { needsUpgrade } = useSubscription()
 
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const inviteModalRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(inviteModalRef, showInviteModal, () => setShowInviteModal(false))
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<OrgRole>('hookah_master')
   const [inviting, setInviting] = useState(false)
@@ -449,7 +452,7 @@ export default function TeamPage() {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div role="dialog" aria-modal="true" aria-labelledby="invite-modal-title" className="card w-full max-w-md p-6">
+          <div ref={inviteModalRef} role="dialog" aria-modal="true" aria-labelledby="invite-modal-title" className="card w-full max-w-md p-6">
             <h2 id="invite-modal-title" className="text-xl font-bold mb-4">{tm.inviteMember}</h2>
 
             <form onSubmit={handleInvite} className="space-y-4">

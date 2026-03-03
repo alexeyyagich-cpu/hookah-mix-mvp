@@ -318,4 +318,8 @@ export const bar: typeof BarType = {
   groupByLabel: 'Group by',
   menuFilterLabel: 'Menu filter',
   periodLabel: 'Period',
+
+  // A11y
+  decreaseQuantity: 'Decrease quantity',
+  addToOrder: 'Add to order',
 } as const

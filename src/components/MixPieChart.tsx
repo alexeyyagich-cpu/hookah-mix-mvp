@@ -5,6 +5,7 @@ import type { MixItem } from "@/logic/mixCalculator";
 type Props = {
   items: MixItem[];
   size?: number;
+  legendLabel?: string;
 };
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
@@ -19,7 +20,7 @@ function describeArc(cx: number, cy: number, r: number, startAngle: number, endA
   return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y} Z`;
 }
 
-export default function MixPieChart({ items, size = 200 }: Props) {
+export default function MixPieChart({ items, size = 200, legendLabel }: Props) {
   const r = size / 2;
   const cx = r;
   const cy = r;
@@ -127,7 +128,7 @@ export default function MixPieChart({ items, size = 200 }: Props) {
       </div>
 
       {/* Legend */}
-      <div className="w-full space-y-2" role="list" aria-label="Mix composition">
+      <div className="w-full space-y-2" role="list" aria-label={legendLabel ?? "Mix composition"}>
         {paths.map((p) => (
           <div
             key={p.id}

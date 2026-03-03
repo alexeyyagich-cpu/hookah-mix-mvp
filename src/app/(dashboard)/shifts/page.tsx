@@ -44,6 +44,8 @@ export default function ShiftsPage() {
   const closeModalRef = useRef<HTMLDivElement>(null)
   useFocusTrap(openModalRef, showOpenModal, () => setShowOpenModal(false))
   useFocusTrap(closeModalRef, showCloseModal, () => setShowCloseModal(false))
+  const reconModalRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(reconModalRef, !!selectedShift, () => setSelectedShift(null))
   useBodyScrollLock(showOpenModal || showCloseModal)
 
   // Live duration timer for active shift
@@ -411,7 +413,7 @@ export default function ShiftsPage() {
       {selectedShift && selectedReconciliation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true" onClick={() => setSelectedShift(null)} />
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="shift-recon-title">
+          <div ref={reconModalRef} className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-bgCard)] border border-[var(--color-border)] shadow-xl p-6" role="dialog" aria-modal="true" aria-labelledby="shift-recon-title">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 id="shift-recon-title" className="text-xl font-bold">{tm.shiftReconciliation}</h2>

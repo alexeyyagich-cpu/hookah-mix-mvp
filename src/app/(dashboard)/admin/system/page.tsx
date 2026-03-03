@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { AccessDenied } from '@/components/ui/AccessDenied'
+import { useTranslation } from '@/lib/i18n'
 import Link from 'next/link'
 
 interface BackupInfo {
@@ -19,6 +20,7 @@ interface HealthStatus {
 
 export default function AdminSystem() {
   const { isSuperAdmin, user } = useAuth()
+  const t = useTranslation('admin')
   const [backups, setBackups] = useState<BackupInfo[]>([])
   const [health, setHealth] = useState<HealthStatus | null>(null)
   const [loading, setLoading] = useState(true)
@@ -71,13 +73,13 @@ export default function AdminSystem() {
 
       // We need CRON_SECRET for this - it's server-side only
       // Use an admin API endpoint instead
-      setTriggerResult('Backup runs automatically at 3:00 AM UTC daily. Manual trigger requires CRON_SECRET.')
+      setTriggerResult(t.backupAutoNote)
     } catch (err) {
       setTriggerResult(`Error: ${err}`)
     } finally {
       setTriggering(false)
     }
-  }, [])
+  }, [t])
 
   if (!isSuperAdmin) {
     return <AccessDenied />
@@ -88,15 +90,15 @@ export default function AdminSystem() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>System</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>Backups, health & monitoring</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>{t.system}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-textMuted)' }}>{t.backupsHealth}</p>
           </div>
-          <Link href="/admin" className="text-sm" style={{ color: 'var(--color-primary)' }}>← Dashboard</Link>
+          <Link href="/admin" className="text-sm" style={{ color: 'var(--color-primary)' }}>{t.backToDashboard}</Link>
         </div>
 
         {/* Health Check */}
         <div className="card p-6">
-          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Health</h2>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.health}</h2>
           {loading ? (
             <div className="h-16 skeleton rounded-lg" />
           ) : health ? (
@@ -107,15 +109,15 @@ export default function AdminSystem() {
                   style={{ background: health.api === 'ok' ? 'var(--color-success)' : 'var(--color-danger)' }}
                 />
                 <span className="font-medium" style={{ color: 'var(--color-text)' }}>
-                  API: {health.api.toUpperCase()}
+                  {t.apiStatus(health.api.toUpperCase())}
                 </span>
               </div>
               <span className="text-sm" style={{ color: 'var(--color-textMuted)' }}>
-                Latency: {health.latency}ms
+                {t.latencyMs(health.latency)}
               </span>
             </div>
           ) : (
-            <p style={{ color: 'var(--color-danger)' }}>Could not check health</p>
+            <p style={{ color: 'var(--color-danger)' }}>{t.healthCheckFailed}</p>
           )}
         </div>
 
@@ -123,7 +125,7 @@ export default function AdminSystem() {
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              Backups
+              {t.backups}
             </h2>
             <button
               type="button"
@@ -132,7 +134,7 @@ export default function AdminSystem() {
               className="text-sm px-3 py-1.5 rounded-lg font-medium"
               style={{ background: 'var(--color-primary)', color: '#fff' }}
             >
-              {triggering ? '...' : 'Info'}
+              {triggering ? '...' : t.backupInfoBtn}
             </button>
           </div>
 
@@ -149,7 +151,7 @@ export default function AdminSystem() {
               ))}
             </div>
           ) : backups.length === 0 ? (
-            <p style={{ color: 'var(--color-textMuted)' }}>No backups found. Ensure the &apos;backups&apos; bucket exists in Supabase Storage.</p>
+            <p style={{ color: 'var(--color-textMuted)' }}>{t.noBackupsFound}</p>
           ) : (
             <div className="space-y-2">
               {backups.map(b => (
@@ -169,16 +171,16 @@ export default function AdminSystem() {
           )}
 
           <p className="text-xs mt-4" style={{ color: 'var(--color-textMuted)' }}>
-            Automated daily at 3:00 AM UTC · Retention: 30 days
+            {t.automatedDaily}
           </p>
         </div>
 
         {/* Cron Jobs */}
         <div className="card p-6">
-          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>Cron Jobs</h2>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.cronJobs}</h2>
           <div className="space-y-2">
-            <CronItem path="/api/cron/backup" schedule="0 3 * * *" description="Daily database backup" />
-            <CronItem path="/api/cron/low-stock" schedule="0 9 * * *" description="Low stock push notifications" />
+            <CronItem path="/api/cron/backup" schedule="0 3 * * *" description={t.dailyBackupDesc} />
+            <CronItem path="/api/cron/low-stock" schedule="0 9 * * *" description={t.lowStockCronDesc} />
           </div>
         </div>
       </div>

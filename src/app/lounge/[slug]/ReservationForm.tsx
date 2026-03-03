@@ -87,8 +87,9 @@ export function ReservationForm({ profileId }: { profileId: string }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">{t.reservationDateLabel}</label>
+            <label htmlFor="reservation-date" className="block text-sm font-medium mb-1">{t.reservationDateLabel}</label>
             <input
+              id="reservation-date"
               type="date"
               value={date}
               onChange={(e) => handleDateChange(e.target.value)}
@@ -98,8 +99,9 @@ export function ReservationForm({ profileId }: { profileId: string }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">{t.reservationTimeLabel}</label>
+            <label htmlFor="reservation-time" className="block text-sm font-medium mb-1">{t.reservationTimeLabel}</label>
             <select
+              id="reservation-time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none transition-colors"
@@ -116,8 +118,9 @@ export function ReservationForm({ profileId }: { profileId: string }) {
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">{t.reservationNameLabel}</label>
+            <label htmlFor="reservation-name" className="block text-sm font-medium mb-1">{t.reservationNameLabel}</label>
             <input
+              id="reservation-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -127,8 +130,9 @@ export function ReservationForm({ profileId }: { profileId: string }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">{t.reservationGuestCount}</label>
+            <label htmlFor="reservation-guests" className="block text-sm font-medium mb-1">{t.reservationGuestCount}</label>
             <input
+              id="reservation-guests"
               type="number"
               inputMode="numeric"
               value={guestCount}
@@ -143,8 +147,9 @@ export function ReservationForm({ profileId }: { profileId: string }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">{t.reservationPhoneLabel}</label>
+          <label htmlFor="reservation-phone" className="block text-sm font-medium mb-1">{t.reservationPhoneLabel}</label>
           <input
+            id="reservation-phone"
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -154,8 +159,9 @@ export function ReservationForm({ profileId }: { profileId: string }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">{t.reservationCommentLabel}</label>
+          <label htmlFor="reservation-comment" className="block text-sm font-medium mb-1">{t.reservationCommentLabel}</label>
           <textarea
+            id="reservation-comment"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder={t.reservationCommentPlaceholder}

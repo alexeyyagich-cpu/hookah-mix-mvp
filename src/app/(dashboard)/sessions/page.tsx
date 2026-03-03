@@ -130,6 +130,7 @@ function SessionsPageInner() {
               disabled={!canExport || sessions.length === 0}
               className="btn btn-ghost disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               title={canExport ? t.exportSessions : t.exportProOnly}
+              aria-label={canExport ? t.exportSessions : t.exportProOnly}
             >
               <IconExport size={18} />
               {!canExport && <IconLock size={14} />}

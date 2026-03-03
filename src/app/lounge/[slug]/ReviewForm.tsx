@@ -59,8 +59,9 @@ export function ReviewForm({
       <h3 className="text-lg font-bold mb-4">{t.reviewFormTitle}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">{t.reviewNameLabel}</label>
+          <label htmlFor="review-name" className="block text-sm font-medium mb-1">{t.reviewNameLabel}</label>
           <input
+            id="review-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -80,6 +81,8 @@ export function ReviewForm({
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
+                aria-label={t.reviewStarLabel(star)}
+                aria-pressed={rating >= star}
                 className="text-2xl transition-transform hover:scale-110"
               >
                 <span className={star <= (hoverRating || rating) ? 'text-[var(--color-warning)]' : 'text-[var(--color-border)]'}>
@@ -91,8 +94,9 @@ export function ReviewForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">{t.reviewTextLabel}</label>
+          <label htmlFor="review-text" className="block text-sm font-medium mb-1">{t.reviewTextLabel}</label>
           <textarea
+            id="review-text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={t.reviewTextPlaceholder}
