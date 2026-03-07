@@ -390,6 +390,7 @@ export default function LandingPage() {
                 <li><Link href="/mix" className="hover:text-[var(--color-text)]">{t.footerMixCalculator}</Link></li>
                 <li><Link href="/mix" className="hover:text-[var(--color-text)]">{t.footerAiRecommendations}</Link></li>
                 <li><Link href="/pricing" className="hover:text-[var(--color-text)]">{t.footerPricing}</Link></li>
+                <li><Link href="/partner" className="hover:text-[var(--color-text)]">Partner Program</Link></li>
               </ul>
             </div>
 

@@ -8,6 +8,7 @@ import { manage } from './de/manage'
 import { market } from './de/market'
 import { tip } from './de/tip'
 import { admin } from './de/admin'
+import { partner } from './de/partner'
 
 export const dictionary = {
   common,
@@ -20,4 +21,5 @@ export const dictionary = {
   market,
   tip,
   admin,
+  partner,
 }
