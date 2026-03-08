@@ -37,25 +37,32 @@ vi.mock('@/lib/logger', () => ({
 
 import { POST } from '@/app/api/ocr/extract/route'
 
-// Create a JPEG-like file (FF D8 magic bytes)
-function makeJpegFile(sizeBytes = 100) {
+// Create a JPEG-like buffer (FF D8 magic bytes)
+function makeJpegBuffer(sizeBytes = 100): ArrayBuffer {
   const bytes = new Uint8Array(sizeBytes)
   bytes[0] = 0xFF
   bytes[1] = 0xD8
-  return new File([bytes], 'invoice.jpg', { type: 'image/jpeg' })
+  return bytes.buffer
 }
 
-function makeFormData(file?: File) {
-  const form = new FormData()
-  if (file) form.append('image', file)
-  return form
+// Mock File that returns correct arrayBuffer() and size
+function makeMockFile(opts: { buffer: ArrayBuffer; name: string; type: string; sizeOverride?: number }): File {
+  const file = new File([new Uint8Array(opts.buffer)], opts.name, { type: opts.type })
+  if (opts.sizeOverride !== undefined) {
+    Object.defineProperty(file, 'size', { value: opts.sizeOverride })
+  }
+  // Ensure arrayBuffer() resolves correctly in test env
+  file.arrayBuffer = () => Promise.resolve(opts.buffer)
+  return file
 }
 
-function makeRequest(formData: FormData) {
-  return new Request('http://localhost/api/ocr/extract', {
+function makeRequest(formDataResult: FormData | null): Parameters<typeof POST>[0] {
+  const req = new Request('http://localhost/api/ocr/extract', {
     method: 'POST',
-    body: formData,
   }) as Parameters<typeof POST>[0]
+  // Mock formData() to avoid hanging in Node test environment
+  req.formData = () => Promise.resolve(formDataResult ?? new FormData())
+  return req
 }
 
 describe('POST /api/ocr/extract', () => {
@@ -67,28 +74,44 @@ describe('POST /api/ocr/extract', () => {
   it('returns 401 when unauthenticated', async () => {
     const authResponse = new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
     mockGetAuthenticatedUser.mockResolvedValue({ response: authResponse, user: null })
-    const res = await POST(makeRequest(makeFormData(makeJpegFile())))
+    const form = new FormData()
+    const res = await POST(makeRequest(form))
     expect(res.status).toBe(401)
   })
 
   it('returns 400 when no image provided', async () => {
-    const res = await POST(makeRequest(makeFormData()))
+    const form = new FormData()
+    const res = await POST(makeRequest(form))
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.error).toContain('No image')
   })
 
   it('returns 400 when file is too large', async () => {
-    const bigFile = makeJpegFile(11 * 1024 * 1024)
-    const res = await POST(makeRequest(makeFormData(bigFile)))
+    const file = makeMockFile({
+      buffer: makeJpegBuffer(100),
+      name: 'invoice.jpg',
+      type: 'image/jpeg',
+      sizeOverride: 11 * 1024 * 1024,
+    })
+    const form = new FormData()
+    form.append('image', file)
+    const res = await POST(makeRequest(form))
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.error).toContain('too large')
   })
 
   it('returns 400 for unsupported file format', async () => {
-    const unknownFile = new File([new Uint8Array([0x00, 0x00, 0x00, 0x00])], 'file.bin', { type: 'application/octet-stream' })
-    const res = await POST(makeRequest(makeFormData(unknownFile)))
+    const unknownBuffer = new Uint8Array([0x00, 0x00, 0x00, 0x00]).buffer
+    const file = makeMockFile({
+      buffer: unknownBuffer,
+      name: 'file.bin',
+      type: 'application/octet-stream',
+    })
+    const form = new FormData()
+    form.append('image', file)
+    const res = await POST(makeRequest(form))
     expect(res.status).toBe(400)
     const json = await res.json()
     expect(json.error).toContain('Unsupported')
@@ -104,7 +127,14 @@ describe('POST /api/ocr/extract', () => {
     mockAnthropicCreate.mockResolvedValue({
       content: [{ type: 'text', text: JSON.stringify(extractedData) }],
     })
-    const res = await POST(makeRequest(makeFormData(makeJpegFile())))
+    const file = makeMockFile({
+      buffer: makeJpegBuffer(100),
+      name: 'invoice.jpg',
+      type: 'image/jpeg',
+    })
+    const form = new FormData()
+    form.append('image', file)
+    const res = await POST(makeRequest(form))
     const json = await res.json()
     expect(res.status).toBe(200)
     expect(json.items).toHaveLength(1)
@@ -115,7 +145,8 @@ describe('POST /api/ocr/extract', () => {
   it('returns 429 when rate limited', async () => {
     const { checkRateLimit } = await import('@/lib/rateLimit')
     vi.mocked(checkRateLimit).mockResolvedValueOnce({ success: false, remaining: 0, resetIn: 5000 })
-    const res = await POST(makeRequest(makeFormData(makeJpegFile())))
+    const form = new FormData()
+    const res = await POST(makeRequest(form))
     expect(res.status).toBe(429)
   })
 })
