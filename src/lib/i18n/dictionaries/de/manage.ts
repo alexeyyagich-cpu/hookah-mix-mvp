@@ -72,6 +72,7 @@ export const manage: typeof ManageType = {
 
   reportsTitle: 'GuV-Berichte',
   reportsDescription: 'Gewinn und Verlust',
+  allLocations: 'Alle Standorte',
   totalRevenue: 'Gesamtumsatz',
   totalCost: 'Gesamtkosten',
   netProfit: 'Nettogewinn',
@@ -553,6 +554,10 @@ export const manage: typeof ManageType = {
   sortVisits: 'Besuche',
   sortSpent: 'Ausgaben',
   sortTier: 'Stufe',
+  filterAllTiers: 'Alle',
+  filterActive: 'Aktiv',
+  filterInactive: 'Inaktiv',
+  filterAllActivity: 'Alle',
   visits: 'Besuche',
   spent: 'Ausgegeben',
   bonus: 'Bonus',

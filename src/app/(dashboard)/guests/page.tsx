@@ -17,8 +17,11 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { PageBackground } from '@/components/ui/PageBackground'
 
 type SortBy = 'name' | 'visits' | 'spent' | 'tier' | 'recent'
+type TierFilter = 'all' | LoyaltyTier
+type ActivityFilter = 'all' | 'active' | 'inactive'
 
 const TIER_ORDER: Record<LoyaltyTier, number> = { gold: 3, silver: 2, bronze: 1 }
+const INACTIVE_DAYS = 30
 
 export default function GuestsPage() {
   const tm = useTranslation('manage')
@@ -29,12 +32,20 @@ export default function GuestsPage() {
 
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<SortBy>('recent')
+  const [tierFilter, setTierFilter] = useState<TierFilter>('all')
+  const [activityFilter, setActivityFilter] = useState<ActivityFilter>('all')
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [addingSaving, setAddingSaving] = useState(false)
+
+  const inactiveCutoff = useMemo(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - INACTIVE_DAYS)
+    return d.getTime()
+  }, [])
 
   const filteredGuests = useMemo(() => {
     let result = guests
@@ -46,6 +57,18 @@ export default function GuestsPage() {
         g.phone?.toLowerCase().includes(q) ||
         g.notes?.toLowerCase().includes(q)
       )
+    }
+
+    // Tier filter
+    if (tierFilter !== 'all') {
+      result = result.filter(g => g.loyalty_tier === tierFilter)
+    }
+
+    // Activity filter
+    if (activityFilter === 'active') {
+      result = result.filter(g => g.last_visit_at && new Date(g.last_visit_at).getTime() >= inactiveCutoff)
+    } else if (activityFilter === 'inactive') {
+      result = result.filter(g => !g.last_visit_at || new Date(g.last_visit_at).getTime() < inactiveCutoff)
     }
 
     result = [...result].sort((a, b) => {
@@ -65,7 +88,7 @@ export default function GuestsPage() {
     })
 
     return result
-  }, [guests, search, sortBy])
+  }, [guests, search, sortBy, tierFilter, activityFilter, inactiveCutoff])
 
   const handleAddGuest = async () => {
     if (!newName.trim() || addingSaving) return
@@ -200,6 +223,52 @@ export default function GuestsPage() {
               }`}
             >
               {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Segment filters */}
+      <div className="flex flex-wrap gap-3">
+        {/* Tier filter */}
+        <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1">
+          {([
+            { key: 'all' as TierFilter, label: tm.filterAllTiers },
+            { key: 'bronze' as TierFilter, label: tm.tierBronze },
+            { key: 'silver' as TierFilter, label: tm.tierSilver },
+            { key: 'gold' as TierFilter, label: tm.tierGold },
+          ]).map(t => (
+            <button type="button"
+              key={t.key}
+              onClick={() => setTierFilter(t.key)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                tierFilter === t.key
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                  : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Activity filter */}
+        <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1">
+          {([
+            { key: 'all' as ActivityFilter, label: tm.filterAllActivity },
+            { key: 'active' as ActivityFilter, label: tm.filterActive },
+            { key: 'inactive' as ActivityFilter, label: tm.filterInactive },
+          ]).map(a => (
+            <button type="button"
+              key={a.key}
+              onClick={() => setActivityFilter(a.key)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                activityFilter === a.key
+                  ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                  : 'text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+              }`}
+            >
+              {a.label}
             </button>
           ))}
         </div>

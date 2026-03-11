@@ -110,8 +110,8 @@ export function dateKey(d: Date | string): string {
 }
 
 export interface ComputePnLParams {
-  sales: { sold_at: string; total_revenue: number; total_cost: number; quantity: number; margin_percent: number | null; recipe_name: string }[]
-  sessions: { session_date: string; selling_price: number | null; session_items: { tobacco_id: string; brand: string; grams_used: number }[] | null }[]
+  sales: { sold_at: string; total_revenue: number; total_cost: number; quantity: number; margin_percent: number | null; recipe_name: string; location_id?: string | null }[]
+  sessions: { session_date: string; selling_price: number | null; session_items: { tobacco_id: string; brand: string; grams_used: number }[] | null; location_id?: string | null }[]
   pricePerGram: Record<string, number>
   barInventory: { id: string; category: string; purchase_price: number | null }[]
   isBarActive: boolean
@@ -121,10 +121,20 @@ export interface ComputePnLParams {
   prevStart: Date
   prevEnd: Date
   days: number
+  /** Optional: filter by location_id. null/undefined = all locations */
+  filterLocationId?: string | null
 }
 
 export function computePnL(params: ComputePnLParams): PnLData {
-  const { sales, sessions, pricePerGram, barInventory, isBarActive, isHookahActive, periodStart, periodEnd, prevStart, prevEnd, days } = params
+  const { sales: rawSales, sessions: rawSessions, pricePerGram, barInventory, isBarActive, isHookahActive, periodStart, periodEnd, prevStart, prevEnd, days, filterLocationId } = params
+
+  // Apply location filter if provided
+  const sales = filterLocationId
+    ? rawSales.filter(s => s.location_id === filterLocationId)
+    : rawSales
+  const sessions = filterLocationId
+    ? rawSessions.filter(s => s.location_id === filterLocationId)
+    : rawSessions
 
   // --- BAR: current period ---
   const periodSales = isBarActive
@@ -369,7 +379,7 @@ export function computePnL(params: ComputePnLParams): PnLData {
   }
 }
 
-export function usePnL(): UsePnLReturn {
+export function usePnL(filterLocationId?: string | null): UsePnLReturn {
   const { isHookahActive, isBarActive } = useModules()
   const { sales, loading: barLoading, error: barError } = useBarSales()
   const { inventory: barInventory } = useBarInventory()
@@ -408,8 +418,8 @@ export function usePnL(): UsePnLReturn {
 
   const data = useMemo<PnLData>(() => computePnL({
     sales, sessions, pricePerGram, barInventory, isBarActive, isHookahActive,
-    periodStart, periodEnd, prevStart, prevEnd, days,
-  }), [sales, sessions, pricePerGram, barInventory, isBarActive, isHookahActive, periodStart, periodEnd, prevStart, prevEnd, days])
+    periodStart, periodEnd, prevStart, prevEnd, days, filterLocationId,
+  }), [sales, sessions, pricePerGram, barInventory, isBarActive, isHookahActive, periodStart, periodEnd, prevStart, prevEnd, days, filterLocationId])
 
   return {
     data,

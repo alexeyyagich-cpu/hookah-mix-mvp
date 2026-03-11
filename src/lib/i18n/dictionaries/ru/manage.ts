@@ -75,6 +75,7 @@ export const manage = {
   // Reports / P&L
   reportsTitle: 'Отчеты P&L',
   reportsDescription: 'Прибыль и убытки',
+  allLocations: 'Все локации',
   totalRevenue: 'Общая выручка',
   totalCost: 'Общие расходы',
   netProfit: 'Чистая прибыль',
@@ -559,6 +560,10 @@ export const manage = {
   sortVisits: 'Визиты',
   sortSpent: 'Расходы',
   sortTier: 'Уровень',
+  filterAllTiers: 'Все',
+  filterActive: 'Активные',
+  filterInactive: 'Давно не были',
+  filterAllActivity: 'Все',
   visits: 'Визиты',
   spent: 'Потрачено',
   bonus: 'Бонус',

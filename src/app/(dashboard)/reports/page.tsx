@@ -30,6 +30,7 @@ import {
   IconChart,
 } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { LocationSelector } from '@/components/ui/LocationSelector'
 import { useTranslation, useLocale, formatCurrency } from '@/lib/i18n'
 import Link from 'next/link'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -40,7 +41,8 @@ export default function ReportsPage() {
   const tm = useTranslation('manage')
   const tc = useTranslation('common')
   const { locale } = useLocale()
-  const { data, loading, error, selectedPreset, setSelectedPreset, period } = usePnL()
+  const [filterLocationId, setFilterLocationId] = useState<string | null>(null)
+  const { data, loading, error, selectedPreset, setSelectedPreset, period } = usePnL(filterLocationId)
   const { isHookahActive, isBarActive } = useModules()
   const { canUseFinancialReports, canExport } = useSubscription()
 
@@ -108,7 +110,10 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Location filter */}
+          <LocationSelector value={filterLocationId} onChange={setFilterLocationId}  />
+
           {/* Period selector */}
           <div className="flex bg-[var(--color-bgHover)] rounded-xl p-1">
             {presets.map(({ key, label }) => (

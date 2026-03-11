@@ -72,6 +72,7 @@ export const manage: typeof ManageType = {
 
   reportsTitle: 'P&L Reports',
   reportsDescription: 'Profit and loss',
+  allLocations: 'All locations',
   totalRevenue: 'Total revenue',
   totalCost: 'Total expenses',
   netProfit: 'Net profit',
@@ -553,6 +554,10 @@ export const manage: typeof ManageType = {
   sortVisits: 'Visits',
   sortSpent: 'Spent',
   sortTier: 'Tier',
+  filterAllTiers: 'All',
+  filterActive: 'Active',
+  filterInactive: 'Inactive',
+  filterAllActivity: 'All',
   visits: 'Visits',
   spent: 'Spent',
   bonus: 'Bonus',

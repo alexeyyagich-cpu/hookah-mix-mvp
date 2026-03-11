@@ -90,6 +90,17 @@ export interface OrgMember {
   updated_at: string
 }
 
+export interface ApiKey {
+  id: string
+  organization_id: string
+  profile_id: string
+  key_hash: string
+  label: string
+  is_active: boolean
+  last_used_at: string | null
+  created_at: string
+}
+
 export interface InviteToken {
   id: string
   organization_id: string
@@ -658,6 +669,12 @@ export interface Database {
         Row: S<InviteToken>
         Insert: Ins<InviteToken, 'id' | 'created_at'>
         Update: S<Partial<Omit<InviteToken, 'id' | 'organization_id'>>>
+        Relationships: []
+      }
+      api_keys: {
+        Row: S<ApiKey>
+        Insert: Ins<ApiKey, 'id' | 'created_at' | 'last_used_at' | 'is_active'>
+        Update: S<Partial<Omit<ApiKey, 'id' | 'organization_id' | 'profile_id'>>>
         Relationships: []
       }
       promotions: {
