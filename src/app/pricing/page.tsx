@@ -302,7 +302,7 @@ function PricingPageContent() {
         )}
 
         {/* Pricing Cards — 4 plans */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16 items-start">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16 items-stretch">
           {plans.map((plan) => {
             const isEnterprise = 'isEnterprise' in plan && plan.isEnterprise
             const price = plan.priceYearly === 0 && plan.priceMonthly > 0

@@ -52,10 +52,8 @@ export function PricingCard({
       : 'border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10'
     : ''
 
-  const scaleClass = highlight ? 'scale-[1.03] z-10' : ''
-
   return (
-    <div className={`card relative p-6 flex flex-col transition-transform ${borderClass} ${scaleClass} ${isPopular ? 'mt-4' : ''}`}>
+    <div className={`card relative p-6 flex flex-col ${borderClass} ${isPopular ? 'mt-4' : ''}`}>
       {/* Popular Badge */}
       {isPopular && !isCurrent && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
