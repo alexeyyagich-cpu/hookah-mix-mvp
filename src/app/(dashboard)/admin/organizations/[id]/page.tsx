@@ -86,6 +86,7 @@ export default function AdminOrgDetail() {
   const tierColor = {
     trial: 'var(--color-textMuted)',
     core: 'var(--color-primary)',
+    pro: 'var(--color-secondary)',
     multi: 'var(--color-success)',
     enterprise: 'var(--color-warning)',
   }[org.subscription_tier] || 'var(--color-textMuted)'

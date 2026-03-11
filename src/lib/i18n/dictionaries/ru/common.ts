@@ -167,6 +167,13 @@ export const common = {
   legalPrivacy: 'Конфиденциальность',
   legalImpressum: 'Impressum',
   legalAllRights: 'Все права защищены.',
+  legalWiderruf: 'Отзыв',
+  legalCookies: 'Cookies',
+  cookiePolicy: 'Политика Cookie',
+  reconsentTitle: 'Обновлённые условия',
+  reconsentMessage: 'Мы обновили правовые документы. Ознакомьтесь и примите для продолжения работы.',
+  reconsentAccept: 'Я принимаю обновлённые условия',
+  reconsentRefuse: 'Выйти',
 
   changeTheme: 'Сменить тему',
 

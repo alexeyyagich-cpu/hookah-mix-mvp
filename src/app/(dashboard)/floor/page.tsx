@@ -3,13 +3,15 @@
 import { Suspense, useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { FloorPlan, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
+import { STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/floorConstants'
+import { TableModal } from '@/components/floor/TableModal'
+import type { TableFormData } from '@/components/floor/TableModal'
 import FloorTablePanel from '@/components/floor/FloorTablePanel'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useReservations } from '@/lib/hooks/useReservations'
 import { useInventory } from '@/lib/hooks/useInventory'
 import { useSessions } from '@/lib/hooks/useSessions'
-import { IconSettings, IconCalendar, IconFloor } from '@/components/Icons'
+import { IconPlus, IconCalendar, IconFloor } from '@/components/Icons'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useTranslation } from '@/lib/i18n'
 import { useAuth } from '@/lib/AuthContext'
@@ -52,7 +54,8 @@ function FloorPageInner() {
   const { inventory } = useInventory()
   const { createSession } = useSessions()
   const { createOrder: createKdsOrder } = useKDS()
-  const [isEditMode, setIsEditMode] = useState(false)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [editTable, setEditTable] = useState<FloorTable | null>(null)
   const [selectedTable, setSelectedTable] = useState<FloorTable | null>(null)
   const [showQuickReserve, setShowQuickReserve] = useState(false)
   const [showLinkPicker, setShowLinkPicker] = useState(false)
@@ -443,7 +446,7 @@ function FloorPageInner() {
         )}
       </div>
 
-      {/* Floor Plan */}
+      {/* Tables */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Zone filter pills */}
         {zones.length > 0 && (
@@ -478,22 +481,21 @@ function FloorPageInner() {
 
         {hasPermission('floor.edit') && (
           <button type="button"
-            onClick={() => setIsEditMode(!isEditMode)}
-            className={`btn btn-sm self-end ${
-              isEditMode ? 'btn-primary ring-2 ring-offset-2 ring-[var(--color-primary)]' : 'btn-ghost'
-            }`}
+            onClick={() => setAddModalOpen(true)}
+            className="btn btn-sm btn-primary self-end flex items-center gap-1.5"
           >
-            <IconSettings size={18} />
-            {isEditMode ? tm.ready : tc.edit}
+            <IconPlus size={16} />
+            {tm.addTable}
           </button>
         )}
       </div>
-      {tables.length === 0 && !loading && !isEditMode ? (
+
+      {tables.length === 0 && !loading ? (
         <EmptyState
           icon={<IconFloor size={32} />}
           title={tm.noTables}
           description={tm.noTablesHint}
-          action={hasPermission('floor.edit') ? { label: tm.enableEditMode, onClick: () => setIsEditMode(true) } : undefined}
+          action={hasPermission('floor.edit') ? { label: tm.addTable, onClick: () => setAddModalOpen(true) } : undefined}
         />
       ) : filteredTables.length === 0 && zoneFilter && tables.length > 0 ? (
         <div className="card p-8 text-center">
@@ -503,23 +505,70 @@ function FloorPageInner() {
           </button>
         </div>
       ) : (
-        <div className="card p-6">
-          <FloorPlan
-            tables={filteredTables}
-            loading={loading}
-            editable={isEditMode}
-            onTableSelect={handleTableSelect}
-            addTable={floorPlan.addTable}
-            updateTable={floorPlan.updateTable}
-            deleteTable={floorPlan.deleteTable}
-            moveTable={floorPlan.moveTable}
-            setTableStatus={floorPlan.setTableStatus}
-          />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {filteredTables.map(table => {
+            const isSelected = activeSelectedTable?.id === table.id
+            const isLong = table.status === 'occupied' && table.session_start_time &&
+              (Date.now() - new Date(table.session_start_time).getTime()) / 60000 >= LONG_SESSION_MINUTES
+            const elapsed = table.session_start_time
+              ? Math.floor((Date.now() - new Date(table.session_start_time).getTime()) / 60000)
+              : null
+
+            return (
+              <button
+                key={table.id}
+                type="button"
+                onClick={() => handleTableSelect(table)}
+                onDoubleClick={() => hasPermission('floor.edit') && setEditTable(table)}
+                className={`card p-4 text-left transition-all hover:shadow-md ${
+                  isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''
+                } ${isLong ? 'ring-2 ring-[var(--color-warning)]' : ''}`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold text-sm truncate">{table.name}</span>
+                  <span
+                    className="px-2 py-0.5 rounded-full text-[10px] font-medium shrink-0"
+                    style={{
+                      backgroundColor: STATUS_COLORS[table.status].bg,
+                      color: STATUS_COLORS[table.status].text,
+                    }}
+                  >
+                    {table.status === 'available' ? tm.statusAvailable
+                      : table.status === 'occupied' ? tm.statusOccupied
+                      : table.status === 'reserved' ? tm.statusReserved
+                      : tm.statusCleaning}
+                  </span>
+                </div>
+
+                {table.zone && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-bgHover)] text-[var(--color-textMuted)] mb-1 inline-block">
+                    {table.zone}
+                  </span>
+                )}
+
+                <div className="text-xs text-[var(--color-textMuted)]">
+                  {table.capacity} {tm.guestCountShort}
+                </div>
+
+                {table.current_guest_name && (
+                  <div className="text-sm font-medium mt-1 truncate">
+                    {table.current_guest_name}
+                  </div>
+                )}
+
+                {elapsed !== null && elapsed > 0 && (
+                  <div className={`text-xs mt-1 ${isLong ? 'text-[var(--color-warning)] font-medium' : 'text-[var(--color-textMuted)]'}`}>
+                    {Math.floor(elapsed / 60) > 0 ? `${Math.floor(elapsed / 60)}h ` : ''}{elapsed % 60}m
+                  </div>
+                )}
+              </button>
+            )
+          })}
         </div>
       )}
 
       {/* Selected Table Info */}
-      {activeSelectedTable && !isEditMode && (
+      {activeSelectedTable && (
         <FloorTablePanel
           table={activeSelectedTable}
           linkedReservation={linkedReservation}
@@ -566,16 +615,44 @@ function FloorPageInner() {
         />
       )}
 
-      {/* Help text */}
-      {isEditMode && (
-        <div className="p-4 rounded-xl bg-[var(--color-bgHover)] text-sm text-[var(--color-textMuted)]">
-          <p className="font-medium mb-1">{tm.editModeTitle}</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>{tm.editModeDrag}</li>
-            <li>{tm.editModeClick}</li>
-            <li>{tm.editModeAdd}</li>
-          </ul>
-        </div>
+      {/* Add Table Modal */}
+      {addModalOpen && (
+        <TableModal
+          existingZones={zones}
+          onClose={() => setAddModalOpen(false)}
+          onSave={async (data: TableFormData) => {
+            await floorPlan.addTable({
+              ...data,
+              status: 'available',
+              current_session_id: null,
+              current_guest_name: null,
+              session_start_time: null,
+            })
+            setAddModalOpen(false)
+          }}
+        />
+      )}
+
+      {/* Edit Table Modal */}
+      {editTable && (
+        <TableModal
+          table={editTable}
+          existingZones={zones}
+          onClose={() => setEditTable(null)}
+          onSave={async (data: TableFormData) => {
+            await floorPlan.updateTable(editTable.id, data)
+            setEditTable(null)
+          }}
+          onDelete={async () => {
+            await floorPlan.deleteTable(editTable.id)
+            setEditTable(null)
+            if (selectedTable?.id === editTable.id) setSelectedTable(null)
+          }}
+          onStatusChange={async (status) => {
+            await floorPlan.setTableStatus(editTable.id, status)
+            setEditTable(prev => prev ? { ...prev, status } : null)
+          }}
+        />
       )}
 
     </div>

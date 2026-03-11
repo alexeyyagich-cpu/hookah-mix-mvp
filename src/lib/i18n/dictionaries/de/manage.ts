@@ -85,7 +85,7 @@ export const manage: typeof ManageType = {
   averageRating: 'Durchschnittsbewertung',
 
   pricingTitle: 'Tarife',
-  pricingSubtitle: 'Wählen Sie einen Tarif für Ihr Geschäft',
+  pricingSubtitle: 'Was kostet Ordnung in Ihrer Shisha-Bar?',
   free: 'Testphase',
   perMonth: '/Monat',
   currentPlan: 'Aktueller Tarif',
@@ -440,6 +440,10 @@ export const manage: typeof ManageType = {
   categoryJuice: 'Säfte',
   categoryGarnish: 'Garnitur',
   categoryBitter: 'Bitter',
+  categoryWine: 'Wein',
+  categoryBeer: 'Bier',
+  categoryIce: 'Eis',
+  categoryOther: 'Sonstiges',
   categoryCocktails: 'Cocktails',
 
   // Shifts & Reconciliation

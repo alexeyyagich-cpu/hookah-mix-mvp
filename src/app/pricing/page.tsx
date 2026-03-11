@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 import { useSubscription } from '@/lib/hooks/useSubscription'
 import { PricingCard } from '@/components/pricing/PricingCard'
+import { CheckoutConfirmModal } from '@/components/pricing/CheckoutConfirmModal'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n'
@@ -14,6 +15,8 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 const STRIPE_PRICES = {
   core_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_MONTHLY,
   core_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_YEARLY,
+  pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY,
+  pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY,
   multi_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_MULTI_MONTHLY,
   multi_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_MULTI_YEARLY,
 }
@@ -25,65 +28,68 @@ function PricingPageContent() {
 
   const plans = [
     {
-      id: 'trial' as const,
-      name: 'Trial',
-      priceMonthly: 0,
-      priceYearly: 0,
-      description: ta.planDescTrial,
-      features: [
-        { name: ta.featureInventoryItems, value: '\u221E', included: true },
-        { name: ta.featureBowlTypes, value: '\u221E', included: true },
-        { name: ta.featureSessionHistory, value: ta.featureSessionDays('14'), included: true },
-        { name: ta.featureBarModule, included: true },
-        { name: ta.featureKds, included: true },
-        { name: ta.featureExportCsvPdf, included: true },
-        { name: ta.featureOneLocation, included: true },
-      ],
-    },
-    {
       id: 'core' as const,
       name: 'Core',
-      priceMonthly: 7900,
-      priceYearly: 79000,
+      priceMonthly: 9900,
+      priceYearly: 99000,
       stripePriceMonthly: STRIPE_PRICES.core_monthly,
       stripePriceYearly: STRIPE_PRICES.core_yearly,
       description: ta.planDescCore,
       features: [
-        { name: ta.featureInventoryItems, value: '\u221E', included: true },
-        { name: ta.featureBowlTypes, value: '\u221E', included: true },
-        { name: ta.featureSessionHistory, value: '\u221E', included: true },
-        { name: ta.featureFullStats, included: true },
-        { name: ta.featureBarModule, included: true },
-        { name: ta.featureCocktailRecipes, included: true },
-        { name: ta.featureKds, included: true },
+        { name: ta.benefitAutoWriteOff, included: true },
+        { name: ta.benefitSaveBudget, included: true },
+        { name: ta.benefitTelegramPL, included: true },
+        { name: ta.benefitQrOrder, included: true },
         { name: ta.featureTeamManagement, included: true },
         { name: ta.featureExportCsvPdf, included: true },
-        { name: ta.featureOneLocation, included: true },
+        { name: ta.benefitOffline, included: true },
+      ],
+      savingsBadge: ta.roiCoreHint,
+    },
+    {
+      id: 'pro' as const,
+      name: 'Pro',
+      priceMonthly: 12900,
+      priceYearly: 129000,
+      stripePriceMonthly: STRIPE_PRICES.pro_monthly,
+      stripePriceYearly: STRIPE_PRICES.pro_yearly,
+      description: ta.planDescPro,
+      features: [
+        { name: ta.featureAllFromCore, value: '+', included: true },
+        { name: ta.benefitCrmLoyalty, included: true },
+        { name: ta.benefitBarModule, included: true },
+        { name: ta.benefitPromo, included: true },
+        { name: ta.featureWaiterTablet, included: true },
+        { name: ta.featureFinancialReports, included: true },
+        { name: ta.benefitGuestSegments, included: true },
+        { name: ta.benefitAdvancedStats, included: true },
       ],
       isPopular: true,
+      savingsBadge: ta.roiProBadge,
+      highlight: true,
+      accentMint: true,
     },
     {
       id: 'multi' as const,
       name: 'Multi',
-      priceMonthly: 14900,
-      priceYearly: 149000,
+      priceMonthly: 18900,
+      priceYearly: 179000,
       stripePriceMonthly: STRIPE_PRICES.multi_monthly,
       stripePriceYearly: STRIPE_PRICES.multi_yearly,
       description: ta.planDescMulti,
       features: [
-        { name: ta.featureAllFromCore, value: '+', included: true },
-        { name: ta.featureWaiterTablet, included: true },
-        { name: ta.featureGuestCrm, included: true },
-        { name: ta.featureFinancialReports, included: true },
-        { name: ta.featureShiftManagement, included: true },
-        { name: ta.featureUnlimitedLocations, included: true },
-        { name: ta.featureApiAccess, included: true },
+        { name: ta.featureAllFromPro, value: '+', included: true },
+        { name: ta.benefitMultiLoc, included: true },
+        { name: ta.benefitShifts, included: true },
+        { name: ta.benefitApi, included: true },
+        { name: ta.featureAutoOrder, included: true },
       ],
+      savingsBadge: ta.roiMultiBadge,
     },
     {
       id: 'enterprise' as const,
       name: 'Enterprise',
-      priceMonthly: 29900, // "from" price
+      priceMonthly: 34900,
       priceYearly: 0,
       description: ta.planDescEnterprise,
       features: [
@@ -98,9 +104,10 @@ function PricingPageContent() {
   ]
   const { tier } = useSubscription()
   const searchParams = useSearchParams()
-  const [isYearly, setIsYearly] = useState(true)
+  const [isYearly, setIsYearly] = useState(false)
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [checkoutPlan, setCheckoutPlan] = useState<typeof plans[0] | null>(null)
 
   const showError = useCallback((message: string) => {
     setError(message)
@@ -114,17 +121,7 @@ function PricingPageContent() {
 
   const canceled = searchParams.get('canceled')
 
-  const handleSelectPlan = async (plan: typeof plans[0]) => {
-    // Trial plan - redirect to register or dashboard
-    if (plan.id === 'trial') {
-      if (user) {
-        window.location.href = '/dashboard'
-      } else {
-        window.location.href = '/register'
-      }
-      return
-    }
-
+  const handleSelectPlan = (plan: typeof plans[0]) => {
     // Enterprise - contact sales
     if (plan.id === 'enterprise') {
       window.location.href = 'mailto:htorus@hookahtorus.com?subject=Enterprise%20Plan'
@@ -138,13 +135,27 @@ function PricingPageContent() {
     }
 
     // Check if Stripe is configured
-    const priceId = isYearly ? plan.stripePriceYearly : plan.stripePriceMonthly
+    const priceId = isYearly
+      ? ('stripePriceYearly' in plan ? plan.stripePriceYearly : undefined)
+      : ('stripePriceMonthly' in plan ? plan.stripePriceMonthly : undefined)
     if (!priceId) {
       showError(ta.stripeNotConfigured)
       return
     }
 
-    setLoadingPlan(plan.id)
+    // Show confirmation modal before Stripe checkout
+    setCheckoutPlan(plan)
+  }
+
+  const handleConfirmCheckout = async () => {
+    if (!checkoutPlan || !user) return
+
+    const priceId = isYearly
+      ? ('stripePriceYearly' in checkoutPlan ? checkoutPlan.stripePriceYearly : undefined)
+      : ('stripePriceMonthly' in checkoutPlan ? checkoutPlan.stripePriceMonthly : undefined)
+    if (!priceId) return
+
+    setLoadingPlan(checkoutPlan.id)
 
     try {
       const response = await fetch('/api/stripe/checkout', {
@@ -170,10 +181,22 @@ function PricingPageContent() {
       showError(msg)
     } finally {
       setLoadingPlan(null)
+      setCheckoutPlan(null)
     }
   }
 
-  const yearlyDiscount = Math.round((1 - 79000 / (7900 * 12)) * 100)
+  const yearlyDiscount = 17
+
+  const getButtonText = (plan: typeof plans[0]) => {
+    if (tier === plan.id) return tm.currentPlan
+    switch (plan.id) {
+      case 'core': return ta.tryFree14
+      case 'pro': return ta.bookDemo
+      case 'multi': return ta.requestConnect
+      case 'enterprise': return ta.contactSales
+      default: return ta.subscribe
+    }
+  }
 
   return (
     <ErrorBoundary sectionName="Pricing">
@@ -216,13 +239,27 @@ function PricingPageContent() {
           </div>
         )}
 
+        {/* Trial trust badge */}
+        <div className="text-center mb-4">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)] text-sm font-medium">
+            {ta.pricingTrialBadge}
+          </span>
+        </div>
+
         {/* Hero */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">
             {tm.pricingSubtitle}
           </h1>
-          <p className="text-xl text-[var(--color-textMuted)] max-w-2xl mx-auto">
+          <p className="text-xl text-[var(--color-textMuted)] max-w-2xl mx-auto whitespace-pre-line">
             {ta.pricingHeroSubtitle}
+          </p>
+        </div>
+
+        {/* ROI quote */}
+        <div className="mb-10 text-center">
+          <p className="text-sm italic text-[var(--color-textMuted)] max-w-lg mx-auto">
+            {ta.roiBanner}
           </p>
         </div>
 
@@ -252,7 +289,7 @@ function PricingPageContent() {
             <span className={`text-xs px-2 py-0.5 rounded-full ${
               isYearly ? 'bg-white/20' : 'bg-[var(--color-success)] text-white'
             }`}>
-              -{yearlyDiscount}%
+              -{yearlyDiscount}% ({ta.yearlySavingsHint})
             </span>
           </button>
         </div>
@@ -264,20 +301,18 @@ function PricingPageContent() {
           </div>
         )}
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        {/* Pricing Cards — 4 plans */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-16 items-start">
           {plans.map((plan) => {
             const isEnterprise = 'isEnterprise' in plan && plan.isEnterprise
             const price = plan.priceYearly === 0 && plan.priceMonthly > 0
-              ? plan.priceMonthly // Enterprise: show "from" price
+              ? plan.priceMonthly
               : isYearly ? plan.priceYearly : plan.priceMonthly
-            const priceDisplay = price === 0
-              ? plan.id === 'trial' ? ta.priceFree : ta.contactSales
-              : isEnterprise
-                ? ta.priceFrom(`${(price / 100).toFixed(0)}\u20AC`)
-                : isYearly
-                  ? ta.pricePerYear(`${(price / 100).toFixed(0)}\u20AC`)
-                  : ta.pricePerMonth(`${(price / 100).toFixed(0)}\u20AC`)
+            const priceDisplay = isEnterprise
+              ? ta.priceFrom(`${(price / 100).toFixed(0)}\u20AC`)
+              : isYearly
+                ? ta.pricePerYear(`${(price / 100).toFixed(0)}\u20AC`)
+                : ta.pricePerMonth(`${(price / 100).toFixed(0)}\u20AC`)
 
             const monthlyEquivalent = isYearly && price > 0 && !isEnterprise
               ? ta.priceMonthlyEquiv(`${Math.round(price / 12 / 100)}\u20AC`)
@@ -291,26 +326,40 @@ function PricingPageContent() {
                 monthlyPrice={monthlyEquivalent}
                 description={plan.description}
                 features={plan.features}
-                isPopular={plan.isPopular}
+                isPopular={'isPopular' in plan && plan.isPopular}
+                highlight={'highlight' in plan && plan.highlight}
+                accentMint={'accentMint' in plan && plan.accentMint}
                 isCurrent={tier === plan.id}
                 isLoading={loadingPlan === plan.id}
                 onSelect={() => handleSelectPlan(plan)}
-                buttonText={
-                  tier === plan.id
-                    ? tm.currentPlan
-                    : isEnterprise
-                      ? ta.contactSales
-                      : price === 0
-                        ? ta.startFree
-                        : ta.subscribe
-                }
+                savingsBadge={'savingsBadge' in plan ? plan.savingsBadge : null}
+                buttonText={getButtonText(plan)}
               />
             )
           })}
         </div>
 
+        {/* Trial gradient banner */}
+        <div className="mb-16">
+          <div className="relative overflow-hidden rounded-2xl p-8 text-center bg-gradient-to-r from-[#00E6B4]/15 via-[var(--color-primary)]/10 to-purple-500/10 border border-[#00E6B4]/20">
+            <h3 className="text-xl font-bold mb-2">{ta.trialBannerTitle}</h3>
+            <p className="text-[var(--color-textMuted)] mb-5 max-w-xl mx-auto">{ta.trialBannerSubtitle}</p>
+            <Link
+              href={user ? '/dashboard' : '/register'}
+              className="btn btn-primary inline-flex items-center gap-2 px-8"
+            >
+              {ta.trialBannerButton}
+            </Link>
+          </div>
+        </div>
+
+        {/* Support note */}
+        <div className="mb-16 text-center">
+          <p className="text-sm text-[var(--color-textMuted)]">{ta.supportNote}</p>
+        </div>
+
         {/* FAQ */}
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto mb-16">
           <h2 className="text-2xl font-bold text-center mb-8">{ta.faqTitle}</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
@@ -329,8 +378,22 @@ function PricingPageContent() {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-16 text-center">
+        {/* "Not sure which plan?" CTA */}
+        <div className="mb-16">
+          <div className="card p-8 text-center">
+            <h3 className="text-xl font-bold mb-2">{ta.helpChooseTitle}</h3>
+            <p className="text-[var(--color-textMuted)] mb-5">{ta.helpChooseSubtitle}</p>
+            <a
+              href="mailto:htorus@hookahtorus.com?subject=Help%20Choose%20Plan"
+              className="btn btn-primary inline-flex items-center gap-2 px-8"
+            >
+              {ta.helpChooseButton}
+            </a>
+          </div>
+        </div>
+
+        {/* Contact */}
+        <div className="text-center">
           <p className="text-[var(--color-textMuted)] mb-4">
             {ta.contactCta}
           </p>
@@ -342,6 +405,23 @@ function PricingPageContent() {
           </a>
         </div>
       </main>
+
+      {/* Checkout confirmation modal (German law: BGB §312j) */}
+      {checkoutPlan && (
+        <CheckoutConfirmModal
+          open={!!checkoutPlan}
+          planName={checkoutPlan.name}
+          price={
+            isYearly
+              ? ta.pricePerYear(`${((checkoutPlan.priceYearly || 0) / 100).toFixed(0)}\u20AC`)
+              : ta.pricePerMonth(`${((checkoutPlan.priceMonthly || 0) / 100).toFixed(0)}\u20AC`)
+          }
+          billingPeriod={isYearly ? ta.billingYearly : ta.billingMonthly}
+          isLoading={loadingPlan === checkoutPlan.id}
+          onConfirm={handleConfirmCheckout}
+          onCancel={() => setCheckoutPlan(null)}
+        />
+      )}
     </div>
     </ErrorBoundary>
   )

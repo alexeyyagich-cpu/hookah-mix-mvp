@@ -90,7 +90,7 @@ export const manage = {
 
   // Pricing
   pricingTitle: 'Тарифы',
-  pricingSubtitle: 'Выберите тариф для вашего бизнеса',
+  pricingSubtitle: 'Сколько стоит порядок в вашей кальянной?',
   free: 'Пробный',
   perMonth: '/мес',
   currentPlan: 'Текущий тариф',
@@ -446,6 +446,10 @@ export const manage = {
   categoryJuice: 'Соки',
   categoryGarnish: 'Гарниш',
   categoryBitter: 'Биттеры',
+  categoryWine: 'Вино',
+  categoryBeer: 'Пиво',
+  categoryIce: 'Лёд',
+  categoryOther: 'Другое',
   categoryCocktails: 'Коктейли',
 
   // Shifts & Reconciliation

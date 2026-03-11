@@ -19,7 +19,13 @@ interface PricingCardProps {
   isLoading?: boolean
   onSelect: () => void
   buttonText?: string
+  savingsBadge?: string | null
+  highlight?: boolean
+  accentMint?: boolean
 }
+
+const MINT = '#00E6B4'
+const MINT_BG = 'rgba(0, 230, 180, 0.1)'
 
 export function PricingCard({
   name,
@@ -32,21 +38,39 @@ export function PricingCard({
   isLoading,
   onSelect,
   buttonText,
+  savingsBadge,
+  highlight,
+  accentMint,
 }: PricingCardProps) {
   const tc = useTranslation('common')
   const resolvedButtonText = buttonText ?? tc.pricing.select
+  const isHighlighted = isPopular || highlight
+
+  const borderClass = isHighlighted
+    ? accentMint
+      ? 'border-[#00E6B4] shadow-lg shadow-[#00E6B4]/15'
+      : 'border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10'
+    : ''
+
+  const scaleClass = highlight ? 'scale-[1.10] z-10' : ''
+
   return (
-    <div
-      className={`card relative p-6 flex flex-col ${
-        isPopular ? 'border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10' : ''
-      }`}
-    >
+    <div className={`card relative p-6 flex flex-col transition-transform ${borderClass} ${scaleClass}`}>
       {/* Popular Badge */}
       {isPopular && !isCurrent && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="px-4 py-1 rounded-full bg-[var(--color-primary)] text-[var(--color-bg)] text-xs font-semibold">
-            {tc.pricing.popular}
-          </span>
+          {accentMint ? (
+            <span
+              className="px-4 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+              style={{ backgroundColor: MINT, color: '#0E0F11' }}
+            >
+              {tc.pricing.popular}
+            </span>
+          ) : (
+            <span className="px-4 py-1 rounded-full bg-[var(--color-primary)] text-[var(--color-bg)] text-xs font-semibold whitespace-nowrap">
+              {tc.pricing.popular}
+            </span>
+          )}
         </div>
       )}
 
@@ -71,6 +95,22 @@ export function PricingCard({
             </span>
           )}
         </div>
+        {savingsBadge && (
+          <div className="mt-3">
+            {accentMint ? (
+              <span
+                className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                style={{ backgroundColor: MINT_BG, color: MINT }}
+              >
+                {savingsBadge}
+              </span>
+            ) : (
+              <span className="inline-block px-3 py-1 rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)] text-xs font-semibold">
+                {savingsBadge}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Features */}
@@ -78,7 +118,9 @@ export function PricingCard({
         {features.map((feature, index) => (
           <li key={index} className="flex items-start gap-3">
             {feature.included ? (
-              <span className="text-[var(--color-success)] mt-0.5">✓</span>
+              <span className="mt-0.5" style={accentMint ? { color: MINT } : { color: 'var(--color-success)' }}>
+                ✓
+              </span>
             ) : (
               <span className="text-[var(--color-textMuted)] mt-0.5">✕</span>
             )}
@@ -93,16 +135,20 @@ export function PricingCard({
       </ul>
 
       {/* Button */}
-      <button type="button"
+      <button
+        type="button"
         onClick={onSelect}
         disabled={isCurrent || isLoading}
         className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
-          isPopular && !isCurrent
-            ? 'btn-primary'
-            : isCurrent
+          isCurrent
             ? 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] cursor-not-allowed'
-            : 'btn-ghost hover:bg-[var(--color-bgHover)]'
+            : isHighlighted && !accentMint
+              ? 'btn-primary'
+              : !isHighlighted
+                ? 'btn-ghost hover:bg-[var(--color-bgHover)]'
+                : ''
         } ${isLoading ? 'opacity-70 cursor-wait' : ''}`}
+        style={isHighlighted && accentMint && !isCurrent ? { backgroundColor: MINT, color: '#0E0F11' } : undefined}
       >
         {isLoading ? (
           <>

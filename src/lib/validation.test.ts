@@ -1,14 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import {
   slugSchema,
+  ocrExtractResponseSchema,
+  telegramUpdateSchema,
   publicOrderSchema,
   inviteSendSchema,
   tipCreateSessionSchema,
   pushSubscribeSchema,
   pushUnsubscribeSchema,
+  pushSendSchema,
   stripeCheckoutSchema,
+  stripePortalSchema,
   emailLowStockSchema,
   emailOrderStatusSchema,
+  adminOrgUpdateSchema,
   validateBody,
 } from './validation'
 
@@ -247,5 +252,169 @@ describe('validateBody', () => {
   it('handles undefined input', () => {
     const result = validateBody(slugSchema, undefined)
     expect(result.error).toBeTruthy()
+  })
+})
+
+// ── ocrExtractResponseSchema ─────────────────────────────────────────
+
+describe('ocrExtractResponseSchema', () => {
+  it('accepts valid response with items', () => {
+    const data = {
+      items: [{ brand: 'Darkside', flavor: 'Grape', quantity: 2, price: 15.99, packageGrams: 200 }],
+      total: 31.98,
+      supplier: 'Shop',
+      date: '2024-01-15',
+    }
+    expect(ocrExtractResponseSchema.safeParse(data).success).toBe(true)
+  })
+
+  it('applies defaults for missing item fields', () => {
+    const result = ocrExtractResponseSchema.safeParse({ items: [{}] })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.items[0].brand).toBe('Unknown')
+      expect(result.data.items[0].quantity).toBe(1)
+      expect(result.data.items[0].packageGrams).toBe(200)
+    }
+  })
+
+  it('accepts empty object (defaults to empty items)', () => {
+    const result = ocrExtractResponseSchema.safeParse({})
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.items).toEqual([])
+    }
+  })
+
+  it('rejects items array exceeding 100', () => {
+    const items = Array.from({ length: 101 }, () => ({}))
+    expect(ocrExtractResponseSchema.safeParse({ items }).success).toBe(false)
+  })
+})
+
+// ── telegramUpdateSchema ─────────────────────────────────────────────
+
+describe('telegramUpdateSchema', () => {
+  it('accepts message update', () => {
+    const update = {
+      update_id: 123,
+      message: {
+        message_id: 1,
+        chat: { id: 456 },
+        text: '/start',
+        from: { id: 789, username: 'user' },
+      },
+    }
+    expect(telegramUpdateSchema.safeParse(update).success).toBe(true)
+  })
+
+  it('accepts callback_query update', () => {
+    const update = {
+      update_id: 124,
+      callback_query: {
+        id: 'cb1',
+        data: 'action',
+        message: { message_id: 2, chat: { id: 456 } },
+      },
+    }
+    expect(telegramUpdateSchema.safeParse(update).success).toBe(true)
+  })
+
+  it('accepts update with neither message nor callback_query', () => {
+    expect(telegramUpdateSchema.safeParse({ update_id: 125 }).success).toBe(true)
+  })
+
+  it('rejects missing update_id', () => {
+    expect(telegramUpdateSchema.safeParse({}).success).toBe(false)
+  })
+
+  it('passes through unknown fields', () => {
+    const result = telegramUpdateSchema.safeParse({ update_id: 1, extra: true })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect((result.data as Record<string, unknown>).extra).toBe(true)
+    }
+  })
+})
+
+// ── pushSendSchema ───────────────────────────────────────────────────
+
+describe('pushSendSchema', () => {
+  const valid = {
+    profileId: '550e8400-e29b-41d4-a716-446655440000',
+    title: 'Low stock alert',
+  }
+
+  it('accepts valid push', () => {
+    expect(pushSendSchema.safeParse(valid).success).toBe(true)
+  })
+
+  it('accepts with optional body, tag, url', () => {
+    expect(pushSendSchema.safeParse({ ...valid, body: 'Details', tag: 'stock', url: '/dash' }).success).toBe(true)
+  })
+
+  it('rejects empty title', () => {
+    expect(pushSendSchema.safeParse({ ...valid, title: '' }).success).toBe(false)
+  })
+
+  it('rejects non-UUID profileId', () => {
+    expect(pushSendSchema.safeParse({ ...valid, profileId: 'bad' }).success).toBe(false)
+  })
+
+  it('rejects title > 200 chars', () => {
+    expect(pushSendSchema.safeParse({ ...valid, title: 'x'.repeat(201) }).success).toBe(false)
+  })
+})
+
+// ── stripePortalSchema ───────────────────────────────────────────────
+
+describe('stripePortalSchema', () => {
+  it('accepts valid UUID', () => {
+    expect(stripePortalSchema.safeParse({ userId: '550e8400-e29b-41d4-a716-446655440000' }).success).toBe(true)
+  })
+
+  it('rejects missing userId', () => {
+    expect(stripePortalSchema.safeParse({}).success).toBe(false)
+  })
+
+  it('rejects non-UUID userId', () => {
+    expect(stripePortalSchema.safeParse({ userId: 'not-uuid' }).success).toBe(false)
+  })
+})
+
+// ── adminOrgUpdateSchema ─────────────────────────────────────────────
+
+describe('adminOrgUpdateSchema', () => {
+  const valid = { id: '550e8400-e29b-41d4-a716-446655440000' }
+
+  it('accepts id only', () => {
+    expect(adminOrgUpdateSchema.safeParse(valid).success).toBe(true)
+  })
+
+  it('accepts with subscription_tier', () => {
+    expect(adminOrgUpdateSchema.safeParse({ ...valid, subscription_tier: 'multi' }).success).toBe(true)
+  })
+
+  it('rejects invalid tier', () => {
+    expect(adminOrgUpdateSchema.safeParse({ ...valid, subscription_tier: 'gold' }).success).toBe(false)
+  })
+
+  it('accepts all valid tiers', () => {
+    for (const tier of ['trial', 'core', 'pro', 'multi', 'enterprise']) {
+      expect(adminOrgUpdateSchema.safeParse({ ...valid, subscription_tier: tier }).success).toBe(true)
+    }
+  })
+
+  it('accepts nullable trial_expires_at', () => {
+    expect(adminOrgUpdateSchema.safeParse({ ...valid, trial_expires_at: null }).success).toBe(true)
+    expect(adminOrgUpdateSchema.safeParse({ ...valid, trial_expires_at: '2026-04-01' }).success).toBe(true)
+  })
+
+  it('rejects non-UUID id', () => {
+    expect(adminOrgUpdateSchema.safeParse({ id: 'bad' }).success).toBe(false)
+  })
+
+  it('rejects missing id', () => {
+    expect(adminOrgUpdateSchema.safeParse({}).success).toBe(false)
   })
 })

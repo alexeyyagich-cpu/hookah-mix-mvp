@@ -16,6 +16,7 @@ export function RegisterForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const { signUp } = useAuth()
   const router = useRouter()
   const t = useTranslation('auth')
@@ -23,6 +24,11 @@ export function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (!termsAccepted) {
+      setError(t.mustAcceptTerms)
+      return
+    }
 
     if (password !== confirmPassword) {
       setError(t.passwordMismatch)
@@ -46,6 +52,13 @@ export function RegisterForm() {
         setError(translateError(signUpError))
         return
       }
+
+      // Notify admin about new signup (fire-and-forget)
+      fetch('/api/admin/notify-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, businessName, ownerName }),
+      }).catch(() => {})
 
       setSuccess(true)
     } catch {
@@ -189,9 +202,29 @@ export function RegisterForm() {
           />
         </div>
 
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            className="mt-0.5 w-4 h-4 rounded border-[var(--color-border)] accent-[var(--color-primary)] flex-shrink-0"
+            required
+          />
+          <span className="text-sm text-[var(--color-textMuted)]">
+            {t.agreeTermsPrefix}{' '}
+            <Link href="/legal/terms" target="_blank" className="text-[var(--color-primary)] hover:underline">
+              {t.termsLink}
+            </Link>{' '}
+            {t.and}{' '}
+            <Link href="/legal/privacy" target="_blank" className="text-[var(--color-primary)] hover:underline">
+              {t.privacyLink}
+            </Link>
+          </span>
+        </label>
+
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !termsAccepted}
           className="btn btn-primary w-full py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (

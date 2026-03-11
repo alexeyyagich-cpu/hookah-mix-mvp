@@ -1,6 +1,6 @@
 # Hookah Torus — Präsentation für die Agentur für Arbeit
 
-## Antrag auf Gründungszuschuss
+## Antrag auf Gründungszuschuss | März 2026
 
 ---
 
@@ -147,11 +147,11 @@ Preisvorteil bei deutlich mehr Funktionalität.
 
 | Zeitraum | Meilenstein |
 |---|---|
-| Monat 1–2 | Gewerbeanmeldung, Deutsches UI, erste 10 Registrierungen |
-| Monat 3–4 | 20 Registrierungen, 8 zahlende Bars, MRR €232 |
-| Monat 5–6 | 30 Registrierungen, Marktplatz live, 2 Lieferanten |
-| Monat 7–9 | 50 zahlende Bars, MRR €1.450, Break-Even |
-| Monat 10–12 | Expansion Österreich/Schweiz, MRR €2.000+ |
+| Mrz–Apr 2026 | Gewerbeanmeldung, Deutsches UI, erste 10 Registrierungen |
+| Mai–Jun 2026 | 20 Registrierungen, 8 zahlende Bars, MRR €232 |
+| Jul–Aug 2026 | 30 Registrierungen, Marktplatz live, 2 Lieferanten |
+| Sep–Nov 2026 | 50 zahlende Bars, MRR €1.450, Break-Even |
+| Dez 2026–Feb 2027 | Expansion Österreich/Schweiz, MRR €2.000+ |
 
 ---
 
@@ -161,7 +161,7 @@ Preisvorteil bei deutlich mehr Funktionalität.
 - Web: https://hookahtorus.com
 - Demo-Account: demo@hookahtorus.com / demo2026!
 - E-Mail: oleksii@hookahtorus.com
-- Telefon: [Ihre Nummer]
+- Telefon: [Telefonnummer]
 
 **Das Produkt ist live. Sie können es jetzt testen.**
 

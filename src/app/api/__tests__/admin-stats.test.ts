@@ -120,9 +120,9 @@ describe('/api/admin/stats GET', () => {
     expect(response.status).toBe(200)
     expect(data).toHaveProperty('total_orgs', 3)
     expect(data).toHaveProperty('mrr')
-    expect(data.mrr).toBe(79 + 149) // 1 core + 1 multi
+    expect(data.mrr).toBe(99 + 189) // 1 core + 1 multi
     expect(data).toHaveProperty('orgs_by_tier')
-    expect(data.orgs_by_tier).toEqual({ trial: 1, core: 1, multi: 1, enterprise: 0 })
+    expect(data.orgs_by_tier).toEqual({ trial: 1, core: 1, pro: 0, multi: 1, enterprise: 0 })
     expect(data).toHaveProperty('active_orgs_7d', 5)
     expect(data).toHaveProperty('total_users', 10)
     expect(data).toHaveProperty('recent_signups_30d')

@@ -144,31 +144,42 @@ export const auth = {
   footerCopyright: (year: number) => `© ${year} Hookah Torus. Все права защищены.`,
 
   // Pricing page
-  pricingHeroSubtitle: 'Инструменты для учета табака, анализа сессий и оптимизации работы вашего заведения',
+  pricingHeroSubtitle: 'Hookah Torus заменяет 5 инструментов и экономит до 5 часов в день.\nВыберите тариф и держите всё под контролем \u2014 от табака до прибыли.',
+  pricingTrialBadge: '14 дней бесплатно \u2014 без кредитки',
   paymentCanceled: 'Оплата была отменена. Выберите тариф, чтобы попробовать снова.',
   billingMonthly: 'Ежемесячно',
   billingYearly: 'Ежегодно',
+  yearlySavingsHint: '2 месяца бесплатно',
   priceFree: 'Бесплатно',
   pricePerYear: (price: string) => `${price}/год`,
   pricePerMonth: (price: string) => `${price}/мес`,
-  priceMonthlyEquiv: (price: string) => `≈ ${price}/мес`,
+  priceMonthlyEquiv: (price: string) => `\u2248 ${price}/мес`,
   subscribe: 'Подключить',
+  bookDemo: 'Забронировать демо',
+  bookDemoHint: 'Покажем, как Hookah Torus окупается за 1 неделю',
   stripeNotConfigured: 'Stripe не настроен. Добавьте STRIPE_PRICE_* в переменные окружения.',
   paymentError: 'Ошибка при создании сессии оплаты. Попробуйте позже.',
 
   // Pricing page — Plan descriptions
   planDescFree: 'Для небольших заведений',
-  planDescPro: 'Для активных заведений',
-  planDescEnterprise: 'Для сетей заведений',
-  planDescTrial: '14 дней — полный доступ бесплатно',
-  planDescCore: 'Для одного заведения',
-  planDescMulti: 'Для нескольких локаций',
+  planDescPro: 'Для кальянных с баром и постоянным потоком гостей',
+  planDescEnterprise: 'Для сетей 5+ заведений',
+  planDescTrial: 'Полный доступ, импорт ассортимента, Telegram-бот с отчётами',
+  planDescCore: 'Для одной кальянной, чтобы навести порядок',
+  planDescMulti: 'Для сетей и нескольких локаций',
+
+  // ROI messaging
+  roiBanner: '\u00AB\u20AC99 \u2014 это 1 час работы администратора. Система экономит 5 таких часов каждый день.\u00BB',
+  roiCoreHint: 'Экономит до 20% закупочного бюджета',
+  roiMultiSaves: 'Экономит до 5ч/день на операционке',
+  roiProBadge: 'Выбор владельцев',
+  roiMultiBadge: 'Рекомендовано для сетей',
 
   // Pricing page — Contact / Enterprise
   contactSales: 'Связаться с нами',
   priceFrom: (price: string) => `от ${price}/мес`,
 
-  // Pricing page — Feature names
+  // Pricing page — Feature names (benefit-oriented)
   featureInventoryItems: 'Позиций в инвентаре',
   featureSessionHistory: 'История сессий',
   featureSessionDays: (days: string) => `${days} дней`,
@@ -199,6 +210,18 @@ export const auth = {
   featureGuestCrm: 'Гостевая CRM и промоакции',
   featureFinancialReports: 'Финансовые отчёты (P&L)',
   featureShiftManagement: 'Управление сменами',
+  // Benefit-style feature descriptions
+  benefitAutoWriteOff: 'Автоматически списывает табак и считает себестоимость чаш',
+  benefitTelegramPL: 'Ежедневный P&L в Telegram \u2014 владелец всегда в курсе',
+  benefitQrOrder: 'Гости заказывают с QR-кода \u2014 официанты не теряют заказы',
+  benefitOffline: 'Работает оффлайн и на любом устройстве',
+  benefitSaveBudget: 'Экономит до 20% закупочного бюджета за счёт учёта остатков',
+  benefitCrmLoyalty: 'CRM и программа лояльности \u2014 гости возвращаются',
+  benefitBarModule: 'Модуль бармена \u2014 рецепты, себестоимость, продажи',
+  benefitPromo: 'Промо-акции и бонусы \u2014 увеличивают средний чек',
+  benefitMultiLoc: 'Все локации в одном кабинете \u2014 P&L по каждой',
+  benefitShifts: 'Смены и сверка кассы \u2014 контроль персонала',
+  benefitApi: 'API для интеграции с вашими системами',
 
   // Pricing page — FAQ
   faqTitle: 'Часто задаваемые вопросы',
@@ -207,7 +230,7 @@ export const auth = {
   faqQ2: 'Какие способы оплаты доступны?',
   faqA2: 'Мы принимаем банковские карты (Visa, Mastercard, American Express) через безопасную платежную систему Stripe.',
   faqQ3: 'Можно ли попробовать Pro-функции перед оплатой?',
-  faqA3: 'Бесплатный тариф доступен навсегда с основными функциями. Перейдите на Pro в любой момент \u2014 отмена в течение 14 дней с полным возвратом.',
+  faqA3: 'Да! Trial даёт полный доступ ко всем функциям на 14 дней. Без кредитки. Потом выберите подходящий тариф.',
   faqQ4: 'Могу ли я перейти на другой тариф?',
   faqA4: 'Да, вы можете повысить или понизить тариф в любой момент через личный кабинет.',
   faqQ5: 'Что будет с моими данными при понижении тарифа?',
@@ -215,8 +238,20 @@ export const auth = {
   faqQ6: 'Возможен ли возврат средств?',
   faqA6: 'Да, в течение 14 дней после оплаты вы можете запросить полный возврат средств.',
 
-  // Pricing page — Contact
+  // Pricing page — Contact & CTAs
   contactCta: 'Есть вопросы? Напишите нам',
+  trialBannerTitle: 'Попробуйте Hookah Torus бесплатно 14 дней',
+  trialBannerSubtitle: 'Без карты. Полный доступ ко всем функциям: KDS, Telegram-бот, CRM, P&L.',
+  trialBannerButton: 'Начать бесплатный период',
+  supportNote: 'Все тарифы включают обновления, резервные копии, оффлайн-режим и поддержку на русском, английском и немецком.',
+  helpChooseTitle: 'Не знаете, что выбрать?',
+  helpChooseSubtitle: 'Оставьте заявку, мы подберём решение.',
+  helpChooseButton: 'Подобрать тариф',
+  tryFree14: 'Попробовать 14 дней бесплатно',
+  requestConnect: 'Запросить подключение',
+  // Pro specific benefits
+  benefitGuestSegments: 'Сегментация гостей и напоминания',
+  benefitAdvancedStats: 'Расширенная статистика продаж',
 
   // Join / Invite page
   invalidLink: 'Недействительная ссылка',
@@ -236,4 +271,22 @@ export const auth = {
   error: 'Ошибка',
   loginFailed: 'Не удалось войти. Попробуйте ещё раз.',
   registrationFailed: 'Не удалось создать аккаунт. Попробуйте ещё раз.',
+
+  // Legal consent (registration)
+  agreeTermsPrefix: 'Я принимаю',
+  termsLink: 'Условия использования',
+  and: 'и',
+  privacyLink: 'Политику конфиденциальности',
+  mustAcceptTerms: 'Необходимо принять Условия использования и Политику конфиденциальности',
+
+  // Checkout confirmation (Widerrufsbelehrung)
+  checkoutConfirmTitle: 'Подтверждение заказа',
+  orderSummary: 'Сводка заказа',
+  plan: 'Тариф',
+  billingPeriodLabel: 'Период оплаты',
+  widerrufsbelehrungSummary: 'Вы имеете право отказаться от договора в течение 14 дней без указания причин. Отметив галочку ниже, вы даёте согласие на немедленное начало оказания услуг и подтверждаете, что теряете право на отзыв.',
+  waiveWithdrawalRight: 'Я даю согласие на немедленное предоставление цифровой услуги и подтверждаю утрату права на отзыв',
+  acceptTermsCheckout: 'Я принимаю Условия использования',
+  proceedToPayment: 'Перейти к оплате',
+  widerrufsDetails: 'Подробнее о праве на отзыв',
 }

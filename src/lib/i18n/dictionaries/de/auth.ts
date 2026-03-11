@@ -140,25 +140,36 @@ export const auth: typeof AuthType = {
   footerCopyright: (year: number) => `\u00A9 ${year} Hookah Torus. Alle Rechte vorbehalten.`,
 
   // Pricing page
-  pricingHeroSubtitle: 'Werkzeuge für Tabak-Inventar, Sitzungsanalyse und Optimierung Ihres Lokalbetriebs',
+  pricingHeroSubtitle: 'Hookah Torus ersetzt 5 Tools und spart bis zu 5 Stunden am Tag.\nWählen Sie einen Tarif und behalten Sie alles im Griff \u2014 vom Tabak bis zum Gewinn.',
+  pricingTrialBadge: '14 Tage kostenlos \u2014 ohne Kreditkarte',
   paymentCanceled: 'Zahlung wurde abgebrochen. Wählen Sie einen Tarif, um es erneut zu versuchen.',
   billingMonthly: 'Monatlich',
   billingYearly: 'Jährlich',
+  yearlySavingsHint: '2 Monate gratis',
   priceFree: 'Kostenlos',
   pricePerYear: (price: string) => `${price}/Jahr`,
   pricePerMonth: (price: string) => `${price}/Monat`,
   priceMonthlyEquiv: (price: string) => `\u2248 ${price}/Monat`,
   subscribe: 'Abonnieren',
+  bookDemo: 'Demo buchen',
+  bookDemoHint: 'Wir zeigen, wie sich Hookah Torus in 1 Woche amortisiert',
   stripeNotConfigured: 'Stripe nicht konfiguriert. Fügen Sie STRIPE_PRICE_* zu den Umgebungsvariablen hinzu.',
   paymentError: 'Fehler beim Erstellen der Zahlungssitzung. Bitte versuchen Sie es später erneut.',
 
   // Pricing page — Plan descriptions
   planDescFree: 'Für kleine Lokale',
-  planDescPro: 'Für aktive Lokale',
-  planDescEnterprise: 'Für Lokalketten',
-  planDescTrial: '14 Tage — voller Zugang kostenlos',
-  planDescCore: 'Für eine Filiale',
-  planDescMulti: 'Für mehrere Standorte',
+  planDescPro: 'Für Shisha-Bars mit Bar und stetigem Gästefluss',
+  planDescEnterprise: 'Für Ketten mit 5+ Standorten',
+  planDescTrial: 'Voller Zugang, Sortiment-Import, Telegram-Berichte',
+  planDescCore: 'Für eine Shisha-Bar \u2014 Ordnung schaffen',
+  planDescMulti: 'Für Ketten und mehrere Standorte',
+
+  // ROI messaging
+  roiBanner: '\u00AB\u20AC99 ist 1 Stunde Adminzeit. Das System spart 5 solcher Stunden jeden Tag.\u00BB',
+  roiCoreHint: 'Spart bis zu 20% beim Einkauf',
+  roiMultiSaves: 'Spart bis zu 5h/Tag im Betrieb',
+  roiProBadge: 'Wahl der Inhaber',
+  roiMultiBadge: 'Empfohlen für Ketten',
 
   contactSales: 'Kontakt aufnehmen',
   priceFrom: (price: string) => `ab ${price}/Monat`,
@@ -194,6 +205,18 @@ export const auth: typeof AuthType = {
   featureGuestCrm: 'Gäste-CRM & Aktionen',
   featureFinancialReports: 'Finanzberichte (GuV)',
   featureShiftManagement: 'Schichtverwaltung',
+  // Benefit-style feature descriptions
+  benefitAutoWriteOff: 'Automatische Tabak-Abbuchung und Kopfkosten-Berechnung',
+  benefitTelegramPL: 'Täglicher GuV in Telegram \u2014 Inhaber immer informiert',
+  benefitQrOrder: 'Gäste bestellen per QR \u2014 Kellner verlieren keine Bestellungen',
+  benefitOffline: 'Funktioniert offline, auf jedem Gerät',
+  benefitSaveBudget: 'Spart bis zu 20% beim Einkauf durch Bestandskontrolle',
+  benefitCrmLoyalty: 'CRM & Treueprogramm \u2014 Gäste kommen zurück',
+  benefitBarModule: 'Barkeeper-Modul \u2014 Rezepte, Kosten, Verkäufe',
+  benefitPromo: 'Aktionen & Boni \u2014 erhöhen den Durchschnittsbon',
+  benefitMultiLoc: 'Alle Standorte in einem Dashboard \u2014 GuV für jeden',
+  benefitShifts: 'Schichten & Kassenabstimmung \u2014 Personalkontrolle',
+  benefitApi: 'API für die Integration mit Ihren Systemen',
 
   // Pricing page — FAQ
   faqTitle: 'Häufig gestellte Fragen',
@@ -202,7 +225,7 @@ export const auth: typeof AuthType = {
   faqQ2: 'Welche Zahlungsmethoden sind verfügbar?',
   faqA2: 'Wir akzeptieren Kreditkarten (Visa, Mastercard, American Express) über das sichere Stripe-Zahlungssystem.',
   faqQ3: 'Kann ich Pro-Funktionen vor der Zahlung testen?',
-  faqA3: 'Der kostenlose Tarif ist dauerhaft mit Kernfunktionen verfügbar. Wechseln Sie jederzeit zu Pro \u2014 Kündigung innerhalb von 14 Tagen mit voller Rückerstattung.',
+  faqA3: 'Ja! Trial gibt vollen Zugang zu allen Funktionen für 14 Tage. Ohne Kreditkarte. Danach wählen Sie den passenden Tarif.',
   faqQ4: 'Kann ich zu einem anderen Tarif wechseln?',
   faqA4: 'Ja, Sie können Ihren Tarif jederzeit über Ihr Dashboard upgraden oder downgraden.',
   faqQ5: 'Was passiert mit meinen Daten bei einem Downgrade?',
@@ -210,8 +233,20 @@ export const auth: typeof AuthType = {
   faqQ6: 'Ist eine Rückerstattung möglich?',
   faqA6: 'Ja, innerhalb von 14 Tagen nach der Zahlung können Sie eine vollständige Rückerstattung anfordern.',
 
-  // Pricing page — Contact
+  // Pricing page — Contact & CTAs
   contactCta: 'Haben Sie Fragen? Kontaktieren Sie uns',
+  trialBannerTitle: 'Testen Sie Hookah Torus 14 Tage kostenlos',
+  trialBannerSubtitle: 'Ohne Karte. Voller Zugang zu allen Funktionen: KDS, Telegram-Bot, CRM, GuV.',
+  trialBannerButton: 'Kostenlose Testphase starten',
+  supportNote: 'Alle Tarife beinhalten Updates, Backups, Offline-Modus und Support auf Deutsch, Englisch und Russisch.',
+  helpChooseTitle: 'Nicht sicher, welcher Tarif passt?',
+  helpChooseSubtitle: 'Hinterlassen Sie eine Anfrage, wir finden die richtige Lösung.',
+  helpChooseButton: 'Tarif finden',
+  tryFree14: '14 Tage kostenlos testen',
+  requestConnect: 'Zugang anfragen',
+  // Pro specific benefits
+  benefitGuestSegments: 'Gästesegmentierung & Erinnerungen',
+  benefitAdvancedStats: 'Erweiterte Verkaufsstatistiken',
 
   // Join / Invite page
   invalidLink: 'Ungültiger Link',
@@ -231,4 +266,22 @@ export const auth: typeof AuthType = {
   error: 'Fehler',
   loginFailed: 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.',
   registrationFailed: 'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+
+  // Legal consent (registration)
+  agreeTermsPrefix: 'Ich akzeptiere die',
+  termsLink: 'AGB',
+  and: 'und die',
+  privacyLink: 'Datenschutzerklärung',
+  mustAcceptTerms: 'Sie müssen die AGB und Datenschutzerklärung akzeptieren',
+
+  // Checkout confirmation (Widerrufsbelehrung)
+  checkoutConfirmTitle: 'Bestellbestätigung',
+  orderSummary: 'Bestellübersicht',
+  plan: 'Tarif',
+  billingPeriodLabel: 'Abrechnungszeitraum',
+  widerrufsbelehrungSummary: 'Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Indem Sie unten das Häkchen setzen, stimmen Sie zu, dass die Leistung sofort beginnt und bestätigen, dass Sie Ihr Widerrufsrecht verlieren.',
+  waiveWithdrawalRight: 'Ich stimme ausdrücklich zu, dass mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist begonnen wird, und mir ist bekannt, dass ich damit mein Widerrufsrecht verliere',
+  acceptTermsCheckout: 'Ich akzeptiere die AGB',
+  proceedToPayment: 'Zur Zahlung',
+  widerrufsDetails: 'Einzelheiten zum Widerrufsrecht',
 }

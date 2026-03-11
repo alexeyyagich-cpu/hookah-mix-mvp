@@ -140,25 +140,36 @@ export const auth: typeof AuthType = {
   footerCopyright: (year: number) => `\u00A9 ${year} Hookah Torus. All rights reserved.`,
 
   // Pricing page
-  pricingHeroSubtitle: 'Tools for tobacco inventory, session analysis, and optimizing your venue operations',
+  pricingHeroSubtitle: 'Hookah Torus replaces 5 tools and saves up to 5 hours a day.\nPick a plan and stay in control \u2014 from tobacco to profit.',
+  pricingTrialBadge: '14 days free \u2014 no credit card required',
   paymentCanceled: 'Payment was canceled. Choose a plan to try again.',
   billingMonthly: 'Monthly',
   billingYearly: 'Yearly',
+  yearlySavingsHint: '2 months free',
   priceFree: 'Free',
   pricePerYear: (price: string) => `${price}/year`,
   pricePerMonth: (price: string) => `${price}/mo`,
   priceMonthlyEquiv: (price: string) => `\u2248 ${price}/mo`,
   subscribe: 'Subscribe',
+  bookDemo: 'Book a demo',
+  bookDemoHint: "We'll show how Hookah Torus pays for itself in 1 week",
   stripeNotConfigured: 'Stripe is not configured. Add STRIPE_PRICE_* to environment variables.',
   paymentError: 'Error creating payment session. Please try again later.',
 
   // Pricing page — Plan descriptions
   planDescFree: 'For small venues',
-  planDescPro: 'For active venues',
-  planDescEnterprise: 'For venue chains',
-  planDescTrial: '14 days — full access for free',
-  planDescCore: 'For a single location',
-  planDescMulti: 'For multiple locations',
+  planDescPro: 'For hookah bars with a bar and steady guest flow',
+  planDescEnterprise: 'For chains with 5+ venues',
+  planDescTrial: 'Full access, inventory import, Telegram reports',
+  planDescCore: 'For a single hookah lounge to get organized',
+  planDescMulti: 'For chains and multiple locations',
+
+  // ROI messaging
+  roiBanner: '\u00AB\u20AC99 is 1 hour of an admin\u2019s time. The system saves 5 of those hours every day.\u00BB',
+  roiCoreHint: 'Saves up to 20% on procurement',
+  roiMultiSaves: 'Saves up to 5h/day on operations',
+  roiProBadge: 'Owner\u2019s choice',
+  roiMultiBadge: 'Recommended for chains',
 
   contactSales: 'Contact Sales',
   priceFrom: (price: string) => `from ${price}/mo`,
@@ -194,6 +205,18 @@ export const auth: typeof AuthType = {
   featureGuestCrm: 'Guest CRM & promotions',
   featureFinancialReports: 'Financial reports (P&L)',
   featureShiftManagement: 'Shift management',
+  // Benefit-style feature descriptions
+  benefitAutoWriteOff: 'Auto tobacco write-off and bowl cost tracking',
+  benefitTelegramPL: 'Daily P&L in Telegram \u2014 owner always in the loop',
+  benefitQrOrder: 'Guests order via QR \u2014 waiters never lose an order',
+  benefitOffline: 'Works offline, on any device',
+  benefitSaveBudget: 'Saves up to 20% on procurement through stock tracking',
+  benefitCrmLoyalty: 'CRM & loyalty program \u2014 guests keep coming back',
+  benefitBarModule: 'Bartender module \u2014 recipes, cost, sales',
+  benefitPromo: 'Promotions & bonuses \u2014 increase average check',
+  benefitMultiLoc: 'All locations in one dashboard \u2014 P&L for each',
+  benefitShifts: 'Shifts & cash reconciliation \u2014 staff control',
+  benefitApi: 'API for integration with your systems',
 
   // Pricing page — FAQ
   faqTitle: 'Frequently asked questions',
@@ -202,7 +225,7 @@ export const auth: typeof AuthType = {
   faqQ2: 'What payment methods are available?',
   faqA2: 'We accept credit cards (Visa, Mastercard, American Express) through the secure Stripe payment system.',
   faqQ3: 'Can I try Pro features before paying?',
-  faqA3: 'The free plan is available forever with core features. Upgrade to Pro anytime \u2014 you can cancel within 14 days for a full refund.',
+  faqA3: 'Yes! Trial gives full access to all features for 14 days. No credit card. Then pick the plan that fits.',
   faqQ4: 'Can I switch to a different plan?',
   faqA4: 'Yes, you can upgrade or downgrade your plan at any time from your dashboard.',
   faqQ5: 'What happens to my data when I downgrade?',
@@ -210,8 +233,20 @@ export const auth: typeof AuthType = {
   faqQ6: 'Is a refund possible?',
   faqA6: 'Yes, within 14 days of payment you can request a full refund.',
 
-  // Pricing page — Contact
+  // Pricing page — Contact & CTAs
   contactCta: 'Have questions? Contact us',
+  trialBannerTitle: 'Try Hookah Torus free for 14 days',
+  trialBannerSubtitle: 'No card required. Full access to all features: KDS, Telegram bot, CRM, P&L.',
+  trialBannerButton: 'Start free trial',
+  supportNote: 'All plans include updates, backups, offline mode, and support in English, Russian, and German.',
+  helpChooseTitle: "Not sure which plan to pick?",
+  helpChooseSubtitle: 'Leave a request and we\u2019ll find the right solution.',
+  helpChooseButton: 'Help me choose',
+  tryFree14: 'Try 14 days free',
+  requestConnect: 'Request access',
+  // Pro specific benefits
+  benefitGuestSegments: 'Guest segmentation & reminders',
+  benefitAdvancedStats: 'Advanced sales analytics',
 
   // Join / Invite page
   invalidLink: 'Invalid link',
@@ -231,4 +266,22 @@ export const auth: typeof AuthType = {
   error: 'Error',
   loginFailed: 'Login failed. Please try again.',
   registrationFailed: 'Registration failed. Please try again.',
+
+  // Legal consent (registration)
+  agreeTermsPrefix: 'I accept the',
+  termsLink: 'Terms of Service',
+  and: 'and',
+  privacyLink: 'Privacy Policy',
+  mustAcceptTerms: 'You must accept the Terms of Service and Privacy Policy',
+
+  // Checkout confirmation (Widerrufsbelehrung)
+  checkoutConfirmTitle: 'Order confirmation',
+  orderSummary: 'Order summary',
+  plan: 'Plan',
+  billingPeriodLabel: 'Billing period',
+  widerrufsbelehrungSummary: 'You have the right to withdraw from the contract within 14 days without giving any reason. By checking the box below, you consent to the immediate provision of services and acknowledge that you lose your right of withdrawal.',
+  waiveWithdrawalRight: 'I consent to the immediate provision of the digital service and acknowledge the loss of my right of withdrawal',
+  acceptTermsCheckout: 'I accept the Terms of Service',
+  proceedToPayment: 'Proceed to payment',
+  widerrufsDetails: 'Details on the right of withdrawal',
 }

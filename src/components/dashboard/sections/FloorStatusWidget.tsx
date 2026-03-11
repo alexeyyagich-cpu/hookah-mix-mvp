@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useFloorPlan } from '@/lib/hooks/useFloorPlan'
 import { useTranslation } from '@/lib/i18n'
-import { STATUS_COLORS } from '@/components/floor/FloorPlan'
+import { STATUS_COLORS } from '@/components/floor/floorConstants'
 
 export function FloorStatusWidget() {
   const t = useTranslation('manage')

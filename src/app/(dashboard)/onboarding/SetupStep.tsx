@@ -4,8 +4,11 @@ import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import { useBowls } from '@/lib/hooks/useBowls'
 import { useInventory } from '@/lib/hooks/useInventory'
+import { useBarInventory } from '@/lib/hooks/useBarInventory'
 import { TOBACCOS, getBrandNames, getFlavorsByBrand } from '@/data/tobaccos'
 import { getBowlBrands, getBowlsByBrand } from '@/data/bowls'
+import { BAR_INGREDIENT_PRESETS, BAR_CATEGORY_EMOJI } from '@/data/bar-ingredients'
+import type { BarIngredientCategory } from '@/types/database'
 import type { BusinessType } from '@/lib/hooks/useOnboarding'
 
 interface SetupStepProps {
@@ -17,8 +20,10 @@ interface SetupStepProps {
 export function SetupStep({ selectedType, onPrevStep, onFinish }: SetupStepProps) {
   const t = useTranslation('hookah')
   const tc = useTranslation('common')
+  const tm = useTranslation('manage')
   const { addBowl } = useBowls()
   const { addTobacco } = useInventory()
+  const { addIngredient } = useBarInventory()
 
   // Bowl step state
   const [bowlBrand, setBowlBrand] = useState('Oblako')
@@ -31,6 +36,12 @@ export function SetupStep({ selectedType, onPrevStep, onFinish }: SetupStepProps
   const [selectedFlavors, setSelectedFlavors] = useState<Set<string>>(new Set())
   const [tobaccoQuantity, setTobaccoQuantity] = useState('100')
   const [addedCount, setAddedCount] = useState(0)
+
+  // Bar step state — multi-select by category
+  const BAR_CATEGORIES: BarIngredientCategory[] = ['spirit', 'liqueur', 'mixer', 'syrup', 'juice', 'wine', 'beer', 'bitter', 'garnish', 'other']
+  const [barCategory, setBarCategory] = useState<BarIngredientCategory>('spirit')
+  const [selectedIngredients, setSelectedIngredients] = useState<Set<string>>(new Set())
+  const [barAddedCount, setBarAddedCount] = useState(0)
 
   // Setup tab for hookah_bar
   const [setupTab, setSetupTab] = useState<'hookah' | 'bar'>('hookah')
@@ -72,6 +83,59 @@ export function SetupStep({ selectedType, onPrevStep, onFinish }: SetupStepProps
       }
       return next
     })
+  }
+
+  const getIngredientsByCategory = (cat: BarIngredientCategory) =>
+    BAR_INGREDIENT_PRESETS.filter(p => p.category === cat)
+
+  const toggleIngredient = (id: string) => {
+    setSelectedIngredients(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleAllIngredients = () => {
+    const catItems = getIngredientsByCategory(barCategory)
+    const allSelected = catItems.every(i => selectedIngredients.has(i.id))
+    setSelectedIngredients(prev => {
+      const next = new Set(prev)
+      if (allSelected) {
+        catItems.forEach(i => next.delete(i.id))
+      } else {
+        catItems.forEach(i => next.add(i.id))
+      }
+      return next
+    })
+  }
+
+  const handleBulkBarSave = async () => {
+    if (selectedIngredients.size === 0) return
+    setSaving(true)
+    let added = 0
+    for (const presetId of selectedIngredients) {
+      const preset = BAR_INGREDIENT_PRESETS.find(p => p.id === presetId)
+      if (!preset) continue
+      await addIngredient({
+        name: preset.name,
+        brand: preset.brand || null,
+        category: preset.category,
+        unit_type: preset.defaultUnit,
+        quantity: preset.defaultPackageSize,
+        min_quantity: 0,
+        purchase_price: null,
+        package_size: preset.defaultPackageSize,
+        supplier_name: null,
+        barcode: null,
+        notes: null,
+      })
+      added++
+    }
+    setBarAddedCount(prev => prev + added)
+    setSelectedIngredients(new Set())
+    setSaving(false)
   }
 
   const handleBulkTobaccoSave = async () => {
@@ -316,17 +380,84 @@ export function SetupStep({ selectedType, onPrevStep, onFinish }: SetupStepProps
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            {[t.barStockVodka, t.barStockGin, t.barStockWhiteRum, t.barStockWhiskey, t.barStockTequila, t.barStockTonic].map(name => (
-              <div
-                key={name}
-                className="p-3 rounded-xl bg-[var(--color-bgHover)] flex items-center gap-2"
-              >
-                <span className="text-sm">🍶</span>
-                <span className="text-sm">{name}</span>
-              </div>
-            ))}
+          {barAddedCount > 0 && (
+            <div className="p-2 rounded-lg bg-[var(--color-success)]/10 text-[var(--color-success)] text-sm text-center">
+              {t.barIngredientsAdded(barAddedCount)}
+            </div>
+          )}
+
+          {/* Category tabs */}
+          <div className="flex flex-wrap gap-1.5">
+            {BAR_CATEGORIES.map(cat => {
+              const CATEGORY_LABELS: Record<BarIngredientCategory, string> = {
+                spirit: tm.categorySpirit, liqueur: tm.categoryLiqueur, syrup: tm.categorySyrup,
+                mixer: tm.categoryMixer, juice: tm.categoryJuice, garnish: tm.categoryGarnish,
+                bitter: tm.categoryBitter, wine: tm.categoryWine, beer: tm.categoryBeer,
+                ice: tm.categoryIce, other: tm.categoryOther,
+              }
+              return (
+                <button type="button"
+                  key={cat}
+                  onClick={() => setBarCategory(cat)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    barCategory === cat
+                      ? 'bg-[var(--color-primary)] text-[var(--color-bg)]'
+                      : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                  }`}
+                >
+                  {BAR_CATEGORY_EMOJI[cat]} {CATEGORY_LABELS[cat]}
+                </button>
+              )
+            })}
           </div>
+
+          {/* Select all / count */}
+          <div className="flex items-center justify-between">
+            <button type="button"
+              onClick={toggleAllIngredients}
+              className="text-xs text-[var(--color-primary)] hover:underline"
+            >
+              {getIngredientsByCategory(barCategory).every(i => selectedIngredients.has(i.id))
+                ? t.deselectAll
+                : t.selectAll}
+            </button>
+            {selectedIngredients.size > 0 && (
+              <span className="text-xs text-[var(--color-textMuted)]">
+                {t.selectedCount(selectedIngredients.size)}
+              </span>
+            )}
+          </div>
+
+          {/* Ingredient chip grid */}
+          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+            {getIngredientsByCategory(barCategory).map(preset => {
+              const isSelected = selectedIngredients.has(preset.id)
+              return (
+                <button type="button"
+                  key={preset.id}
+                  onClick={() => toggleIngredient(preset.id)}
+                  className={`px-3 py-2 rounded-xl text-sm transition-colors ${
+                    isSelected
+                      ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/50'
+                      : 'bg-[var(--color-bgHover)] text-[var(--color-textMuted)] hover:text-[var(--color-text)]'
+                  }`}
+                >
+                  {isSelected && <span className="mr-1">{'\u2713'}</span>}
+                  {preset.name}
+                </button>
+              )
+            })}
+          </div>
+
+          {selectedIngredients.size > 0 && (
+            <button type="button"
+              onClick={handleBulkBarSave}
+              disabled={saving}
+              className="btn btn-primary w-full disabled:opacity-50"
+            >
+              {saving ? tc.saving : t.addSelectedIngredients(selectedIngredients.size)}
+            </button>
+          )}
 
           <p className="text-xs text-[var(--color-textMuted)] text-center">
             {t.barStockNote}

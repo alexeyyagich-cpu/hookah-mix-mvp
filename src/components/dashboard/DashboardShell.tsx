@@ -19,6 +19,8 @@ import { TrialBanner } from '@/components/dashboard/TrialBanner'
 import { OnlineStatusProvider } from '@/lib/offline/useOnlineStatus'
 import { SidebarBadgeProvider, useSetSidebarBadge } from '@/lib/SidebarBadgeContext'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
+import { ReconsentModal } from '@/components/ReconsentModal'
+import { useConsentCheck } from '@/lib/hooks/useConsentCheck'
 
 function PageProgressBar() {
   const pathname = usePathname()
@@ -150,6 +152,7 @@ function LowStockNotifier() {
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isOnboarding = pathname === '/onboarding'
+  const { needsReconsent, setNeedsReconsent } = useConsentCheck()
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] relative">
@@ -168,6 +171,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <PageProgressBar />
       {!isOnboarding && <LowStockNotifier />}
       <OfflineIndicator />
+      <ReconsentModal open={needsReconsent} onAccept={() => setNeedsReconsent(false)} />
       <ServiceWorkerRegistration />
       <Toaster
         position="top-right"

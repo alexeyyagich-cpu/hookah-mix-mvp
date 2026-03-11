@@ -12,6 +12,7 @@ import type { AdminOrganization, SubscriptionTier } from '@/types/database'
 const TIER_COLORS: Record<SubscriptionTier, string> = {
   trial: 'var(--color-textMuted)',
   core: 'var(--color-primary)',
+  pro: 'var(--color-secondary)',
   multi: 'var(--color-success)',
   enterprise: 'var(--color-warning)',
 }
@@ -234,7 +235,7 @@ export default function AdminOrganizations() {
                     disabled={actionLoading === org.id}
                   >
                     <option value="">{t.changeTierPlaceholder}</option>
-                    {(['trial', 'core', 'multi', 'enterprise'] as SubscriptionTier[])
+                    {(['trial', 'core', 'pro', 'multi', 'enterprise'] as SubscriptionTier[])
                       .filter(t => t !== org.subscription_tier)
                       .map(t => <option key={t} value={t}>{t}</option>)
                     }

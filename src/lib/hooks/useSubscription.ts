@@ -10,6 +10,7 @@ interface UseSubscriptionReturn {
   // Tier booleans
   isTrialTier: boolean
   isCoreTier: boolean
+  isProTier: boolean
   isMultiTier: boolean
   isEnterpriseTier: boolean
   // Trial state
@@ -32,9 +33,8 @@ interface UseSubscriptionReturn {
   canUseCRM: boolean
   canUseWaiterTablet: boolean
   canUseFinancialReports: boolean
-  // Legacy aliases (for gradual migration of existing consumers)
+  // Legacy alias
   isFreeTier: boolean
-  isProTier: boolean
 }
 
 export function useSubscription(): UseSubscriptionReturn {
@@ -75,6 +75,7 @@ export function useSubscription(): UseSubscriptionReturn {
     // Tier booleans
     isTrialTier: effectiveTier === 'trial',
     isCoreTier: effectiveTier === 'core',
+    isProTier: effectiveTier === 'pro',
     isMultiTier: effectiveTier === 'multi',
     isEnterpriseTier: effectiveTier === 'enterprise',
     // Trial state
@@ -97,8 +98,7 @@ export function useSubscription(): UseSubscriptionReturn {
     canUseCRM: effectiveLimits.crm,
     canUseWaiterTablet: effectiveLimits.waiter_tablet,
     canUseFinancialReports: effectiveLimits.financial_reports,
-    // Legacy aliases (for gradual migration)
+    // Legacy alias
     isFreeTier: effectiveTier === 'trial',
-    isProTier: effectiveTier === 'core',
   }
 }

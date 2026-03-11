@@ -150,6 +150,13 @@ export const common: typeof CommonType = {
   legalPrivacy: 'Privacy',
   legalImpressum: 'Impressum',
   legalAllRights: 'All rights reserved.',
+  legalWiderruf: 'Withdrawal',
+  legalCookies: 'Cookies',
+  cookiePolicy: 'Cookie Policy',
+  reconsentTitle: 'Updated Terms',
+  reconsentMessage: 'We have updated our legal documents. Please review and accept to continue.',
+  reconsentAccept: 'I accept the updated terms',
+  reconsentRefuse: 'Log out',
 
   changeTheme: 'Change theme',
 

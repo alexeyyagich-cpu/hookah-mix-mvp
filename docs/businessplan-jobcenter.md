@@ -3,7 +3,7 @@
 ## Hookah Torus — B2B SaaS-Plattform für Shisha-Bar-Management
 
 **Gründer:** Oleksii Iagich
-**Datum:** Februar 2026
+**Datum:** März 2026
 **Rechtsform:** Einzelunternehmen (geplant: UG haftungsbeschränkt)
 **Standort:** Deutschland
 **Website:** https://hookahtorus.com
@@ -173,10 +173,10 @@ Pro-Upgrade (€29/Monat) → Marktplatz-Nutzung (Provision)
 
 | Quartal | Zahlende Bars | MRR | Quartalsumsatz |
 |---|---|---|---|
-| Q1 (Mrz–Mai) | 8 | €232 | €696 |
-| Q2 (Jun–Aug) | 20 | €580 | €1.740 |
-| Q3 (Sep–Nov) | 35 | €1.015 | €3.045 |
-| Q4 (Dez–Feb) | 50 | €1.450 | €4.350 |
+| Q1 (Mrz–Mai 2026) | 8 | €232 | €696 |
+| Q2 (Jun–Aug 2026) | 20 | €580 | €1.740 |
+| Q3 (Sep–Nov 2026) | 35 | €1.015 | €3.045 |
+| Q4 (Dez 2026–Feb 2027) | 50 | €1.450 | €4.350 |
 | **Gesamt Jahr 1** | | | **€9.831** |
 
 *Annahme: Durchschnittlicher Preis €29/Monat, lineares Wachstum*
@@ -301,9 +301,9 @@ Pro-Upgrade (€29/Monat) → Marktplatz-Nutzung (Provision)
 
 ## 9. Zukunftsaussichten
 
-**Phase 1 (2026):** Deutschland — 50+ zahlende Bars, Marktplatz-Einführung
-**Phase 2 (2027):** DACH-Expansion, 150+ Bars, DATEV-Integration, eigenständiges Kassensystem
-**Phase 3 (2028):** Europäische Expansion (NL, FR, UAE), 400+ Bars, €500K+ Jahresumsatz
+**Phase 1 (Mrz 2026–Feb 2027):** Deutschland — 50+ zahlende Bars, Marktplatz-Einführung
+**Phase 2 (2027–2028):** DACH-Expansion, 150+ Bars, DATEV-Integration, eigenständiges Kassensystem
+**Phase 3 (2028–2029):** Europäische Expansion (NL, FR, UAE), 400+ Bars, €500K+ Jahresumsatz
 
 Das Geschäftsmodell ist hochgradig skalierbar: Die Software ist bereits entwickelt, die Grenzkosten pro neuem Kunden sind nahezu null. Die Kombination aus SaaS-Abonnements und Marktplatz-Provisionen schafft zwei komplementäre Umsatzströme mit hohem Lock-in-Effekt.
 
@@ -319,4 +319,4 @@ Das Geschäftsmodell ist hochgradig skalierbar: Die Software ist bereits entwick
 
 ---
 
-*Erstellt im Februar 2026 | Hookah Torus | https://hookahtorus.com*
+*Erstellt im März 2026 | Hookah Torus | https://hookahtorus.com*

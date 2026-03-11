@@ -108,9 +108,10 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
               {t.subscriptionBreakdown}
             </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
               <TierCard tier={t.trial} count={stats.orgs_by_tier.trial} color="var(--color-textMuted)" />
               <TierCard tier={t.core} count={stats.orgs_by_tier.core} color="var(--color-primary)" />
+              <TierCard tier="Pro" count={stats.orgs_by_tier.pro} color="var(--color-secondary)" />
               <TierCard tier={t.multi} count={stats.orgs_by_tier.multi} color="var(--color-success)" />
               <TierCard tier={t.enterprise} count={stats.orgs_by_tier.enterprise} color="var(--color-warning)" />
             </div>

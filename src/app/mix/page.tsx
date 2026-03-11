@@ -1298,7 +1298,7 @@ function MixPageInner() {
         <GuestDrawer
           onClose={() => setIsGuestsDrawerOpen(false)}
           onRepeatMix={handleRepeatGuestMix}
-          isPro={profile?.subscription_tier === 'core' || profile?.subscription_tier === 'multi' || profile?.subscription_tier === 'enterprise'}
+          isPro={profile?.subscription_tier === 'core' || profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'multi' || profile?.subscription_tier === 'enterprise'}
         />
       )}
 

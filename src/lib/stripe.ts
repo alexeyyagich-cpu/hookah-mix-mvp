@@ -16,14 +16,18 @@ export const stripe = stripeSecretKey
 export const STRIPE_PRICES = {
   core_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_MONTHLY || '',
   core_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORE_YEARLY || '',
+  pro_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || '',
+  pro_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || '',
   multi_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_MULTI_MONTHLY || '',
   multi_yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_MULTI_YEARLY || '',
 }
 
 // Subscription tier mapping (price ID → tier name)
-export const PRICE_TO_TIER: Record<string, 'core' | 'multi'> = {
+export const PRICE_TO_TIER: Record<string, 'core' | 'pro' | 'multi'> = {
   [STRIPE_PRICES.core_monthly]: 'core',
   [STRIPE_PRICES.core_yearly]: 'core',
+  [STRIPE_PRICES.pro_monthly]: 'pro',
+  [STRIPE_PRICES.pro_yearly]: 'pro',
   [STRIPE_PRICES.multi_monthly]: 'multi',
   [STRIPE_PRICES.multi_yearly]: 'multi',
 }
@@ -38,21 +42,28 @@ export const PLANS = {
   },
   core: {
     name: 'Core',
-    price: 7900, // €79/mo
-    priceYearly: 79000, // €790/yr
+    price: 9900, // €99/mo
+    priceYearly: 99000, // €990/yr (~2 months free)
     stripePriceMonthly: STRIPE_PRICES.core_monthly,
     stripePriceYearly: STRIPE_PRICES.core_yearly,
   },
+  pro: {
+    name: 'Pro',
+    price: 12900, // €129/mo
+    priceYearly: 129000, // €1,290/yr (~2 months free)
+    stripePriceMonthly: STRIPE_PRICES.pro_monthly,
+    stripePriceYearly: STRIPE_PRICES.pro_yearly,
+  },
   multi: {
     name: 'Multi',
-    price: 14900, // €149/mo
-    priceYearly: 149000, // €1,490/yr
+    price: 18900, // €189/mo
+    priceYearly: 179000, // €1,790/yr (~2 months free)
     stripePriceMonthly: STRIPE_PRICES.multi_monthly,
     stripePriceYearly: STRIPE_PRICES.multi_yearly,
   },
   enterprise: {
     name: 'Enterprise',
-    price: 29900, // from €299/mo — contact sales
+    price: 34900, // from €349/mo — contact sales
     priceYearly: 0, // custom pricing
   },
 } as const

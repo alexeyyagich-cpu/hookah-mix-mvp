@@ -39,7 +39,7 @@ export default function AdminAnalytics() {
   }
 
   const arr = stats ? stats.mrr * 12 : 0
-  const totalPaid = stats ? (stats.orgs_by_tier.core + stats.orgs_by_tier.multi + stats.orgs_by_tier.enterprise) : 0
+  const totalPaid = stats ? (stats.orgs_by_tier.core + stats.orgs_by_tier.pro + stats.orgs_by_tier.multi + stats.orgs_by_tier.enterprise) : 0
 
   return (
     <ErrorBoundary sectionName="Admin Analytics">
@@ -87,12 +87,13 @@ export default function AdminAnalytics() {
           <div className="card p-6">
             <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>{t.tierDistribution}</h2>
             <div className="space-y-3">
-              {(['trial', 'core', 'multi', 'enterprise'] as const).map(tier => {
+              {(['trial', 'core', 'pro', 'multi', 'enterprise'] as const).map(tier => {
                 const count = stats.orgs_by_tier[tier]
                 const pct = stats.total_orgs > 0 ? Math.round((count / stats.total_orgs) * 100) : 0
-                const colors = {
+                const colors: Record<string, string> = {
                   trial: 'var(--color-textMuted)',
                   core: 'var(--color-primary)',
+                  pro: 'var(--color-secondary)',
                   multi: 'var(--color-success)',
                   enterprise: 'var(--color-warning)',
                 }

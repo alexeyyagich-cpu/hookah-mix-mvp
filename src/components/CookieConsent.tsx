@@ -70,6 +70,10 @@ export default function CookieConsent() {
       <div className="max-w-lg mx-auto bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-2xl p-5 flex flex-col gap-4">
         <p className="text-sm text-[var(--color-text)]">
           {tc.cookieText}{' '}
+          <Link href="/legal/cookies" className="text-[var(--color-primary)] underline">
+            {tc.cookiePolicy}
+          </Link>
+          {' · '}
           <Link href="/legal/privacy" className="text-[var(--color-primary)] underline">
             {tc.privacyPolicy}
           </Link>

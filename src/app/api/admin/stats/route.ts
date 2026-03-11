@@ -27,14 +27,14 @@ export async function GET(request: Request) {
     const total_orgs = allOrgs.length
 
     // Count by tier
-    const orgs_by_tier: Record<SubscriptionTier, number> = { trial: 0, core: 0, multi: 0, enterprise: 0 }
+    const orgs_by_tier: Record<SubscriptionTier, number> = { trial: 0, core: 0, pro: 0, multi: 0, enterprise: 0 }
     for (const org of allOrgs) {
       const tier = (org.subscription_tier || 'trial') as SubscriptionTier
       orgs_by_tier[tier] = (orgs_by_tier[tier] || 0) + 1
     }
 
     // MRR calculation (€/month)
-    const mrr = orgs_by_tier.core * 79 + orgs_by_tier.multi * 149 + orgs_by_tier.enterprise * 299
+    const mrr = orgs_by_tier.core * 99 + orgs_by_tier.pro * 129 + orgs_by_tier.multi * 189 + orgs_by_tier.enterprise * 349
 
     // Recent signups (30 days)
     const recent_signups_30d = allOrgs.filter(o => o.created_at >= thirtyDaysAgo).length

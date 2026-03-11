@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'trial' | 'core' | 'multi' | 'enterprise'
+export type SubscriptionTier = 'trial' | 'core' | 'pro' | 'multi' | 'enterprise'
 
 // Organization roles (multi-tenant system)
 export type OrgRole = 'owner' | 'manager' | 'hookah_master' | 'bartender' | 'cook'
@@ -1191,6 +1191,24 @@ const CORE_LIMITS = {
   financial_reports: false,
 } as const
 
+const PRO_LIMITS = {
+  inventory_items: Infinity,
+  bowl_types: Infinity,
+  session_history_days: Infinity,
+  export: true,
+  api_access: false,
+  marketplace: false,
+  auto_reorder: false,
+  pos_integration: true,
+  guest_qr_ordering: true,
+  bar_module: true,
+  bar_inventory_items: Infinity,
+  max_locations: 1,
+  crm: true,
+  waiter_tablet: true,
+  financial_reports: true,
+} as const
+
 const MULTI_LIMITS = {
   inventory_items: Infinity,
   bowl_types: Infinity,
@@ -1212,6 +1230,7 @@ const MULTI_LIMITS = {
 export const SUBSCRIPTION_LIMITS = {
   trial: CORE_LIMITS,
   core: CORE_LIMITS,
+  pro: PRO_LIMITS,
   multi: MULTI_LIMITS,
   enterprise: MULTI_LIMITS,
 } as const

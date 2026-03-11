@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { STATUS_COLORS as TABLE_STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/FloorPlan'
+import { STATUS_COLORS as TABLE_STATUS_COLORS, LONG_SESSION_MINUTES } from '@/components/floor/floorConstants'
 import { LazyQRCode as QRCodeCanvas } from '@/components/ui/LazyQRCode'
 import { useTranslation, formatTime, useLocale } from '@/lib/i18n'
 import type { FloorTable, Reservation, ReservationStatus, Guest } from '@/types/database'

@@ -85,7 +85,7 @@ export const manage: typeof ManageType = {
   averageRating: 'Average rating',
 
   pricingTitle: 'Pricing',
-  pricingSubtitle: 'Choose a plan for your business',
+  pricingSubtitle: 'How much does order cost in your hookah lounge?',
   free: 'Trial',
   perMonth: '/mo',
   currentPlan: 'Current plan',
@@ -440,6 +440,10 @@ export const manage: typeof ManageType = {
   categoryJuice: 'Juices',
   categoryGarnish: 'Garnish',
   categoryBitter: 'Bitters',
+  categoryWine: 'Wine',
+  categoryBeer: 'Beer',
+  categoryIce: 'Ice',
+  categoryOther: 'Other',
   categoryCocktails: 'Cocktails',
 
   // Shifts & Reconciliation

@@ -4,7 +4,7 @@ import { memo } from 'react'
 import Link from 'next/link'
 import type { FloorTable, TableStatus } from '@/types/database'
 import type { Dictionary } from '@/lib/i18n'
-import { STATUS_COLORS } from '@/components/floor/FloorPlan'
+import { STATUS_COLORS } from '@/components/floor/floorConstants'
 
 interface FloorMiniMapProps {
   tables: FloorTable[]

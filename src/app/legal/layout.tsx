@@ -35,6 +35,12 @@ export default function LegalLayout({
             <Link href="/legal/impressum" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
               {tc.legalImpressum}
             </Link>
+            <Link href="/legal/widerruf" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
+              {tc.legalWiderruf}
+            </Link>
+            <Link href="/legal/cookies" className="text-[var(--color-textMuted)] hover:text-[var(--color-text)] transition-colors">
+              {tc.legalCookies}
+            </Link>
           </nav>
         </div>
       </header>

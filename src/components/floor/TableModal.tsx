@@ -6,7 +6,7 @@ import { useTranslation } from '@/lib/i18n'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { useBodyScrollLock } from '@/lib/hooks/useBodyScrollLock'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { STATUS_COLORS } from './FloorPlan'
+import { STATUS_COLORS } from './floorConstants'
 import type { FloorTable, TableStatus, TableShape } from '@/types/database'
 
 export interface TableFormData {
@@ -46,9 +46,6 @@ export function TableModal({ table, existingZones = [], onClose, onSave, onDelet
 
   const [name, setName] = useState(table?.name || '')
   const [capacity, setCapacity] = useState(table?.capacity?.toString() || '4')
-  const [shape, setShape] = useState<TableShape>(table?.shape || 'circle')
-  const [width, setWidth] = useState(table?.width?.toString() || '80')
-  const [height, setHeight] = useState(table?.height?.toString() || '80')
   const [zone, setZone] = useState(table?.zone || '')
   const [notes, setNotes] = useState(table?.notes || '')
   const [saving, setSaving] = useState(false)
@@ -61,9 +58,9 @@ export function TableModal({ table, existingZones = [], onClose, onSave, onDelet
       await onSave({
         name,
         capacity: parseInt(capacity) || 4,
-        shape,
-        width: parseInt(width) || 80,
-        height: parseInt(height) || 80,
+        shape: table?.shape || 'circle',
+        width: table?.width || 80,
+        height: table?.height || 80,
         zone: zone.trim() || null,
         notes: notes || null,
         position_x: table?.position_x || 100,
@@ -115,61 +112,18 @@ export function TableModal({ table, existingZones = [], onClose, onSave, onDelet
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t.labelCapacity}</label>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={capacity}
-                onChange={(e) => setCapacity(e.target.value)}
-                min="1"
-                max="20"
-                step="1"
-                className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t.labelShape}</label>
-              <select
-                value={shape}
-                onChange={(e) => setShape(e.target.value as TableShape)}
-                className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              >
-                <option value="circle">{t.shapeCircle}</option>
-                <option value="square">{t.shapeSquare}</option>
-                <option value="rectangle">{t.shapeRectangle}</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t.labelWidth}</label>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={width}
-                onChange={(e) => setWidth(e.target.value)}
-                min="40"
-                max="200"
-                step="1"
-                className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t.labelHeight}</label>
-              <input
-                type="number"
-                inputMode="numeric"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                min="40"
-                max="200"
-                step="1"
-                className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">{t.labelCapacity}</label>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              min="1"
+              max="20"
+              step="1"
+              className="w-full px-4 py-2 rounded-xl bg-[var(--color-bgHover)] border border-[var(--color-border)] focus:border-[var(--color-primary)] focus:outline-none"
+            />
           </div>
 
           <div>
