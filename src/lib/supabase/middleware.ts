@@ -95,7 +95,7 @@ export async function updateSession(request: NextRequest) {
     if (isApiRoute && !isStripeRoute) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_tier, trial_expires_at')
+        .select('subscription_tier, trial_expires_at, subscription_expires_at')
         .eq('id', user.id)
         .single()
 
@@ -104,21 +104,39 @@ export async function updateSession(request: NextRequest) {
         profile?.trial_expires_at &&
         new Date(profile.trial_expires_at) < new Date()
 
-      if (isTrialExpired && isWriteOp) {
-        const trialExpiredResponse = NextResponse.json(
-          { error: 'Trial expired. Please upgrade to continue.' },
+      // Grace period: paid subscriptions get 7 days after expiry before write-block
+      const GRACE_PERIOD_MS = 7 * 24 * 60 * 60 * 1000
+      const isSubscriptionInGrace =
+        profile?.subscription_tier !== 'trial' &&
+        profile?.subscription_expires_at &&
+        new Date(profile.subscription_expires_at) < new Date()
+      const isGraceExpired =
+        isSubscriptionInGrace &&
+        new Date(profile!.subscription_expires_at!).getTime() + GRACE_PERIOD_MS < Date.now()
+
+      const shouldBlock = isTrialExpired || isGraceExpired
+
+      if (shouldBlock && isWriteOp) {
+        const message = isTrialExpired
+          ? 'Trial expired. Please upgrade to continue.'
+          : 'Payment overdue. Please update your payment method.'
+        const expiredResponse = NextResponse.json(
+          { error: message },
           { status: 402 }
         )
         // Copy auth cookies to preserve session
         for (const cookie of supabaseResponse.cookies.getAll()) {
-          trialExpiredResponse.cookies.set(cookie.name, cookie.value)
+          expiredResponse.cookies.set(cookie.name, cookie.value)
         }
-        return applySecurityHeaders(trialExpiredResponse)
+        return applySecurityHeaders(expiredResponse)
       }
 
-      // Add warning header on GET for expired trial — non-blocking but signals to client
+      // Add warning headers — non-blocking but signals to client
       if (isTrialExpired && !isWriteOp) {
         supabaseResponse.headers.set('X-Trial-Expired', 'true')
+      }
+      if (isSubscriptionInGrace && !isWriteOp) {
+        supabaseResponse.headers.set('X-Payment-Grace', 'true')
       }
     }
   }

@@ -126,6 +126,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (error) {
     logger.error('R2O webhook error', { error: String(error) })
+
+    // Log to webhook_events for retry
+    try {
+      const rawBody = await request.clone().json().catch(() => ({}))
+      const supabaseAdmin = getSupabaseAdmin()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabaseAdmin as any).from('webhook_events').insert({
+        source: 'r2o',
+        event_type: (rawBody as Record<string, unknown>)?.event as string || 'unknown',
+        payload: rawBody,
+        status: 'failed',
+        last_error: String(error),
+      })
+    } catch {
+      // webhook_events table may not exist yet — skip silently
+    }
+
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }

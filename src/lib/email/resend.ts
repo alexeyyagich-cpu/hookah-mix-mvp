@@ -265,6 +265,44 @@ export function generateDailySummaryEmailHtml(data: DailySummaryData, businessNa
   `
 }
 
+// Payment failure / subscription expiry email
+export function generatePaymentFailureEmailHtml(businessName: string, message: string): string {
+  function esc(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  }
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5;">
+      <div style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="background: linear-gradient(135deg, #ff6b35, #ff8c42); padding: 24px; text-align: center;">
+          <h1 style="color: #fff; margin: 0; font-size: 24px;">Hookah Torus</h1>
+        </div>
+        <div style="padding: 24px;">
+          <h2 style="color: #333; margin: 0 0 8px;">Subscription Alert</h2>
+          <p style="color: #666; margin: 0 0 8px;">${esc(businessName)}</p>
+          <p style="color: #333; margin: 0 0 24px; line-height: 1.6;">${esc(message)}</p>
+          <div style="text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://hookahtorus.com'}/pricing"
+               style="display: inline-block; background: #ff6b35; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+              Manage Subscription
+            </a>
+          </div>
+        </div>
+        <div style="background: #f8f8f8; padding: 16px; text-align: center; color: #999; font-size: 12px;">
+          Hookah Torus — Hookah Business Management
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+}
+
 // Welcome email for new users
 export function generateWelcomeEmailHtml(ownerName: string, businessName: string): string {
   return `

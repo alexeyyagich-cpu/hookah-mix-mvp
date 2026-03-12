@@ -1,6 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   getPendingMutations,
+  getPendingCount,
+  getFailedCount,
   updateMutationStatus,
   updateMutationMeta,
   removeMutation,
@@ -53,7 +55,56 @@ export async function processSyncQueue(
     }
   }
 
+  // Report sync queue status to server (best-effort heartbeat)
+  try {
+    const [pendingCount, failedCount] = await Promise.all([getPendingCount(), getFailedCount()])
+    await reportSyncHeartbeat(pendingCount, failedCount)
+  } catch {
+    // Heartbeat is non-critical — never block sync
+  }
+
   return { synced, failed }
+}
+
+/** Report device sync queue status to the server */
+async function reportSyncHeartbeat(pendingCount: number, failedCount: number) {
+  const deviceId = getDeviceId()
+  const deviceName = getDeviceName()
+
+  await fetch('/api/sync/heartbeat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      device_id: deviceId,
+      device_name: deviceName,
+      pending_count: pendingCount,
+      failed_count: failedCount,
+    }),
+    // Don't block on failure
+    signal: AbortSignal.timeout(5000),
+  })
+}
+
+function getDeviceId(): string {
+  if (typeof localStorage === 'undefined') return 'unknown'
+  let id = localStorage.getItem('ht_device_id')
+  if (!id) {
+    id = crypto.randomUUID()
+    localStorage.setItem('ht_device_id', id)
+  }
+  return id
+}
+
+function getDeviceName(): string {
+  if (typeof navigator === 'undefined') return 'Unknown'
+  const ua = navigator.userAgent
+  if (ua.includes('iPad')) return 'iPad'
+  if (ua.includes('iPhone')) return 'iPhone'
+  if (ua.includes('Android')) return 'Android'
+  if (ua.includes('Mac')) return 'Mac'
+  if (ua.includes('Windows')) return 'Windows'
+  if (ua.includes('Linux')) return 'Linux'
+  return 'Browser'
 }
 
 /** Resolve a single value if it's a temp offline ID that's been synced */

@@ -11,6 +11,34 @@
     {
       "path": "/api/cron/guest-reminders",
       "schedule": "0 10 * * 1"
+    },
+    {
+      "path": "/api/cron/telegram-daily-report",
+      "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/auto-close-shifts",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/subscription-check",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/webhook-retry",
+      "schedule": "30 * * * *"
+    },
+    {
+      "path": "/api/cron/auto-reorder",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/trial-expiry-warning",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/subscription-sync",
+      "schedule": "0 5 * * *"
     }
   ]
 }
